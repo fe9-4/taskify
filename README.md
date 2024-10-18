@@ -53,7 +53,18 @@ Windows에서 Bun을 설치하려면 PowerShell을 관리자 모드로 실행한
 
 ```powershell
 npm install -g bun
+```
+
+### package.json 인스톨
+
+```bash
 bun install
+```
+
+### Bun으로 라이브러리 추가
+
+```bash
+bun add zod
 ```
 
 ### Bun으로 프로젝트 실행
