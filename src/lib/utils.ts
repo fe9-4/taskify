@@ -1,1 +1,4 @@
-// 유틸리티 함수를 여기에 추가하세요
+// tailwind 동적 스타일을 위한 함수
+export const cls = (...cls: string[]) => {
+  return cls.join(" ");
+};

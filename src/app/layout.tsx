@@ -1,9 +1,14 @@
 import { Metadata } from "next";
-import "./globals.css";
+import "../styles/globals.css";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
-  title: "코드잇 프론트엔드 9기 4팀 프로젝트",
-  description: "코드잇 프론트엔드 9기 4팀 프로젝트입니다.",
+  title: {
+    template: "%s | Taskify",
+    default: "새로운 일정관리 | Taskify"
+  },
+  description: "새로운 일정관리 | Taskify",
+  icons: { icon: "/icons/favicon.ico", shortcut: "/icons/favicon.ico"}
 };
 
 export default function RootLayout({
@@ -13,8 +18,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body>
+      <body className="min-h-screen font-pretendard text-black03">
         {children}
+        <Toaster toastOptions={{ success: {style: { fontSize: "14px" }}, error: {style: { fontSize: "14px" }} }} />
       </body>
     </html>
   );
