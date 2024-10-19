@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import "./globals.css";
+import Header from "@/components/Header";
 
 export const metadata: Metadata = {
   title: "코드잇 프론트엔드 9기 4팀 프로젝트",
@@ -14,6 +15,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body>
+        <Header />
         {children}
       </body>
     </html>
