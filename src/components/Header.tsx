@@ -22,7 +22,7 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="h-[60px] border-b border-gray-300 bg-white px-[24px] md:h-[70px] md:px-[40px] xl:px-[70px]">
+    <header className="border-gray03 h-[60px] border-b bg-white px-[24px] md:h-[70px] md:px-[40px] xl:px-[70px]">
       <nav className="ml-[20px] flex h-full items-center justify-between gap-[17px] pr-[24px] md:gap-[15px]">
         {/* 로고와 Taskify 텍스트를 감싸는 컨테이너 */}
         <div className="flex items-center space-x-2">
