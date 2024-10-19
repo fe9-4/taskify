@@ -18,4 +18,3 @@ export function formatNumber(num: number): string {
   return num.toLocaleString('ko-KR');
 }
 
-// 기타 유용한 유틸리티 함수들을 여기에 추가할 수 있습니다.
