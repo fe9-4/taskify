@@ -1,60 +1,34 @@
 "use client";
 
-import { ChangeEvent, useRef, useState } from "react";
 import Image from "next/image";
 import { FaPlus as PlusImage } from "react-icons/fa6";
 import { InputFileProps } from "@/types/formType";
+import { useInputFile } from "@/hooks/useInputFile";
 
-const InputFile = ({ label, name, value, size }: InputFileProps) => {
-  const [imagePreviewUrl, setImagePreviewUrl] = useState("");
-  const inputRef = useRef<HTMLInputElement | null>(null);
-
-  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-
-    if (!file) return;
-    const imageUrl = URL.createObjectURL(file);
-    setImagePreviewUrl(imageUrl);
-
-    e.target.value = "";
-
-    return () => {
-      setImagePreviewUrl(value || "");
-      URL.revokeObjectURL(imageUrl);
-    };
-  };
-
-  const handleClearClick = () => {
-    const inputNode = inputRef.current;
-    if (!inputNode) return;
-
-    inputNode.value = "";
-    setImagePreviewUrl("");
-  };
+const InputFile = ({ label, size }: InputFileProps) => {
+  const { imageRef, preview, handleFileChange } = useInputFile();
 
   return (
     <div>
-      {label && <label className="text-lg font-normal text-black03">{label}</label>}
+      {label && <p className="text-lg font-normal text-black03">{label}</p>}
 
       <div className={`relative flex ${inputFileSize.size[size]} cursor-pointer overflow-hidden rounded-md`}>
-        <label
-          htmlFor="image-upload"
-          className="grid h-full w-full cursor-pointer place-items-center gap-[24px] bg-slate-200"
-        >
+        <label htmlFor="file" className="grid h-full w-full cursor-pointer place-items-center gap-[24px] bg-slate-200">
           <PlusImage size="17px" color="#5534DA" />
         </label>
 
         <input
-          id="image-upload"
+          id="file"
           type="file"
-          onChange={handleImageChange}
+          onChange={handleFileChange}
           accept="image/*"
-          className="hidden"
-          ref={inputRef}
+          className="absolute left-0 top-0 z-10 h-full w-full cursor-pointer opacity-0"
         />
 
-        {imagePreviewUrl && (
-          <Image src={imagePreviewUrl} fill alt="이미지 미리보기" className="object-cover" onClick={handleClearClick} />
+        {preview && (
+          <>
+            <Image ref={imageRef} src={preview} fill alt="이미지 미리보기" className="z-0 object-cover" />
+          </>
         )}
       </div>
     </div>
