@@ -1,7 +1,43 @@
-// Zod 스키마를 여기에 정의하세요
-import { z } from 'zod';
+import { z } from "zod";
+import { UserSchema } from "./authSchema";
 
-// 예시 사용자 스키마
-export const userSchema = z.object({
-  // 스키마 정의를 여기에 추가하세요
+// request schema
+export const SignupSchema = z.object({
+  email: z.string(),
+  password: z.string(),
+  nickname: z.string(),
 });
+
+export type Signup = z.infer<typeof SignupSchema>;
+
+export const UpdateUserProfileSchema = z.object({
+  nickname: z.string(),
+  profileImageUrl: z.string(),
+});
+
+export type UpdateUserProfile = z.infer<typeof UpdateUserProfileSchema>;
+
+// response schema
+export const SignupResponseSchema = z.object({
+  user: UserSchema,
+});
+
+export type SignupResponse = z.infer<typeof SignupResponseSchema>;
+
+export const UserProfileResponseSchema = z.object({
+  user: UserSchema,
+});
+
+export type UserProfileResponse = z.infer<typeof UserProfileResponseSchema>;
+
+export const UpdateUserProfileResponseSchema = z.object({
+  user: UserSchema,
+});
+
+export type UpdateUserProfileResponse = z.infer<typeof UpdateUserProfileResponseSchema>;
+
+export const UploadUserProfileImageResponseSchema = z.object({
+  profileImageUrl: z.string(),
+});
+
+export type UploadUserProfileImageResponse = z.infer<typeof UploadUserProfileImageResponseSchema>;
