@@ -1,5 +1,6 @@
-import { ChangeEventHandler } from "react";
 import { inputFileSize } from "@/components/InputFile";
+
+type Size = keyof typeof inputFileSize.size;
 
 export interface InputProps extends textAreaProps {
   id?: string;
@@ -16,15 +17,9 @@ export interface InputProps extends textAreaProps {
 
 export interface textAreaProps {
   isTextArea?: boolean;
-  inputButton?: boolean;
+  isButton?: boolean;
 }
 
-export interface InputFileProps {
-  label?: string;
-  name?: string;
-  value?: string;
+export interface InputFileProps extends InputProps {
   size: Size;
-  onChange?: ChangeEventHandler;
 }
-
-type Size = keyof typeof inputFileSize.size;
