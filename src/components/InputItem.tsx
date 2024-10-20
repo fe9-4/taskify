@@ -7,7 +7,7 @@ import CloseEyes from "../../public/icons/visibility_off.svg";
 import OpenEyes from "../../public/icons/visibility_on.svg";
 
 const InputItem = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, id, name, value, type, isTextArea, inputButton, errors, ...props }, ref) => {
+  ({ label, id, name, value, type, isTextArea, isButton, errors, ...props }, ref) => {
     const [inputType, setInputType] = useState(type);
     const [password, setPassword] = useState(false);
 
@@ -27,12 +27,12 @@ const InputItem = forwardRef<HTMLInputElement, InputProps>(
         {isTextArea ? (
           <>
             <textarea
-              className="relative h-[70px] w-full rounded-lg border border-solid border-gray03 px-3 py-4 text-xs text-black03 placeholder-gray02 focus:outline-none md:h-[110px] md:text-base"
+              className="relative h-[70px] w-full rounded-lg border border-solid border-gray03 p-3 text-xs text-black03 placeholder-gray02 focus:outline-none md:h-[110px] md:py-4 md:text-base"
               id={id}
               value={value}
               {...props}
             />
-            {inputButton && (
+            {isButton && (
               <button className="absolute bottom-3 right-3 h-[28px] rounded border border-solid border-gray03 px-[31px] text-xs font-medium text-violet01 md:h-[32px]">
                 입력
               </button>
