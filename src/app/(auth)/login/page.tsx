@@ -38,8 +38,10 @@ const LoginPage = () => {
         throw new Error(errorData.error || "로그인 실패");
       }
 
+      // TODO: Modal 로 변경 예정
       toast.success("로그인 성공!");
-      router.push("/dashboard");
+      // TODO: 로그인 성공 후 리다이렉트 처리 예정
+      //router.push("/dashboard");
     } catch (error) {
       console.error("로그인 오류:", error);
       toast.error(error instanceof Error ? error.message : "로그인 중 오류가 발생했습니다.");

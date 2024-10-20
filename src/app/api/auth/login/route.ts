@@ -17,18 +17,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
       // AxiosError 관련 처리
       if (error.response) {
-        switch (error.response.status) {
-          case 400:
-            return NextResponse.json({ message: "이메일 형식으로 작성해주세요." }, { status: 400 });
-          case 401:
-            return NextResponse.json({ error: "Unauthorized: Invalid or expired token" }, { status: 401 });
-          case 404:
-            return NextResponse.json({ message: "존재하지 않는 유저입니다." }, { status: 404 });
-        }
+        // API 서버에서 전송한 메시지를 그대로 사용
+        return NextResponse.json({ message: error.response.data.message }, { status: error.response.status });
       }
     }
 
     // 기타 에러 처리
-    return NextResponse.json({ error: "Failed to fetch user profile" }, { status: 500 });
+    return NextResponse.json({ error: "로그인 실패" }, { status: 500 });
   }
 }

@@ -1,76 +1,175 @@
 "use client";
 
-import { useForm, SubmitHandler } from "react-hook-form";
-import type { Signup } from "@/zodSchema/userSchema";
+import { Signup, SignupSchema } from "@/zodSchema/userSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import toast, { Toaster } from "react-hot-toast";
 
-export default function Signup() {
+const SignupPage = () => {
+  const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<Signup>();
+  } = useForm<Signup>({
+    resolver: zodResolver(SignupSchema),
+  });
 
-  const onSubmit: SubmitHandler<Signup> = (data) => {
-    // TODO 회원가입 로직 구현
-    console.log("회원가입 시도:", data);
+  const onSubmit: SubmitHandler<Signup> = async (data) => {
+    setIsLoading(true);
+    try {
+      const { confirmPassword, ...signupData } = data;
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(signupData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "회원가입 실패");
+      }
+      toast.success("회원가입 성공!");
+      router.push("/login");
+    } catch (error) {
+      console.error("회원가입 오류:", error);
+      toast.error(error instanceof Error ? error.message : "회원가입 중 오류가 발생했습니다.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // TODO CSS 변경 예정
   return (
-    <div className="container mx-auto mt-8">
-      <h1 className="mb-4 text-2xl font-bold">회원가입</h1>
-      <form onSubmit={handleSubmit(onSubmit)} className="max-w-md">
-        <div className="mb-4">
-          <label htmlFor="email" className="mb-2 block">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-white px-4 py-8">
+      <Toaster position="top-center" reverseOrder={false} />
+      <button type="button" onClick={() => router.push("/")} className="mb-6">
+        <Image src="/images/auth/logo.svg" alt="Logo" width={200} height={280} className="mx-auto" />
+      </button>
+      <p className="mb-8 text-center text-xl font-medium text-black02">오늘도 만나서 반가워요!</p>
+
+      <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-sm space-y-6">
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium text-black02">
             이메일
           </label>
           <input
-            {...register("email", {
-              required: "이메일은 필수입니다",
-              pattern: { value: /^\S+@\S+$/i, message: "올바른 이메일 형식이 아닙니다" },
-            })}
-            type="email"
             id="email"
-            className="w-full rounded border px-3 py-2"
+            type="email"
+            {...register("email")}
+            className={`mt-1 w-full rounded-md border p-2 ${
+              errors.email ? "border-red01" : "border-gray03"
+            } bg-white text-black02`}
+            placeholder="johndoe@example.com"
           />
-          {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>}
+          {errors.email && <div className="mt-1 text-xs text-red01">{errors.email.message}</div>}
         </div>
-        <div className="mb-4">
-          <label htmlFor="password" className="mb-2 block">
-            비밀번호
-          </label>
-          <input
-            {...register("password", {
-              required: "비밀번호는 필수입니다",
-              minLength: { value: 6, message: "비밀번호는 최소 6자 이상이어야 합니다" },
-              maxLength: { value: 20, message: "비밀번호는 최대 20자 이하이어야 합니다" },
-            })}
-            type="password"
-            id="password"
-            className="w-full rounded border px-3 py-2"
-          />
-          {errors.password && <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>}
-        </div>
-        <div className="mb-4">
-          <label htmlFor="nickname" className="mb-2 block">
+
+        <div>
+          <label htmlFor="nickname" className="block text-sm font-medium text-black02">
             닉네임
           </label>
           <input
-            {...register("nickname", {
-              required: "닉네임은 필수입니다",
-              minLength: { value: 2, message: "닉네임은 최소 2자 이상이어야 합니다" },
-              maxLength: { value: 20, message: "닉네임은 최대 20자 이하이어야 합니다" },
-            })}
-            type="text"
             id="nickname"
-            className="w-full rounded border px-3 py-2"
+            type="text"
+            {...register("nickname")}
+            className={`mt-1 w-full rounded-md border p-2 ${
+              errors.nickname ? "border-red01" : "border-gray03"
+            } bg-white text-black02`}
+            placeholder="닉네임을 입력해 주세요"
           />
-          {errors.nickname && <p className="mt-1 text-sm text-red-500">{errors.nickname.message}</p>}
+          {errors.nickname && <div className="mt-1 text-xs text-red01">{errors.nickname.message}</div>}
         </div>
-        <button type="submit" className="rounded bg-green-500 px-4 py-2 text-white">
-          회원가입
+
+        <div className="relative">
+          <label htmlFor="password" className="block text-sm font-medium text-black02">
+            비밀번호
+          </label>
+          <input
+            id="password"
+            type={showPassword ? "text" : "password"}
+            {...register("password")}
+            className={`mt-1 w-full rounded-md border p-2 ${
+              errors.password ? "border-red01" : "border-gray03"
+            } bg-white text-black02`}
+            placeholder="••••••••"
+          />
+          <button type="button" className="absolute right-2 top-8" onClick={() => setShowPassword(!showPassword)}>
+            {showPassword ? (
+              <Image src="/icons/visibility_on.svg" alt="visibility_on" width={24} height={24} />
+            ) : (
+              <Image src="/icons/visibility_off.svg" alt="visibility_off" width={24} height={24} />
+            )}
+          </button>
+          {errors.password && <div className="mt-1 text-xs text-red01">{errors.password.message}</div>}
+        </div>
+
+        <div className="relative">
+          <label htmlFor="passwordConfirm" className="block text-sm font-medium text-black02">
+            비밀번호 확인
+          </label>
+          <input
+            id="passwordConfirm"
+            type={showPassword ? "text" : "password"}
+            {...register("confirmPassword")}
+            className={`mt-1 w-full rounded-md border p-2 ${
+              errors.confirmPassword ? "border-red01" : "border-gray03"
+            } bg-white text-black02`}
+            placeholder="••••••••"
+          />
+          <button
+            type="button"
+            className="absolute right-2 top-8"
+            onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
+          >
+            {showPasswordConfirm ? (
+              <Image src="/icons/visibility_on.svg" alt="visibility_on" width={24} height={24} />
+            ) : (
+              <Image src="/icons/visibility_off.svg" alt="visibility_off" width={24} height={24} />
+            )}
+          </button>
+          {errors.confirmPassword && <div className="mt-1 text-xs text-red01">{errors.confirmPassword.message}</div>}
+        </div>
+
+        <div className="flex items-center">
+          <input
+            id="terms"
+            type="checkbox"
+            {...register("terms")}
+            className="h-4 w-4 rounded border-gray03 text-purple01 focus:ring-purple01"
+          />
+          <label htmlFor="terms" className="ml-2 block text-sm text-black02">
+            이용약관에 동의합니다.
+          </label>
+        </div>
+        {errors.terms && <div className="mt-1 text-xs text-red01">{errors.terms.message}</div>}
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full rounded-md bg-violet01 py-2 text-white hover:bg-purple01 disabled:bg-gray03"
+        >
+          {isLoading ? "회원가입 중..." : "회원가입"}
         </button>
+
+        <div className="w-full text-center">
+          이미 회원이신가요?{" "}
+          <Link href={"/login"} className="text-violet01 hover:underline">
+            로그인하기
+          </Link>
+        </div>
       </form>
     </div>
   );
-}
+};
+
+export default SignupPage;
