@@ -7,7 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 const SignupPage = () => {
   const router = useRouter();
@@ -50,13 +50,8 @@ const SignupPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-white px-4 py-8">
-      <Toaster position="top-center" reverseOrder={false} />
-      <button type="button" onClick={() => router.push("/")} className="mb-6">
-        <Image src="/images/auth/logo.svg" alt="Logo" width={200} height={280} className="mx-auto" />
-      </button>
-      <p className="mb-8 text-center text-xl font-medium text-black02">오늘도 만나서 반가워요!</p>
-
+    <>
+      <p className="mb-8 text-center text-xl font-medium text-black02">첫 방문을 환영합니다!</p>
       <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-sm space-y-6">
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-black02">
@@ -168,7 +163,7 @@ const SignupPage = () => {
           </Link>
         </div>
       </form>
-    </div>
+    </>
   );
 };
 
