@@ -15,7 +15,7 @@ const config: Config = {
       xl: ["18px", "26px"],
       "2xl": ["20px", "32px"],
       "3xl": ["24px", "32px"],
-      "4xl": ["32px", "42px"]
+      "4xl": ["32px", "42px"],
     },
     extend: {
       colors: {
@@ -48,6 +48,7 @@ const config: Config = {
           "Apple SD Gothic Neo",
           "sans-serif",
         ],
+        montserrat: ["var(--font-montserrat)", "sans-serif"],
       },
     },
   },
