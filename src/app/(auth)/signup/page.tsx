@@ -53,9 +53,9 @@ const SignupPage = () => {
   };
 
   return (
-    <>
+    <div className="mx-auto w-[351px] md:w-[520px]">
       <p className="mb-8 text-center text-xl font-medium text-black02">첫 방문을 환영합니다!</p>
-      <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-sm space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="w-full space-y-6">
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-black02">
             이메일
@@ -166,7 +166,7 @@ const SignupPage = () => {
           </Link>
         </div>
       </form>
-    </>
+    </div>
   );
 };
 
