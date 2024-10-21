@@ -43,15 +43,18 @@ const LoginPage = () => {
         throw new Error(responseData.message || "로그인 실패");
       }
 
-      // accessToken을 httpOnly 쿠키에 저장 (서버 측에서 처리해야 함)
-      // 여기서는 서버 측 API를 호출하여 쿠키를 설정합니다
-      await fetch("/api/auth/setCookie", {
+      // 변경된 setCookie API를 호출하여 accessToken을 설정합니다.
+      const setCookieResponse = await fetch("/api/auth/setCookie", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ accessToken: responseData.accessToken }),
+        body: JSON.stringify({ action: "set", accessToken: responseData.accessToken }),
       });
+
+      if (!setCookieResponse.ok) {
+        throw new Error("쿠키 설정 실패");
+      }
 
       // 사용자 정보를 userAtom에 저장
       setUser({

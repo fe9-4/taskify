@@ -23,9 +23,34 @@ export default function Header() {
     handleResize();
     window.addEventListener("resize", handleResize);
 
+    // userAtom이 비어있을 때 쿠키 초기화 로직 추가
+    const checkUserAndClearCookie = async () => {
+      if (!user) {
+        try {
+          const response = await fetch("/api/auth/setCookie", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ action: "clear" }),
+          });
+
+          if (!response.ok) {
+            throw new Error("쿠키 초기화 실패");
+          }
+
+          console.log("쿠키가 성공적으로 초기화되었습니다.");
+        } catch (error) {
+          console.error("쿠키 초기화 중 오류 발생:", error);
+        }
+      }
+    };
+
+    checkUserAndClearCookie();
+
     // 컴포넌트 언마운트 시 리스너 제거
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [user]); // user 의존성 추가
 
   const handleLogout = async () => {
     try {
