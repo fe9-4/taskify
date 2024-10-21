@@ -23,3 +23,10 @@ export interface textAreaProps {
 export interface InputFileProps extends InputProps {
   size: Size;
 }
+
+export interface InputDateProps {
+  label: string;
+  value: string;
+  placeholder: string;
+  onChange: (date: Date | null) => void;
+}
