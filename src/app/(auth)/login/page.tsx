@@ -25,6 +25,10 @@ const LoginPage = () => {
   } = useForm<Login>({
     resolver: zodResolver(LoginSchema),
     mode: "onChange",
+    defaultValues: {
+      email: "",
+      password: "",
+    },
   });
 
   const onSubmit: SubmitHandler<Login> = async (data) => {
@@ -46,7 +50,7 @@ const LoginPage = () => {
       });
 
       //toast.success("로그인 성공!");
-      reset(); // 폼 초기화
+      reset(); // 폼을 기본값으로 초기화
       router.push("/");
     } catch (error) {
       console.error("로그인 오류:", error);

@@ -23,6 +23,13 @@ const SignupPage = () => {
   } = useForm<Signup>({
     resolver: zodResolver(SignupSchema),
     mode: "onChange",
+    defaultValues: {
+      email: "",
+      nickname: "",
+      password: "",
+      confirmPassword: "",
+      terms: false,
+    },
   });
 
   const onSubmit: SubmitHandler<Signup> = async (data) => {
