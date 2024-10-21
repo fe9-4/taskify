@@ -15,8 +15,8 @@ const InputFile = ({ label, size }: InputFileProps) => {
       {label && (
         <p
           className={cls(
-            "text-lg font-normal text-black03",
-            size === "profile" ? "mb-8 text-xl font-bold md:mb-5 md:text-3xl" : ""
+            "text-lg text-black03",
+            size === "profile" ? "mb-8 text-xl font-bold md:mb-5 md:text-3xl" : "font-medium"
           )}
         >
           {label}
