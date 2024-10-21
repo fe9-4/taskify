@@ -5,16 +5,26 @@ import { FaPlus as PlusImage } from "react-icons/fa6";
 import { InputFileProps } from "@/types/formType";
 import { useInputFile } from "@/hooks/useInputFile";
 import ImageEdit from "../../public/icons/image_edit.svg";
+import { cls } from "@/lib/utils";
 
 const InputFile = ({ label, size }: InputFileProps) => {
   const { imageRef, preview, handleFileChange } = useInputFile();
 
   return (
     <div>
-      {label && <p className="text-lg font-normal text-black03">{label}</p>}
+      {label && (
+        <p
+          className={cls(
+            "text-lg font-normal text-black03",
+            size === "profile" ? "mb-8 text-xl font-bold md:mb-5 md:text-3xl" : ""
+          )}
+        >
+          {label}
+        </p>
+      )}
 
       <div className={`relative flex ${inputFileSize.size[size]} cursor-pointer overflow-hidden rounded-md`}>
-        <label htmlFor="file" className="bg-#F5F5F5 grid size-full cursor-pointer place-items-center gap-[24px]">
+        <label htmlFor="file" className="grid size-full cursor-pointer place-items-center gap-[24px] bg-[#F5F5F5]">
           <PlusImage className="size-[17px] text-violet01" />
         </label>
 
