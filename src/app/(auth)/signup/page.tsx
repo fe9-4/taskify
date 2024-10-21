@@ -8,51 +8,42 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import axios from "axios";
 
 const SignupPage = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors, isValid, isSubmitting },
+    reset,
   } = useForm<Signup>({
     resolver: zodResolver(SignupSchema),
     mode: "onChange",
   });
 
   const onSubmit: SubmitHandler<Signup> = async (data) => {
-    setIsLoading(true);
     try {
       const { confirmPassword, ...signupData } = data;
-      const response = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(signupData),
-      });
-
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        // 409 상태 코드에 대한 특별한 처리
-        if (response.status === 409) {
-          throw new Error(responseData.message || "이미 사용중인 이메일입니다.");
-        }
-        throw new Error(responseData.message || "회원가입 실패");
-      }
+      const response = await axios.post("/api/auth/signup", signupData);
 
       toast.success("가입이 완료되었습니다");
+      reset(); // 폼 초기화
       router.push("/login");
     } catch (error) {
       console.error("회원가입 오류:", error);
-      toast.error(error instanceof Error ? error.message : "회원가입 중 오류가 발생했습니다.");
-    } finally {
-      setIsLoading(false);
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 409) {
+          toast.error(error.response.data.message || "이미 사용중인 이메일입니다.");
+        } else {
+          toast.error(error.response?.data?.message || "회원가입 중 오류가 발생했습니다.");
+        }
+      } else {
+        toast.error("회원가입 중 오류가 발생했습니다.");
+      }
     }
   };
 
@@ -111,7 +102,7 @@ const SignupPage = () => {
             className={`mt-1 w-full rounded-md border p-2 ${
               errors.password ? "border-red01" : "border-gray03"
             } bg-white text-black02`}
-            placeholder="••••••••"
+            placeholder="비밀번호를 입력해 주세요"
           />
           <button type="button" className="absolute right-2 top-8" onClick={togglePasswordVisibility}>
             <Image
@@ -135,7 +126,7 @@ const SignupPage = () => {
             className={`mt-1 w-full rounded-md border p-2 ${
               errors.confirmPassword ? "border-red01" : "border-gray03"
             } bg-white text-black02`}
-            placeholder="••••••••"
+            placeholder="비밀번호를 한번 더 입력해 주세요"
           />
           <button type="button" className="absolute right-2 top-8" onClick={togglePasswordConfirmVisibility}>
             <Image
@@ -163,10 +154,10 @@ const SignupPage = () => {
 
         <button
           type="submit"
-          disabled={isLoading || !isValid}
+          disabled={isSubmitting || !isValid}
           className="w-full rounded-md bg-violet01 py-2 text-white hover:bg-purple01 disabled:bg-gray03"
         >
-          {isLoading ? "회원가입 중..." : "회원가입"}
+          {isSubmitting ? "회원가입 중..." : "회원가입"}
         </button>
 
         <div className="w-full text-center">

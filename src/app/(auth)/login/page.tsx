@@ -10,66 +10,51 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useSetAtom } from "jotai";
 import { userAtom } from "@/store/userAtoms";
+import axios from "axios";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const setUser = useSetAtom(userAtom);
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors, isValid, isSubmitting },
+    reset,
   } = useForm<Login>({
     resolver: zodResolver(LoginSchema),
     mode: "onChange",
   });
 
   const onSubmit: SubmitHandler<Login> = async (data) => {
-    setIsLoading(true);
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await axios.post("/api/auth/login", data);
 
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        throw new Error(responseData.message || "로그인 실패");
+      if (!response.data) {
+        throw new Error("로그인 실패");
       }
 
-      // 변경된 setCookie API를 호출하여 accessToken을 설정합니다.
-      const setCookieResponse = await fetch("/api/auth/cookie/setCookie", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ accessToken: responseData.accessToken }),
-      });
-
-      if (!setCookieResponse.ok) {
-        throw new Error("쿠키 설정 실패");
-      }
+      // axios를 사용하여 setCookie API 호출
+      await axios.post("/api/auth/cookie/setCookie", { accessToken: response.data.accessToken });
 
       // 사용자 정보를 userAtom에 저장
       setUser({
-        id: responseData.user.id,
-        email: responseData.user.email,
-        nickname: responseData.user.nickname,
+        id: response.data.user.id,
+        email: response.data.user.email,
+        nickname: response.data.user.nickname,
       });
 
       //toast.success("로그인 성공!");
+      reset(); // 폼 초기화
       router.push("/");
     } catch (error) {
       console.error("로그인 오류:", error);
-      toast.error(error instanceof Error ? error.message : "로그인 중 오류가 발생했습니다.");
-    } finally {
-      setIsLoading(false);
+      toast.error(
+        axios.isAxiosError(error)
+          ? error.response?.data?.message || "로그인 중 오류가 발생했습니다."
+          : "로그인 중 오류가 발생했습니다."
+      );
     }
   };
 
@@ -104,7 +89,7 @@ const LoginPage = () => {
             className={`mt-1 w-full rounded-md border p-2 ${
               errors.password ? "border-red01" : "border-gray03"
             } bg-white text-black02`}
-            placeholder="••••••••"
+            placeholder="비밀번호를 입력해 주세요"
           />
           <button type="button" className="absolute right-2 top-8" onClick={() => setShowPassword(!showPassword)}>
             {showPassword ? (
@@ -118,10 +103,10 @@ const LoginPage = () => {
 
         <button
           type="submit"
-          disabled={isLoading || !isValid}
+          disabled={isSubmitting || !isValid}
           className="w-full rounded-md bg-violet01 py-2 text-white hover:bg-purple01 disabled:bg-gray03"
         >
-          {isLoading ? "로그인 중..." : "로그인"}
+          {isSubmitting ? "로그인 중..." : "로그인"}
         </button>
 
         <div className="w-full text-center">
