@@ -1,9 +1,6 @@
 import { cls } from "@/lib/utils";
-import { BaseBtn, Content, ContentLeftAlign } from "./ButtonSetting";
-
-export const PlusIcon = () => {
-  return <span className="flex h-6 w-6 items-center justify-center rounded bg-violet02 text-violet01">+</span>;
-};
+import { BaseBtn, Content, ContentLeftAlign, PlusIcon } from "./ButtonSetting";
+import { FaCrown } from "react-icons/fa";
 
 export const AddColumnBtn = () => {
   return (
@@ -47,88 +44,91 @@ export const DeleteDashboardBtn = () => {
   );
 };
 
-export const DashboardCard = ({ dashboardName = "비브리지" }) => {
+export const DashboardCard = ({ dashboardName, isMine }: { dashboardName: string; isMine: boolean }) => {
   return (
     <BaseBtn>
-      <ContentLeftAlign extra="h-[58px] w-[260px] text-lg font-medium md:h-[68px] md:w-[247px] md:text-xl xl:w-[332px] xl:h-[70px]">
+      <ContentLeftAlign extra=" flex gap-[4px] md:gap-[6px] xl:gap-[8px] h-[58px] w-[260px] text-lg font-semibold md:h-[68px] md:w-[247px] md:text-xl xl:w-[332px] xl:h-[70px]">
         {dashboardName}
+        {isMine ? <FaCrown fill="#FDD446" /> : <></>}
       </ContentLeftAlign>
     </BaseBtn>
   );
 };
-//아이콘 추가 -> prop으로 색깔 받아서 반영 & 내가 만든 대시보드 여부 -> 왕관 아이콘
+//아이콘 추가 -> prop으로 색깔 받아서 반영
 
 // form 채웠을때 활성화되는 버튼 (로그인, 각종 모달)
-export const ActiveBtn = (props: any) => {
+export const ActiveBtn = ({ disabled, children }: { disabled: boolean; children: string }) => {
   return (
     <button
       type="submit"
-      disabled={props.disabled}
+      disabled={disabled}
       className={cls(
         "h-[50px] w-[351px] rounded-lg bg-violet01 text-xl font-medium text-white md:w-[520px]",
-        props.disabled ? "bg-gray02" : ""
+        disabled ? "bg-gray02" : ""
       )}
     >
-      {props.children}
+      {children}
     </button>
   );
 };
-export const DeleteCancelBtn = (props: any) => {
+export const DeleteCancelBtn = ({ children }: { children: string }) => {
   return (
     <BaseBtn extra="rounded-[4px]">
-      <Content extra="text-violet01 font-medium	text-xs md:text-base w-[52px] h-[32px] md:w-[84px]">
-        {props.children}
-      </Content>
+      <Content extra="text-violet01 font-medium	text-xs md:text-base w-[52px] h-[32px] md:w-[84px]">{children}</Content>
     </BaseBtn>
   );
 };
-export const InsertBtn = (props: any) => {
+export const InsertBtn = ({ children }: { children: string }) => {
   return (
     <BaseBtn extra="rounded-[4px]">
-      <Content extra="text-violet01 font-medium	text-xs w-[84px] h-[28px] md:h-[32px]">{props.children}</Content>
+      <Content extra="text-violet01 font-medium	text-xs w-[84px] h-[28px] md:h-[32px]">{children}</Content>
     </BaseBtn>
   );
 };
 
-export const CancelBtn = (props: any) => {
+export const CancelBtn = ({ children }: { children: string }) => {
   return (
     <BaseBtn>
       <Content extra="text-gray01 font-medium	text-xs w-[138px] h-[42px] md:h-[48px] md:w-[120px] md:text-lg">
-        {props.children}
+        {children}
       </Content>
     </BaseBtn>
   );
 };
-export const ConfirmBtn = (props: any) => {
+export const ConfirmBtn = ({ children }: { children: string }) => {
   return (
     <BaseBtn>
       <Content extra="bg-violet01 text-white font-semibold text-xs w-[138px] h-[42px] md:h-[48px] md:w-[120px] md:text-lg">
-        {props.children}
+        {children}
       </Content>
     </BaseBtn>
   );
 };
 
 //초대 수락/거절 버튼
-export const AcceptBtn = (props: any) => {
+export const AcceptBtn = ({ children }: { children: string }) => {
   return (
     <BaseBtn>
       <Content extra="w-[109px] h-[32px] md:w-[72px] md:h-[30px] xl:w-[84px] xl:h-[32px] bg-violet01 text-white font-medium text-xs md:text-base">
-        {props.children}
+        {children}
       </Content>
     </BaseBtn>
   );
 };
-export const RefuseBtn = (props: any) => {
+export const RefuseBtn = ({ children }: { children: string }) => {
   return (
     <BaseBtn>
       <Content extra="w-[109px] h-[32px] md:w-[72px] md:h-[30px] xl:w-[84px] xl:h-[32px] bg-white text-violet01 font-medium text-xs md:text-base">
-        {props.children}
+        {children}
       </Content>
     </BaseBtn>
   );
 };
 export const CombiBtn = ({ value }: { value: string[] }) => {
+  if (!Array.isArray(value) || value.length < 2 || typeof value[0] !== "string" || typeof value[1] !== "string") {
+    console.error("CombiBtn 컴포넌트는 [문자열, 문자열] 을 value 속성으로 받아야합니다.");
+    return null;
+  }
   return (
     <div className="flex w-[100%] justify-center gap-[10px]">
       <AcceptBtn>{value[0]}</AcceptBtn>

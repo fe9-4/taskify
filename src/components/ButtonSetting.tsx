@@ -3,8 +3,8 @@ import { FaPlus } from "react-icons/fa6";
 
 export const PlusIcon = () => {
   return (
-    <span className="flex h-6 w-6 items-center justify-center rounded bg-violet02 text-violet01">
-      <FaPlus />
+    <span className="flex h-[22px] w-[22px] items-center justify-center rounded bg-violet02">
+      <FaPlus className="h-[10px] w-[10px] text-violet01" />
     </span>
   );
 };

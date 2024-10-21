@@ -16,24 +16,20 @@ import {
 
 export default function Home() {
   return (
-    <body className="bg-white">
-      <div className="flex flex-col items-center justify-items-center gap-1">
-        <div>...</div>
-        <div>...</div>
-        <div>...</div>
-        <AddColumnBtn />
-        <AddDashboardBtn />
-        <AddTodoBtn />
-        <DeleteDashboardBtn />
-        <DashboardCard />
-        <ActiveBtn>로그인</ActiveBtn>
-        <DeleteCancelBtn>삭제</DeleteCancelBtn>
-        <DeleteCancelBtn>취소</DeleteCancelBtn>
-        <InsertBtn>입력</InsertBtn>
-        <CancelBtn>취소</CancelBtn>
-        <ConfirmBtn>확인</ConfirmBtn>
-        <CombiBtn value={["수락", "거절"]}></CombiBtn>
-      </div>
-    </body>
+    <div className="flex flex-col items-center justify-items-center gap-1">
+      <AddColumnBtn />
+      <AddDashboardBtn />
+      <AddTodoBtn />
+      <DeleteDashboardBtn />
+      <DashboardCard dashboardName="비브리지" isMine={false} />
+      <DashboardCard dashboardName="비브리지" isMine={true} />
+      <ActiveBtn disabled={false}>로그인</ActiveBtn>
+      <DeleteCancelBtn>삭제</DeleteCancelBtn>
+      <DeleteCancelBtn>취소</DeleteCancelBtn>
+      <InsertBtn>입력</InsertBtn>
+      <CancelBtn>취소</CancelBtn>
+      <ConfirmBtn>확인</ConfirmBtn>
+      <CombiBtn value={["수락", "거절"]}></CombiBtn>
+    </div>
   );
 }
