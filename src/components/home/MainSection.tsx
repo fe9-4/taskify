@@ -23,15 +23,15 @@ const MainSection = () => {
         </div>
       </section>
       <section className="grid h-[686px] grid-rows-2 rounded-lg bg-black02 md:h-[972px] xl:h-[600px] xl:grid-cols-2 xl:grid-rows-1">
-        <div className="flex-1 py-[60px] text-center md:px-[60px] md:text-left xl:py-[120px]">
-          <p className="text-xl text-gray02 md:text-[22px]">Point 1</p>
+        <div className="flex-1 py-[60px] text-center md:px-[60px] md:text-left xl:order-2 xl:py-[120px]">
+          <p className="text-xl text-gray02 md:text-[22px]">Point 2</p>
           <h2 className="my-[60px] text-[36px] font-bold text-white md:my-[100px] md:text-[48px]">
             해야 할 일을
             <br />
             등록하세요
           </h2>
         </div>
-        <div className="flex flex-1 items-end justify-center">
+        <div className="flex flex-1 items-end justify-center xl:order-1">
           <Image
             className="h-auto w-[218px] md:w-[360px] xl:w-[436px]"
             src="/images/landing/landing3.svg"

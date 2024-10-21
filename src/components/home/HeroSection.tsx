@@ -5,9 +5,9 @@ const HeroSection = () => {
     <div className="flex flex-col items-center">
       <Image
         className="h-auto w-[287px] md:w-[537px] xl:w-[772px]"
-        src="/images/landing/landing1.svg"
+        src="/images/landing/landing1.png"
         alt="image6"
-        width={0}
+        width={772}
         height={0}
       />
       <h1 className="mb-[100px] mt-[26px] text-center text-[40px] font-bold -tracking-[2px] text-white md:mb-[110px] md:mt-[48px] md:text-[56px] xl:text-[76px]">
