@@ -5,6 +5,7 @@ import { InputProps } from "@/types/formType";
 import Image from "next/image";
 import CloseEyes from "../../public/icons/visibility_off.svg";
 import OpenEyes from "../../public/icons/visibility_on.svg";
+import { cls } from "@/lib/utils";
 
 const InputItem = forwardRef<HTMLInputElement, InputProps>(
   ({ label, id, name, value, type, isTextArea, isButton, errors, ...props }, ref) => {
@@ -27,21 +28,20 @@ const InputItem = forwardRef<HTMLInputElement, InputProps>(
         {isTextArea ? (
           <>
             <textarea
-              className="relative h-[70px] w-full rounded-lg border border-solid border-gray03 p-3 text-xs text-black03 placeholder-gray02 focus:outline-none md:h-[110px] md:py-4 md:text-base"
+              className="relative h-[70px] w-full rounded-lg border border-solid border-gray03 p-4 text-xs text-black03 placeholder-gray02 focus:outline-none md:h-[110px] md:py-4 md:text-base"
               id={id}
               value={value}
               {...props}
             />
-            {isButton && (
-              <button className="absolute bottom-3 right-3 h-[28px] rounded border border-solid border-gray03 px-[31px] text-xs font-medium text-violet01 md:h-[32px]">
-                입력
-              </button>
-            )}
+            {isButton && <button className="absolute bottom-3 right-3">입력</button>}
           </>
         ) : (
           <>
             <input
-              className={`h-[50px] w-full rounded-lg px-3 text-lg text-black03 placeholder-gray02 ring-1 ring-inset ring-gray03 focus:outline-none focus:ring-1 focus:ring-inset ${errors ? "ring-red01 focus:ring-red01" : "focus:ring-violet01"}`}
+              className={cls(
+                "h-[50px] w-full rounded-lg px-4 text-lg text-black03 placeholder-gray02 ring-1 ring-inset ring-gray03 transition-all focus:outline-none focus:ring-1 focus:ring-inset",
+                errors ? "ring-red01 transition-all focus:ring-red01" : "focus:ring-violet01"
+              )}
               id={id}
               name={name}
               value={value}
