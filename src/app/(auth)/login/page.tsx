@@ -44,12 +44,12 @@ const LoginPage = () => {
       }
 
       // 변경된 setCookie API를 호출하여 accessToken을 설정합니다.
-      const setCookieResponse = await fetch("/api/auth/setCookie", {
+      const setCookieResponse = await fetch("/api/auth/cookie/setCookie", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ action: "set", accessToken: responseData.accessToken }),
+        body: JSON.stringify({ accessToken: responseData.accessToken }),
       });
 
       if (!setCookieResponse.ok) {

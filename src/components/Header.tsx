@@ -22,8 +22,34 @@ export default function Header() {
     handleResize();
     window.addEventListener("resize", handleResize);
 
-    const fetchUserInfo = async () => {
+    const checkAccessTokenAndFetchUserInfo = async () => {
       setIsLoading(true);
+      try {
+        const cookieResponse = await fetch("/api/auth/cookie/getCookie", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (cookieResponse.ok) {
+          const { accessToken } = await cookieResponse.json();
+          if (accessToken) {
+            await fetchUserInfo();
+          } else {
+            setUser(null);
+          }
+        } else {
+          console.error("쿠키 확인 중 오류 발생");
+          setUser(null);
+        }
+      } catch (error) {
+        console.error("쿠키 확인 중 오류 발생:", error);
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    const fetchUserInfo = async () => {
       try {
         const response = await fetch("/api/user/profile", {
           method: "GET",
@@ -39,12 +65,10 @@ export default function Header() {
       } catch (error) {
         console.error("사용자 정보를 가져오는 중 오류 발생:", error);
         setUser(null);
-      } finally {
-        setIsLoading(false);
       }
     };
 
-    fetchUserInfo();
+    checkAccessTokenAndFetchUserInfo();
 
     return () => window.removeEventListener("resize", handleResize);
   }, [setUser]);
@@ -75,13 +99,13 @@ export default function Header() {
     <header className="h-[60px] border-b border-gray03 bg-white px-[24px] md:h-[70px] md:px-[40px] xl:px-[70px]">
       <nav className="ml-[20px] flex h-full items-center justify-between gap-[17px] pr-[24px] md:gap-[15px]">
         <div className="flex items-center space-x-2">
-          <div className="flex-shrink-0">
+          <Link href="/" className="flex-shrink-0">
             {isLargeScreen ? (
               <Image src="/images/header/logo_md.svg" alt="로고" width={110} height={34} />
             ) : (
               <Image src="/images/header/logo.svg" alt="로고" width={24} height={30} />
             )}
-          </div>
+          </Link>
         </div>
         <ul className="flex space-x-4">
           {isLoading ? (
