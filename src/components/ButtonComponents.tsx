@@ -1,6 +1,6 @@
 import { cls } from "@/lib/utils";
 import { BaseBtn, Content, ContentLeftAlign, PlusIcon } from "./ButtonSetting";
-import { FaCrown } from "react-icons/fa";
+import { FaCrown, FaCircle } from "react-icons/fa";
 
 export const AddColumnBtn = () => {
   return (
@@ -44,10 +44,19 @@ export const DeleteDashboardBtn = () => {
   );
 };
 
-export const DashboardCard = ({ dashboardName, isMine }: { dashboardName: string; isMine: boolean }) => {
+export const DashboardCard = ({
+  dashboardName,
+  isMine,
+  color,
+}: {
+  dashboardName: string;
+  isMine: boolean;
+  color: string;
+}) => {
   return (
     <BaseBtn>
       <ContentLeftAlign extra=" flex gap-[4px] md:gap-[6px] xl:gap-[8px] h-[58px] w-[260px] text-lg font-semibold md:h-[68px] md:w-[247px] md:text-xl xl:w-[332px] xl:h-[70px]">
+        <FaCircle className="mr-[8px] size-[8px] md:mr-[9px] xl:mr-[16px]" fill={color} />
         {dashboardName}
         {isMine ? <FaCrown fill="#FDD446" /> : <></>}
       </ContentLeftAlign>

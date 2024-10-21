@@ -21,8 +21,8 @@ export default function Home() {
       <AddDashboardBtn />
       <AddTodoBtn />
       <DeleteDashboardBtn />
-      <DashboardCard dashboardName="비브리지" isMine={false} />
-      <DashboardCard dashboardName="비브리지" isMine={true} />
+      <DashboardCard dashboardName="비브리지" isMine={false} color="#7AC555" />
+      <DashboardCard dashboardName="비브리지" isMine={true} color="#7AC555" />
       <ActiveBtn disabled={false}>로그인</ActiveBtn>
       <ActiveBtn disabled={true}>로그인</ActiveBtn>
       <DeleteCancelBtn>삭제</DeleteCancelBtn>
