@@ -5,6 +5,7 @@ const config: Config = {
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/**/*.{js,ts,jsx,tsx,mdx}", //test용 폴더 경로
   ],
   theme: {
     fontSize: {
@@ -15,7 +16,7 @@ const config: Config = {
       xl: ["18px", "26px"],
       "2xl": ["20px", "32px"],
       "3xl": ["24px", "32px"],
-      "4xl": ["32px", "42px"]
+      "4xl": ["32px", "42px"],
     },
     extend: {
       colors: {

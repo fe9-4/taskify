@@ -5,10 +5,10 @@ import { Toaster } from "react-hot-toast";
 export const metadata: Metadata = {
   title: {
     template: "%s | Taskify",
-    default: "새로운 일정관리 | Taskify"
+    default: "새로운 일정관리 | Taskify",
   },
   description: "새로운 일정관리 | Taskify",
-  icons: { icon: "/icons/favicon.ico", shortcut: "/icons/favicon.ico"}
+  icons: { icon: "/icons/favicon.ico", shortcut: "/icons/favicon.ico" },
 };
 
 export default function RootLayout({
@@ -18,9 +18,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className="min-h-screen font-pretendard text-black03">
+      <body className="font-pretendard min-h-screen text-black03">
         {children}
-        <Toaster toastOptions={{ success: {style: { fontSize: "14px" }}, error: {style: { fontSize: "14px" }} }} />
+        <Toaster toastOptions={{ success: { style: { fontSize: "14px" } }, error: { style: { fontSize: "14px" } } }} />
       </body>
     </html>
   );
