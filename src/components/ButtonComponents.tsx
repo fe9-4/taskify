@@ -63,8 +63,8 @@ export const ActiveBtn = ({ disabled, children }: { disabled: boolean; children:
       type="submit"
       disabled={disabled}
       className={cls(
-        "h-[50px] w-[351px] rounded-lg bg-violet01 text-xl font-medium text-white md:w-[520px]",
-        disabled ? "bg-gray02" : ""
+        "h-[50px] w-[351px] rounded-lg text-xl font-medium text-white md:w-[520px]",
+        disabled ? "bg-gray02" : "bg-violet01"
       )}
     >
       {children}

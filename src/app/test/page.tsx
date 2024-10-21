@@ -24,6 +24,7 @@ export default function Home() {
       <DashboardCard dashboardName="비브리지" isMine={false} />
       <DashboardCard dashboardName="비브리지" isMine={true} />
       <ActiveBtn disabled={false}>로그인</ActiveBtn>
+      <ActiveBtn disabled={true}>로그인</ActiveBtn>
       <DeleteCancelBtn>삭제</DeleteCancelBtn>
       <DeleteCancelBtn>취소</DeleteCancelBtn>
       <InsertBtn>입력</InsertBtn>
