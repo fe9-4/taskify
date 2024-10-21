@@ -30,6 +30,7 @@ const InputItem = forwardRef<HTMLInputElement, InputProps>(
             <textarea
               className="relative h-[70px] w-full rounded-lg border border-solid border-gray03 p-4 text-xs text-black03 placeholder-gray02 focus:outline-none md:h-[110px] md:py-4 md:text-base"
               id={id}
+              name={name}
               value={value}
               {...props}
             />
