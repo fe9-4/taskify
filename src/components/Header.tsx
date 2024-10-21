@@ -2,12 +2,16 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useAtom } from "jotai";
+import { userAtom } from "@/store/userAtoms";
 
 export default function Header() {
   const [isLargeScreen, setIsLargeScreen] = useState(false);
   const pathname = usePathname();
+  const [user, setUser] = useAtom(userAtom);
+  const router = useRouter();
 
   useEffect(() => {
     // 화면 크기를 감지하여 md 이상인지 확인하는 함수
@@ -22,6 +26,28 @@ export default function Header() {
     // 컴포넌트 언마운트 시 리스너 제거
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  const handleLogout = async () => {
+    try {
+      // 로그아웃 API 호출
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include", // 쿠키를 포함하여 요청
+      });
+
+      if (!response.ok) {
+        throw new Error("로그아웃 실패");
+      }
+
+      // userAtom 초기화
+      setUser(null);
+      // 홈페이지로 리다이렉트
+      router.push("/");
+    } catch (error) {
+      console.error("로그아웃 오류:", error);
+      // 에러 처리 (예: 사용자에게 알림)
+    }
+  };
 
   // 로그인 또는 회원가입 페이지일 경우 Header를 렌더링하지 않음
   if (pathname === "/login" || pathname === "/signup") {
@@ -41,18 +67,37 @@ export default function Header() {
             )}
           </div>
         </div>
-        {/* 로그인/회원가입 메뉴 */}
+        {/* 로그인/회원가입 또는 로그아웃 메뉴 */}
         <ul className="flex space-x-4">
-          <li>
-            <Link className="text-base font-normal md:text-lg" href="/login">
-              로그인
-            </Link>
-          </li>
-          <li>
-            <Link className="text-base font-normal md:text-lg" href="/signup">
-              회원가입
-            </Link>
-          </li>
+          {user ? (
+            <li>
+              <button
+                onClick={handleLogout}
+                className="text-base font-normal transition-colors duration-300 hover:text-violet01 md:text-lg"
+              >
+                로그아웃
+              </button>
+            </li>
+          ) : (
+            <>
+              <li>
+                <Link
+                  className="text-base font-normal transition-colors duration-300 hover:text-violet01 md:text-lg"
+                  href="/login"
+                >
+                  로그인
+                </Link>
+              </li>
+              <li>
+                <Link
+                  className="text-base font-normal transition-colors duration-300 hover:text-violet01 md:text-lg"
+                  href="/signup"
+                >
+                  회원가입
+                </Link>
+              </li>
+            </>
+          )}
         </ul>
       </nav>
     </header>

@@ -8,18 +8,22 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { useSetAtom } from "jotai";
+import { userAtom } from "@/store/userAtoms";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const setUser = useSetAtom(userAtom);
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<Login>({
     resolver: zodResolver(LoginSchema),
+    mode: "onChange",
   });
 
   const onSubmit: SubmitHandler<Login> = async (data) => {
@@ -33,15 +37,30 @@ const LoginPage = () => {
         body: JSON.stringify(data),
       });
 
+      const responseData = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "로그인 실패");
+        throw new Error(responseData.message || "로그인 실패");
       }
 
-      // TODO: Modal 로 변경 예정
+      // accessToken을 httpOnly 쿠키에 저장 (서버 측에서 처리해야 함)
+      // 여기서는 서버 측 API를 호출하여 쿠키를 설정합니다
+      await fetch("/api/auth/setCookie", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ accessToken: responseData.accessToken }),
+      });
+
+      // 사용자 정보를 userAtom에 저장
+      setUser({
+        id: responseData.user.id,
+        email: responseData.user.email,
+        nickname: responseData.user.nickname,
+      });
+
       toast.success("로그인 성공!");
-      // TODO: 대시보드 페이지는 아직 구현 전이기 때문에 홈으로 리다이렉트
-      //router.push("/dashboard");
       router.push("/");
     } catch (error) {
       console.error("로그인 오류:", error);
@@ -96,7 +115,7 @@ const LoginPage = () => {
 
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || !isValid}
           className="w-full rounded-md bg-violet01 py-2 text-white hover:bg-purple01 disabled:bg-gray03"
         >
           {isLoading ? "로그인 중..." : "로그인"}

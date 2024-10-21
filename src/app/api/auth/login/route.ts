@@ -17,12 +17,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
       // AxiosError 관련 처리
       if (error.response) {
-        // API 서버에서 전송한 메시지를 그대로 사용
+        // API 서버에서 전송한 메시지를 그대로 사용하되, 상태 코드도 함께 전달
         return NextResponse.json({ message: error.response.data.message }, { status: error.response.status });
       }
     }
 
     // 기타 에러 처리
-    return NextResponse.json({ error: "로그인 실패" }, { status: 500 });
+    return NextResponse.json({ message: "로그인 실패" }, { status: 500 });
   }
 }

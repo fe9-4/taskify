@@ -18,9 +18,10 @@ const SignupPage = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<Signup>({
     resolver: zodResolver(SignupSchema),
+    mode: "onChange",
   });
 
   const onSubmit: SubmitHandler<Signup> = async (data) => {
@@ -35,10 +36,12 @@ const SignupPage = () => {
         body: JSON.stringify(signupData),
       });
 
+      const responseData = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "회원가입 실패");
+        throw new Error(responseData.message || "회원가입 실패");
       }
+
       toast.success("회원가입 성공!");
       router.push("/login");
     } catch (error) {
@@ -150,7 +153,7 @@ const SignupPage = () => {
 
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={isLoading || !isValid}
           className="w-full rounded-md bg-violet01 py-2 text-white hover:bg-purple01 disabled:bg-gray03"
         >
           {isLoading ? "회원가입 중..." : "회원가입"}

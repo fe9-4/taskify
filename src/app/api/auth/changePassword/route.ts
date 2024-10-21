@@ -10,6 +10,6 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: "Password change failed" }, { status: 500 });
+    return NextResponse.json({ message: "비밀번호 변경 실패" }, { status: 500 });
   }
 }
