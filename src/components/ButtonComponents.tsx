@@ -1,6 +1,7 @@
 import { cls } from "@/lib/utils";
 import { BaseBtn, Content, ContentLeftAlign, PlusIcon } from "./ButtonSetting";
 import { FaCrown, FaCircle } from "react-icons/fa";
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 
 export const AddColumnBtn = () => {
   return (
@@ -27,7 +28,7 @@ export const AddDashboardBtn = () => {
 export const AddTodoBtn = () => {
   return (
     <BaseBtn>
-      <Content extra="h-[32px] w-[284px] md:h-[40px] md:w-[544px] xl:w-[314px]">
+      <Content extra="h-8 w-[284px] md:h-[40px] md:w-[544px] xl:w-[314px]">
         <PlusIcon />
       </Content>
     </BaseBtn>
@@ -37,9 +38,7 @@ export const AddTodoBtn = () => {
 export const DeleteDashboardBtn = () => {
   return (
     <BaseBtn>
-      <Content extra="h-[52px] w-[284px] text-lg font-medium md:h-[62px] md:w-[320px] md:text-xl">
-        대시보드 삭제하기
-      </Content>
+      <Content extra="h-[52px] w-[284px] text-lg font-medium md:h-[62px] md:w-80 md:text-xl">대시보드 삭제하기</Content>
     </BaseBtn>
   );
 };
@@ -55,15 +54,14 @@ export const DashboardCard = ({
 }) => {
   return (
     <BaseBtn>
-      <ContentLeftAlign extra=" flex gap-[4px] md:gap-[6px] xl:gap-[8px] h-[58px] w-[260px] text-lg font-semibold md:h-[68px] md:w-[247px] md:text-xl xl:w-[332px] xl:h-[70px]">
-        <FaCircle className="mr-[8px] size-[8px] md:mr-[9px] xl:mr-[16px]" fill={color} />
+      <ContentLeftAlign extra=" flex gap-1 md:gap-1.5 xl:gap-2 h-[58px] w-[260px] text-lg font-semibold md:h-[68px] md:w-[247px] md:text-xl xl:w-[332px] xl:h-[70px]">
+        <FaCircle className="mr-2 size-[8px] md:mr-[9px] xl:mr-4" fill={color} />
         {dashboardName}
         {isMine ? <FaCrown fill="#FDD446" /> : <></>}
       </ContentLeftAlign>
     </BaseBtn>
   );
 };
-//아이콘 추가 -> prop으로 색깔 받아서 반영
 
 // form 채웠을때 활성화되는 버튼 (로그인, 각종 모달)
 export const ActiveBtn = ({ disabled, children }: { disabled: boolean; children: string }) => {
@@ -73,7 +71,7 @@ export const ActiveBtn = ({ disabled, children }: { disabled: boolean; children:
       disabled={disabled}
       className={cls(
         "h-[50px] w-[351px] rounded-lg text-xl font-medium text-white md:w-[520px]",
-        disabled ? "bg-gray02" : "bg-violet01"
+        disabled ? "cursor-not-allowed bg-gray02" : "bg-violet01"
       )}
     >
       {children}
@@ -83,14 +81,14 @@ export const ActiveBtn = ({ disabled, children }: { disabled: boolean; children:
 export const DeleteCancelBtn = ({ children }: { children: string }) => {
   return (
     <BaseBtn extra="rounded-[4px]">
-      <Content extra="text-violet01 font-medium	text-xs md:text-base w-[52px] h-[32px] md:w-[84px]">{children}</Content>
+      <Content extra="text-violet01 font-medium	text-xs md:text-base w-[52px] h-8 md:w-[84px]">{children}</Content>
     </BaseBtn>
   );
 };
 export const InsertBtn = ({ children }: { children: string }) => {
   return (
     <BaseBtn extra="rounded-[4px]">
-      <Content extra="text-violet01 font-medium	text-xs w-[84px] h-[28px] md:h-[32px]">{children}</Content>
+      <Content extra="text-violet01 font-medium	text-xs w-[84px] h-7 md:h-8">{children}</Content>
     </BaseBtn>
   );
 };
@@ -98,7 +96,7 @@ export const InsertBtn = ({ children }: { children: string }) => {
 export const CancelBtn = ({ children }: { children: string }) => {
   return (
     <BaseBtn>
-      <Content extra="text-gray01 font-medium	text-xs w-[138px] h-[42px] md:h-[48px] md:w-[120px] md:text-lg">
+      <Content extra="text-gray01 font-medium	text-xs w-[138px] h-[42px] md:h-12 md:w-[120px] md:text-lg">
         {children}
       </Content>
     </BaseBtn>
@@ -107,7 +105,7 @@ export const CancelBtn = ({ children }: { children: string }) => {
 export const ConfirmBtn = ({ children }: { children: string }) => {
   return (
     <BaseBtn>
-      <Content extra="bg-violet01 text-white font-semibold text-xs w-[138px] h-[42px] md:h-[48px] md:w-[120px] md:text-lg">
+      <Content extra="bg-violet01 text-white font-semibold text-xs w-[138px] h-[42px] md:h-12 md:w-[120px] md:text-lg">
         {children}
       </Content>
     </BaseBtn>
@@ -118,7 +116,7 @@ export const ConfirmBtn = ({ children }: { children: string }) => {
 export const AcceptBtn = ({ children }: { children: string }) => {
   return (
     <BaseBtn>
-      <Content extra="w-[109px] h-[32px] md:w-[72px] md:h-[30px] xl:w-[84px] xl:h-[32px] bg-violet01 text-white font-medium text-xs md:text-base">
+      <Content extra="w-[109px] h-8 md:w-[72px] md:h-[30px] xl:w-[84px] xl:h-8 bg-violet01 text-white font-medium text-xs md:text-base">
         {children}
       </Content>
     </BaseBtn>
@@ -127,21 +125,45 @@ export const AcceptBtn = ({ children }: { children: string }) => {
 export const RefuseBtn = ({ children }: { children: string }) => {
   return (
     <BaseBtn>
-      <Content extra="w-[109px] h-[32px] md:w-[72px] md:h-[30px] xl:w-[84px] xl:h-[32px] bg-white text-violet01 font-medium text-xs md:text-base">
+      <Content extra="w-[109px] h-8 md:w-[72px] md:h-[30px] xl:w-[84px] xl:h-8 bg-white text-violet01 font-medium text-xs md:text-base">
         {children}
       </Content>
     </BaseBtn>
   );
 };
 export const CombiBtn = ({ value }: { value: string[] }) => {
-  if (!Array.isArray(value) || value.length < 2 || typeof value[0] !== "string" || typeof value[1] !== "string") {
+  if (!Array.isArray(value) || value.length < 2) {
     console.error("CombiBtn 컴포넌트는 [문자열, 문자열] 을 value 속성으로 받아야합니다.");
     return null;
   }
   return (
-    <div className="flex w-[100%] justify-center gap-[10px]">
+    <div className="flex w-full justify-center space-x-2.5">
       <AcceptBtn>{value[0]}</AcceptBtn>
       <RefuseBtn>{value[1]}</RefuseBtn>
+    </div>
+  );
+};
+
+export const BackForwardBtn = ({ disabled }: { disabled: boolean }) => {
+  return (
+    <div className="flex h-10 w-20 items-center justify-center overflow-hidden rounded-[4px] border border-gray03 md:h-[36px] md:w-[72px]">
+      <button
+        type="button"
+        disabled={disabled}
+        className={cls(
+          "flex size-full items-center justify-center border-r border-gray03",
+          disabled ? "cursor-not-allowed" : ""
+        )}
+      >
+        <IoIosArrowBack className={cls("size-4", disabled ? "text-gray03" : "text-black03")} />
+      </button>
+      <button
+        type="button"
+        disabled={disabled}
+        className={cls("flex size-full items-center justify-center", disabled ? "cursor-not-allowed" : "")}
+      >
+        <IoIosArrowForward className={cls("size-4", disabled ? "text-gray03" : "text-black03")} />
+      </button>
     </div>
   );
 };

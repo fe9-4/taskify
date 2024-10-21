@@ -5,6 +5,7 @@ import {
   AddColumnBtn,
   AddDashboardBtn,
   AddTodoBtn,
+  BackForwardBtn,
   CancelBtn,
   CombiBtn,
   ConfirmBtn,
@@ -16,7 +17,7 @@ import {
 
 export default function Home() {
   return (
-    <div className="flex flex-col items-center justify-items-center gap-1">
+    <div className="my-[100px] flex flex-col items-center justify-items-center gap-1">
       <AddColumnBtn />
       <AddDashboardBtn />
       <AddTodoBtn />
@@ -31,6 +32,8 @@ export default function Home() {
       <CancelBtn>취소</CancelBtn>
       <ConfirmBtn>확인</ConfirmBtn>
       <CombiBtn value={["수락", "거절"]}></CombiBtn>
+      <BackForwardBtn disabled={true} />
+      <BackForwardBtn disabled={false} />
     </div>
   );
 }
