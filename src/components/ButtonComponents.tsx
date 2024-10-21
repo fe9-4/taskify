@@ -1,6 +1,7 @@
 import { cls } from "@/lib/utils";
 import { BaseBtn, Content, ContentLeftAlign, PlusIcon } from "./ButtonSetting";
 import { FaCrown, FaCircle } from "react-icons/fa";
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 
 export const AddColumnBtn = () => {
   return (
@@ -63,7 +64,6 @@ export const DashboardCard = ({
     </BaseBtn>
   );
 };
-//아이콘 추가 -> prop으로 색깔 받아서 반영
 
 // form 채웠을때 활성화되는 버튼 (로그인, 각종 모달)
 export const ActiveBtn = ({ disabled, children }: { disabled: boolean; children: string }) => {
@@ -73,7 +73,7 @@ export const ActiveBtn = ({ disabled, children }: { disabled: boolean; children:
       disabled={disabled}
       className={cls(
         "h-[50px] w-[351px] rounded-lg text-xl font-medium text-white md:w-[520px]",
-        disabled ? "bg-gray02" : "bg-violet01"
+        disabled ? "cursor-not-allowed bg-gray02" : "bg-violet01"
       )}
     >
       {children}
@@ -142,6 +142,30 @@ export const CombiBtn = ({ value }: { value: string[] }) => {
     <div className="flex w-[100%] justify-center gap-[10px]">
       <AcceptBtn>{value[0]}</AcceptBtn>
       <RefuseBtn>{value[1]}</RefuseBtn>
+    </div>
+  );
+};
+
+export const BackForwardBtn = ({ disabled }: { disabled: boolean }) => {
+  return (
+    <div className="flex h-[40px] w-[80px] items-center justify-center overflow-hidden rounded-[4px] border border-gray03 md:h-[36px] md:w-[72px]">
+      <button
+        type="button"
+        disabled={disabled}
+        className={cls(
+          "flex h-[100%] w-[100%] items-center justify-center border-r border-gray03",
+          disabled ? "cursor-not-allowed" : ""
+        )}
+      >
+        <IoIosArrowBack className={cls("size-[16px]", disabled ? "text-gray03" : "text-black03")} />
+      </button>
+      <button
+        type="button"
+        disabled={disabled}
+        className={cls("flex h-[100%] w-[100%] items-center justify-center", disabled ? "cursor-not-allowed" : "")}
+      >
+        <IoIosArrowForward className={cls("size-[16px]", disabled ? "text-gray03" : "text-black03")} />
+      </button>
     </div>
   );
 };
