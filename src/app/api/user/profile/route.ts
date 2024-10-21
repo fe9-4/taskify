@@ -4,19 +4,16 @@ import { apiClient } from "../../apiClient";
 import config from "@/constants/config";
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
-  // Authorization 헤더에서 토큰 추출
-  const authHeader = request.headers.get("Authorization");
+  // 쿠키에서 accessToken 추출
+  const accessToken = request.cookies.get("accessToken")?.value;
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    // 토큰이 없거나 형식이 잘못된 경우
-    return NextResponse.json({ error: "Unauthorized: No token provided" }, { status: 401 });
+  if (!accessToken) {
+    return NextResponse.json({ error: "No access token provided" }, { status: 401 });
   }
-
-  const token = authHeader.split(" ")[1];
 
   try {
     // apiClient에 토큰 추가
-    apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    apiClient.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
 
     const response = await apiClient.get<UserProfileResponse>(`/${config.TEAM_ID}/users/me`);
     return NextResponse.json(response.data, { status: 200 });
