@@ -14,7 +14,9 @@ export const useInputFile = () => {
       reader.readAsDataURL(file);
       // 파일 읽는 작업 완료 후 호출될 onloadend 메서드 정의
       reader.onloadend = () => {
-        setPreview(reader.result as string);
+        if (reader.result && typeof reader.result === "string") {
+          setPreview(reader.result);
+        }
       };
     }
   };
