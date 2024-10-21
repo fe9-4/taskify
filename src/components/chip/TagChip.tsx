@@ -14,7 +14,7 @@ const TagChip = ({ tag }: { tag: string }) => {
   const matchingColor = colorList.find((item) => Array.isArray(item.tag) ? item.tag.includes(tag) : item.tag === tag) || anoterStringColor;
 
   return (
-    <span className={cls("w-fit rounded px-1 py-[6px] md:px-[6px] md:py-[2px]", tag !== "" ? `${matchingColor.bg} ${matchingColor.text}` : "")}>
+    <span className={cls("w-fit rounded px-[6px] py-1 text-xs md:px-[6px] md:py-[2px] md:text-base", tag !== "" ? `${matchingColor.bg} ${matchingColor.text}` : "")}>
       {tag}
     </span>
   );

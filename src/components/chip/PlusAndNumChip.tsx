@@ -1,13 +1,8 @@
-import { Dispatch, SetStateAction } from "react";
-
-export const PlusChip = ({ setModalOpen }: { setModalOpen: Dispatch<SetStateAction<boolean>> }) => {
+export const PlusChip = () => {
   return (
-    <button
-      onClick={() => setModalOpen((prev) => !prev)}
-      className="flex h-5 w-5 items-center justify-center rounded bg-violet02 text-center text-base text-violet01 md:h-[22px] md:w-[22px] md:text-lg"
-    >
+    <span className="flex h-5 w-5 items-center justify-center rounded bg-violet02 text-center text-base text-violet01 md:h-[22px] md:w-[22px] md:text-lg">
       +
-    </button>
+    </span>
   );
 };
 
