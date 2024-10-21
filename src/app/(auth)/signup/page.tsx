@@ -39,10 +39,14 @@ const SignupPage = () => {
       const responseData = await response.json();
 
       if (!response.ok) {
+        // 409 상태 코드에 대한 특별한 처리
+        if (response.status === 409) {
+          throw new Error(responseData.message || "이미 사용중인 이메일입니다.");
+        }
         throw new Error(responseData.message || "회원가입 실패");
       }
 
-      toast.success("회원가입 성공!");
+      toast.success("가입이 완료되었습니다");
       router.push("/login");
     } catch (error) {
       console.error("회원가입 오류:", error);
@@ -50,6 +54,14 @@ const SignupPage = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const togglePasswordConfirmVisibility = () => {
+    setShowPasswordConfirm(!showPasswordConfirm);
   };
 
   return (
@@ -101,12 +113,13 @@ const SignupPage = () => {
             } bg-white text-black02`}
             placeholder="••••••••"
           />
-          <button type="button" className="absolute right-2 top-8" onClick={() => setShowPassword(!showPassword)}>
-            {showPassword ? (
-              <Image src="/icons/visibility_on.svg" alt="visibility_on" width={24} height={24} />
-            ) : (
-              <Image src="/icons/visibility_off.svg" alt="visibility_off" width={24} height={24} />
-            )}
+          <button type="button" className="absolute right-2 top-8" onClick={togglePasswordVisibility}>
+            <Image
+              src={showPassword ? "/icons/visibility_on.svg" : "/icons/visibility_off.svg"}
+              alt={showPassword ? "visibility_on" : "visibility_off"}
+              width={24}
+              height={24}
+            />
           </button>
           {errors.password && <div className="mt-1 text-xs text-red01">{errors.password.message}</div>}
         </div>
@@ -117,23 +130,20 @@ const SignupPage = () => {
           </label>
           <input
             id="passwordConfirm"
-            type={showPassword ? "text" : "password"}
+            type={showPasswordConfirm ? "text" : "password"}
             {...register("confirmPassword")}
             className={`mt-1 w-full rounded-md border p-2 ${
               errors.confirmPassword ? "border-red01" : "border-gray03"
             } bg-white text-black02`}
             placeholder="••••••••"
           />
-          <button
-            type="button"
-            className="absolute right-2 top-8"
-            onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
-          >
-            {showPasswordConfirm ? (
-              <Image src="/icons/visibility_on.svg" alt="visibility_on" width={24} height={24} />
-            ) : (
-              <Image src="/icons/visibility_off.svg" alt="visibility_off" width={24} height={24} />
-            )}
+          <button type="button" className="absolute right-2 top-8" onClick={togglePasswordConfirmVisibility}>
+            <Image
+              src={showPasswordConfirm ? "/icons/visibility_on.svg" : "/icons/visibility_off.svg"}
+              alt={showPasswordConfirm ? "visibility_on" : "visibility_off"}
+              width={24}
+              height={24}
+            />
           </button>
           {errors.confirmPassword && <div className="mt-1 text-xs text-red01">{errors.confirmPassword.message}</div>}
         </div>

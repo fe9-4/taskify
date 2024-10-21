@@ -63,7 +63,7 @@ const LoginPage = () => {
         nickname: responseData.user.nickname,
       });
 
-      toast.success("로그인 성공!");
+      //toast.success("로그인 성공!");
       router.push("/");
     } catch (error) {
       console.error("로그인 오류:", error);

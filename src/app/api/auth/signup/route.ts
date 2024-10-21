@@ -15,6 +15,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       console.error(error);
 
       if (error.response) {
+        // 409 상태 코드에 대한 특별한 처리
+        if (error.response.status === 409) {
+          return NextResponse.json({ message: "이미 사용중인 이메일입니다." }, { status: 409 });
+        }
         return NextResponse.json({ message: error.response.data.message }, { status: error.response.status });
       }
     }
