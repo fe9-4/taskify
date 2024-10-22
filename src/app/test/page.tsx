@@ -13,14 +13,14 @@ import {
   DeleteCancelBtn,
   DeleteDashboardBtn,
   InsertBtn,
-} from "@/components/ButtonComponents";
+} from "@/components/button/ButtonComponents";
 
 export default function Home() {
   const onClick = () => {
     console.log(`클릭 테스트`);
   };
   return (
-    <div className="my-[100px] flex flex-col items-center justify-items-center gap-1">
+    <div className="my-[100px] ml-[200px] flex flex-col items-center justify-items-center gap-1">
       <AddColumnBtn onClick={onClick} />
       <AddDashboardBtn onClick={onClick} />
       <AddTodoBtn onClick={onClick} />
