@@ -3,6 +3,8 @@ import { BaseBtn, Content, ContentLeftAlign, PlusIcon } from "./ButtonSetting";
 import { FaCrown, FaCircle } from "react-icons/fa";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 
+// 1. 버튼 텍스트가 정해져있는 경우
+// 1) 컬럼 추가
 export const AddColumnBtn = () => {
   return (
     <BaseBtn>
@@ -14,6 +16,7 @@ export const AddColumnBtn = () => {
   );
 };
 
+//2) 대시보드 추가
 export const AddDashboardBtn = () => {
   return (
     <BaseBtn>
@@ -25,6 +28,7 @@ export const AddDashboardBtn = () => {
   );
 };
 
+//3) 투두 추가
 export const AddTodoBtn = () => {
   return (
     <BaseBtn>
@@ -35,6 +39,7 @@ export const AddTodoBtn = () => {
   );
 };
 
+//4) 대시보드 삭제
 export const DeleteDashboardBtn = () => {
   return (
     <BaseBtn>
@@ -43,6 +48,8 @@ export const DeleteDashboardBtn = () => {
   );
 };
 
+// 2. 버튼 내부에 들어갈 요소를 prop으로 받는 경우
+// 1) 대시보드 카드 (사이드바)
 export const DashboardCard = ({
   dashboardName,
   isMine,
@@ -63,7 +70,7 @@ export const DashboardCard = ({
   );
 };
 
-// form 채웠을때 활성화되는 버튼 (로그인, 각종 모달)
+// 2) form 채웠을때 활성화되는 버튼 (로그인, 회원가입, 각종 모달)
 export const ActiveBtn = ({ disabled, children }: { disabled: boolean; children: string }) => {
   return (
     <button
@@ -78,6 +85,8 @@ export const ActiveBtn = ({ disabled, children }: { disabled: boolean; children:
     </button>
   );
 };
+
+//3) 삭제 / 피그마 표기 : Component24
 export const DeleteCancelBtn = ({ children }: { children: string }) => {
   return (
     <BaseBtn extra="rounded-[4px]">
@@ -85,6 +94,8 @@ export const DeleteCancelBtn = ({ children }: { children: string }) => {
     </BaseBtn>
   );
 };
+
+//4) 입력  / 피그마 표기 : Component24
 export const InsertBtn = ({ children }: { children: string }) => {
   return (
     <BaseBtn extra="rounded-[4px]">
@@ -93,6 +104,7 @@ export const InsertBtn = ({ children }: { children: string }) => {
   );
 };
 
+//5) 취소 / 피그마 표기 : modal
 export const CancelBtn = ({ children }: { children: string }) => {
   return (
     <BaseBtn>
@@ -102,6 +114,7 @@ export const CancelBtn = ({ children }: { children: string }) => {
     </BaseBtn>
   );
 };
+// 6) 확인 / 피그마 표기 : modal
 export const ConfirmBtn = ({ children }: { children: string }) => {
   return (
     <BaseBtn>
@@ -131,6 +144,8 @@ export const RefuseBtn = ({ children }: { children: string }) => {
     </BaseBtn>
   );
 };
+
+// 7) 수락 거절 버튼(위 2개 세트) / 피그마 표기 : button
 export const CombiBtn = ({ value }: { value: string[] }) => {
   if (!Array.isArray(value) || value.length < 2) {
     console.error("CombiBtn 컴포넌트는 [문자열, 문자열] 을 value 속성으로 받아야합니다.");
@@ -144,6 +159,7 @@ export const CombiBtn = ({ value }: { value: string[] }) => {
   );
 };
 
+// 8) 페이지네이션 버튼
 export const BackForwardBtn = ({ disabled }: { disabled: boolean }) => {
   return (
     <div className="flex h-10 w-20 items-center justify-center overflow-hidden rounded-[4px] border border-gray03 md:h-[36px] md:w-[72px]">
