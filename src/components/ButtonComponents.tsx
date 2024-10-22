@@ -108,9 +108,7 @@ export const InsertBtn = ({ children }: { children: string }) => {
 export const CancelBtn = ({ children }: { children: string }) => {
   return (
     <BaseBtn>
-      <Content extra="text-gray01 font-medium	text-xs w-[138px] h-[42px] md:h-12 md:w-[120px] md:text-lg">
-        {children}
-      </Content>
+      <Content extra="text-gray01 font-medium	text-xs md:text-lg">{children}</Content>
     </BaseBtn>
   );
 };
@@ -118,9 +116,7 @@ export const CancelBtn = ({ children }: { children: string }) => {
 export const ConfirmBtn = ({ children }: { children: string }) => {
   return (
     <BaseBtn>
-      <Content extra="bg-violet01 text-white font-semibold text-xs w-[138px] h-[42px] md:h-12 md:w-[120px] md:text-lg">
-        {children}
-      </Content>
+      <Content extra="bg-violet01 text-white font-semibold text-xs w-full h-full md:text-lg">{children}</Content>
     </BaseBtn>
   );
 };

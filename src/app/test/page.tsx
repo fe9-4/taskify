@@ -29,8 +29,12 @@ export default function Home() {
       <DeleteCancelBtn>삭제</DeleteCancelBtn>
       <DeleteCancelBtn>취소</DeleteCancelBtn>
       <InsertBtn>입력</InsertBtn>
-      <CancelBtn>취소</CancelBtn>
-      <ConfirmBtn>확인</ConfirmBtn>
+      <div className="h-[42px] w-[138px] md:h-12 md:w-[120px]">
+        <CancelBtn>취소</CancelBtn>
+      </div>
+      <div className="h-[42px] w-[138px] md:h-12 md:w-[120px]">
+        <ConfirmBtn>확인</ConfirmBtn>
+      </div>
       <CombiBtn value={["수락", "거절"]}></CombiBtn>
       <BackForwardBtn disabled={true} />
       <BackForwardBtn disabled={false} />
