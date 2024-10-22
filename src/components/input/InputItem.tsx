@@ -35,7 +35,11 @@ const InputItem = forwardRef<HTMLInputElement, InputProps>(
               value={value}
               {...props}
             />
-            {isButton && <InsertBtn onClick={() => ""}>입력</InsertBtn>}
+            {isButton && (
+              <div className="absolute bottom-3 right-3">
+                <InsertBtn onClick={() => ""}>입력</InsertBtn>
+              </div>
+            )}
           </>
         ) : (
           <>
