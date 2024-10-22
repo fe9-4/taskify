@@ -49,6 +49,7 @@ const config: Config = {
           "Apple SD Gothic Neo",
           "sans-serif",
         ],
+        montserrat: ["var(--font-montserrat)", "sans-serif"],
       },
     },
   },

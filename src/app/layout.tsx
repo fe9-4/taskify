@@ -1,6 +1,14 @@
 import { Metadata } from "next";
 import "../styles/globals.css";
 import { Toaster } from "react-hot-toast";
+import { Montserrat } from "next/font/google";
+import Header from "@/components/Header";
+
+const montserrat = Montserrat({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-montserrat",
+});
 
 export const metadata: Metadata = {
   title: {
@@ -18,7 +26,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className="font-pretendard min-h-screen text-black03">
+      <body className={`${montserrat.variable} font-pretendard min-h-screen text-black03`}>
+        <Header />
         {children}
         <Toaster toastOptions={{ success: { style: { fontSize: "14px" } }, error: { style: { fontSize: "14px" } } }} />
       </body>
