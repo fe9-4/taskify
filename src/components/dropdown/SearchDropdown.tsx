@@ -95,7 +95,7 @@ const SearchDropdown = ({ inviteMemberList, setManager, currentManager }: IProps
             >
               {selectedName?.nickname === item.nickname && <HiCheck />}
               <span
-                className={`flex h-[26px] w-[26px] items-center justify-center rounded-full ${bg} text-xs font-semibold text-white ring-white ring-offset-2`}
+                className={`flex size-[26px] items-center justify-center rounded-full ${bg} text-xs font-semibold text-white ring-white ring-offset-2`}
               >
                 {item.email.charAt(0)}
               </span>
