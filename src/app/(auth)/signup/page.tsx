@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import axios from "axios";
@@ -14,15 +14,12 @@ const SignupPage = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
-  const [isFormValid, setIsFormValid] = useState(false);
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid, isSubmitting, touchedFields },
+    formState: { errors, isValid, isSubmitting },
     reset,
-    watch,
-    trigger,
   } = useForm<Signup>({
     resolver: zodResolver(SignupSchema),
     mode: "onChange",
@@ -34,19 +31,6 @@ const SignupPage = () => {
       terms: false,
     },
   });
-
-  const email = watch("email");
-  const nickname = watch("nickname");
-  const password = watch("password");
-  const confirmPassword = watch("confirmPassword");
-
-  useEffect(() => {
-    const validateForm = async () => {
-      const result = await trigger(["email", "nickname", "password", "confirmPassword"]);
-      setIsFormValid(result);
-    };
-    validateForm();
-  }, [email, nickname, password, confirmPassword, trigger]);
 
   const onSubmit: SubmitHandler<Signup> = async (data) => {
     try {
@@ -91,11 +75,11 @@ const SignupPage = () => {
             type="email"
             {...register("email")}
             className={`mt-1 w-full rounded-md border p-2 ${
-              touchedFields.email && errors.email ? "border-red01" : "border-gray03"
+              errors.email ? "border-red01" : "border-gray03"
             } bg-white text-black02`}
             placeholder="johndoe@example.com"
           />
-          {touchedFields.email && errors.email && <div className="mt-1 text-xs text-red01">{errors.email.message}</div>}
+          {errors.email && <div className="mt-1 text-xs text-red01">{errors.email.message}</div>}
         </div>
 
         <div>
@@ -107,13 +91,11 @@ const SignupPage = () => {
             type="text"
             {...register("nickname")}
             className={`mt-1 w-full rounded-md border p-2 ${
-              touchedFields.nickname && errors.nickname ? "border-red01" : "border-gray03"
+              errors.nickname ? "border-red01" : "border-gray03"
             } bg-white text-black02`}
             placeholder="닉네임을 입력해 주세요"
           />
-          {touchedFields.nickname && errors.nickname && (
-            <div className="mt-1 text-xs text-red01">{errors.nickname.message}</div>
-          )}
+          {errors.nickname && <div className="mt-1 text-xs text-red01">{errors.nickname.message}</div>}
         </div>
 
         <div className="relative">
@@ -125,7 +107,7 @@ const SignupPage = () => {
             type={showPassword ? "text" : "password"}
             {...register("password")}
             className={`mt-1 w-full rounded-md border p-2 ${
-              touchedFields.password && errors.password ? "border-red01" : "border-gray03"
+              errors.password ? "border-red01" : "border-gray03"
             } bg-white text-black02`}
             placeholder="비밀번호를 입력해 주세요"
           />
@@ -137,9 +119,7 @@ const SignupPage = () => {
               height={24}
             />
           </button>
-          {touchedFields.password && errors.password && (
-            <div className="mt-1 text-xs text-red01">{errors.password.message}</div>
-          )}
+          {errors.password && <div className="mt-1 text-xs text-red01">{errors.password.message}</div>}
         </div>
 
         <div className="relative">
@@ -151,7 +131,7 @@ const SignupPage = () => {
             type={showPasswordConfirm ? "text" : "password"}
             {...register("confirmPassword")}
             className={`mt-1 w-full rounded-md border p-2 ${
-              touchedFields.confirmPassword && errors.confirmPassword ? "border-red01" : "border-gray03"
+              errors.confirmPassword ? "border-red01" : "border-gray03"
             } bg-white text-black02`}
             placeholder="비밀번호를 한번 더 입력해 주세요"
           />
@@ -163,9 +143,7 @@ const SignupPage = () => {
               height={24}
             />
           </button>
-          {touchedFields.confirmPassword && errors.confirmPassword && (
-            <div className="mt-1 text-xs text-red01">{errors.confirmPassword.message}</div>
-          )}
+          {errors.confirmPassword && <div className="mt-1 text-xs text-red01">{errors.confirmPassword.message}</div>}
         </div>
 
         <div className="flex items-center">
@@ -173,17 +151,9 @@ const SignupPage = () => {
             id="terms"
             type="checkbox"
             {...register("terms")}
-            disabled={!isFormValid}
-            className={`h-4 w-4 rounded border-gray03 text-purple01 focus:ring-purple01 ${
-              isFormValid ? "cursor-pointer" : "cursor-not-allowed opacity-50"
-            }`}
+            className="h-4 w-4 cursor-pointer rounded border-gray03 text-purple01 focus:ring-purple01"
           />
-          <label
-            htmlFor="terms"
-            className={`ml-2 block text-sm text-black02 ${
-              isFormValid ? "cursor-pointer" : "cursor-not-allowed opacity-50"
-            }`}
-          >
+          <label htmlFor="terms" className="ml-2 block cursor-pointer text-sm text-black02">
             이용약관에 동의합니다.
           </label>
         </div>

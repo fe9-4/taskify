@@ -17,6 +17,7 @@ const LoginPage = () => {
   const router = useRouter();
   const setUser = useSetAtom(userAtom);
 
+  // react-hook-form 설정
   const {
     register,
     handleSubmit,
@@ -31,27 +32,18 @@ const LoginPage = () => {
     },
   });
 
+  // 로그인 폼 제출 핸들러
   const onSubmit: SubmitHandler<Login> = async (data) => {
     try {
       const response = await axios.post("/api/auth/login", data);
 
-      if (!response.data) {
+      if (response.data.user) {
+        setUser(response.data.user);
+        reset();
+        router.push("/");
+      } else {
         throw new Error("로그인 실패");
       }
-
-      // axios를 사용하여 setCookie API 호출
-      await axios.post("/api/auth/cookie/setCookie", { accessToken: response.data.accessToken });
-
-      // 사용자 정보를 userAtom에 저장
-      setUser({
-        id: response.data.user.id,
-        email: response.data.user.email,
-        nickname: response.data.user.nickname,
-      });
-
-      //toast.success("로그인 성공!");
-      reset(); // 폼을 기본값으로 초기화
-      router.push("/");
     } catch (error) {
       console.error("로그인 오류:", error);
       toast.error(

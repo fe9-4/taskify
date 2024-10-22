@@ -21,25 +21,20 @@ export default function Header() {
   }, 200);
 
   useEffect(() => {
-    handleResize(); // 초기 실행
+    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, [handleResize]);
 
   useEffect(() => {
-    // 드롭다운 메뉴 외부 클릭 시 메뉴를 닫는 이벤트 핸들러
+    // mousedown 이벤트를 사용하여 드롭다운 외부 클릭 시 즉시 닫기
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
       }
     };
 
-    // mousedown 이벤트 리스너 추가
-    // mousedown은 click 이벤트보다 먼저 발생하며, 마우스 버튼이 눌릴 때 즉시 트리거됩니다.
-    // 이를 통해 사용자가 드롭다운 외부를 클릭하는 즉시 드롭다운을 닫을 수 있습니다.
     document.addEventListener("mousedown", handleClickOutside);
-
-    // 컴포넌트 언마운트 시 이벤트 리스너 제거
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -60,19 +55,38 @@ export default function Header() {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
+  // 홈 페이지 여부를 확인하는 변수 추가
+  const isHomePage = pathname === "/";
+
   if (pathname === "/login" || pathname === "/signup") {
     return null;
   }
 
   return (
-    <header className="h-[60px] border-b border-gray03 bg-white px-[24px] md:h-[70px] md:px-[40px] xl:px-[70px]">
+    <header
+      className={`h-[60px] px-[24px] md:h-[70px] md:px-[40px] xl:px-[70px] ${
+        isHomePage ? "bg-black" : "border-b border-gray03 bg-white"
+      }`}
+    >
       <nav className="ml-[20px] flex h-full items-center justify-between gap-[17px] pr-[24px] md:gap-[15px]">
         <div className="flex items-center space-x-2">
-          <Link href="/" className="flex-shrink-0">
-            {isLargeScreen ? (
-              <Image src="/images/header/logo_md.svg" alt="로고" width={110} height={34} />
-            ) : (
-              <Image src="/images/header/logo.svg" alt="로고" width={24} height={30} />
+          <Link href="/" className="flex items-center">
+            <div className="relative flex-shrink-0">
+              <Image
+                src={isHomePage ? "/images/header/logo_home.svg" : "/images/header/logo.svg"}
+                alt="logo"
+                width={24}
+                height={30}
+                style={{ width: "auto", height: "auto" }}
+              />
+            </div>
+            {isLargeScreen && (
+              <span
+                className={`font-montserrat text-lg font-semibold ${isHomePage ? "text-white" : "text-violet01"}`}
+                style={{ width: "80px", height: "22px", lineHeight: "28px" }}
+              >
+                Taskify
+              </span>
             )}
           </Link>
         </div>
@@ -83,7 +97,9 @@ export default function Header() {
             <li className="relative" ref={dropdownRef}>
               <button
                 onClick={toggleDropdown}
-                className="text-base font-normal transition-colors duration-300 hover:text-violet01 md:text-lg"
+                className={`text-base font-normal transition-colors duration-300 md:text-lg ${
+                  isHomePage ? "text-white hover:text-gray03" : "hover:text-violet01"
+                }`}
               >
                 {user.nickname}
               </button>
@@ -91,7 +107,7 @@ export default function Header() {
                 <div className="absolute right-0 mt-2 w-20 rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
                   <button
                     onClick={handleLogout}
-                    className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+                    className="block w-full px-4 py-2 text-left text-sm text-gray01 hover:bg-gray03"
                   >
                     로그아웃
                   </button>
@@ -102,7 +118,9 @@ export default function Header() {
             <>
               <li>
                 <Link
-                  className="text-base font-normal transition-colors duration-300 hover:text-violet01 md:text-lg"
+                  className={`text-base font-normal transition-colors duration-300 md:text-lg ${
+                    isHomePage ? "text-white hover:text-gray03" : "hover:text-violet01"
+                  }`}
                   href="/login"
                 >
                   로그인
@@ -110,7 +128,9 @@ export default function Header() {
               </li>
               <li>
                 <Link
-                  className="text-base font-normal transition-colors duration-300 hover:text-violet01 md:text-lg"
+                  className={`text-base font-normal transition-colors duration-300 md:text-lg ${
+                    isHomePage ? "text-white hover:text-gray03" : "hover:text-violet01"
+                  }`}
                   href="/signup"
                 >
                   회원가입
