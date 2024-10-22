@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { UserSchema } from "./authSchema";
+import { UserSchema } from "./commonSchema";
 
 // request schema
 export const SignupSchema = z

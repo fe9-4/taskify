@@ -1,17 +1,7 @@
 import { z } from "zod";
+import { UserSchema } from "./commonSchema";
 
 // request schema
-export const UserSchema = z.object({
-  id: z.string(),
-  email: z.string(),
-  nickname: z.string(),
-  profileImageUrl: z.string(),
-  createdAt: z.string().transform((date) => new Date(date).toLocaleDateString()),
-  updatedAt: z.string().transform((date) => new Date(date).toLocaleDateString()),
-});
-
-export type User = z.infer<typeof UserSchema>;
-
 export const LoginSchema = z.object({
   email: z
     .string()
