@@ -3,100 +3,51 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
-import { useAtom } from "jotai";
-import { userAtom } from "@/store/userAtoms";
+import { useState, useRef, useEffect } from "react";
+import { useDebounce } from "@/hooks/useDebounce";
+import axios from "axios";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Header() {
   const [isLargeScreen, setIsLargeScreen] = useState(false);
   const pathname = usePathname();
-  const [user, setUser] = useAtom(userAtom);
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLLIElement>(null);
+  const { user, loading: isLoading, setUser } = useAuth();
+
+  const handleResize = useDebounce(() => {
+    setIsLargeScreen(window.innerWidth >= 768);
+  }, 200);
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsLargeScreen(window.innerWidth >= 768);
-    };
-
-    handleResize();
+    handleResize(); // 초기 실행
     window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [handleResize]);
 
+  useEffect(() => {
+    // 드롭다운 메뉴 외부 클릭 시 메뉴를 닫는 이벤트 핸들러
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
       }
     };
 
+    // mousedown 이벤트 리스너 추가
+    // mousedown은 click 이벤트보다 먼저 발생하며, 마우스 버튼이 눌릴 때 즉시 트리거됩니다.
+    // 이를 통해 사용자가 드롭다운 외부를 클릭하는 즉시 드롭다운을 닫을 수 있습니다.
     document.addEventListener("mousedown", handleClickOutside);
 
-    const checkAccessTokenAndFetchUserInfo = async () => {
-      setIsLoading(true);
-      try {
-        const cookieResponse = await fetch("/api/auth/cookie/getCookie", {
-          method: "GET",
-          credentials: "include",
-        });
-
-        if (cookieResponse.ok) {
-          const { accessToken } = await cookieResponse.json();
-          if (accessToken) {
-            await fetchUserInfo();
-          } else {
-            setUser(null);
-          }
-        } else {
-          console.error("쿠키 확인 중 오류 발생");
-          setUser(null);
-        }
-      } catch (error) {
-        console.error("쿠키 확인 중 오류 발생:", error);
-        setUser(null);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    const fetchUserInfo = async () => {
-      try {
-        const response = await fetch("/api/user/profile", {
-          method: "GET",
-          credentials: "include",
-        });
-
-        if (response.ok) {
-          const userData = await response.json();
-          setUser(userData);
-        } else {
-          setUser(null);
-        }
-      } catch (error) {
-        console.error("사용자 정보를 가져오는 중 오류 발생:", error);
-        setUser(null);
-      }
-    };
-
-    checkAccessTokenAndFetchUserInfo();
-
+    // 컴포넌트 언마운트 시 이벤트 리스너 제거
     return () => {
-      window.removeEventListener("resize", handleResize);
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [setUser]);
+  }, []);
 
   const handleLogout = async () => {
     try {
-      const response = await fetch("/api/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        throw new Error("로그아웃 실패");
-      }
-
+      await axios.post("/api/auth/logout", {}, { withCredentials: true });
       setUser(null);
       setIsDropdownOpen(false);
       router.push("/");
@@ -137,7 +88,7 @@ export default function Header() {
                 {user.nickname}
               </button>
               {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
+                <div className="absolute right-0 mt-2 w-20 rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
                   <button
                     onClick={handleLogout}
                     className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"

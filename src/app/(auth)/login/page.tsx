@@ -115,7 +115,7 @@ const LoginPage = () => {
 
         <div className="w-full text-center">
           회원이 아니신가요?{" "}
-          <Link href={"/signup"} className="text-violet01 hover:underline">
+          <Link href={"/signup"} className="text-violet01 underline">
             회원가입하기
           </Link>
         </div>
