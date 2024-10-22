@@ -34,6 +34,9 @@ export default function Header() {
       }
     };
 
+    // mousedown 이벤트 리스너 추가
+    // mousedown은 click 이벤트보다 먼저 발생하며, 마우스 버튼이 눌릴 때 즉시 트리거됩니다.
+    // 이를 통해 사용자가 드롭다운 외부를 클릭하는 즉시 드롭다운을 닫을 수 있습니다.
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
