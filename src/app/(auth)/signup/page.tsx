@@ -199,7 +199,7 @@ const SignupPage = () => {
 
         <div className="w-full text-center">
           이미 회원이신가요?{" "}
-          <Link href={"/login"} className="text-violet01 hover:underline">
+          <Link href={"/login"} className="text-violet01 underline">
             로그인하기
           </Link>
         </div>

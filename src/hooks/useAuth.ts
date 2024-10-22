@@ -1,49 +1,47 @@
 import { loadingAtom, userAtom } from "@/store/userAtoms";
 import { useAtom } from "jotai";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { UserProfileResponse } from "@/zodSchema/userSchema";
+import apiClient from "@/app/api/apiClient";
+import axios from "axios";
+import { useThrottle } from "./useThrottle";
 
 export function useAuth() {
   const [user, setUser] = useAtom(userAtom);
   const [loading, setLoading] = useAtom(loadingAtom);
 
-  useEffect(() => {
-    async function loadUser() {
-      setLoading(true);
-      try {
-        // TODO 로컬 스토리지에서 토큰 가져오기(Cookie 로 바뀔 수 있음)
-        const token = localStorage.getItem("authToken");
+  const loadUser = useCallback(async () => {
+    setLoading(true);
+    try {
+      const {
+        data: { accessToken },
+      } = await axios.get("/api/auth/cookie/getCookie", { withCredentials: true });
 
-        if (!token) {
-          console.error("인증 토큰이 없습니다.");
-          setUser(null);
-          return;
-        }
-
-        const response = await fetch("/api/user/profile", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-        if (response.ok) {
-          const userData: UserProfileResponse = await response.json();
-          setUser(userData.user);
-        } else {
-          console.error("사용자 프로필 로딩 실패:", response.statusText);
-          setUser(null);
-        }
-      } catch (error) {
-        console.error("사용자 프로필 로딩 실패:", error);
+      if (!accessToken) {
         setUser(null);
-      } finally {
-        setLoading(false);
+        return;
       }
-    }
 
-    loadUser();
+      const { data: userData } = await apiClient.get<UserProfileResponse>("/api/user/profile", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      setUser(userData.user);
+    } catch (error) {
+      console.error("사용자 프로필 로딩 실패:", error);
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
   }, [setUser, setLoading]);
 
-  return { user, loading };
+  const throttledLoadUser = useThrottle(loadUser, 5000); // 5초마다 실행
+
+  useEffect(() => {
+    throttledLoadUser();
+  }, [throttledLoadUser]);
+
+  return { user, loading, setUser };
 }
