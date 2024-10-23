@@ -64,7 +64,7 @@ const SearchDropdown = ({ inviteMemberList, setManager, currentManager }: IProps
   const { bg } = randomColor(colorList);
 
   return (
-    <div className="flex w-full flex-col space-y-[2px] bg-white md:w-[217px]">
+    <div className="flex w-full flex-col space-y-[2px] bg-white">
       <div className="flex h-[50px] w-full items-center justify-between overflow-hidden rounded-lg px-4 ring-1 ring-inset ring-gray03 transition-all focus-within:ring-violet01 focus:outline-none focus:ring-1 focus:ring-inset">
         <div className="flex items-center space-x-2">
           {selectedName && (
