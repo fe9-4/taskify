@@ -1,18 +1,7 @@
-// 필요한 칩을 찾아서 import 해주세요.
-export const TodoChip = () => {
+// 등록할 컬럼 이름을 prop으로 받아 사용해주세요.
+// title: "toDo", "progress", "done"
+export const StatusTitleChip = ({ title }: { title: string }) => {
   return (
-    <span className="statusChip-style">• To Do</span>
-  )
-}
-
-export const ProgressChip = () => {
-  return (
-    <span className="statusChip-style">• On Progress</span>
-  )
-}
-
-export const DoneChip = () => {
-  return (
-    <span className="statusChip-style">• Done</span>
+    <span className="statusChip-style">• {title}</span>
   )
 }
