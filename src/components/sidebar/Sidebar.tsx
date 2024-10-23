@@ -1,18 +1,6 @@
-"use client";
-import { FaCrown, FaCircle } from "react-icons/fa";
+import { DashboardList } from "./DashboardList";
 import { Logo } from "./Logo";
-import { Button } from "./button";
-
-// 회원이 가입한 대시보드 리스트 [] 받아서 map((listiem)=><DashboardItem />)으로 쭉 나열하기
-export const DashboardItem = ({ name, color, isMine }: { name: string; color: string; isMine: boolean }) => {
-  return (
-    <div className="w-full p-4">
-      <FaCircle fill={color} />
-      <div className="hidden md:block">{name}</div>
-      <div className="hidden md:block">{isMine ? <FaCrown /> : <></>}</div>
-    </div>
-  );
-};
+import { Button } from "./Button";
 
 export const Sidebar = () => {
   return (
@@ -21,6 +9,7 @@ export const Sidebar = () => {
       {/* Dashboard[+] + 대시보드 리스트 */}
       <div className="">
         <Button />
+        <DashboardList />
       </div>
     </aside>
   );
