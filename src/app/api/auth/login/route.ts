@@ -17,7 +17,7 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
         httpOnly: true, // 브라우저에서 접근 불가
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict", // CSRF 방지
-        maxAge: 60 * 60 * 24 * 7, // 1주일 동안 유효
+        maxAge: 60 * 30, // 30분 동안 유효
         path: "/",
       });
 
@@ -54,7 +54,7 @@ export const GET = async (request: NextRequest) => {
     });
 
     if (response.status === 200) {
-      return NextResponse.json({ user: response.data }, { status: 200 });
+      return NextResponse.json({ user: response.data.user }, { status: 200 });
     } else {
       // user/profile API에서 오류 발생 시
       return NextResponse.json({ user: null }, { status: 200 });

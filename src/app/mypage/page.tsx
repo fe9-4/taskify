@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -20,15 +20,12 @@ import {
 } from "@/zodSchema/userSchema";
 
 const MyPage = () => {
-  const { user, loading, refreshUser } = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
 
   // 프로필 이미지 관련 상태
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
-
-  // 초기 로딩 상태를 관리
-  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   // 프로필 수정 폼 설정
   const profileForm = useForm<UpdateUserProfile>({
@@ -42,35 +39,15 @@ const MyPage = () => {
     defaultValues: { currentPassword: "", newPassword: "", confirmPassword: "" },
   });
 
-  // 사용자 정보 초기화 함수
-  const initializeUser = useCallback(async () => {
-    if (!user) {
-      await refreshUser(true);
-    }
-    setIsInitialLoading(false);
-  }, [user, refreshUser]);
-
-  // 컴포넌트 마운트 시 사용자 정보 초기화
-  useEffect(() => {
-    initializeUser();
-  }, [initializeUser]);
-
-  // 로그인 상태 확인 및 리다이렉트
-  useEffect(() => {
-    if (!isInitialLoading && !loading && !user) {
-      router.push("/login");
-    }
-  }, [isInitialLoading, loading, user, router]);
-
   // 사용자 정보가 있을 때 폼 초기값 설정
   useEffect(() => {
-    if (user) {
+    if (!loading && user) {
       profileForm.setValue("nickname", user.nickname || "");
       if (user.profileImageUrl) {
         setProfileImageUrl(user.profileImageUrl);
       }
     }
-  }, [user, profileForm]);
+  }, [user, loading, router]);
 
   // 프로필 수정 제출 핸들러
   const onSubmitProfile: SubmitHandler<UpdateUserProfile> = async (data) => {
@@ -122,12 +99,12 @@ const MyPage = () => {
     }
   };
 
-  // 로딩 중 표시
-  if (isInitialLoading || loading) {
+  // 로딩 중일 때 로딩 화면 표시
+  if (loading) {
     return <div>로딩 중...</div>;
   }
 
-  // 사용자 정보가 없으면 null 반환 (리다이렉트 처리됨)
+  // 로그인하지 않은 경우 null 반환 (마이페이지를 렌더링하지 않음)
   if (!user) {
     return null;
   }
