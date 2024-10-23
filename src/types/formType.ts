@@ -1,4 +1,4 @@
-import { inputFileSize } from "@/components/InputFile";
+import { inputFileSize } from "@/components/input/InputFile";
 
 type Size = keyof typeof inputFileSize.size;
 

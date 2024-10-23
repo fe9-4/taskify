@@ -3,9 +3,10 @@
 import { forwardRef, useState } from "react";
 import { InputProps } from "@/types/formType";
 import Image from "next/image";
-import CloseEyes from "../../public/icons/visibility_off.svg";
-import OpenEyes from "../../public/icons/visibility_on.svg";
+import CloseEyes from "../../../public/icons/visibility_off.svg";
+import OpenEyes from "../../../public/icons/visibility_on.svg";
 import { cls } from "@/lib/utils";
+import { InsertBtn } from "../button/ButtonComponents";
 
 const InputItem = forwardRef<HTMLInputElement, InputProps>(
   ({ label, id, name, value, type, isTextArea, isButton, errors, readOnly = false, ...props }, ref) => {
@@ -20,7 +21,7 @@ const InputItem = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="relative flex flex-col gap-2">
         {label && (
-          <label htmlFor={id} className="text-lg font-medium text-black03">
+          <label htmlFor={id} className="text-lg font-medium text-black03 md:text-xl">
             {label}
           </label>
         )}
@@ -35,7 +36,11 @@ const InputItem = forwardRef<HTMLInputElement, InputProps>(
               readOnly={readOnly}
               {...props}
             />
-            {isButton && <button className="absolute bottom-3 right-3">입력</button>}
+            {isButton && (
+              <div className="absolute bottom-3 right-3">
+                <InsertBtn onClick={() => ""}>입력</InsertBtn>
+              </div>
+            )}
           </>
         ) : (
           <>

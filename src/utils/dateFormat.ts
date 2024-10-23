@@ -7,12 +7,3 @@ export const CalendarFormatDate = (date: Date | null): string => {
   }
   return "";
 };
-
-// 날짜 포맷팅 함수
-export function formatDate(date: Date): string {
-  return date.toLocaleDateString("ko-KR", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
