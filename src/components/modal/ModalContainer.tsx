@@ -3,7 +3,7 @@
 import React from "react";
 import Modal from "react-modal";
 import { useAtom } from "jotai";
-import { CreateDashboardAtom } from "@/components/modal/modalAtom";
+import { CreateDashboardAtom } from "@/store/modalAtom";
 import CreateDashboard from "@/components/modal/CreateDashboard";
 import ModalContent from "./ModalContent";
 

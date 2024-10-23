@@ -14,7 +14,7 @@ import {
   DeleteDashboardBtn,
   InsertBtn,
 } from "@/components/ButtonComponents";
-import { CreateDashboardAtom } from "@/components/modal/modalAtom";
+import { CreateDashboardAtom } from "@/store/modalAtom";
 import { useAtom } from "jotai";
 
 export default function Home() {
