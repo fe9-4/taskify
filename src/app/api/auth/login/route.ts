@@ -47,15 +47,37 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
   }
 };
 
-export const GET = async () => {
-  // 쿠키에서 accessToken 가져오기
-  const accessToken = cookies().get("accessToken");
+export const GET = async (request: NextRequest) => {
+  try {
+    // 쿠키에서 accessToken 가져오기
+    const accessToken = cookies().get("accessToken");
 
-  if (accessToken) {
-    // 사용자 정보 가져오기
-    const userInfo = await axios.get("/api/user/profile", { withCredentials: true });
-    return NextResponse.json({ user: userInfo.data.user });
+    if (!accessToken) {
+      return NextResponse.json({ user: null }, { status: 200 });
+    }
+
+    // user/profile API를 호출하여 사용자 정보 가져오기
+    const response = await axios.get(`${request.nextUrl.origin}/api/user/profile`, {
+      headers: {
+        Cookie: `accessToken=${accessToken.value}`,
+      },
+    });
+
+    if (response.status === 200) {
+      return NextResponse.json({ user: response.data }, { status: 200 });
+    } else {
+      // user/profile API에서 오류 발생 시
+      return NextResponse.json({ user: null }, { status: 200 });
+    }
+  } catch (error) {
+    console.error("사용자 정보 조회 실패:", error);
+    if (axios.isAxiosError(error)) {
+      // axios 에러 처리
+      return NextResponse.json(
+        { message: error.response?.data?.message || "사용자 정보 조회 실패" },
+        { status: error.response?.status || 500 }
+      );
+    }
+    return NextResponse.json({ message: "사용자 정보 조회 실패" }, { status: 500 });
   }
-
-  return NextResponse.json({ accessToken: null }, { status: 200 });
 };
