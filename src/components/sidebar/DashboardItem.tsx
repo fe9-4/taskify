@@ -4,7 +4,7 @@ import { ItemType } from "@/types/dashboardType";
 import { FaCircle, FaCrown } from "react-icons/fa6";
 
 // 현재 보고있는 대시보드 아이디와 같으면 가장 바깥쪽 div에 보라색 배경
-export const DashboardItem = ({ key, item }: { key: number; item: ItemType }) => {
+const DashboardItem = ({ key, item }: { key: number; item: ItemType }) => {
   const { color, title, createdByMe } = item;
   let length = 5;
   let shortTitle;
@@ -28,3 +28,4 @@ export const DashboardItem = ({ key, item }: { key: number; item: ItemType }) =>
     </div>
   );
 };
+export default DashboardItem;

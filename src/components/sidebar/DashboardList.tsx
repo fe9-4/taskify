@@ -2,7 +2,7 @@ import apiClient from "@/app/api/apiClient";
 import config from "@/constants/config";
 import { ItemType } from "@/types/dashboardType";
 import { useEffect, useState } from "react";
-import { DashboardItem } from "./DashboardItem";
+import DashboardItem from "./DashboardItem";
 
 /*
 https://sp-taskify-api.vercel.app/9-4/dashboards?navigationMethod=pagination&cursorId=1&page=1&size=10
@@ -43,7 +43,7 @@ https://sp-taskify-api.vercel.app/9-4/dashboards?navigationMethod=pagination&cur
 */
 
 // 대시보드 리스트 가져오기
-export const DashboardList = () => {
+const DashboardList = () => {
   const [dashboardList, setDashboardList] = useState<ItemType[]>([]);
 
   const fetchDashboardList = async () => {
@@ -72,3 +72,5 @@ export const DashboardList = () => {
     </div>
   );
 };
+
+export default DashboardList;

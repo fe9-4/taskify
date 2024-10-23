@@ -1,12 +1,12 @@
 "use client";
-import { DashboardList } from "./DashboardList";
-import { Logo } from "./Logo";
-import { Button } from "./Button";
 import { ItemType } from "@/types/dashboardType";
 import { usePathname } from "next/navigation";
-import { DashboardItem } from "./DashboardItem";
+import Button from "./Button";
+import DashboardItem from "./DashboardItem";
+import DashboardList from "./DashboardList";
+import Logo from "./Logo";
 
-export const Sidebar = () => {
+const Sidebar = () => {
   const item1: ItemType = {
     id: 12043,
     title: "여섯글자넘어가면 말줄임표",
@@ -41,3 +41,5 @@ export const Sidebar = () => {
     </aside>
   );
 };
+
+export default Sidebar;
