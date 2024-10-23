@@ -7,8 +7,8 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { ActiveBtn } from "@/components/ButtonComponents";
-import InputItem from "@/components/InputItem";
+import { ActiveBtn } from "@/components/button/ButtonComponents";
+import InputItem from "@/components/input/InputItem";
 import { useAuth } from "@/hooks/useAuth";
 import {
   UserProfileResponse,

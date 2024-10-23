@@ -9,6 +9,8 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import { ActiveBtn } from "@/components/button/ButtonComponents";
 import InputItem from "@/components/input/InputItem";
+import { useAuth } from "@/hooks/useAuth";
+import { useEffect } from "react";
 
 const LoginPage = () => {
   const router = useRouter();
