@@ -63,13 +63,7 @@ const DashboardList = () => {
   }, []);
 
   return (
-    <div>
-      {dashboardList.length > 0 ? (
-        dashboardList.map((item: ItemType) => <DashboardItem key={item.id} item={item} />)
-      ) : (
-        <></>
-      )}
-    </div>
+    <div>{dashboardList.length > 0 ? dashboardList.map((item: ItemType) => <DashboardItem item={item} />) : <></>}</div>
   );
 };
 
