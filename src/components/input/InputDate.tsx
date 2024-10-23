@@ -36,7 +36,7 @@ const InputDate = ({ label, id, name, value, placeholder, onChange }: InputDateP
           name={name}
           ref={datePickerRef}
           className={cls(
-            "flex h-[50px] w-[287px] cursor-pointer items-center rounded-lg border border-solid border-gray03 pl-11 text-base placeholder-gray02 transition-all md:w-[520px] md:text-lg",
+            "flex h-[50px] w-[287px] cursor-pointer items-center rounded-lg pl-11 text-base placeholder-gray02 ring-1 ring-inset ring-gray03 transition-all focus-within:ring-violet01 focus:outline-none focus:ring-1 focus:ring-inset md:w-[520px] md:text-lg",
             value ? "text-black03" : "text-gray02"
           )}
           selected={selectedDate}

@@ -10,12 +10,12 @@ const InputTag = ({ cardData, tagInput, onKeyDown, onClick, onChange }: InputTag
         태그
       </label>
 
-      <div className="flex h-[50px] w-full items-center gap-2 rounded-lg border px-4 text-lg text-black03 placeholder-gray02 ring-1 ring-inset ring-gray03 transition-all focus:outline-none focus:ring-1 focus:ring-inset focus:ring-violet01">
+      <div className="flex h-[50px] w-full items-center gap-2 rounded-lg px-4 text-lg text-black03 placeholder-gray02 ring-1 ring-inset ring-gray03 transition-all focus-within:ring-violet01 focus:outline-none focus:ring-1 focus:ring-inset">
         {cardData.tags.length > 0 && (
           <div className="flex gap-2">
             {[...cardData.tags].map((tag) => (
               <div onClick={() => onClick(tag)}>
-                <TagChip tag={tag} key={tag} />
+                <TagChip tag={tag} key={cardData.assigneeUserId} />
               </div>
             ))}
           </div>
@@ -27,6 +27,7 @@ const InputTag = ({ cardData, tagInput, onKeyDown, onClick, onChange }: InputTag
           onChange={onChange}
           onKeyDown={onKeyDown}
           className="w-full flex-grow border-none p-1 focus:outline-none"
+          placeholder="입력 후 Enter"
         />
       </div>
     </div>
