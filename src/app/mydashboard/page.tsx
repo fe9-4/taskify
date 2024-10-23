@@ -1,36 +1,23 @@
 "use client";
 
-import { AddDashboardBtn, BackForwardBtn, DashboardCard } from "@/components/ButtonComponents";
-import Image from "next/image";
 import axios from "axios";
 import toast from "react-hot-toast";
+import Pagination from "@/components/myDashboard/Pagination";
+import Invitation from "@/components/myDashboard/Invitation";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-
-interface IDashboardList {
-  id: number;
-  title: string;
-  color: string;
-  createdAt: string;
-  createdByMe: boolean;
-}
-
-interface IDashboard {
-  dsahboards: IDashboardList[];
-  totalCount: number;
-}
+import { useAtom } from "jotai";
+import { AddDashboardBtn, DashboardCard } from "@/components/button/ButtonComponents";
+import { IMyDashboard } from "@/types/myDashboardType";
+import { CreateDashboardAtom } from "@/store/modalAtom";
 
 const MyDashboard = () => {
   const router = useRouter();
-  const [page, setPage] = useState(1);
-  const [dashboardList, setDashboardList] = useState<IDashboard["dsahboards"]>([]);
-  const [totalCount, setTotalCount] = useState(0);
-  const [pageBtn, setPageBtn] = useState(false);
 
-  const handleAddDashboard = () => {
-    // 모달 구현되면 연결
-    console.log("대시보드 추가 모달 오픈");
-  };
+  const [page, setPage] = useState(1);
+  const [dashboardList, setDashboardList] = useState<IMyDashboard["dsahboards"]>([]);
+  const [totalPage, setTotalPage] = useState(0);
+  const [, setisCreateDashboardOpen] = useAtom(CreateDashboardAtom);
 
   const getCurrentDashboards = useCallback(async () => {
     try {
@@ -42,8 +29,9 @@ const MyDashboard = () => {
       });
 
       if (response.status === 200) {
-        setDashboardList(response.data.dashboardList);
-        setTotalCount(response.data.totalCount);
+        const data = response.data;
+        setDashboardList(data.dashboardList);
+        setTotalPage(Math.ceil(data.totalCount / 5));
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -51,21 +39,7 @@ const MyDashboard = () => {
         toast.error(error.response?.data);
       }
     }
-  }, []);
-
-  const handleClickNextPage = () => {
-    setPage((prev) => prev + 1);
-  };
-
-  const handleClickPrevPage = () => {
-    setPage((prev) => prev - 1);
-
-    if (page < 1) {
-      setPage(1);
-      toast.error("첫 번째 페이지입니다.");
-      setPageBtn(true);
-    }
-  };
+  }, [page]);
 
   useEffect(() => {
     getCurrentDashboards();
@@ -76,7 +50,7 @@ const MyDashboard = () => {
       <div className="flex flex-col space-y-6 xl:w-[1022px]">
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
           <div className="md:w-[247px] xl:w-[332px]">
-            <AddDashboardBtn onClick={handleAddDashboard} />
+            <AddDashboardBtn onClick={() => setisCreateDashboardOpen(true)} />
           </div>
           {dashboardList?.length > 0
             ? dashboardList.map((dashboard) => (
@@ -93,27 +67,15 @@ const MyDashboard = () => {
         {dashboardList.length > 0 ? (
           <div className="flex items-center justify-end space-x-4">
             <span className="text-xs">
-              {page}페이지 중 {dashboardList.length}
+              {totalPage}페이지 중 {page}
             </span>
-            <BackForwardBtn disabled={pageBtn} onClickNext={handleClickNextPage} onClickPrev={handleClickPrevPage} />
+            <Pagination totalPage={totalPage} setPage={setPage} page={page} />
           </div>
         ) : (
           <span className="text-center text-gray02 md:text-xl">아직 소속된 대시보드가 없어요.</span>
         )}
       </div>
-      <div className="flex flex-col space-y-[105px] bg-white px-5 pb-20 pt-6 xl:w-[1022px]">
-        <h2 className="font-bold md:text-3xl">초대받은 대시보드</h2>
-        <div className="flex flex-col items-center justify-center space-y-4 rounded-lg">
-          <Image
-            src="/images/myDashboard/invitation.svg"
-            alt="초대"
-            width={60}
-            height={60}
-            className="md:size-[100px]"
-          />
-          <span className="text-xs text-gray02 md:text-xl">아직 초대받은 대시보드가 없어요</span>
-        </div>
-      </div>
+      <Invitation />
     </div>
   );
 };

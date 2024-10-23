@@ -4,14 +4,15 @@ import ColumnList from "@/components/dashboard/ColumnList";
 import { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { AddColumnBtn } from "@/components/ButtonComponents";
 import apiClient from "@/app/api/apiClient";
 import { useParams } from "next/navigation";
+import { AddColumnBtn } from "@/components/button/ButtonComponents";
 
 const DUMMY_TITLE = ["새 프로젝트", "지난 프로젝트", "예정 프로젝트"];
 
 const DashboardDetail = () => {
   const { dashboardId } = useParams();
+  
   const [columnTitle, setColumnTitle] = useState<string[]>(DUMMY_TITLE || []);
   const [addColumn, setAddColumn] = useState(false);
   const [selectedValue, setSelectedValue] = useState("");

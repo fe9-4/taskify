@@ -2,11 +2,11 @@ import { HiOutlineCog } from "react-icons/hi";
 import { NumChip, PlusChip } from "../chip/PlusAndNumChip";
 import ColumnItem from "./ColumnItem";
 import { useEffect, useRef, useState } from "react";
-import { ICard } from "../../../types/types";
 import axios from "axios";
 import toast from "react-hot-toast";
 import apiClient from "@/app/api/apiClient";
-import { AddTodoBtn } from "../ButtonComponents";
+import { AddTodoBtn } from "../button/ButtonComponents";
+import { ICard } from "@/types/dashboardType";
 
 const DUMMY_ITEM = [
   {

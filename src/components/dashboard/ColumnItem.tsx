@@ -1,7 +1,7 @@
 import { HiOutlineCalendar } from "react-icons/hi";
 import Image from "next/image";
 import TagChip from "../chip/TagChip";
-import { ICard } from "../../../types/types";
+import { ICard } from "@/types/dashboardType";
 
 const ColumnItem = ({ cards }: ICard) => {
   return (
