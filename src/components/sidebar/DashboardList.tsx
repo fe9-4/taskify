@@ -52,10 +52,10 @@ export const DashboardItem = ({ key, item }: { key: number; item: ItemType }) =>
     shortTitle = title.slice(0, 5) + "...";
   }
   return (
-    <div key={key} className="w-full p-4 md:py-2 md:pl-[10px] md:pr-0 xl:p-3">
-      <div className="flex w-full items-center gap-4">
-        <FaCircle fill={color} className="size-2" />
-        <div className="xl: flex items-center gap-[6px] md:gap-1">
+    <div key={key} className="flex h-10 w-10 items-center justify-center md:w-full md:py-2 md:pl-[10px] md:pr-0 xl:p-3">
+      <div className="flex w-full justify-center md:w-full md:items-center md:gap-4">
+        <FaCircle fill={color} width={8} height={8} className="size-2" />
+        <div className="flex items-center gap-[6px] md:gap-1">
           <div className="hidden whitespace-nowrap font-medium text-gray01 md:block md:text-lg xl:hidden">
             {shortTitle}
           </div>
