@@ -5,6 +5,7 @@ import Modal from "react-modal";
 import { useAtom } from "jotai";
 import { CreateDashboardAtom } from "@/components/modal/modalAtom";
 import CreateDashboard from "@/components/modal/CreateDashboard";
+import ModalContent from "./ModalContent";
 
 Modal.setAppElement("#modal-root");
 
@@ -15,14 +16,9 @@ const ModalContainer = () => {
 
   return (
     <>
-      <Modal
-        isOpen={isCreateDashboardOpen}
-        onRequestClose={closeModal1}
-        className="flex items-center justify-center"
-        overlayClassName="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center "
-      >
+      <ModalContent isOpen={isCreateDashboardOpen} onRequestClose={closeModal1}>
         <CreateDashboard />
-      </Modal>
+      </ModalContent>
     </>
   );
 };
