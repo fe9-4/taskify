@@ -1,5 +1,5 @@
 import { cls } from "@/lib/utils";
-import { BaseBtn, Content, ContentLeftAlign, PlusIcon } from "./ButtonSetting";
+import { BaseBtn, Content, ContentLeftAlign, PlusIcon } from "@/components/button/ButtonSetting";
 import { FaCrown, FaCircle } from "react-icons/fa";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 

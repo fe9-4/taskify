@@ -6,7 +6,7 @@ import Image from "next/image";
 import CloseEyes from "../../../public/icons/visibility_off.svg";
 import OpenEyes from "../../../public/icons/visibility_on.svg";
 import { cls } from "@/lib/utils";
-import { InsertBtn } from "../ButtonComponents";
+import { InsertBtn } from "../button/ButtonComponents";
 
 const InputItem = forwardRef<HTMLInputElement, InputProps>(
   ({ label, id, name, value, type, isTextArea, isButton, errors, ...props }, ref) => {
