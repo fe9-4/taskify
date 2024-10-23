@@ -4,7 +4,7 @@ import Image from "next/image";
 import { FaPlus as PlusImage } from "react-icons/fa6";
 import { InputFileProps } from "@/types/formType";
 import { useInputFile } from "@/hooks/useInputFile";
-import ImageEdit from "../../public/icons/image_edit.svg";
+import ImageEdit from "../../../public/icons/image_edit.svg";
 import { cls } from "@/lib/utils";
 
 const InputFile = ({ label, size }: InputFileProps) => {
