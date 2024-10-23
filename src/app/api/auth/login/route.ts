@@ -14,10 +14,10 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
     if (response.data.accessToken) {
       // 로그인 성공 시 쿠키에 accessToken 설정
       cookies().set("accessToken", response.data.accessToken, {
-        httpOnly: true,
+        httpOnly: true, // 브라우저에서 접근 불가
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 1800, // 30분
+        sameSite: "strict", // CSRF 방지
+        maxAge: 60 * 60 * 24 * 7, // 1주일 동안 유효
         path: "/",
       });
 
