@@ -23,9 +23,23 @@ export const Sidebar = () => {
     <aside className="fixed left-0 top-0 z-10 flex h-screen w-[67px] flex-col gap-[39px] border-r border-gray03 bg-white px-[22px] py-5 md:w-[160px] md:gap-[57px] md:pr-6 xl:w-[300px] xl:px-6">
       <Link href="/" className="justify-centermd:justify-normal flex w-full items-center">
         {isLargeScreen ? (
-          <Image src="/images/header/logo_md.svg" alt="로고" width={108} height={34} />
+          <Image
+            src="/images/header/logo_md.svg"
+            alt="로고"
+            width={108}
+            height={34}
+            style={{ width: 108, height: 34 }}
+            priority={true}
+          />
         ) : (
-          <Image src="/images/header/logo.svg" alt="로고" width={24} height={28} />
+          <Image
+            src="/images/header/logo.svg"
+            alt="로고"
+            width={24}
+            height={28}
+            style={{ width: 24, height: 28 }}
+            priority={true}
+          />
         )}
       </Link>
       <div className="">
