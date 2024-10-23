@@ -27,7 +27,7 @@ const InputTag = ({ cardData, tagInput, onKeyDown, onClick, onChange }: InputTag
           onChange={onChange}
           onKeyDown={onKeyDown}
           className="w-full flex-grow border-none p-1 focus:outline-none"
-          placeholder="입력 후 Enter"
+          placeholder={!cardData.tags ? "입력 후 Enter" : ""}
         />
       </div>
     </div>

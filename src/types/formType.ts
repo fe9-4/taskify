@@ -26,8 +26,13 @@ export interface textAreaProps {
   isButton?: boolean;
 }
 
-export interface InputFileProps extends InputProps {
+export interface InputFileProps {
+  label: string;
+  id: string;
+  name: string;
+  value: string | File | null;
   size: Size;
+  onChange: (file: File | null | string) => void;
 }
 
 export interface InputDateProps {

@@ -12,8 +12,24 @@ import InputFile from "@/components/input/InputFile";
 import InputDate from "@/components/input/InputDate";
 import InputTag from "@/components/input/InputTag";
 
+const Member_Mock_Data = {
+  "members": [
+    {
+      // "id": 12046,
+      // "userId": 4672,
+      "email": "test1234@test.com",
+      "nickname": "test1234",
+      // "profileImageUrl": "string",
+      // "createdAt": "2024-10-23T12:27:55.840Z",
+      // "updatedAt": "2024-10-23T12:27:55.840Z",
+      // "isOwner": true
+    }
+  ],
+  "totalCount": 0
+}
+
 const CreateCard = () => {
-  const [inviteMember, setInviteMember] = useState([]);
+  const [inviteMember, setInviteMember] = useState(Member_Mock_Data.members);
   const [tagInput, setTagInput] = useState("");
   const [cardData, setCardData] = useState<CardProps>({
     assigneeUserId: 0,
@@ -28,27 +44,6 @@ const CreateCard = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    try {
-      const response = await axios.post("/api/cards", cardData, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (response.status === 201) {
-        toast.success("카드가 성공적으로 생성되었습니다.");
-        console.log("카드 생성 성공:", response.data);
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        toast.error("카드 생성 중 에러가 발생했습니다.");
-        console.error("카드 생성 실패:", error.response?.data?.message);
-      } else {
-        toast.error("네트워크 오류가 발생했습니다.");
-        console.error("알 수 없는 에러:", error);
-      }
-    }
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -105,8 +100,7 @@ const CreateCard = () => {
       cardData.assigneeUserId !== 0 &&
       cardData.title.trim() !== "" &&
       cardData.description.trim() !== "" &&
-      cardData.dueDate !== null &&
-      cardData.imageUrl.trim() !== ""
+      cardData.dueDate !== null 
     );
   };
 
@@ -126,7 +120,13 @@ const CreateCard = () => {
           <label htmlFor="assignee" className="text-lg font-medium text-black03">
             제목 <span className="text-violet01">*</span>
           </label>
-          <InputItem id="title" name="title" value={cardData.title} onChange={handleChange} />
+          <InputItem
+            id="title"
+            name="title"
+            value={cardData.title}
+            onChange={handleChange}
+            placeholder="제목을 입력해 주세요"
+          />
         </div>
 
         <div className="flex flex-col gap-2">
@@ -138,6 +138,7 @@ const CreateCard = () => {
             name="description"
             value={cardData.description}
             onChange={handleChange}
+            placeholder="설명을 입력해 주세요"
             isTextArea
             size="description"
           />
@@ -160,7 +161,14 @@ const CreateCard = () => {
           onChange={handleTagChange}
         />
 
-        <InputFile label="이미지" id="imageUrl" name="imageUrl" value={cardData.imageUrl} size="todo" />
+        <InputFile
+          label="이미지"
+          id="imageUrl"
+          name="imageUrl"
+          value={cardData.imageUrl}
+          onChange={(file) => setCardData({ ...cardData, imageUrl: file })}
+          size="todo"
+        />
 
         <div className="flex h-[42px] gap-3 md:h-[54px] md:gap-2">
           <CancelBtn>취소</CancelBtn>
