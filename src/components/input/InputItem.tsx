@@ -3,9 +3,10 @@
 import { forwardRef, useState } from "react";
 import { InputProps } from "@/types/formType";
 import Image from "next/image";
-import CloseEyes from "../../public/icons/visibility_off.svg";
-import OpenEyes from "../../public/icons/visibility_on.svg";
+import CloseEyes from "../../../public/icons/visibility_off.svg";
+import OpenEyes from "../../../public/icons/visibility_on.svg";
 import { cls } from "@/lib/utils";
+import { InsertBtn } from "../ButtonComponents";
 
 const InputItem = forwardRef<HTMLInputElement, InputProps>(
   ({ label, id, name, value, type, isTextArea, isButton, errors, ...props }, ref) => {
@@ -34,7 +35,11 @@ const InputItem = forwardRef<HTMLInputElement, InputProps>(
               value={value}
               {...props}
             />
-            {isButton && <button className="absolute bottom-3 right-3">입력</button>}
+            {isButton && (
+              <div className="absolute bottom-3 right-3">
+                <InsertBtn onClick={() => ""}>입력</InsertBtn>
+              </div>
+            )}
           </>
         ) : (
           <>

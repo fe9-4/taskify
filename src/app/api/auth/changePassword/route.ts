@@ -3,7 +3,7 @@ import config from "@/constants/config";
 import { ChangePassword } from "@/zodSchema/authSchema";
 import { apiClient } from "../../apiClient";
 
-export async function PUT(request: NextRequest): Promise<NextResponse> {
+export const PUT = async (request: NextRequest): Promise<NextResponse> => {
   try {
     const changePassword: ChangePassword = await request.json();
     await apiClient.put(`/${config.TEAM_ID}/auth/password`, changePassword);
@@ -12,4 +12,4 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
     console.error(error);
     return NextResponse.json({ message: "비밀번호 변경 실패" }, { status: 500 });
   }
-}
+};
