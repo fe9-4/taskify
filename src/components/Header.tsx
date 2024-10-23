@@ -16,6 +16,7 @@ export default function Header() {
   const dropdownRef = useRef<HTMLLIElement>(null);
   const { user, loading: isLoading, setUser } = useAuth();
 
+  // 화면 크기 변경 감지를 위한 디바운스 함수
   const handleResize = useDebounce(() => {
     setIsLargeScreen(window.innerWidth >= 768);
   }, 200);
@@ -27,22 +28,20 @@ export default function Header() {
   }, [handleResize]);
 
   useEffect(() => {
-    // mousedown 이벤트를 사용하여 드롭다운 외부 클릭 시 즉시 닫기
+    // 드롭다운 외부 클릭 시 닫기
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
       }
     };
 
-    // mousedown 이벤트 리스너 추가
-    // mousedown은 click 이벤트보다 먼저 발생하며, 마우스 버튼이 눌릴 때 즉시 트리거됩니다.
-    // 이를 통해 사용자가 드롭다운 외부를 클릭하는 즉시 드롭다운을 닫을 수 있습니다.
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
+  // 로그아웃 처리
   const handleLogout = async () => {
     try {
       await axios.post("/api/auth/logout", {}, { withCredentials: true });
@@ -54,24 +53,26 @@ export default function Header() {
     }
   };
 
+  // 드롭다운 토글
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
-  // 홈 페이지 여부를 확인하는 변수 추가
   const isHomePage = pathname === "/";
 
+  // 로그인/회원가입 페이지에서는 헤더를 표시하지 않음
   if (pathname === "/login" || pathname === "/signup") {
     return null;
   }
 
   return (
     <header
-      className={`h-[60px] px-[24px] md:h-[70px] md:px-[40px] xl:px-[70px] ${
+      className={`fixed left-0 right-0 top-0 z-50 h-[60px] px-[24px] md:h-[70px] md:px-[40px] xl:px-[70px] ${
         isHomePage ? "bg-black" : "border-b border-gray03 bg-white"
       }`}
     >
       <nav className="ml-[20px] flex h-full items-center justify-between gap-[17px] pr-[24px] md:gap-[15px]">
+        {/* 로고 및 사이트 이름 */}
         <div className="flex items-center space-x-2">
           <Link href="/" className="flex items-center">
             <div className="relative flex-shrink-0">
@@ -93,6 +94,7 @@ export default function Header() {
             )}
           </Link>
         </div>
+        {/* 사용자 메뉴 */}
         <ul className="flex space-x-4">
           {isLoading ? (
             <li>로딩 중...</li>
@@ -119,6 +121,7 @@ export default function Header() {
             </li>
           ) : (
             <>
+              {/* 로그인/회원가입 링크 */}
               <li>
                 <Link
                   className={`text-base font-normal transition-colors duration-300 md:text-lg ${
