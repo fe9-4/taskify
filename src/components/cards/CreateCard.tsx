@@ -5,7 +5,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { CardProps } from "@/types/cardType";
 import { CalendarFormatDate } from "@/utils/dateFormat";
-import { CancelBtn, ConfirmBtn } from "@/components/ButtonComponents";
+import { CancelBtn, ConfirmBtn } from "@/components/button/ButtonComponents";
 import SearchDropdown from "@/components/dropdown/SearchDropdown";
 import InputItem from "@/components/input/InputItem";
 import InputFile from "@/components/input/InputFile";
