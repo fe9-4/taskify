@@ -9,9 +9,8 @@ import toast from "react-hot-toast";
 import { useSetAtom } from "jotai";
 import { userAtom } from "@/store/userAtoms";
 import axios from "axios";
-import { ActiveBtn } from "@/components/ButtonComponents";
+import { ActiveBtn } from "@/components/button/ButtonComponents";
 import InputItem from "@/components/input/InputItem";
-
 
 const LoginPage = () => {
   const router = useRouter();

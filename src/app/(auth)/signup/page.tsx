@@ -7,8 +7,8 @@ import { useRouter } from "next/navigation";
 import { SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import axios from "axios";
-import { ActiveBtn } from "@/components/ButtonComponents";
 import InputItem from "@/components/input/InputItem";
+import { ActiveBtn } from "@/components/button/ButtonComponents";
 
 const SignupPage = () => {
   const router = useRouter();
