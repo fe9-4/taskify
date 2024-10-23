@@ -13,7 +13,7 @@ const ModalContent = ({ children, isOpen, onRequestClose }: Props) => {
       isOpen={isOpen}
       onRequestClose={onRequestClose}
       className="flex items-center justify-center"
-      overlayClassName="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center "
+      overlayClassName="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50"
     >
       {children}
     </Modal>
