@@ -49,7 +49,7 @@ export const DashboardList = () => {
   const fetchDashboardList = async () => {
     try {
       const res = await apiClient.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/${config.TEAM_ID}/dashboards?navigationMethod=pagination&cursorId=1&page=1&size=10`
+        `/${config.TEAM_ID}/dashboards?navigationMethod=pagination&cursorId=1&page=1&size=10`
       );
       const dashboards = res.data.dashboards;
       setDashboardList(dashboards);
