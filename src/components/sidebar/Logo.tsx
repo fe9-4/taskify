@@ -6,7 +6,7 @@ export const Logo = () => {
   const { isLargeScreen } = useWidth();
 
   return (
-    <Link href="/" className="justify-centermd:justify-normal flex w-full items-center">
+    <Link href="/" className="flex w-full items-center justify-center xl:justify-start">
       {isLargeScreen ? (
         <Image
           src="/images/header/logo_md.svg"

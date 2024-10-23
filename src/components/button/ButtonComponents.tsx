@@ -2,6 +2,7 @@ import { cls } from "@/lib/utils";
 import { BaseBtn, Content, ContentLeftAlign, PlusIcon } from "@/components/button/ButtonSetting";
 import { FaCrown, FaCircle } from "react-icons/fa";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import { ItemType } from "@/types/dashboardType";
 
 // 1. 버튼 텍스트가 정해져있는 경우
 // 1) 컬럼 추가
@@ -50,23 +51,14 @@ export const DeleteDashboardBtn = ({ onClick }: any) => {
 
 // 2. 버튼 내부에 들어갈 요소를 prop으로 받는 경우
 // 1) 대시보드 카드 (사이드바)
-export const DashboardCard = ({
-  dashboardName,
-  isMine,
-  color,
-  onClick,
-}: {
-  dashboardName: string;
-  isMine: boolean;
-  color: string;
-  onClick: any;
-}) => {
+export const DashboardCard = ({ item, onClick }: { item: ItemType; onClick: any }) => {
+  const { title, color, createdByMe } = item;
   return (
     <BaseBtn onClick={onClick}>
       <ContentLeftAlign extra="flex gap-1 md:gap-1.5 xl:gap-2 h-[58px] w-[260px] text-lg font-semibold md:h-[68px] md:w-[247px] md:text-xl xl:w-[332px] xl:h-[70px]">
         <FaCircle className="mr-2 size-[8px] md:mr-[9px] xl:mr-4" fill={color} />
-        {dashboardName}
-        {isMine ? <FaCrown fill="#FDD446" /> : <></>}
+        {title}
+        {createdByMe ? <FaCrown fill="#FDD446" /> : <></>}
       </ContentLeftAlign>
     </BaseBtn>
   );
