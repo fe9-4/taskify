@@ -1,5 +1,3 @@
-import apiClient from "@/app/api/apiClient";
-import config from "@/constants/config";
 import { ItemType } from "@/types/dashboardType";
 import { useEffect, useState } from "react";
 import DashboardItem from "./DashboardItem";
@@ -48,11 +46,17 @@ const DashboardList = () => {
 
   const fetchDashboardList = async () => {
     try {
-      const res = await apiClient.get(
-        `/${config.TEAM_ID}/dashboards?navigationMethod=pagination&cursorId=1&page=1&size=10`
-      );
-      const dashboards = res.data.dashboards;
-      setDashboardList(dashboards);
+      const res = await fetch("api/dashboard/list", { method: "GET" });
+      if (!res.ok) {
+        throw new Error(`Failed to fetch data : ${res.status}`);
+      }
+      const data = await res.json();
+
+      if (data.dashboard) {
+        setDashboardList(data.dashboard);
+      } else {
+        setDashboardList([]);
+      }
     } catch (err) {
       console.error(`데이터 fetching error`, err);
     }
