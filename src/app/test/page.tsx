@@ -14,15 +14,18 @@ import {
   DeleteDashboardBtn,
   InsertBtn,
 } from "@/components/ButtonComponents";
+import { CreateDashboardAtom } from "@/components/modal/modalAtom";
+import { useAtom } from "jotai";
 
 export default function Home() {
+  const [, setisCreateDashboardOpen] = useAtom(CreateDashboardAtom);
   const onClick = () => {
     console.log(`클릭 테스트`);
   };
   return (
     <div className="my-[100px] flex flex-col items-center justify-items-center gap-1">
       <AddColumnBtn onClick={onClick} />
-      <AddDashboardBtn onClick={onClick} />
+      <AddDashboardBtn onClick={() => setisCreateDashboardOpen(true)} />
       <AddTodoBtn onClick={onClick} />
       <DeleteDashboardBtn onClick={onClick} />
       <DashboardCard onClick={onClick} dashboardName="비브리지" isMine={false} color="#7AC555" />
