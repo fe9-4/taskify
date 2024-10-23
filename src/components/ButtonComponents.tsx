@@ -108,7 +108,7 @@ export const InsertBtn = ({ children, onClick }: { children: string; onClick: an
 };
 
 //5) 취소 / 피그마 표기 : modal
-export const CancelBtn = ({ children, onClick }: { children: string; onClick: any }) => {
+export const CancelBtn = ({ children, onClick }: { children: string; onClick?: any }) => {
   return (
     <BaseBtn extra="size-full" onClick={onClick}>
       <Content extra="text-gray01 font-medium	text-xs md:text-lg">{children}</Content>
@@ -116,10 +116,27 @@ export const CancelBtn = ({ children, onClick }: { children: string; onClick: an
   );
 };
 // 6) 확인 / 피그마 표기 : modal
-export const ConfirmBtn = ({ children, onClick }: { children: string; onClick: any }) => {
+export const ConfirmBtn = ({
+  type,
+  children,
+  onClick,
+  disabled,
+}: {
+  type: string;
+  children: string;
+  onClick?: any;
+  disabled: boolean;
+}) => {
   return (
-    <BaseBtn extra="size-full" onClick={onClick}>
-      <Content extra="bg-violet01 text-white font-semibold text-xs w-full h-full md:text-lg">{children}</Content>
+    <BaseBtn extra="size-full" onClick={onClick} type={type} disabled={disabled}>
+      <Content
+        extra={cls(
+          "text-white font-semibold text-xs w-full h-full md:text-lg",
+          disabled ? "cursor-not-allowed bg-gray02" : "bg-violet01"
+        )}
+      >
+        {children}
+      </Content>
     </BaseBtn>
   );
 };

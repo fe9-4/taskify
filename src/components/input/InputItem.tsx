@@ -9,7 +9,7 @@ import { cls } from "@/lib/utils";
 import { InsertBtn } from "../ButtonComponents";
 
 const InputItem = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, id, name, value, type, isTextArea, isButton, errors, ...props }, ref) => {
+  ({ label, id, name, value, type, isTextArea, isButton, errors, size, ...props }, ref) => {
     const [inputType, setInputType] = useState(type);
     const [password, setPassword] = useState(false);
 
@@ -29,7 +29,10 @@ const InputItem = forwardRef<HTMLInputElement, InputProps>(
         {isTextArea ? (
           <>
             <textarea
-              className="relative h-[70px] w-full rounded-lg border border-solid border-gray03 p-4 text-xs text-black03 placeholder-gray02 focus:outline-none md:h-[110px] md:py-4 md:text-base"
+              className={cls(
+                "relative w-full resize-none rounded-lg border border-solid border-gray03 p-4 text-xs text-black03 placeholder-gray02 focus:outline-none md:py-4 md:text-base",
+                size === "description" ? "h-[126px]" : "h-[70px] md:h-[110px]"
+              )}
               id={id}
               name={name}
               value={value}
