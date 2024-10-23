@@ -35,7 +35,6 @@ export default function Header() {
       await axios.post("/api/auth/logout", {}, { withCredentials: true });
       setUser(null);
       setIsDropdownOpen(false);
-      localStorage.clear();
       router.push("/");
     } catch (error) {
       console.error("로그아웃 오류:", error);

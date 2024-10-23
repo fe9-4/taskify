@@ -18,8 +18,6 @@ export const useAuth = () => {
   // 사용자 데이터를 초기화하는 함수
   const clearUserData = useCallback(() => {
     setUser(null); // 사용자 상태를 null로 설정
-    localStorage.clear(); // 로컬 스토리지 초기화
-    console.log("사용자 정보 및 localStorage 초기화됨");
   }, [setUser]); // setUser에 의존
 
   // 사용자 정보를 새로 고치는 함수
