@@ -26,18 +26,18 @@ export const Sidebar = () => {
           <Image
             src="/images/header/logo_md.svg"
             alt="로고"
-            width={108}
-            height={34}
-            style={{ width: 108, height: 34 }}
+            width={0}
+            height={0}
+            className="h-[34px] w-[108px]"
             priority={true}
           />
         ) : (
           <Image
             src="/images/header/logo.svg"
             alt="로고"
-            width={24}
-            height={28}
-            style={{ width: 24, height: 28 }}
+            width={0}
+            height={0}
+            className="h-[28px] w-[24px]"
             priority={true}
           />
         )}
