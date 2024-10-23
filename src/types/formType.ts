@@ -13,6 +13,7 @@ export interface InputProps extends textAreaProps {
   required?: boolean;
   autoComplete?: string;
   className?: string;
+  readOnly?: boolean;
 }
 
 export interface textAreaProps {

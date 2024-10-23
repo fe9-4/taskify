@@ -50,3 +50,11 @@ export const UploadUserProfileImageResponseSchema = z.object({
 });
 
 export type UploadUserProfileImageResponse = z.infer<typeof UploadUserProfileImageResponseSchema>;
+
+export const UpdateUserPasswordSchema = z.object({
+  currentPassword: PasswordSchema,
+  newPassword: PasswordSchema,
+  confirmPassword: z.string(),
+});
+
+export type UpdateUserPassword = z.infer<typeof UpdateUserPasswordSchema>;
