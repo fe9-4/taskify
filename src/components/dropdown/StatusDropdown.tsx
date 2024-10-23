@@ -1,10 +1,10 @@
 "use client";
 
-import { DoneChip, ProgressChip, TodoChip } from "../chip/StatusChip";
 import { HiChevronDown } from "react-icons/hi";
 import { HiCheck } from "react-icons/hi";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { cls } from "@/lib/utils";
+import { StatusTitleChip } from "../chip/StatusChip";
 
 interface IProps {
   setSelectedValue: Dispatch<SetStateAction<string>>;
@@ -13,7 +13,7 @@ interface IProps {
 
 // 상태값 변경함수를 보내서 드롭다운에서 값을 받아 쓰세요.
 // currentValue는 '할 일 수정' 모달에서 불러온 현재 값입니다.
-// 가장 바깥쪽 div 요소의 w-[217px]을 w-full로 바꿔서 적용해야 사용하시는 곳에 맞춰질수도 있습니다.
+// 가장 바깥쪽 div 요소의 w-[217px]을 w-full로 바꿔서 적용해야 사용하시는 곳에 맞춰질수도 있습니다. (말씀해주시면 w-full로 수정해서 올리겠습니다.)
 const StatusDropdown = ({ setSelectedValue, currentValue }: IProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [value, setValue] = useState(currentValue || "toDo");
@@ -32,16 +32,7 @@ const StatusDropdown = ({ setSelectedValue, currentValue }: IProps) => {
   };
 
   const renderChip = () => {
-    switch (value) {
-      case "toDo":
-        return <TodoChip />;
-      case "progress":
-        return <ProgressChip />;
-      case "done":
-        return <DoneChip />;
-      default:
-        return <TodoChip />;
-    }
+    return <StatusTitleChip title={value === "toDo" ? "To Do" : value === "progress" ? "On Progress" : "Done"} />;
   };
 
   useEffect(() => {
@@ -53,9 +44,9 @@ const StatusDropdown = ({ setSelectedValue, currentValue }: IProps) => {
   }, []);
 
   const btnArr = [
-    { value: "toDo", chip: <TodoChip /> },
-    { value: "progress", chip: <ProgressChip /> },
-    { value: "done", chip: <DoneChip /> },
+    { value: "toDo", title: "To Do" },
+    { value: "progress", title: "On Progress" },
+    { value: "done", title: "Done" },
   ];
 
   return (
@@ -76,7 +67,7 @@ const StatusDropdown = ({ setSelectedValue, currentValue }: IProps) => {
               className={cls("status-dropdown-custom-btn", value !== item.value ? "px-0 pl-[46px] pr-4" : "")}
             >
               {value === item.value && <HiCheck />}
-              {item.chip}
+              <StatusTitleChip title={item.value} />
             </button>
           ))}
         </div>
