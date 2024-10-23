@@ -71,29 +71,33 @@ export default function Header() {
         isHomePage ? "bg-black" : "border-b border-gray03 bg-white"
       }`}
     >
-      <nav className="ml-[20px] flex h-full items-center justify-between gap-[17px] pr-[24px] md:gap-[15px]">
+      <nav
+        className={`flex h-full items-center ${isHomePage ? "justify-between" : "justify-end"} gap-[17px] pr-[24px] md:gap-[15px]`}
+      >
         {/* 로고 및 사이트 이름 */}
-        <div className="flex items-center space-x-2">
-          <Link href="/" className="flex items-center">
-            <div className="relative flex-shrink-0">
-              <Image
-                src={isHomePage ? "/images/header/logo_home.svg" : "/images/header/logo.svg"}
-                alt="logo"
-                width={24}
-                height={30}
-                style={{ width: "auto", height: "auto" }}
-              />
-            </div>
-            {isLargeScreen && (
-              <span
-                className={`font-montserrat text-lg font-semibold ${isHomePage ? "text-white" : "text-violet01"}`}
-                style={{ width: "80px", height: "22px", lineHeight: "28px" }}
-              >
-                Taskify
-              </span>
-            )}
-          </Link>
-        </div>
+        {isHomePage && (
+          <div className="flex items-center space-x-2">
+            <Link href="/" className="flex items-center">
+              <div className="relative flex-shrink-0">
+                <Image
+                  src="/images/header/logo_home.svg"
+                  alt="logo"
+                  width={24}
+                  height={30}
+                  style={{ width: "auto", height: "auto" }}
+                />
+              </div>
+              {isLargeScreen && (
+                <span
+                  className="font-montserrat text-lg font-semibold text-white"
+                  style={{ width: "80px", height: "22px", lineHeight: "28px" }}
+                >
+                  Taskify
+                </span>
+              )}
+            </Link>
+          </div>
+        )}
         {/* 사용자 메뉴 */}
         <ul className="flex space-x-4">
           {isLoading ? (
