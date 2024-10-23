@@ -1,9 +1,10 @@
 "use client";
-import { DashboardItem, DashboardList } from "./DashboardList";
+import { DashboardList } from "./DashboardList";
 import { Logo } from "./Logo";
 import { Button } from "./Button";
 import { ItemType } from "@/types/dashboardType";
 import { usePathname } from "next/navigation";
+import { DashboardItem } from "./DashboardItem";
 
 export const Sidebar = () => {
   const item1: ItemType = {
