@@ -31,7 +31,7 @@ export default function RootLayout({
         <div id="modal-root"></div>
         <ModalContainer />
         <Header />
-        {children}
+        <main className="pt-[60px] md:pt-[70px]">{children}</main>
         <Toaster toastOptions={{ success: { style: { fontSize: "14px" } }, error: { style: { fontSize: "14px" } } }} />
       </body>
     </html>

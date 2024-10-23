@@ -4,7 +4,7 @@ import { apiClient } from "../../apiClient";
 import { Signup, SignupResponse } from "@/zodSchema/userSchema";
 import { AxiosError } from "axios";
 
-export async function POST(request: NextRequest): Promise<NextResponse> {
+export const POST = async (request: NextRequest): Promise<NextResponse> => {
   try {
     const signupData: Signup = await request.json();
     const response = await apiClient.post<SignupResponse>(`/${config.TEAM_ID}/users/`, signupData);
@@ -25,4 +25,4 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     return NextResponse.json({ message: "회원가입 실패" }, { status: 500 });
   }
-}
+};

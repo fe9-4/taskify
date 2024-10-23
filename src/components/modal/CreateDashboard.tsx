@@ -2,7 +2,7 @@
 
 import { useAtom } from "jotai";
 import { ActiveBtn, CancelBtn } from "../ButtonComponents";
-import InputItem from "../InputItem";
+import InputItem from "@/components/input/InputItem";
 import { CreateDashboardAtom } from "./modalAtom";
 import { useForm } from "react-hook-form";
 import SelectColorChip from "../chip/SelectColorChip";
