@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-export async function POST() {
+export const POST = async () => {
   const response = NextResponse.json({ success: true });
 
   // accessToken 쿠키 삭제
@@ -13,4 +13,4 @@ export async function POST() {
   });
 
   return response;
-}
+};

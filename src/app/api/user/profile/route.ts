@@ -3,7 +3,7 @@ import { UserProfileResponse } from "@/zodSchema/userSchema";
 import { apiClient } from "../../apiClient";
 import config from "@/constants/config";
 
-export async function GET(request: NextRequest): Promise<NextResponse> {
+export const GET = async (request: NextRequest): Promise<NextResponse> => {
   // 쿠키에서 accessToken 추출
   const accessToken = request.cookies.get("accessToken")?.value;
 
@@ -31,4 +31,4 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     // 요청 후 헤더 초기화 (선택사항)
     delete apiClient.defaults.headers.common["Authorization"];
   }
-}
+};

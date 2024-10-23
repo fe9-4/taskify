@@ -1,49 +1,40 @@
 import { loadingAtom, userAtom } from "@/store/userAtoms";
 import { useAtom } from "jotai";
-import { useEffect } from "react";
-import { UserProfileResponse } from "@/zodSchema/userSchema";
+import { useEffect, useCallback, useRef } from "react";
+import axios from "axios";
 
-export function useAuth() {
+export const useAuth = () => {
   const [user, setUser] = useAtom(userAtom);
   const [loading, setLoading] = useAtom(loadingAtom);
+  const lastFetchTimeRef = useRef(0);
+
+  const loadUser = useCallback(
+    async (force = false) => {
+      const now = Date.now();
+      if (force || now - lastFetchTimeRef.current > 5 * 60 * 1000) {
+        setLoading(true);
+        try {
+          const { data } = await axios.get("/api/auth/login", { withCredentials: true });
+          if (data.user) {
+            setUser(data.user);
+          } else {
+            setUser(null);
+          }
+          lastFetchTimeRef.current = now;
+        } catch (error) {
+          console.error("사용자 정보 로딩 실패:", error);
+          setUser(null);
+        } finally {
+          setLoading(false);
+        }
+      }
+    },
+    [setUser, setLoading]
+  );
 
   useEffect(() => {
-    async function loadUser() {
-      setLoading(true);
-      try {
-        // TODO 로컬 스토리지에서 토큰 가져오기(Cookie 로 바뀔 수 있음)
-        const token = localStorage.getItem("authToken");
+    loadUser(true);
+  }, [loadUser]);
 
-        if (!token) {
-          console.error("인증 토큰이 없습니다.");
-          setUser(null);
-          return;
-        }
-
-        const response = await fetch("/api/user/profile", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-        if (response.ok) {
-          const userData: UserProfileResponse = await response.json();
-          setUser(userData.user);
-        } else {
-          console.error("사용자 프로필 로딩 실패:", response.statusText);
-          setUser(null);
-        }
-      } catch (error) {
-        console.error("사용자 프로필 로딩 실패:", error);
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadUser();
-  }, [setUser, setLoading]);
-
-  return { user, loading };
-}
+  return { user, loading, setUser, refreshUser: () => loadUser(true) };
+};
