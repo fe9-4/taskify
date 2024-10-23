@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import { ICard } from "../../../types/types";
 import axios from "axios";
 import toast from "react-hot-toast";
+import apiClient from "@/app/api/apiClient";
+import { AddTodoBtn } from "../ButtonComponents";
 
 const DUMMY_ITEM = [
   {
@@ -70,7 +72,7 @@ const DUMMY_ITEM = [
       description: "다음프로젝트 개요입니다.",
       tags: ["프로젝트", "프론트엔드", "상"],
       dueDate: "2024. 11. 21",
-      imageUrl: "/images/cardImg1.png",
+
       assignee: {
         nickname: "H",
       },
@@ -112,7 +114,7 @@ const DUMMY_ITEM = [
       description: "다다음 프로젝트 개요입니다.",
       tags: ["프로젝트", "프론트엔드", "백엔드", "상"],
       dueDate: "2024. 12. 21",
-      imageUrl: "/images/cardImg1.png",
+      imageUrl: "",
       assignee: {
         nickname: "K",
       },
@@ -137,7 +139,7 @@ const DUMMY_ITEM = [
 
 const ITEMS_PER_PAGE = 3;
 
-const ColumnList = () => {
+const ColumnList = ({ columnTitle }: { columnTitle: string }) => {
   // const [cardList, setCardList] = useState<ICard[]>([]);
   const [cardList, setCardList] = useState(DUMMY_ITEM.slice(0, ITEMS_PER_PAGE));
   const [cursorId, setCursorId] = useState<number>(ITEMS_PER_PAGE);
@@ -157,24 +159,24 @@ const ColumnList = () => {
       console.log("더 이상 로딩할 데이터가 없습니다.");
     }
   };
+  console.log(cursorId, hasMore);
+  const getCardList = async () => {
+    try {
+      const response = await apiClient.get(`/cards?size=10&cursorId=${cursorId}&columnId=`, {
+        params: { cursorId },
+      });
 
-  // const getCardList = async () => {
-  //   try {
-  //     const response = await apiClient.get("/cards", {
-  //       params: { cursorId }
-  //     });
-
-  //     if (response.status === 200) {
-  //       setCardList((prev) => [...prev, ...response.data.cards]);
-  //       setCursorId(response.data.cursorId);
-  //     }
-  //   } catch (error) {
-  //     if (axios.isAxiosError(error)) {
-  //       console.error("ColumnList getCardList에서 api 오류 발생", error);
-  //       toast.error(error.response?.data.message);
-  //     }
-  //   }
-  // };
+      if (response.status === 200) {
+        setCardList((prev) => [...prev, ...response.data.cards]);
+        setCursorId(response.data.cursorId);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error("ColumnList getCardList에서 api 오류 발생", error);
+        toast.error(error.response?.data.message);
+      }
+    }
+  };
 
   // 카드아이템 무한스크롤
   useEffect(() => {
@@ -182,7 +184,7 @@ const ColumnList = () => {
 
     observeRef.current = new IntersectionObserver((entries) => {
       const lastCardItem = entries[0];
-
+      console.log("IntersectionObserver 호출");
       if (lastCardItem.isIntersecting && hasMore) {
         // getCardList();
         loadMoreCardItem();
@@ -198,15 +200,20 @@ const ColumnList = () => {
         observeRef.current?.unobserve(loadingRef.current);
       }
     };
-  }, [loadingRef, hasMore]);
+  }, [hasMore]);
+
+  const handleAddTodo = () => {
+    // 모달 만들어지면 모달 연결
+    console.log("모달 오픈");
+  };
 
   return (
-    <>
+    <div className="space-y-6 px-4 pt-4 md:border-b md:border-gray04 md:pb-6 xl:flex xl:min-h-screen xl:flex-col xl:border-b-0 xl:border-r">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <div className="flex items-center space-x-2">
             <span className="size-2 rounded-full bg-violet01" />
-            <h2 className="text-lg font-bold text-black">To Do</h2>
+            <h2 className="text-lg font-bold text-black">{columnTitle}</h2>
           </div>
           <NumChip num={DUMMY_ITEM.length} />
         </div>
@@ -215,15 +222,19 @@ const ColumnList = () => {
         </button>
       </div>
       <div className="flex flex-col space-y-2">
-        <button className="flex h-8 w-full items-center justify-center rounded-md border border-gray03">
-          <PlusChip />
-        </button>
-        {DUMMY_ITEM.map((item) => (
-          <ColumnItem key={item.cards.id} cards={item.cards} />
-        ))}
-        <div ref={loadingRef} className="h-10" />
+        <AddTodoBtn onClick={handleAddTodo} />
+        {cardList.length > 0 ? (
+          cardList.map((item, i) => (
+            <div key={item.cards.id}>
+              <ColumnItem cards={item.cards} />
+              {i === cardList.length - 1 && <div ref={loadingRef} className="h-[1px]" />}
+            </div>
+          ))
+        ) : (
+          <p className="flex items-center justify-center text-center font-bold">등록된 카드가 없습니다.</p>
+        )}
       </div>
-    </>
+    </div>
   );
 };
 

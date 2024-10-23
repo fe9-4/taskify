@@ -10,7 +10,8 @@ import { useSetAtom } from "jotai";
 import { userAtom } from "@/store/userAtoms";
 import axios from "axios";
 import { ActiveBtn } from "@/components/ButtonComponents";
-import InputItem from "@/components/InputItem";
+import InputItem from "@/components/input/InputItem";
+
 
 const LoginPage = () => {
   const router = useRouter();

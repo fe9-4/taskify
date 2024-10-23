@@ -29,7 +29,7 @@ export const AddDashboardBtn = ({ onClick }: any) => {
 };
 
 //3) 투두 추가
-export const AddTodoBtn = ({ onClick }: any) => {
+export const AddTodoBtn = ({ onClick }: { onClick: () => void }) => {
   return (
     <BaseBtn onClick={onClick}>
       <Content extra="h-8 w-[284px] md:h-[40px] md:w-[544px] xl:w-[314px]">

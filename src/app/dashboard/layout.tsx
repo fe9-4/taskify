@@ -1,6 +1,12 @@
-const DashboardLayout = ({ children}: { children: React.ReactNode }) => {
+import { Metadata } from "next";
+
+export const metaData: Metadata = {
+  title: "대시보드",
+}
+
+const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="mt-[60px] py-4 px-3 bg-gray05">
+    <div className="bg-gray05">
       {children}
     </div>
   );
