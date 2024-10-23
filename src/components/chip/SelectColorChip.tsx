@@ -25,7 +25,7 @@ const SelectColorChip = ({ register, watch }: Props) => {
           <ColorChip color={item.value} />
           {/* 선택 됬을 경우 check 아이콘 표시 */}
           {selectedColor === item.value && <FaCheck className="absolute left-[3px] top-[3px] size-6 text-white" />}
-          <input type="radio" {...register("color")} value={item.value} className="hidden" />
+          <input type="radio" {...register("color", { required: true })} value={item.value} className="hidden" />
         </label>
       ))}
     </div>
