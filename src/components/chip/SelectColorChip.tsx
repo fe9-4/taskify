@@ -1,4 +1,4 @@
-import ColorChip from "./ColorChip";
+import ColorChip from "@/components/chip/ColorChip";
 import { FieldValues, UseFormRegister, UseFormWatch } from "react-hook-form";
 import { FaCheck } from "react-icons/fa6";
 

@@ -4,7 +4,7 @@ import React from "react";
 import Modal from "react-modal";
 import { useAtom } from "jotai";
 import { CreateDashboardAtom } from "@/components/modal/modalAtom";
-import CreateDashboard from "./CreateDashboard";
+import CreateDashboard from "@/components/modal/CreateDashboard";
 
 Modal.setAppElement("#modal-root");
 
