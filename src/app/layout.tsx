@@ -28,7 +28,7 @@ export default function RootLayout({
     <html lang="ko">
       <body className={`${montserrat.variable} font-pretendard min-h-screen text-black03`}>
         <Header />
-        {children}
+        <main className="pt-[60px] md:pt-[70px]">{children}</main>
         <Toaster toastOptions={{ success: { style: { fontSize: "14px" } }, error: { style: { fontSize: "14px" } } }} />
       </body>
     </html>
