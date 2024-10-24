@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import toast from "react-hot-toast";
-import ColumnList from "@/components/dashboard/ColumnList";
+import ColumnList from "@/app/dashboard/components/ColumnList";
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { AddColumnBtn } from "@/components/button/ButtonComponents";
@@ -19,9 +19,9 @@ interface IColumnList {
 const DashboardDetail = () => {
   const { dashboardId } = useParams();
 
-  const [columnList, setColumnList] = useState<IColumnList["data"]>( []);
+  const [columnList, setColumnList] = useState<IColumnList["data"]>([]);
   const [addColumn, setAddColumn] = useState(false);
-  
+
   const getColumn = useCallback(async () => {
     try {
       const response = await axios.get(`/api/dashboard/${dashboardId}`);
@@ -58,6 +58,6 @@ const DashboardDetail = () => {
       </div>
     </div>
   );
-}
+};
 
 export default DashboardDetail;

@@ -3,8 +3,8 @@ import toast from "react-hot-toast";
 import ColumnItem from "./ColumnItem";
 import { useEffect, useRef, useState } from "react";
 import { HiOutlineCog } from "react-icons/hi";
-import { NumChip } from "../chip/PlusAndNumChip";
-import { AddTodoBtn } from "../button/ButtonComponents";
+import { NumChip } from "../../../components/chip/PlusAndNumChip";
+import { AddTodoBtn } from "../../../components/button/ButtonComponents";
 import { ICard } from "@/types/dashboardType";
 
 interface IProps {
@@ -18,7 +18,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [hasMore, setHasMore] = useState(true);
   const observeRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
-  
+
   const getCardList = async () => {
     if (!hasMore) return;
 
@@ -47,7 +47,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
 
     observeRef.current = new IntersectionObserver((entries) => {
       const lastCardItem = entries[0];
-      
+
       if (lastCardItem.isIntersecting && hasMore) {
         getCardList();
       }
