@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   const page = searchParams.get("page") || 1;
   const size = searchParams.get("size") || 10;
 
-  const requestUrl = `/9-4/dashboards?navigationMethod=pagination&page=${page}&size=${size}`;
+  const requestUrl = `/dashboards?navigationMethod=pagination&page=${page}&size=${size}`;
   if (!accessToken) {
     return NextResponse.json({ user: null }, { status: 401 });
   }
