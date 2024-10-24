@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import apiClient from "@/app/api/apiClient";
 
 export async function GET() {
-  const cookieStore = await cookies();
+  const cookieStore = cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
 
   if (!accessToken) {
@@ -11,7 +11,7 @@ export async function GET() {
   }
 
   try {
-    const response = await apiClient.get("/dashboards?navigationMethod=pagination&cursorId=1&page=1&size=10", {
+    const response = await apiClient.get("/9-4/dashboards?navigationMethod=pagination&cursorId=1&page=1&size=10", {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },

@@ -48,13 +48,13 @@ const DashboardList = () => {
   const fetchDashboardList = async () => {
     if (user) {
       try {
-        const res = await fetch("api/dashboard/list", { method: "GET", credentials: "include" });
+        const res = await fetch("/api/dashboard/list", { method: "GET", credentials: "include" });
         if (!res.ok) {
           throw new Error(`Failed to fetch data : ${res.status}`);
         }
         const data = await res.json();
 
-        if (data.dashboard) {
+        if (data.dashboards) {
           setDashboardList(data ? data.dashboards : []);
         } else {
           setDashboardList([]);
