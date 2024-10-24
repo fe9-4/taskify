@@ -7,14 +7,24 @@ import { PaginationBtn } from "../button/ButtonComponents";
 import { ItemType } from "@/types/dashboardType";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useWidth } from "@/hooks/useWidth";
 
 const Sidebar = () => {
   const [page, setPage] = useState(1);
-  const [size, setSize] = useState(10); // 모바일 10개, 태블릿 15개, 데스크탑 15개
+  const [size, setSize] = useState(10);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [dashboardList, setDashboardList] = useState<ItemType[]>([]);
   const { user } = useAuth();
   const pathname = usePathname();
+  const { isLargeScreen } = useWidth();
+
+  useEffect(() => {
+    if (isLargeScreen) {
+      setSize(15);
+    } else {
+      setSize(10);
+    }
+  }, [isLargeScreen]);
 
   const totalPage: number = Math.ceil(totalCount / size);
 
@@ -47,6 +57,7 @@ const Sidebar = () => {
   const onClickNext = () => {
     if (page !== totalPage) setPage(page + 1);
   };
+
   if (pathname === "/" || pathname === "/login" || pathname === "/signup") return null;
   return (
     <aside className="fixed left-0 top-0 z-50 flex h-screen w-[67px] flex-col gap-[39px] border-r border-gray03 bg-white px-[13px] py-5 md:w-[160px] md:gap-[57px] xl:w-[300px] xl:pl-2 xl:pr-3">
@@ -55,13 +66,16 @@ const Sidebar = () => {
         <Button />
         <DashboardList list={dashboardList} />
         <div className="hidden md:mt-6 md:block xl:mt-[32px]">
-          {/* 1페이지면 disabledPrev = true, 마지막 페이지면 disabledNext=true */}
-          <PaginationBtn
-            disabledPrev={page === 1}
-            disabledNext={page === totalPage}
-            onClickPrev={onClickPrev}
-            onClickNext={onClickNext}
-          />
+          {totalCount > size ? (
+            <PaginationBtn
+              disabledPrev={page === 1}
+              disabledNext={page === totalPage}
+              onClickPrev={onClickPrev}
+              onClickNext={onClickNext}
+            />
+          ) : (
+            <></>
+          )}
         </div>
       </div>
     </aside>
