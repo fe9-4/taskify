@@ -8,159 +8,16 @@ import apiClient from "@/app/api/apiClient";
 import { AddTodoBtn } from "../button/ButtonComponents";
 import { ICard } from "@/types/dashboardType";
 
-const DUMMY_ITEM = [
-  {
-    cards: {
-      id: 1,
-      title: "이번 프로젝트 개요",
-      description: "프로젝트 개요입니다.",
-      tags: ["프로젝트", "프론트엔드", "중"],
-      dueDate: "2024. 10. 21",
-      imageUrl: "/images/cardImg1.png",
-      assignee: {
-        nickname: "M",
-      },
-    },
-    totalCount: 3,
-  },
-  {
-    cards: {
-      id: 2,
-      title: "다음 프로젝트 개요",
-      description: "다음프로젝트 개요입니다.",
-      tags: ["프로젝트", "프론트엔드", "상"],
-      dueDate: "2024. 11. 21",
-      imageUrl: "/images/cardImg1.png",
-      assignee: {
-        nickname: "H",
-      },
-    },
-    totalCount: 3,
-  },
-  {
-    cards: {
-      id: 3,
-      title: "다다음 프로젝트 개요",
-      description: "다다음 프로젝트 개요입니다.",
-      tags: ["프로젝트", "프론트엔드", "백엔드", "상"],
-      dueDate: "2024. 12. 21",
-      imageUrl: "/images/cardImg1.png",
-      assignee: {
-        nickname: "K",
-      },
-    },
-    totalCount: 3,
-  },
-  {
-    cards: {
-      id: 4,
-      title: "이번 프로젝트 개요",
-      description: "프로젝트 개요입니다.",
-      tags: ["프로젝트", "프론트엔드", "중"],
-      dueDate: "2024. 10. 21",
-      imageUrl: "/images/cardImg1.png",
-      assignee: {
-        nickname: "M",
-      },
-    },
-    totalCount: 3,
-  },
-  {
-    cards: {
-      id: 5,
-      title: "다음 프로젝트 개요",
-      description: "다음프로젝트 개요입니다.",
-      tags: ["프로젝트", "프론트엔드", "상"],
-      dueDate: "2024. 11. 21",
-
-      assignee: {
-        nickname: "H",
-      },
-    },
-    totalCount: 3,
-  },
-  {
-    cards: {
-      id: 6,
-      title: "다다음 프로젝트 개요",
-      description: "다다음 프로젝트 개요입니다.",
-      tags: ["프로젝트", "프론트엔드", "백엔드", "상"],
-      dueDate: "2024. 12. 21",
-      imageUrl: "/images/cardImg1.png",
-      assignee: {
-        nickname: "K",
-      },
-    },
-    totalCount: 3,
-  },
-  {
-    cards: {
-      id: 76,
-      title: "다다음 프로젝트 개요",
-      description: "다다음 프로젝트 개요입니다.",
-      tags: ["프로젝트", "프론트엔드", "백엔드", "상"],
-      dueDate: "2024. 12. 21",
-      imageUrl: "/images/cardImg1.png",
-      assignee: {
-        nickname: "K",
-      },
-    },
-    totalCount: 3,
-  },
-  {
-    cards: {
-      id: 8,
-      title: "다다음 프로젝트 개요",
-      description: "다다음 프로젝트 개요입니다.",
-      tags: ["프로젝트", "프론트엔드", "백엔드", "상"],
-      dueDate: "2024. 12. 21",
-      imageUrl: "",
-      assignee: {
-        nickname: "K",
-      },
-    },
-    totalCount: 3,
-  },
-  {
-    cards: {
-      id: 9,
-      title: "다다음 프로젝트 개요",
-      description: "다다음 프로젝트 개요입니다.",
-      tags: ["프로젝트", "프론트엔드", "백엔드", "상"],
-      dueDate: "2024. 12. 21",
-      imageUrl: "/images/cardImg1.png",
-      assignee: {
-        nickname: "K",
-      },
-    },
-    totalCount: 3,
-  },
-];
-
-const ITEMS_PER_PAGE = 3;
-
 const ColumnList = ({ columnTitle }: { columnTitle: string }) => {
-  // const [cardList, setCardList] = useState<ICard[]>([]);
-  const [cardList, setCardList] = useState(DUMMY_ITEM.slice(0, ITEMS_PER_PAGE));
-  const [cursorId, setCursorId] = useState<number>(ITEMS_PER_PAGE);
+  const [cardList, setCardList] = useState<ICard[]>([]);
+  const [cursorId, setCursorId] = useState<number>(0);
   const [hasMore, setHasMore] = useState(true);
   const observeRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
-
-  const loadMoreCardItem = () => {
-    const nextCardItem = DUMMY_ITEM.slice(cursorId, cursorId + ITEMS_PER_PAGE);
-
-    if (nextCardItem.length > 0) {
-      setCardList((prev) => [...prev, ...nextCardItem]);
-      console.log("로딩된 카드", nextCardItem);
-      setCursorId((prev) => prev + ITEMS_PER_PAGE);
-    } else {
-      setHasMore(false);
-      console.log("더 이상 로딩할 데이터가 없습니다.");
-    }
-  };
-  console.log(cursorId, hasMore);
+  
   const getCardList = async () => {
+    if (!hasMore) return;
+
     try {
       const response = await apiClient.get(`/cards?size=10&cursorId=${cursorId}&columnId=`, {
         params: { cursorId },
@@ -169,6 +26,10 @@ const ColumnList = ({ columnTitle }: { columnTitle: string }) => {
       if (response.status === 200) {
         setCardList((prev) => [...prev, ...response.data.cards]);
         setCursorId(response.data.cursorId);
+      }
+
+      if (response.data.cards.length < 10) {
+        setHasMore(false);
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -180,14 +41,13 @@ const ColumnList = ({ columnTitle }: { columnTitle: string }) => {
 
   // 카드아이템 무한스크롤
   useEffect(() => {
-    // getCardList();
+    getCardList();
 
     observeRef.current = new IntersectionObserver((entries) => {
       const lastCardItem = entries[0];
-      console.log("IntersectionObserver 호출");
+      
       if (lastCardItem.isIntersecting && hasMore) {
-        // getCardList();
-        loadMoreCardItem();
+        getCardList();
       }
     });
 
@@ -215,7 +75,7 @@ const ColumnList = ({ columnTitle }: { columnTitle: string }) => {
             <span className="size-2 rounded-full bg-violet01" />
             <h2 className="text-lg font-bold text-black">{columnTitle}</h2>
           </div>
-          <NumChip num={DUMMY_ITEM.length} />
+          <NumChip num={cardList.length} />
         </div>
         <button>
           <HiOutlineCog className="size-[22px] text-gray01" />
