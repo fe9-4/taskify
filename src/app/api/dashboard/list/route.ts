@@ -7,10 +7,9 @@ export async function GET() {
   const accessToken = cookieStore.get("accessToken")?.value;
 
   // 모바일 10개, 태블릿 15개, 데스크탑 15개
-  const query = { navigationMethod: "pagination", cursorId: 1, page: 1, size: 10 };
-  const { navigationMethod, cursorId, page, size } = query;
-  const requestUrl = `/9-4/dashboards?navigationMethod=${navigationMethod}&cursorId=${cursorId}&page=${page}&size=${size}`;
-
+  const query = { page: 1, size: 15 };
+  const { page, size } = query;
+  const requestUrl = `/9-4/dashboards?navigationMethod=pagination&page=${page}&size=${size}`;
   if (!accessToken) {
     return NextResponse.json({ user: null }, { status: 401 });
   }
