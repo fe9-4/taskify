@@ -16,7 +16,7 @@ const DashboardItem = ({ item }: { item: ItemType }) => {
           <div className="hidden font-medium text-gray01 md:block md:whitespace-nowrap md:text-lg xl:hidden">
             {shortTitle}
           </div>
-          <div className="hidden xl:block xl:text-xl">{title}</div>
+          <div className="hidden font-medium text-gray01 md:text-lg xl:block xl:text-xl">{title}</div>
           <div className="hidden md:block">
             {createdByMe ? <FaCrown fill="#FDD446" className="h-3 w-[15px] xl:h-[14px] xl:w-[18px]" /> : <></>}
           </div>
