@@ -96,7 +96,7 @@ export default function Header() {
                     {getInitials(user.nickname)}
                   </div>
                 )}
-                <span>{user.nickname}</span>
+                <span className="hidden md:inline">{user.nickname}</span>
               </button>
               {isDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-20 rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
