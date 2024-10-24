@@ -76,7 +76,7 @@ const SearchDropdown = ({ inviteMemberList, setManager, currentManager }: IProps
             type="text"
             value={selectedName?.nickname || name}
             onChange={handleChangeName}
-            className="w-full py-3 focus:outline-none"
+            className="w-full focus:outline-none"
             placeholder="이름을 입력해 주세요"
           />
         </div>
