@@ -32,9 +32,9 @@ export default function RootLayout({
       <body className={`${montserrat.variable} font-pretendard min-h-screen text-black03`}>
         <div id="modal-root"></div>
         <ModalContainer />
-        <Header />
         <Sidebar />
         <ClientLayout>
+          <Header />
           <main className="pt-[60px] md:pt-[70px]">{children}</main>
         </ClientLayout>
         <Toaster toastOptions={{ success: { style: { fontSize: "14px" } }, error: { style: { fontSize: "14px" } } }} />
