@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import ModalContainer from "@/components/modal/ModalContainer";
 import { Sidebar } from "@/components/sidebar/Sidebar";
 import ClientLayout from "./childrenLayout";
+import { Provider } from "jotai";
 
 const montserrat = Montserrat({
   weight: ["400", "700"],
@@ -32,12 +33,13 @@ export default function RootLayout({
       <body className={`${montserrat.variable} font-pretendard min-h-screen text-black03`}>
         <div id="modal-root"></div>
         <ModalContainer />
-        {/* <Sidebar /> */}
+        <Sidebar />
         <ClientLayout>
           <Header />
           <main className="pt-[60px] md:pt-[70px]">{children}</main>
         </ClientLayout>
         <Toaster toastOptions={{ success: { style: { fontSize: "14px" } }, error: { style: { fontSize: "14px" } } }} />
+        <Provider>{children}</Provider>
       </body>
     </html>
   );
