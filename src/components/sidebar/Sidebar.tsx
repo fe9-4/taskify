@@ -3,7 +3,7 @@ import { usePathname } from "next/navigation";
 import Button from "./Button";
 import DashboardList from "./DashboardList";
 import Logo from "./Logo";
-import { BackForwardBtn } from "../button/ButtonComponents";
+import { PaginationBtn } from "../button/ButtonComponents";
 
 const Sidebar = () => {
   const onClickPrev = () => {};
@@ -17,7 +17,8 @@ const Sidebar = () => {
         <Button />
         <DashboardList />
         <div className="hidden md:mt-6 md:block xl:mt-[32px]">
-          <BackForwardBtn disabled onClickPrev={onClickPrev} onClickNext={onClickNext} />
+          {/* 1페이지면 disabledPrev = true */}
+          <PaginationBtn disabledPrev disabledNext onClickPrev={onClickPrev} onClickNext={onClickNext} />
         </div>
       </div>
     </aside>

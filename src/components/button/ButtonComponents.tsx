@@ -167,12 +167,14 @@ export const CombiBtn = ({
 };
 
 // 8) 페이지네이션 버튼
-export const BackForwardBtn = ({
-  disabled,
+export const PaginationBtn = ({
+  disabledPrev,
+  disabledNext,
   onClickPrev,
   onClickNext,
 }: {
-  disabled: boolean;
+  disabledPrev: boolean;
+  disabledNext: boolean;
   onClickPrev: any;
   onClickNext: any;
 }) => {
@@ -181,21 +183,21 @@ export const BackForwardBtn = ({
       <button
         onClick={onClickPrev}
         type="button"
-        disabled={disabled}
+        disabled={disabledPrev}
         className={cls(
           "flex size-full items-center justify-center border-r border-gray03",
-          disabled ? "cursor-not-allowed" : ""
+          disabledPrev ? "cursor-not-allowed" : ""
         )}
       >
-        <IoIosArrowBack className={cls("size-4", disabled ? "text-gray03" : "text-black03")} />
+        <IoIosArrowBack className={cls("size-4", disabledPrev ? "text-gray03" : "text-black03")} />
       </button>
       <button
         onClick={onClickNext}
         type="button"
-        disabled={disabled}
-        className={cls("flex size-full items-center justify-center", disabled ? "cursor-not-allowed" : "")}
+        disabled={disabledNext}
+        className={cls("flex size-full items-center justify-center", disabledNext ? "cursor-not-allowed" : "")}
       >
-        <IoIosArrowForward className={cls("size-4", disabled ? "text-gray03" : "text-black03")} />
+        <IoIosArrowForward className={cls("size-4", disabledNext ? "text-gray03" : "text-black03")} />
       </button>
     </div>
   );
