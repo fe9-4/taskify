@@ -4,8 +4,8 @@ import { Toaster } from "react-hot-toast";
 import { Montserrat } from "next/font/google";
 import Header from "@/components/Header";
 import ModalContainer from "@/components/modal/ModalContainer";
-import { Sidebar } from "@/components/sidebar/Sidebar";
 import ClientLayout from "./childrenLayout";
+import Sidebar from "@/components/sidebar/Sidebar";
 
 const montserrat = Montserrat({
   weight: ["400", "700"],

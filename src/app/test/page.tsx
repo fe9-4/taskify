@@ -5,7 +5,6 @@ import {
   AddColumnBtn,
   AddDashboardBtn,
   AddTodoBtn,
-  BackForwardBtn,
   CancelBtn,
   CombiBtn,
   ConfirmBtn,
@@ -13,6 +12,7 @@ import {
   DeleteCancelBtn,
   DeleteDashboardBtn,
   InsertBtn,
+  PaginationBtn,
 } from "@/components/button/ButtonComponents";
 import { AlertModalAtom, AlertModalTextAtom, CreateCardAtom, CreateDashboardAtom } from "@/store/modalAtom";
 import { useAtom } from "jotai";
@@ -59,8 +59,8 @@ export default function Home() {
         <ConfirmBtn onClick={onClick}>확인</ConfirmBtn>
       </div>
       <CombiBtn onClickAccept={onClick} onClickRefuse={onClick} value={["수락", "거절"]}></CombiBtn>
-      <BackForwardBtn onClickPrev={onClick} onClickNext={onClick} disabled={true} />
-      <BackForwardBtn onClickPrev={onClick} onClickNext={onClick} disabled={false} />
+      <PaginationBtn onClickPrev={onClick} onClickNext={onClick} disabledPrev={true} disabledNext={false} />
+      <PaginationBtn onClickPrev={onClick} onClickNext={onClick} disabledPrev={true} disabledNext={true} />
     </>
   );
 }
