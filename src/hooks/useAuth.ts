@@ -28,7 +28,7 @@ export const useAuth = () => {
     hasAttemptedRefreshRef.current = true; // 새로 고침 시도 표시
     try {
       // 서버로부터 사용자 정보 가져오기
-      const response = await axios.get("/api/auth/login");
+      const response = await axios.get("/api/user/profile");
       console.log("서버 응답 데이터:", response.data);
 
       // 서버 응답 데이터에서 실제 사용자 정보 추출
