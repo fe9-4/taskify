@@ -14,12 +14,14 @@ import {
   DeleteDashboardBtn,
   InsertBtn,
 } from "@/components/button/ButtonComponents";
-import { CreateCardAtom, CreateDashboardAtom } from "@/store/modalAtom";
+import { AlertModalAtom, AlertModalTextAtom, CreateCardAtom, CreateDashboardAtom } from "@/store/modalAtom";
 import { useAtom } from "jotai";
 
 export default function Home() {
   const [, setIsCreateDashboardOpen] = useAtom(CreateDashboardAtom);
   const [, setIsCreateCard] = useAtom(CreateCardAtom);
+  const [, setIsAlertOpen] = useAtom(AlertModalAtom);
+  const [, setAlertText] = useAtom(AlertModalTextAtom);
   const onClick = () => {
     console.log(`클릭 테스트`);
   };
@@ -27,8 +29,18 @@ export default function Home() {
     <>
       <AddColumnBtn onClick={() => setIsCreateCard(true)} />
       <AddDashboardBtn onClick={() => setIsCreateDashboardOpen(true)} />
-      <AddTodoBtn onClick={onClick} />
-      <DeleteDashboardBtn onClick={onClick} />
+      <AddTodoBtn
+        onClick={() => {
+          setAlertText("비밀번호가 일치하지 않습니다.");
+          setIsAlertOpen(true);
+        }}
+      />
+      <DeleteDashboardBtn
+        onClick={() => {
+          setAlertText("가입이 완료되었습니다!");
+          setIsAlertOpen(true);
+        }}
+      />
       <DashboardCard onClick={onClick} dashboardName="비브리지" isMine={false} color="#7AC555" />
       <DashboardCard onClick={onClick} dashboardName="비브리지" isMine={true} color="#7AC555" />
       <ActiveBtn onClick={onClick} disabled={false}>
