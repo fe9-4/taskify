@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import apiClient from "@/app/api/apiClient";
 
 export async function GET() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
 
   if (!accessToken) {
