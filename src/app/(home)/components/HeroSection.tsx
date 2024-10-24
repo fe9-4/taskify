@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import Link from "next/link";
 
 const HeroSection = () => {
   return (
@@ -16,8 +19,12 @@ const HeroSection = () => {
           Taskify
         </span>
       </h1>
-      {/* 임시 버튼 */}
-      <button className="mb-[76px] h-[46px] w-[235px] bg-violet01 text-white md:mb-[180px]">로그인하기</button>
+      <Link
+        href="/login"
+        className="mb-[76px] flex h-[46px] w-[235px] items-center justify-center rounded-lg bg-violet01 text-white md:mb-[180px] md:h-[54px] md:w-[280px]"
+      >
+        로그인하기
+      </Link>
     </div>
   );
 };

@@ -1,10 +1,12 @@
 import DatePicker from "react-datepicker";
-import { useRef } from "react";
+import "react-datepicker/dist/react-datepicker.css";
+import { useRef, useState } from "react";
 import { cls } from "@/lib/utils";
 import { InputDateProps } from "@/types/formType";
 import { MdOutlineCalendarToday as CalendarIcon } from "react-icons/md";
 
-const InputDate = ({ label, value, placeholder, onChange }: InputDateProps) => {
+const InputDate = ({ label, id, name, value, placeholder, onChange }: InputDateProps) => {
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const datePickerRef = useRef<DatePicker>(null);
 
   const handleImageClick = () => {
@@ -17,6 +19,8 @@ const InputDate = ({ label, value, placeholder, onChange }: InputDateProps) => {
     datePickerRef.current?.setOpen(true);
   };
 
+  const DateValue = value instanceof Date ? value.toLocaleString() : value || placeholder;
+
   return (
     <div className="flex flex-col gap-2">
       {label && <label className="text-lg font-medium text-black03">{label}</label>}
@@ -28,19 +32,26 @@ const InputDate = ({ label, value, placeholder, onChange }: InputDateProps) => {
         />
 
         <DatePicker
+          id={id}
+          name={name}
           ref={datePickerRef}
           className={cls(
-            "flex h-[50px] w-[287px] cursor-pointer items-center rounded-lg border border-solid border-gray03 pl-11 text-base placeholder-gray02 transition-all md:w-[520px] md:text-lg",
+            "flex h-[50px] w-[287px] cursor-pointer items-center rounded-lg pl-11 text-base placeholder-gray02 ring-1 ring-inset ring-gray03 transition-all focus-within:ring-violet01 focus:outline-none focus:ring-1 focus:ring-inset md:w-[520px] md:text-lg",
             value ? "text-black03" : "text-gray02"
           )}
-          selected={value ? new Date(value) : null}
-          onChange={(date) => onChange(date)}
+          selected={selectedDate}
+          onChange={(date) => {
+            setSelectedDate(date);
+            if (onChange) {
+              onChange(date);
+            }
+          }}
           showTimeSelect // 시간 선택 기능 활성화
           dateFormat="yyyy. MM. dd HH:mm" // 날짜 형식 및 시간 형식 설정
           timeFormat="HH:mm" // 시간 형식 (24시간 형식)
           timeIntervals={30} // 30분 단위로 시간 선택
           minDate={new Date()} // 현재 날짜 이전은 선택 불가
-          customInput={<div onClick={handleDatePickerOpen}>{value ? value : placeholder}</div>}
+          customInput={<div onClick={handleDatePickerOpen}>{DateValue}</div>}
         />
       </div>
     </div>

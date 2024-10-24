@@ -23,7 +23,7 @@ interface ICurrentManager {
 // currentManager는 '할 일 수정'에서 이 드롭다운메뉴를 사용하실 때 현재 담당자명입니다.
 interface IProps {
   inviteMemberList: ICurrentManager[];
-  setManager: Dispatch<SetStateAction<string>>;
+  setManager?: Dispatch<SetStateAction<string>>;
   currentManager?: ICurrentManager;
 }
 
@@ -64,8 +64,8 @@ const SearchDropdown = ({ inviteMemberList, setManager, currentManager }: IProps
   const { bg } = randomColor(colorList);
 
   return (
-    <div className="flex w-[217px] flex-col space-y-[2px]">
-      <div className="flex items-center justify-between overflow-hidden rounded-md border px-4 transition-all focus-within:border-violet01">
+    <div className="flex w-full flex-col space-y-[2px] bg-white">
+      <div className="flex h-[50px] w-full items-center justify-between overflow-hidden rounded-lg px-4 ring-1 ring-inset ring-gray03 transition-all focus-within:ring-violet01 focus:outline-none focus:ring-1 focus:ring-inset">
         <div className="flex items-center space-x-2">
           {selectedName && (
             <span className="flex h-[26px] w-8 items-center justify-center rounded-full bg-[#A3C4A2] text-xs font-semibold text-white ring-white ring-offset-2">
@@ -76,7 +76,7 @@ const SearchDropdown = ({ inviteMemberList, setManager, currentManager }: IProps
             type="text"
             value={selectedName?.nickname || name}
             onChange={handleChangeName}
-            className="w-full py-3 focus:outline-none"
+            className="w-full focus:outline-none"
             placeholder="이름을 입력해 주세요"
           />
         </div>
