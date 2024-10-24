@@ -32,7 +32,7 @@ export default function RootLayout({
       <body className={`${montserrat.variable} font-pretendard min-h-screen text-black03`}>
         <div id="modal-root"></div>
         <ModalContainer />
-        <Sidebar />
+        {/* <Sidebar /> */}
         <ClientLayout>
           <Header />
           <main className="pt-[60px] md:pt-[70px]">{children}</main>

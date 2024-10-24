@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef } from "react";
 import axios from "axios";
 import { useAtomValue, useSetAtom } from "jotai";
 import { userAtom, loadingAtom } from "@/store/userAtoms";
+import { useRouter } from "next/navigation";
 
 export const useAuth = () => {
   // Jotai의 useAtomValue로 사용자 상태 값 가져오기
@@ -14,6 +15,7 @@ export const useAuth = () => {
   const setLoading = useSetAtom(loadingAtom);
   // 사용자 정보를 새로 고침했는지 여부를 저장하는 ref
   const hasAttemptedRefreshRef = useRef(false);
+  const router = useRouter();
 
   // 사용자 데이터를 초기화하는 함수
   const clearUserData = useCallback(() => {
@@ -46,8 +48,12 @@ export const useAuth = () => {
       // 사용자 정보가 있으면 상태 업데이트
       setUser(userData);
     } catch (error) {
-      // 에러 발생 시 데이터 초기화
-      console.error("사용자 정보 새로고침 실패:", error);
+      // 에러 처리 부분 수정
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        console.log("401 에러: 인증되지 않은 사용자");
+      } else {
+        console.error("사용자 정보 새로고침 실패:", error);
+      }
       clearUserData();
     } finally {
       setLoading(false); // 로딩 상태를 false로 설정
@@ -65,5 +71,16 @@ export const useAuth = () => {
     refreshUser(); // 사용자 정보 새로 고침
   }, [refreshUser]);
 
-  return { user, loading, setUser, resetAuthState };
+  // 로그아웃 함수 추가
+  const logout = useCallback(async () => {
+    try {
+      await axios.post("/api/auth/logout", {}, { withCredentials: true });
+      clearUserData();
+      router.push("/");
+    } catch (error) {
+      console.error("로그아웃 오류:", error);
+    }
+  }, [clearUserData, router]);
+
+  return { user, loading, setUser, resetAuthState, logout };
 };
