@@ -1,16 +1,20 @@
-import { HiOutlineCog } from "react-icons/hi";
-import { NumChip, PlusChip } from "../chip/PlusAndNumChip";
-import ColumnItem from "./ColumnItem";
-import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import apiClient from "@/app/api/apiClient";
+import ColumnItem from "./ColumnItem";
+import { useEffect, useRef, useState } from "react";
+import { HiOutlineCog } from "react-icons/hi";
+import { NumChip } from "../chip/PlusAndNumChip";
 import { AddTodoBtn } from "../button/ButtonComponents";
 import { ICard } from "@/types/dashboardType";
 
-const ColumnList = ({ columnTitle }: { columnTitle: string }) => {
+interface IProps {
+  columnTitle: string;
+  columnId: number;
+}
+
+const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [cardList, setCardList] = useState<ICard[]>([]);
-  const [cursorId, setCursorId] = useState<number>(0);
+  const [cursorId, setCursorId] = useState<number>(1);
   const [hasMore, setHasMore] = useState(true);
   const observeRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
@@ -19,9 +23,7 @@ const ColumnList = ({ columnTitle }: { columnTitle: string }) => {
     if (!hasMore) return;
 
     try {
-      const response = await apiClient.get(`/cards?size=10&cursorId=${cursorId}&columnId=`, {
-        params: { cursorId },
-      });
+      const response = await axios.get(`/api/dashboard/columnList?cursorId=${cursorId}&columnId=${columnId}`);
 
       if (response.status === 200) {
         setCardList((prev) => [...prev, ...response.data.cards]);

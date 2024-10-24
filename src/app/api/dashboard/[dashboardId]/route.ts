@@ -1,22 +1,37 @@
-import config from "@/constants/config";
+import axios from "axios";
 import apiClient from "../../apiClient";
 import { NextResponse } from "next/server";
-import axios from "axios";
+import { cookies } from "next/headers";
 
 interface IParams {
   dashboardId: number;
 }
 
-export const GET = async (req: Request, { params }: { params: IParams}) => {
+export const GET = async (req: Request, { params }: { params: IParams }) => {
   const { dashboardId } = params; 
-  console.log(typeof dashboardId)
+  const id = Number(dashboardId);
+  
+  const cookieStore = cookies();
+  const token = cookieStore.get("accessToken")?.value;
+  
+  if (!token) {
+    return new NextResponse("사용자 정보를 찾을 수 없습니다.", { status: 401 });
+  }
+
+  if (isNaN(id)) {
+    return new NextResponse("대시보드 정보 가져오기 실패", { status: 400 });
+  }
+
   try {
-    const response = await apiClient.get(`${process.env.NEXT_PUBLIC_API_URL}/${config.TEAM_ID}/columns?dashboardId=${dashboardId}`);
+    const response = await apiClient.get(`/columns?dashboardId=${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    });
 
     if (response.status === 200) {
-      const columnTitle = response.data.data.title;
-      console.log(columnTitle)
-      return NextResponse.json(columnTitle, { status: 200 });
+      const data = response.data.data;
+      return NextResponse.json(data, { status: 200 });
     }
   } catch (error) {
     if (axios.isAxiosError(error)) {

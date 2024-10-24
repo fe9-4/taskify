@@ -1,14 +1,25 @@
 import axios from "axios"
-import { NextResponse } from "next/server";
 import apiClient from "../apiClient";
-import config from "@/constants/config";
+import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 
 export const GET = async (req: Request) => {
   const { searchParams } = new URL(req.url);
   const page = searchParams.get("page");
+
+  const cookieStore = cookies();
+  const token = cookieStore.get("accessToken")?.value;
+
+  if (!token) {
+    return new NextResponse("사용자 정보를 찾을 수 없습니다.", { status: 401 });
+  }
   
   try {
-    const response = await apiClient.get(`${process.env.NEXT_PUBLIC_API_URL}/${config.TEAM_ID}/dashboards?navigationMethod=pagination&cursorId=1&page=${page}&size=5`);
+    const response = await apiClient.get(`/dashboards?navigationMethod=pagination&cursorId=1&page=${page}&size=5`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
 
     if (response.status === 200) {
       const dashboardList = response.data.dashboards;

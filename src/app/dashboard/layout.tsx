@@ -6,7 +6,7 @@ export const metaData: Metadata = {
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="bg-gray05">
+    <div className="bg-gray05 min-h-screen">
       {children}
     </div>
   );
