@@ -9,7 +9,6 @@ import { ActiveBtn } from "@/components/button/ButtonComponents";
 import InputItem from "@/components/input/InputItem";
 import { useAuth } from "@/hooks/useAuth";
 import {
-  UserProfileResponse,
   UpdateUserProfile,
   UpdateUserProfileSchema,
   UploadUserProfileImageResponse,
@@ -17,13 +16,11 @@ import {
   UpdateUserPasswordSchema,
 } from "@/zodSchema/userSchema";
 import InputFile from "@/components/input/InputFile";
-import { useRouter } from "next/navigation";
 
 const MyPage = () => {
-  const { user, setUser, loading, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
   const [isProfileChanged, setIsProfileChanged] = useState(false);
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
-  const router = useRouter();
 
   // 프로필 수정 폼 설정
   const profileForm = useForm<UpdateUserProfile>({
@@ -70,7 +67,7 @@ const MyPage = () => {
         });
 
         if (response.data?.profileImageUrl) {
-          console.log("profileImageUrl data: ", response.data?.profileImageUrl);
+          //console.log("profileImageUrl data: ", response.data?.profileImageUrl);
           setProfileImageUrl(response.data.profileImageUrl);
           profileForm.setValue("profileImageUrl", response.data.profileImageUrl);
           setIsProfileChanged(true);
@@ -95,25 +92,8 @@ const MyPage = () => {
     profileForm.setValue("nickname", newNickname, { shouldValidate: true });
     const isChanged = newNickname !== user?.nickname || profileImageUrl !== user?.profileImageUrl;
     setIsProfileChanged(isChanged);
-    console.log("닉네임 변경 상태: ", isChanged);
+    // console.log("닉네임 변경 상태: ", isChanged); // 주석 처리
   };
-
-  // 버튼 활성화 상태를 확인하는 함수
-  const checkButtonState = () => {
-    console.log("isProfileChanged:", isProfileChanged);
-    console.log("isSubmitting:", profileForm.formState.isSubmitting);
-    console.log("isValid:", profileForm.formState.isValid);
-    console.log("Errors:", profileForm.formState.errors);
-    console.log(
-      "Button disabled:",
-      !isProfileChanged || profileForm.formState.isSubmitting || !profileForm.formState.isValid
-    );
-  };
-
-  // useEffect를 사용하여 상태 변경을 감지하고 버튼 상태를 로깅
-  useEffect(() => {
-    checkButtonState();
-  }, [isProfileChanged, profileForm.formState.isSubmitting, profileForm.formState.isValid]);
 
   // 프로필 수정 제출 핸들러
   const onSubmitProfile: SubmitHandler<UpdateUserProfile> = async (data) => {
@@ -126,7 +106,7 @@ const MyPage = () => {
       setIsProfileChanged(false);
       profileForm.reset();
     } catch (error) {
-      console.error("프로필 업데이트 실패:", error);
+      //console.error("프로필 업데이트 실패:", error);
       toast.error("프로필 업데이트 실패");
     }
   };
@@ -139,7 +119,7 @@ const MyPage = () => {
       passwordForm.reset();
       logout();
     } catch (error) {
-      console.error("비밀번호 변경 오류:", error);
+      //console.error("비밀번호 변경 오류:", error);
       toast.error("비밀번호 변경 실패");
     }
   };
@@ -185,10 +165,7 @@ const MyPage = () => {
           </div>
           <ActiveBtn
             disabled={!isProfileChanged || profileForm.formState.isSubmitting || !profileForm.formState.isValid}
-            onClick={() => {
-              checkButtonState();
-              profileForm.handleSubmit(onSubmitProfile)();
-            }}
+            onClick={profileForm.handleSubmit(onSubmitProfile)}
           >
             저장
           </ActiveBtn>
