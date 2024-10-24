@@ -31,7 +31,7 @@ export const useAuth = () => {
     try {
       // 서버로부터 사용자 정보 가져오기
       const response = await axios.get("/api/user/profile");
-      console.log("서버 응답 데이터:", response.data);
+      //console.log("서버 응답 데이터:", response.data);
 
       // 서버 응답 데이터에서 실제 사용자 정보 추출
       let userData;
@@ -40,7 +40,7 @@ export const useAuth = () => {
         userData = response.data.user;
       } else {
         // 사용자 정보가 없으면 데이터 초기화
-        console.log("사용자 정보가 없음");
+        //console.log("사용자 정보가 없음");
         clearUserData();
         return;
       }
@@ -50,9 +50,9 @@ export const useAuth = () => {
     } catch (error) {
       // 에러 처리 부분 수정
       if (axios.isAxiosError(error) && error.response?.status === 401) {
-        console.log("401 에러: 인증되지 않은 사용자");
+        //console.log("401 에러: 인증되지 않은 사용자");
       } else {
-        console.error("사용자 정보 새로고침 실패:", error);
+        //console.error("사용자 정보 새로고침 실패:", error);
       }
       clearUserData();
     } finally {
@@ -76,11 +76,19 @@ export const useAuth = () => {
     try {
       await axios.post("/api/auth/logout", {}, { withCredentials: true });
       clearUserData();
-      router.push("/");
+      // 로그아웃 성공 시 로그인 페이지로 리다이렉트
+      router.push("/login");
     } catch (error) {
       console.error("로그아웃 오류:", error);
     }
   }, [clearUserData, router]);
 
-  return { user, loading, setUser, resetAuthState, logout };
+  const updateUser = useCallback(
+    (updatedUserData: Partial<typeof user>) => {
+      setUser((prevUser) => (prevUser ? { ...prevUser, ...updatedUserData } : null));
+    },
+    [setUser]
+  );
+
+  return { user, loading, setUser, resetAuthState, logout, updateUser };
 };

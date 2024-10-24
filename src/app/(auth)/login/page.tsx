@@ -31,10 +31,10 @@ const LoginPage = () => {
     },
   });
 
-  // 사용자가 이미 로그인한 경우 홈 페이지로 리다이렉트
+  // 사용자가 이미 로그인한 경우 내 대시보드 페이지로 리다이렉트
   useEffect(() => {
     if (user) {
-      router.push("/");
+      router.push("/mydashboard");
     }
   }, [user, router]);
 
@@ -49,7 +49,8 @@ const LoginPage = () => {
         // 로그인 성공 시 사용자 정보 설정
         setUser(response.data.user);
         reset();
-        router.push("/");
+        // 로그인 성공 시 내 대시보드 페이지로 리다이렉트
+        router.push("/mydashboard");
         toast.success("로그인에 성공했습니다.");
       } else {
         throw new Error("로그인 실패");

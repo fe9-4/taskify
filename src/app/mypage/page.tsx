@@ -16,9 +16,10 @@ import {
   UpdateUserPasswordSchema,
 } from "@/zodSchema/userSchema";
 import InputFile from "@/components/input/InputFile";
+import { useFileUpload } from "@/hooks/useFileUpload";
 
 const MyPage = () => {
-  const { user, loading, logout } = useAuth();
+  const { user, loading, logout, updateUser } = useAuth();
   const [isProfileChanged, setIsProfileChanged] = useState(false);
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
 
@@ -47,17 +48,15 @@ const MyPage = () => {
     }
   }, [user, loading, profileForm]);
 
+  const { createFormData, isLoading: isFileLoading, error: fileError } = useFileUpload();
+
   // 프로필 이미지 변경 핸들러
   const handleProfileImageChange = async (file: string | File | null) => {
     if (file) {
       try {
-        const formData = new FormData();
-        if (file instanceof File) {
-          formData.append("image", file);
-        } else {
-          const response = await fetch(file);
-          const blob = await response.blob();
-          formData.append("image", blob, "profile.jpg");
+        const formData = await createFormData(file);
+        if (!formData) {
+          throw new Error("FormData 생성 실패");
         }
 
         const response = await axios.post<UploadUserProfileImageResponse>("/api/user/profile/image", formData, {
@@ -67,11 +66,11 @@ const MyPage = () => {
         });
 
         if (response.data?.profileImageUrl) {
-          //console.log("profileImageUrl data: ", response.data?.profileImageUrl);
           setProfileImageUrl(response.data.profileImageUrl);
           profileForm.setValue("profileImageUrl", response.data.profileImageUrl);
           setIsProfileChanged(true);
-          profileForm.trigger(); // 폼의 유효성을 다시 확인
+          profileForm.trigger();
+          updateUser({ profileImageUrl: response.data.profileImageUrl }); // 전역 상태 업데이트
           toast.success("프로필 이미지 업로드 완료");
         }
       } catch (error) {
@@ -82,7 +81,8 @@ const MyPage = () => {
       setProfileImageUrl(null);
       profileForm.setValue("profileImageUrl", null);
       setIsProfileChanged(true);
-      profileForm.trigger(); // 폼의 유효성을 다시 확인
+      profileForm.trigger();
+      updateUser({ profileImageUrl: undefined }); // 전역 상태 업데이트
     }
   };
 
@@ -92,21 +92,21 @@ const MyPage = () => {
     profileForm.setValue("nickname", newNickname, { shouldValidate: true });
     const isChanged = newNickname !== user?.nickname || profileImageUrl !== user?.profileImageUrl;
     setIsProfileChanged(isChanged);
-    // console.log("닉네임 변경 상태: ", isChanged); // 주석 처리
+    // console.log("닉네임 변경 상태: ", isChanged);
   };
 
   // 프로필 수정 제출 핸들러
   const onSubmitProfile: SubmitHandler<UpdateUserProfile> = async (data) => {
     try {
-      await axios.put("/api/user/profile", {
+      const response = await axios.put("/api/user/profile", {
         ...data,
         profileImageUrl: profileImageUrl,
       });
+      updateUser(response.data.user); // 전역 상태 업데이트
       toast.success("프로필 업데이트 완료");
       setIsProfileChanged(false);
       profileForm.reset();
     } catch (error) {
-      //console.error("프로필 업데이트 실패:", error);
       toast.error("프로필 업데이트 실패");
     }
   };
@@ -119,7 +119,6 @@ const MyPage = () => {
       passwordForm.reset();
       logout();
     } catch (error) {
-      //console.error("비밀번호 변경 오류:", error);
       toast.error("비밀번호 변경 실패");
     }
   };
@@ -225,6 +224,8 @@ const MyPage = () => {
           </ActiveBtn>
         </form>
       </div>
+      {isFileLoading && <p>이미지 업로드 중...</p>}
+      {fileError && <p className="text-red-500">{fileError}</p>}
     </div>
   );
 };
