@@ -27,7 +27,7 @@ const DashboardList = () => {
   }, [user]);
 
   return (
-    <div>
+    <div className="mt-1 md:mt-4">
       {dashboardList.length > 0 ? (
         dashboardList.map((item: ItemType) => <DashboardItem key={item.id} item={item} />)
       ) : (

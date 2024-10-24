@@ -17,7 +17,7 @@ const Sidebar = () => {
         <Button />
         <DashboardList />
         <div className="hidden md:mt-6 md:block xl:mt-[32px]">
-          {/* 1페이지면 disabledPrev = true */}
+          {/* 1페이지면 disabledPrev = true, 마지막 페이지면 disabledNext=true */}
           <PaginationBtn disabledPrev disabledNext onClickPrev={onClickPrev} onClickNext={onClickNext} />
         </div>
       </div>

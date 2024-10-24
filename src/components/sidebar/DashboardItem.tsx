@@ -7,7 +7,7 @@ import { FaCircle, FaCrown } from "react-icons/fa6";
 const DashboardItem = ({ item }: { item: ItemType }) => {
   const { color, title, createdByMe, id } = item;
   const pathname = usePathname();
-  const isSelected = pathname === String(`dashboard/${id}`); // 대시보드id 페이지 만들고 테스트
+  const isSelected = pathname === String(`/dashboard/${id}`);
   let length = 5;
   const shortTitle = title.length > length ? title.slice(0, 5) + "..." : title;
   return (
@@ -17,6 +17,7 @@ const DashboardItem = ({ item }: { item: ItemType }) => {
         "flex h-10 w-10 items-center justify-center rounded-[4px] md:w-full md:py-2 md:pl-[10px] md:pr-0 xl:p-3",
         isSelected ? "bg-violet02" : ""
       )}
+      onClick={() => console.log(pathname, isSelected)}
     >
       <div className="flex w-full justify-center md:w-full md:items-center md:justify-start md:gap-4">
         <FaCircle fill={color} width={8} height={8} className="size-2 flex-shrink-0" />
