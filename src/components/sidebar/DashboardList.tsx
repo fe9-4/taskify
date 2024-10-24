@@ -16,8 +16,8 @@ const DashboardList = () => {
         }
         const data = await res.json();
 
-        if (data.dashboards) {
-          setDashboardList(data ? data.dashboards : []);
+        if (data.user.dashboards) {
+          setDashboardList(data.user ? data.user.dashboards : []);
         } else {
           setDashboardList([]);
         }
