@@ -7,7 +7,7 @@ import { FaCircle, FaCrown } from "react-icons/fa6";
 const DashboardItem = ({ item }: { item: ItemType }) => {
   const { color, title, createdByMe, id } = item;
   const pathname = usePathname();
-  const isSelected = pathname === String(id); // 대시보드id 페이지 만들고 테스트
+  const isSelected = pathname === String(`dashboard/${id}`); // 대시보드id 페이지 만들고 테스트
   let length = 5;
   const shortTitle = title.length > length ? title.slice(0, 5) + "..." : title;
   return (

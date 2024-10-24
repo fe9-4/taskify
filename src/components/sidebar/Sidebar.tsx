@@ -3,8 +3,11 @@ import { usePathname } from "next/navigation";
 import Button from "./Button";
 import DashboardList from "./DashboardList";
 import Logo from "./Logo";
+import { BackForwardBtn } from "../button/ButtonComponents";
 
 const Sidebar = () => {
+  const onClickPrev = () => {};
+  const onClickNext = () => {};
   const pathname = usePathname();
   if (pathname === "/" || pathname === "/login" || pathname === "/signup") return null;
   return (
@@ -13,6 +16,9 @@ const Sidebar = () => {
       <div className="w-full">
         <Button />
         <DashboardList />
+        <div className="hidden md:mt-6 md:block xl:mt-[32px]">
+          <BackForwardBtn disabled onClickPrev={onClickPrev} onClickNext={onClickNext} />
+        </div>
       </div>
     </aside>
   );
