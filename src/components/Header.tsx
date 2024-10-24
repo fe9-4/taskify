@@ -8,27 +8,15 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useDebounce } from "@/hooks/useDebounce";
 import axios from "axios";
 import { useAuth } from "@/hooks/useAuth";
+import { useWidth } from "@/hooks/useWidth";
 
 export default function Header() {
-  const [isLargeScreen, setIsLargeScreen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLLIElement>(null);
+  const { isLargeScreen } = useWidth();
   const { user, setUser, loading } = useAuth();
-
-  const handleResize = useCallback(
-    useDebounce(() => {
-      setIsLargeScreen(window.innerWidth >= 768);
-    }, 200),
-    []
-  );
-
-  useEffect(() => {
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [handleResize]);
 
   const handleLogout = async () => {
     try {

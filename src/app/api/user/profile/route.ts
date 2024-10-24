@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import apiClient from "@/app/api/apiClient";
 
-export async function GET() {
+export const GET = async () => {
   const cookieStore = cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
 
@@ -22,4 +22,4 @@ export async function GET() {
     console.error("사용자 정보 조회 실패:", error);
     return NextResponse.json({ user: null }, { status: 401 });
   }
-}
+};
