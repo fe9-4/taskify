@@ -13,20 +13,20 @@ import InputDate from "@/components/input/InputDate";
 import InputTag from "@/components/input/InputTag";
 
 const Member_Mock_Data = {
-  "members": [
+  members: [
     {
       // "id": 12046,
       // "userId": 4672,
-      "email": "test1234@test.com",
-      "nickname": "test1234",
+      email: "test1234@test.com",
+      nickname: "test1234",
       // "profileImageUrl": "string",
       // "createdAt": "2024-10-23T12:27:55.840Z",
       // "updatedAt": "2024-10-23T12:27:55.840Z",
       // "isOwner": true
-    }
+    },
   ],
-  "totalCount": 0
-}
+  totalCount: 0,
+};
 
 const CreateCard = () => {
   const [inviteMember, setInviteMember] = useState(Member_Mock_Data.members);
@@ -100,7 +100,7 @@ const CreateCard = () => {
       cardData.assigneeUserId !== 0 &&
       cardData.title.trim() !== "" &&
       cardData.description.trim() !== "" &&
-      cardData.dueDate !== null 
+      cardData.dueDate !== null
     );
   };
 
@@ -171,7 +171,7 @@ const CreateCard = () => {
         />
 
         <div className="flex h-[42px] gap-3 md:h-[54px] md:gap-2">
-          <CancelBtn>취소</CancelBtn>
+          <CancelBtn onClick={() => ""}>취소</CancelBtn>
           <ConfirmBtn type="submit" disabled={!isFormValid()}>
             생성
           </ConfirmBtn>

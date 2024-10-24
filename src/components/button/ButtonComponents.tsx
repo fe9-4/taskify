@@ -108,7 +108,7 @@ export const InsertBtn = ({ children, onClick }: { children: string; onClick: an
 };
 
 //5) 취소 / 피그마 표기 : modal
-export const CancelBtn = ({ children, onClick }: { children: string; onClick?: any }) => {
+export const CancelBtn = ({ children, onClick }: { children: string; onClick: any }) => {
   return (
     <BaseBtn extra="size-full" onClick={onClick}>
       <Content extra="text-gray01 font-medium	text-xs md:text-lg">{children}</Content>
