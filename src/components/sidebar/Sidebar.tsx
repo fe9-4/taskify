@@ -10,12 +10,14 @@ import { useAuth } from "@/hooks/useAuth";
 
 const Sidebar = () => {
   const [page, setPage] = useState(1);
-  const [size, setSize] = useState(10); // 기본 값으로 10
-  const [totalCount, setTotalCount] = useState<number>();
-  const pathname = usePathname();
-
+  const [size, setSize] = useState(10); // 모바일 10개, 태블릿 15개, 데스크탑 15개
+  const [totalCount, setTotalCount] = useState<number>(0);
   const [dashboardList, setDashboardList] = useState<ItemType[]>([]);
   const { user } = useAuth();
+  const pathname = usePathname();
+
+  const totalPage: number = totalCount / size;
+
   const fetchDashboardList = async (page: number, size: number) => {
     if (user) {
       try {
@@ -37,11 +39,16 @@ const Sidebar = () => {
 
   useEffect(() => {
     fetchDashboardList(page, size);
-    console.log(dashboardList);
-  }, [user]);
+    console.log(totalPage);
+    console.log(page === totalPage);
+  }, [user, page, size]);
 
-  const onClickPrev = () => {};
-  const onClickNext = () => {};
+  const onClickPrev = () => {
+    if (page !== 1) setPage(page - 1);
+  };
+  const onClickNext = () => {
+    if (page !== totalPage) setPage(page + 1);
+  };
   if (pathname === "/" || pathname === "/login" || pathname === "/signup") return null;
   return (
     <aside className="fixed left-0 top-0 z-50 flex h-screen w-[67px] flex-col gap-[39px] border-r border-gray03 bg-white px-[13px] py-5 md:w-[160px] md:gap-[57px] xl:w-[300px] xl:pl-2 xl:pr-3">
@@ -51,7 +58,12 @@ const Sidebar = () => {
         <DashboardList list={dashboardList} />
         <div className="hidden md:mt-6 md:block xl:mt-[32px]">
           {/* 1페이지면 disabledPrev = true, 마지막 페이지면 disabledNext=true */}
-          <PaginationBtn disabledPrev disabledNext onClickPrev={onClickPrev} onClickNext={onClickNext} />
+          <PaginationBtn
+            disabledPrev={page === 1}
+            disabledNext={page === totalPage}
+            onClickPrev={onClickPrev}
+            onClickNext={onClickNext}
+          />
         </div>
       </div>
     </aside>

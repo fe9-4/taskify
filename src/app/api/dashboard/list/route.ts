@@ -6,7 +6,6 @@ export async function GET(request: NextRequest) {
   const cookieStore = cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
 
-  // 모바일 10개, 태블릿 15개, 데스크탑 15개
   const { searchParams } = new URL(request.url);
   const page = searchParams.get("page") || 1;
   const size = searchParams.get("size") || 10;
