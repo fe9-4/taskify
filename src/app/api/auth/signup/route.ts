@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import config from "@/constants/config";
 import { apiClient } from "../../apiClient";
 import { Signup, SignupResponse } from "@/zodSchema/userSchema";
 import { AxiosError } from "axios";
@@ -7,7 +6,7 @@ import { AxiosError } from "axios";
 export const POST = async (request: NextRequest): Promise<NextResponse> => {
   try {
     const signupData: Signup = await request.json();
-    const response = await apiClient.post<SignupResponse>(`/${config.TEAM_ID}/users/`, signupData);
+    const response = await apiClient.post<SignupResponse>("/users/", signupData);
 
     return NextResponse.json(response.data, { status: 201 });
   } catch (error: unknown) {

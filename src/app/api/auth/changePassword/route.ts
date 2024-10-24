@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import config from "@/constants/config";
 import { ChangePassword } from "@/zodSchema/authSchema";
 import { apiClient } from "../../apiClient";
 
 export const PUT = async (request: NextRequest): Promise<NextResponse> => {
   try {
     const changePassword: ChangePassword = await request.json();
-    await apiClient.put(`/${config.TEAM_ID}/auth/password`, changePassword);
+    await apiClient.put("/auth/password", changePassword);
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     console.error(error);
