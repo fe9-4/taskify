@@ -17,7 +17,7 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
         httpOnly: true, // 브라우저에서 접근 불가
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict", // CSRF 방지
-        maxAge: 60 * 30, // 30분 동안 유효
+        maxAge: 60 * 60 * 24 * 14, // 14일 동안 유효
         path: "/",
       });
 
