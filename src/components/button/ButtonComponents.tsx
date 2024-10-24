@@ -116,27 +116,10 @@ export const CancelBtn = ({ children, onClick }: { children: string; onClick?: a
   );
 };
 // 6) 확인 / 피그마 표기 : modal
-export const ConfirmBtn = ({
-  type,
-  children,
-  onClick,
-  disabled,
-}: {
-  type: string;
-  children: string;
-  onClick?: any;
-  disabled: boolean;
-}) => {
+export const ConfirmBtn = ({ children, onClick }: { children: string; onClick: any }) => {
   return (
-    <BaseBtn extra="size-full" onClick={onClick} type={type} disabled={disabled}>
-      <Content
-        extra={cls(
-          "text-white font-semibold text-xs w-full h-full md:text-lg",
-          disabled ? "cursor-not-allowed bg-gray02" : "bg-violet01"
-        )}
-      >
-        {children}
-      </Content>
+    <BaseBtn extra="size-full" onClick={onClick}>
+      <Content extra="bg-violet01 text-white font-semibold text-xs w-full h-full md:text-lg">{children}</Content>
     </BaseBtn>
   );
 };
