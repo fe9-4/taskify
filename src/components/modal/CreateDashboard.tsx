@@ -1,7 +1,7 @@
 "use client";
 
 import { useAtom } from "jotai";
-import { ActiveBtn, CancelBtn } from "@/components/ButtonComponents";
+import { ActiveBtn, CancelBtn } from "@/components/button/ButtonComponents";
 import InputItem from "@/components/input/InputItem";
 import { CreateDashboardAtom } from "@/store/modalAtom";
 import { useForm } from "react-hook-form";

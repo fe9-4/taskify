@@ -1,4 +1,3 @@
-import config from "@/constants/config";
 import { Login } from "@/zodSchema/authSchema";
 import axios, { AxiosError } from "axios";
 import { NextRequest, NextResponse } from "next/server";
@@ -10,29 +9,20 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
   try {
     const loginData: Login = await request.json();
     // Taskify API를 통해 로그인 시도
-    const response = await apiClient.post(`/${config.TEAM_ID}/auth/login`, loginData);
+    const response = await apiClient.post("/auth/login", loginData);
 
     if (response.data.accessToken) {
       // 로그인 성공 시 쿠키에 accessToken 설정
       cookies().set("accessToken", response.data.accessToken, {
-        httpOnly: true,
+        httpOnly: true, // 브라우저에서 접근 불가
         secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 1800, // 30분
+        sameSite: "strict", // CSRF 방지
+        maxAge: 60 * 30, // 30분 동안 유효
         path: "/",
       });
 
       // 사용자 정보 반환
-      return NextResponse.json(
-        {
-          user: {
-            id: response.data.user.id,
-            email: response.data.user.email,
-            nickname: response.data.user.nickname,
-          },
-        },
-        { status: 200 }
-      );
+      return NextResponse.json({ user: response.data.user }, { status: 200 });
     }
 
     return NextResponse.json({ message: "로그인 실패" }, { status: 401 });
@@ -64,7 +54,7 @@ export const GET = async (request: NextRequest) => {
     });
 
     if (response.status === 200) {
-      return NextResponse.json({ user: response.data }, { status: 200 });
+      return NextResponse.json({ user: response.data.user }, { status: 200 });
     } else {
       // user/profile API에서 오류 발생 시
       return NextResponse.json({ user: null }, { status: 200 });
