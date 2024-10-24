@@ -50,3 +50,16 @@ export const UploadUserProfileImageResponseSchema = z.object({
 });
 
 export type UploadUserProfileImageResponse = z.infer<typeof UploadUserProfileImageResponseSchema>;
+
+export const UpdateUserPasswordSchema = z
+  .object({
+    currentPassword: PasswordSchema,
+    newPassword: PasswordSchema,
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "비밀번호가 일치하지 않습니다.",
+    path: ["confirmPassword"],
+  });
+
+export type UpdateUserPassword = z.infer<typeof UpdateUserPasswordSchema>;

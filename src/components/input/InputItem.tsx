@@ -9,7 +9,8 @@ import { cls } from "@/lib/utils";
 import { InsertBtn } from "../button/ButtonComponents";
 
 const InputItem = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, id, name, value, type, isTextArea, isButton, errors, ...props }, ref) => {
+  ({ label, id, name, value, type, isTextArea, isButton, errors, readOnly = false, size, ...props }, ref) => {
+    
     const [inputType, setInputType] = useState(type);
     const [password, setPassword] = useState(false);
 
@@ -29,10 +30,14 @@ const InputItem = forwardRef<HTMLInputElement, InputProps>(
         {isTextArea ? (
           <>
             <textarea
-              className="relative h-[70px] w-full rounded-lg border border-solid border-gray03 p-4 text-xs text-black03 placeholder-gray02 focus:outline-none md:h-[110px] md:py-4 md:text-base"
+              className={cls(
+                "relative w-full resize-none rounded-lg p-4 text-xs text-black03 placeholder-gray02 ring-1 ring-inset ring-gray03 transition-all focus-within:ring-violet01 focus:outline-none focus:ring-inset md:py-4 md:text-base",
+                size === "description" ? "h-[126px]" : "h-[70px] md:h-[110px]"
+              )}
               id={id}
               name={name}
               value={value}
+              readOnly={readOnly}
               {...props}
             />
             {isButton && (
@@ -46,16 +51,18 @@ const InputItem = forwardRef<HTMLInputElement, InputProps>(
             <input
               className={cls(
                 "h-[50px] w-full rounded-lg px-4 text-lg text-black03 placeholder-gray02 ring-1 ring-inset ring-gray03 transition-all focus:outline-none focus:ring-1 focus:ring-inset",
-                errors ? "ring-red01 transition-all focus:ring-red01" : "focus:ring-violet01"
+                errors ? "ring-red01 transition-all focus-within:ring-red01" : "focus-within:ring-violet01",
+                readOnly ? "bg-gray02" : ""
               )}
               id={id}
               name={name}
               value={value}
               type={inputType}
               ref={ref}
+              readOnly={readOnly}
               {...props}
             />
-            {type === "password" && (
+            {type === "password" && !readOnly && (
               <span className="absolute right-3 top-[47px] cursor-pointer" onClick={handleIconClick}>
                 {password ? (
                   <Image src={OpenEyes} width={24} height={24} alt="OpenEyes" />
@@ -72,5 +79,7 @@ const InputItem = forwardRef<HTMLInputElement, InputProps>(
     );
   }
 );
+
+InputItem.displayName = "InputItem";
 
 export default InputItem;

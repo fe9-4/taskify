@@ -1,11 +1,11 @@
 "use client";
 
 import { useAtom } from "jotai";
+import { ActiveBtn, CancelBtn } from "@/components/button/ButtonComponents";
 import InputItem from "@/components/input/InputItem";
 import { CreateDashboardAtom } from "@/store/modalAtom";
 import { useForm } from "react-hook-form";
 import SelectColorChip from "@/components/chip/SelectColorChip";
-import { ActiveBtn, CancelBtn } from "../button/ButtonComponents";
 
 const CreateDashboard = () => {
   const {

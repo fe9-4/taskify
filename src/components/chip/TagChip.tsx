@@ -1,4 +1,5 @@
 import { cls } from "../../lib/utils";
+import { TiDelete as DeleteIcon } from "react-icons/ti";
 
 // 입력한 태그명을 받아서 지정 색상을 적용해 return합니다.
 const TagChip = ({ tag }: { tag: string }) => {
@@ -11,12 +12,22 @@ const TagChip = ({ tag }: { tag: string }) => {
 
   const anoterStringColor = { bg: "bg-violet02", text: "text-violet01" };
 
-  const matchingColor = colorList.find((item) => Array.isArray(item.tag) ? item.tag.includes(tag) : item.tag === tag) || anoterStringColor;
+  const matchingColor =
+    colorList.find((item) => (Array.isArray(item.tag) ? item.tag.includes(tag) : item.tag === tag)) ||
+    anoterStringColor;
 
   return (
-    <span className={cls("w-fit rounded px-[6px] py-1 text-xs md:px-[6px] md:py-[2px] md:text-base", tag !== "" ? `${matchingColor.bg} ${matchingColor.text}` : "")}>
+    <div
+      className={cls(
+        "relative w-max rounded px-[6px] py-1 text-xs md:px-[6px] md:py-[2px] md:text-base",
+        tag !== "" ? `${matchingColor.bg} ${matchingColor.text}` : ""
+      )}
+    >
+      <span className="absolute left-0 top-0 z-[2] flex size-full cursor-pointer items-center justify-center rounded bg-black bg-opacity-40 opacity-0 transition-opacity duration-300 hover:opacity-100">
+        <DeleteIcon className="size-[17px] text-white" />
+      </span>
       {tag}
-    </span>
+    </div>
   );
 };
 

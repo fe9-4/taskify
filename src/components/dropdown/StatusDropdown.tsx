@@ -50,10 +50,10 @@ const StatusDropdown = ({ setSelectedValue, currentValue }: IProps) => {
   ];
 
   return (
-    <div className="flex w-[217px] flex-col space-y-[2px]" ref={dropdownRef}>
+    <div className="flex w-full flex-col space-y-[2px] md:w-[217px]" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between rounded-md border px-4 py-2 focus:border-violet01"
+        className="flex h-[50px] w-full items-center justify-between overflow-hidden rounded-lg px-4 ring-1 ring-inset ring-gray03 transition-all focus-within:ring-violet01 focus:outline-none focus:ring-1 focus:ring-inset"
       >
         {renderChip()}
         <HiChevronDown />
