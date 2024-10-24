@@ -11,6 +11,8 @@ import InputItem from "@/components/input/InputItem";
 import InputFile from "@/components/input/InputFile";
 import InputDate from "@/components/input/InputDate";
 import InputTag from "@/components/input/InputTag";
+import { useAtom } from "jotai";
+import { CreateCardAtom } from "@/store/modalAtom";
 
 const Member_Mock_Data = {
   members: [
@@ -29,6 +31,7 @@ const Member_Mock_Data = {
 };
 
 const CreateCard = () => {
+  const [, setIsCreateCardOpen] = useAtom(CreateCardAtom);
   const [inviteMember, setInviteMember] = useState(Member_Mock_Data.members);
   const [tagInput, setTagInput] = useState("");
   const [cardData, setCardData] = useState<CardProps>({
@@ -171,7 +174,7 @@ const CreateCard = () => {
         />
 
         <div className="flex h-[42px] gap-3 md:h-[54px] md:gap-2">
-          <CancelBtn onClick={() => ""}>취소</CancelBtn>
+          <CancelBtn onClick={() => setIsCreateCardOpen(false)}>취소</CancelBtn>
           <ConfirmBtn type="submit" disabled={!isFormValid()}>
             생성
           </ConfirmBtn>
