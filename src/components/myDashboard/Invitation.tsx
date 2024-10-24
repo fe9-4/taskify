@@ -60,7 +60,24 @@ const Invitation = () => {
     }
   };
 
-  const handleRefuseInvitation = () => {};
+  const handleRefuseInvitation = async (id: number) => {
+    try {
+      const response = await axios.put(`/api/myDashboard/invitation/${id}`, {
+        id,
+        inviteAccepted: false
+      });
+
+      if (response.status === 200) {
+        toast.success("초대를 거절하였습니다.");
+        setInvitationList((prev) => prev.filter((item) => item.id !== id));
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error("대시보드 초대 거절 요청에서 api 오류 발생", error);
+        toast.error(error.response?.data);
+      }
+    }
+  };
 
   return (
     <div
@@ -115,7 +132,7 @@ const Invitation = () => {
                 <CombiBtn
                   value={["수락", "거절"]}
                   onClickAccept={() => handleAcceptInvitation(item.id)}
-                  onClickRefuse={handleRefuseInvitation}
+                  onClickRefuse={() => handleRefuseInvitation(item.id)}
                 />
               </div>
             </div>

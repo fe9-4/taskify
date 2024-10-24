@@ -9,12 +9,12 @@ export const PUT = async (req: Request) => {
   
   const cookieStore = cookies();
   const token = cookieStore.get("accessToken")?.value;
-
+  
   if (!token) {
     return new NextResponse("사용자 정보를 찾을 수 없습니다.", { status: 401 });
   }
 
-  if (!id || !inviteAccepted) {
+  if (!id || inviteAccepted === null) {
     return new NextResponse("요청에 필요한 값이 없습니다.", { status: 400 });
   }
 

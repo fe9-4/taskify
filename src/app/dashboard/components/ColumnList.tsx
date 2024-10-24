@@ -69,6 +69,10 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
     console.log("모달 오픈");
   };
 
+  const handleEditModal = () => {
+
+  }
+
   return (
     <div className="space-y-6 px-4 pt-4 md:border-b md:border-gray04 md:pb-6 xl:flex xl:min-h-screen xl:flex-col xl:border-b-0 xl:border-r">
       <div className="flex items-center justify-between">
@@ -79,7 +83,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
           </div>
           <NumChip num={cardList.length} />
         </div>
-        <button>
+        <button onClick={handleEditModal}>
           <HiOutlineCog className="size-[22px] text-gray01" />
         </button>
       </div>
