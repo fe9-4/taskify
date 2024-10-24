@@ -15,12 +15,7 @@ const DashboardList = () => {
           throw new Error(`Failed to fetch data : ${res.status}`);
         }
         const data = await res.json();
-
-        if (data.user.dashboards) {
-          setDashboardList(data.user ? data.user.dashboards : []);
-        } else {
-          setDashboardList([]);
-        }
+        setDashboardList(data.user ? data.user.dashboards : []);
       } catch (err) {
         console.error(`데이터 fetching error`, err);
       }

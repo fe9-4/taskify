@@ -11,7 +11,7 @@ const Button = () => {
       <button
         type="button"
         onClick={() => setisCreateDashboardOpen(true)}
-        className="flex size-[20px] items-center justify-center md:justify-end"
+        className="flex size-[20px] items-center justify-center outline-0 md:justify-end"
       >
         <CiSquarePlus stroke-width="1" className="size-[20px] text-gray01" />
       </button>
