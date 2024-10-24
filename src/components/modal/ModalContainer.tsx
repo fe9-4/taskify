@@ -2,7 +2,7 @@
 
 import React from "react";
 import Modal from "react-modal";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { AlertModalAtom, AlertModalTextAtom, CreateCardAtom, CreateDashboardAtom } from "@/store/modalAtom";
 import CreateDashboard from "@/components/modal/CreateDashboard";
 import ModalContent from "./ModalContent";
@@ -16,7 +16,7 @@ const ModalContainer = () => {
   const [isCreateCardOpen, setIsCreateCardOpen] = useAtom(CreateCardAtom);
   const [isAlertOpen, setIsAlertOpen] = useAtom(AlertModalAtom);
 
-  const [AlertText] = useAtom(AlertModalTextAtom);
+  const alertText = useAtomValue(AlertModalTextAtom);
 
   return (
     <>
@@ -27,7 +27,7 @@ const ModalContainer = () => {
         <CreateCard />
       </ModalContent>
       <ModalContent isOpen={isAlertOpen} onRequestClose={() => setIsAlertOpen(false)}>
-        <AlertModal text={AlertText} />
+        <AlertModal text={alertText} />
       </ModalContent>
     </>
   );
