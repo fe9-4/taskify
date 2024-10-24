@@ -6,15 +6,16 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { useSetAtom } from "jotai";
-import { userAtom } from "@/store/userAtoms";
 import axios from "axios";
 import { ActiveBtn } from "@/components/button/ButtonComponents";
 import InputItem from "@/components/input/InputItem";
+import { useAuth } from "@/hooks/useAuth";
+import { useEffect } from "react";
 
 const LoginPage = () => {
   const router = useRouter();
-  const setUser = useSetAtom(userAtom);
+  // useAuth 훅에서 user와 setUser 함수 가져오기
+  const { user, setUser } = useAuth();
 
   const {
     register,
@@ -30,6 +31,13 @@ const LoginPage = () => {
     },
   });
 
+  // 사용자가 이미 로그인한 경우 홈 페이지로 리다이렉트
+  useEffect(() => {
+    if (user) {
+      router.push("/");
+    }
+  }, [user, router]);
+
   const onSubmit: SubmitHandler<Login> = async (data) => {
     try {
       const response = await axios.post("/api/auth/login", {
@@ -38,9 +46,11 @@ const LoginPage = () => {
       });
 
       if (response.data.user) {
+        // 로그인 성공 시 사용자 정보 설정
         setUser(response.data.user);
         reset();
         router.push("/");
+        toast.success("로그인에 성공했습니다.");
       } else {
         throw new Error("로그인 실패");
       }
@@ -53,6 +63,11 @@ const LoginPage = () => {
       );
     }
   };
+
+  // 이미 로그인한 사용자인 경우 로딩 상태 표시
+  if (user) {
+    return <div>로딩 중...</div>;
+  }
 
   return (
     <div className="mx-auto w-[351px] md:w-[520px]">

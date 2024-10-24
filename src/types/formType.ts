@@ -1,11 +1,13 @@
+import { ChangeEventHandler, KeyboardEventHandler, MouseEventHandler } from "react";
 import { inputFileSize } from "@/components/input/InputFile";
+import { CardProps } from "./cardType";
 
 type Size = keyof typeof inputFileSize.size;
 
 export interface InputProps extends textAreaProps {
   id?: string;
   label?: string;
-  value?: string;
+  value?: string | never[];
   placeholder?: string;
   errors?: string;
   type?: string;
@@ -13,6 +15,11 @@ export interface InputProps extends textAreaProps {
   required?: boolean;
   autoComplete?: string;
   className?: string;
+  tag?: string;
+  size?: string;
+  onChange?: ChangeEventHandler;
+  onKeyDown?: KeyboardEventHandler;
+  readOnly?: boolean;
 }
 
 export interface textAreaProps {
@@ -20,13 +27,28 @@ export interface textAreaProps {
   isButton?: boolean;
 }
 
-export interface InputFileProps extends InputProps {
+export interface InputFileProps {
+  label: string;
+  id: string;
+  name: string;
+  value: string | File | null;
   size: Size;
+  onChange: (file: File | null | string) => void;
 }
 
 export interface InputDateProps {
+  id: string;
+  name: string;
   label: string;
-  value: string;
+  value: string | any;
   placeholder: string;
   onChange: (date: Date | null) => void;
+}
+
+export interface InputTagProps {
+  cardData: CardProps;
+  tagInput: string;
+  onKeyDown: KeyboardEventHandler;
+  onClick: (tagRemove: string) => void;
+  onChange: ChangeEventHandler;
 }
