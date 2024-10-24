@@ -16,7 +16,7 @@ const Sidebar = () => {
   const { user } = useAuth();
   const pathname = usePathname();
 
-  const totalPage: number = totalCount / size;
+  const totalPage: number = Math.ceil(totalCount / size);
 
   const fetchDashboardList = async (page: number, size: number) => {
     if (user) {
@@ -39,8 +39,6 @@ const Sidebar = () => {
 
   useEffect(() => {
     fetchDashboardList(page, size);
-    console.log(totalPage);
-    console.log(page === totalPage);
   }, [user, page, size]);
 
   const onClickPrev = () => {
