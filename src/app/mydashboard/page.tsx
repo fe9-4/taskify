@@ -2,8 +2,8 @@
 
 import axios from "axios";
 import toast from "react-hot-toast";
-import Pagination from "@/components/myDashboard/Pagination";
 import Invitation from "@/app/mydashboard/components/Invitation";
+import Pagination from "./components/Pagination";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAtom } from "jotai";
@@ -16,6 +16,8 @@ const MyDashboard = () => {
   const router = useRouter();
 
   const [page, setPage] = useState(1);
+  const [cursorId, setCursorId] = useState(1);
+  const [size, setSize] = useState(5);
   const [dashboardList, setDashboardList] = useState<IMyDashboard["dsahboards"]>([]);
   const [totalPage, setTotalPage] = useState(0);
   const [, setisCreateDashboardOpen] = useAtom(CreateDashboardAtom);
@@ -27,13 +29,16 @@ const MyDashboard = () => {
       const response = await axios.get("/api/myDashboard", {
         params: {
           page,
+          cursorId,
+          size
         },
       });
 
       if (response.status === 200) {
         const data = response.data;
         setDashboardList(data.dashboardList);
-        setTotalPage(Math.ceil(data.totalCount / 5));
+        setCursorId(data.cursorId);
+        setTotalPage(Math.ceil(data.totalCount / size));
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -41,7 +46,7 @@ const MyDashboard = () => {
         toast.error(error.response?.data);
       }
     }
-  }, [page]);
+  }, [page, cursorId, size]);
 
   useEffect(() => {
     getCurrentDashboards();

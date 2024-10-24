@@ -1,5 +1,6 @@
+import { BackForwardBtn } from "@/components/button/ButtonComponents";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { BackForwardBtn } from "../button/ButtonComponents";
+
 import toast from "react-hot-toast";
 
 interface IProps {
@@ -13,13 +14,12 @@ const Pagination = ({ totalPage, setPage, page }: IProps) => {
 
   useEffect(() => {
     setIsDisabled(totalPage === page);
-  }, [page]);
+  }, [page, totalPage]);
 
   const handlePageNext = () => {
     const nextPage = page + 1;
 
     if (nextPage > totalPage) {
-      setPage(totalPage);
       setIsDisabled(true);
       toast.error("마지막 페이지입니다.");
     } else {
@@ -30,7 +30,6 @@ const Pagination = ({ totalPage, setPage, page }: IProps) => {
 
   const handlePagePrev = () => {
     const prevPage = page - 1;
-    setPage(prevPage);
 
     if (prevPage < 1) {
       setPage(1);

@@ -10,6 +10,7 @@ interface IDashboardList {
 export interface IMyDashboard {
   dsahboards: IDashboardList[];
   totalCount: number;
+  cursorId: number;
 }
 
 interface IInvitationList {

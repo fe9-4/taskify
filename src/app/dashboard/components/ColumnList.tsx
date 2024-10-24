@@ -31,9 +31,11 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
         setCursorId(response.data.cursorId);
       }
 
-      if (response.data.cards.length < size) {
+      if (response.data.cards.length === 0) {
         setHasMore(false);
+      } else if (response.data.cards.length < size) {
         toast.success("더 가져올 카드가 없습니다.");
+        setHasMore(false);
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
