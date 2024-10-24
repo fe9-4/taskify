@@ -23,7 +23,7 @@ interface ICurrentManager {
 // currentManager는 '할 일 수정'에서 이 드롭다운메뉴를 사용하실 때 현재 담당자명입니다.
 interface IProps {
   inviteMemberList: ICurrentManager[];
-  setManager?: Dispatch<SetStateAction<string>>;
+  setManager: Dispatch<SetStateAction<string>>;
   currentManager?: ICurrentManager;
 }
 
@@ -43,7 +43,7 @@ const SearchDropdown = ({ inviteMemberList, setManager, currentManager }: IProps
 
   const handleSelectName = (name: ICurrentManager) => {
     setSelectedName(name);
-    setManager(name.nickname);
+    //setManager(name.nickname);
     setName("");
     setIsOpen(false);
   };
