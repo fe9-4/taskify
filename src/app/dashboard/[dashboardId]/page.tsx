@@ -39,7 +39,7 @@ const DashboardDetail = () => {
 
   const handleColumnBtn = () => {
     setAddColumn(!addColumn);
-    console.log("컬럼 추가 모달 오픈");
+    // console.log("컬럼 추가 모달 오픈");
   };
 
   useEffect(() => {
@@ -47,7 +47,7 @@ const DashboardDetail = () => {
   }, [getColumn]);
 
   return (
-    <div className="flex flex-col space-y-6 pb-6 xl:flex-row xl:space-x-6 xl:space-y-0">
+    <div className="flex flex-col space-y-6 pb-6 xl:flex-row xl:space-x-6 xl:space-y-0 overflow-auto">
       <div className="flex flex-col space-y-6 xl:flex-row xl:space-y-0">
         {columnList.map((column) => (
           <ColumnList key={column.id} columnTitle={column.title} columnId={column.id} />

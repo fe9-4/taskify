@@ -3,7 +3,7 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 import Pagination from "@/components/myDashboard/Pagination";
-import Invitation from "@/components/myDashboard/Invitation";
+import Invitation from "@/app/mydashboard/components/Invitation";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAtom } from "jotai";
