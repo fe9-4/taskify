@@ -19,6 +19,7 @@ export interface InputProps extends textAreaProps {
   size?: string;
   onChange?: ChangeEventHandler;
   onKeyDown?: KeyboardEventHandler;
+  readOnly?: boolean;
 }
 
 export interface textAreaProps {
