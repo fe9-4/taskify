@@ -3,21 +3,27 @@
 import React from "react";
 import Modal from "react-modal";
 import { useAtom } from "jotai";
-import { CreateDashboardAtom } from "@/store/modalAtom";
+import { CreateCardAtom, CreateDashboardAtom } from "@/store/modalAtom";
 import CreateDashboard from "@/components/modal/CreateDashboard";
 import ModalContent from "./ModalContent";
+import CreateCard from "../cards/CreateCard";
 
 Modal.setAppElement("#modal-root");
 
 const ModalContainer = () => {
-  const [isCreateDashboardOpen, setisCreateDashboardOpen] = useAtom(CreateDashboardAtom);
+  const [isCreateDashboardOpen, setIsCreateDashboardOpen] = useAtom(CreateDashboardAtom);
+  const [isCreateCard, setIsCreateCardOpen] = useAtom(CreateCardAtom);
 
-  const closeModal1 = () => setisCreateDashboardOpen(false);
+  const closeCreateDashboard = () => setIsCreateDashboardOpen(false);
+  const closeCreateCard = () => setIsCreateCardOpen(false);
 
   return (
     <>
-      <ModalContent isOpen={isCreateDashboardOpen} onRequestClose={closeModal1}>
+      <ModalContent isOpen={isCreateDashboardOpen} onRequestClose={closeCreateDashboard}>
         <CreateDashboard />
+      </ModalContent>
+      <ModalContent isOpen={isCreateCard} onRequestClose={closeCreateCard}>
+        <CreateCard />
       </ModalContent>
     </>
   );

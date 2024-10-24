@@ -14,18 +14,19 @@ import {
   DeleteDashboardBtn,
   InsertBtn,
 } from "@/components/button/ButtonComponents";
-import { CreateDashboardAtom } from "@/store/modalAtom";
+import { CreateCardAtom, CreateDashboardAtom } from "@/store/modalAtom";
 import { useAtom } from "jotai";
 
 export default function Home() {
-  const [, setisCreateDashboardOpen] = useAtom(CreateDashboardAtom);
+  const [, setIsCreateDashboardOpen] = useAtom(CreateDashboardAtom);
+  const [, setIsCreateCard] = useAtom(CreateCardAtom);
   const onClick = () => {
     console.log(`클릭 테스트`);
   };
   return (
     <>
-      <AddColumnBtn onClick={onClick} />
-      <AddDashboardBtn onClick={() => setisCreateDashboardOpen(true)} />
+      <AddColumnBtn onClick={() => setIsCreateCard(true)} />
+      <AddDashboardBtn onClick={() => setIsCreateDashboardOpen(true)} />
       <AddTodoBtn onClick={onClick} />
       <DeleteDashboardBtn onClick={onClick} />
       <DashboardCard onClick={onClick} dashboardName="비브리지" isMine={false} color="#7AC555" />
