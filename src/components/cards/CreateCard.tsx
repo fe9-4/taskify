@@ -88,7 +88,6 @@ const CreateCard = () => {
         }
       } catch (error) {
         if (axios.isAxiosError(error)) {
-          console.error("카드 이미지 업로드 오류: ", error);
           toast.error("카드 이미지 업로드에 실패했습니다.");
         } else {
           toast.error("네트워크 오류가 발생했습니다.");
@@ -120,7 +119,6 @@ const CreateCard = () => {
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.error("카드 생성 오류: ", error);
         toast.error("카드 생성에 실패하였습니다.");
       } else {
         toast.error("네트워크 오류가 발생했습니다.");
