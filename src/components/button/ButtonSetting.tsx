@@ -12,9 +12,10 @@ export const PlusIcon = () => {
 export const BaseBtn = (props: any) => {
   return (
     <button
-      type="button"
+      type={props.type}
       onClick={props.onClick}
       className={cls("overflow-hidden rounded-lg border border-gray03 bg-white", props.extra)}
+      disabled={props.disabled}
     >
       {props.children}
     </button>

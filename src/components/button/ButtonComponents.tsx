@@ -80,7 +80,7 @@ export const ActiveBtn = ({ disabled, children, onClick }: { disabled: boolean; 
       type="submit"
       disabled={disabled}
       className={cls(
-        "h-[50px] w-[351px] rounded-lg text-xl font-medium text-white md:w-[520px]",
+        "h-[50px] w-full rounded-lg text-xl font-medium text-white",
         disabled ? "cursor-not-allowed bg-gray02" : "bg-violet01"
       )}
     >
@@ -108,17 +108,17 @@ export const InsertBtn = ({ children, onClick }: { children: string; onClick: an
 };
 
 //5) 취소 / 피그마 표기 : modal
-export const CancelBtn = ({ children, onClick }: { children: string; onClick: any }) => {
+export const CancelBtn = ({ children, onClick, ...props }: { children: string; onClick: any; props?: any }) => {
   return (
-    <BaseBtn extra="size-full" onClick={onClick}>
+    <BaseBtn extra="size-full" onClick={onClick} props={props}>
       <Content extra="text-gray01 font-medium	text-xs md:text-lg">{children}</Content>
     </BaseBtn>
   );
 };
 // 6) 확인 / 피그마 표기 : modal
-export const ConfirmBtn = ({ children, onClick }: { children: string; onClick: any }) => {
+export const ConfirmBtn = ({ children, onClick, ...props }: { children: string; onClick: any; props?: any }) => {
   return (
-    <BaseBtn extra="size-full" onClick={onClick}>
+    <BaseBtn extra="size-full" onClick={onClick} props={props}>
       <Content extra="bg-violet01 text-white font-semibold text-xs w-full h-full md:text-lg">{children}</Content>
     </BaseBtn>
   );
@@ -167,12 +167,14 @@ export const CombiBtn = ({
 };
 
 // 8) 페이지네이션 버튼
-export const BackForwardBtn = ({
-  disabled,
+export const PaginationBtn = ({
+  disabledPrev,
+  disabledNext,
   onClickPrev,
   onClickNext,
 }: {
-  disabled: boolean;
+  disabledPrev: boolean;
+  disabledNext: boolean;
   onClickPrev: any;
   onClickNext: any;
 }) => {
@@ -181,21 +183,21 @@ export const BackForwardBtn = ({
       <button
         onClick={onClickPrev}
         type="button"
-        disabled={disabled}
+        disabled={disabledPrev}
         className={cls(
           "flex size-full items-center justify-center border-r border-gray03",
-          disabled ? "cursor-not-allowed" : ""
+          disabledPrev ? "cursor-not-allowed" : ""
         )}
       >
-        <IoIosArrowBack className={cls("size-4", disabled ? "text-gray03" : "text-black03")} />
+        <IoIosArrowBack className={cls("size-4", disabledPrev ? "text-gray03" : "text-black03")} />
       </button>
       <button
         onClick={onClickNext}
         type="button"
-        disabled={disabled}
-        className={cls("flex size-full items-center justify-center", disabled ? "cursor-not-allowed" : "")}
+        disabled={disabledNext}
+        className={cls("flex size-full items-center justify-center", disabledNext ? "cursor-not-allowed" : "")}
       >
-        <IoIosArrowForward className={cls("size-4", disabled ? "text-gray03" : "text-black03")} />
+        <IoIosArrowForward className={cls("size-4", disabledNext ? "text-gray03" : "text-black03")} />
       </button>
     </div>
   );

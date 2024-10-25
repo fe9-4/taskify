@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useWidth } from "@/hooks/useWidth";
 
-export const Logo = () => {
+const Logo = () => {
   const { isLargeScreen } = useWidth();
 
   return (
@@ -29,3 +29,4 @@ export const Logo = () => {
     </Link>
   );
 };
+export default Logo;
