@@ -42,7 +42,7 @@ export const AddTodoBtn = ({ onClick }: { onClick: () => void }) => {
 //4) 대시보드 삭제
 export const DeleteDashboardBtn = ({ onClick }: any) => {
   return (
-    <BaseBtn onClick={onClick}>
+    <BaseBtn onClick={onClick} extra="bg-gay03">
       <Content extra="h-[52px] w-[284px] text-lg font-medium md:h-[62px] md:w-80 md:text-xl">대시보드 삭제하기</Content>
     </BaseBtn>
   );
@@ -80,7 +80,7 @@ export const ActiveBtn = ({ disabled, children, onClick }: { disabled: boolean; 
       type="submit"
       disabled={disabled}
       className={cls(
-        "h-[50px] w-[351px] rounded-lg text-xl font-medium text-white md:w-[520px]",
+        "h-[50px] w-full rounded-lg text-xl font-medium text-white md:w-[520px]",
         disabled ? "cursor-not-allowed bg-gray02" : "bg-violet01"
       )}
     >
