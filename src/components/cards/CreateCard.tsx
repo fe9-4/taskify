@@ -2,11 +2,12 @@
 import { z } from "zod";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ChangeEvent, KeyboardEvent, useCallback, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { CreateCardAtom } from "@/store/modalAtom";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { CardProps } from "@/types/cardType";
 import { formatDateTime } from "@/utils/dateFormat";
@@ -16,6 +17,7 @@ import InputItem from "@/components/input/InputItem";
 import InputDate from "@/components/input/InputDate";
 import InputTag from "@/components/input/InputTag";
 import InputFile from "@/components/input/InputFile";
+import { useSearchParams } from "next/navigation";
 
 const CardSchema = z.object({
   assigneeUserId: z.number(),
@@ -28,7 +30,12 @@ const CardSchema = z.object({
   imageUrl: z.string().nullable(), // null 값으로 설정
 });
 
-const TestCard = () => {
+const CreateCard = () => {
+  const searchParams = useSearchParams();
+  const dashboardId = searchParams.get("dashboardId");
+  const columnId = searchParams.get("columnId");
+
+  const { user } = useAuth();
   const [inviteMember, setInviteMember] = useState([]);
   const [Manager, setManager] = useState("");
   const { createFormData, isLoading: isFileLoading, error: fileError } = useFileUpload();
@@ -47,9 +54,9 @@ const TestCard = () => {
     resolver: zodResolver(CardSchema),
     mode: "onChange",
     defaultValues: {
-      assigneeUserId: 0, // 본인의 계정 아이디
-      dashboardId: 0, // 대시보드 생성 아이디
-      columnId: 0, // 컬럼 생성 아이디
+      assigneeUserId: Number(user && user.id), // 본인의 계정 아이디
+      dashboardId: Number(dashboardId), // 대시보드 생성 아이디
+      columnId: Number(columnId), // 컬럼 생성 아이디
       title: "",
       description: "",
       dueDate: "",
@@ -160,7 +167,7 @@ const TestCard = () => {
           <label htmlFor="assignee" className="text-lg font-medium text-black03">
             담당자
           </label>
-          <SearchDropdown inviteMemberList={inviteMember} setManager={setManager} {...register("assigneeUserId")} />
+          <SearchDropdown inviteMemberList={inviteMember} setManager={setManager} />
         </div>
 
         <div className="flex flex-col gap-2">
@@ -228,13 +235,13 @@ const TestCard = () => {
 
         <div className="flex h-[42px] gap-3 md:h-[54px] md:gap-2">
           <CancelBtn onClick={() => ""}>취소</CancelBtn>
-          <button type="submit" disabled={!isValid}>
+          <ConfirmBtn type="submit" disabled={!isValid}>
             생성
-          </button>
+          </ConfirmBtn>
         </div>
       </form>
     </section>
   );
 };
 
-export default TestCard;
+export default CreateCard;
