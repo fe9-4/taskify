@@ -2,8 +2,8 @@
 
 import React from "react";
 import { useAuth } from "@/hooks/useAuth";
-import UpdateProfile from "@/components/myPage/UpdateProfile";
-import ChangePassword from "@/components/myPage/ChangePassword";
+import UpdateProfile from "@/app/mypage/components/UpdateProfile";
+import ChangePassword from "@/app/mypage/components/ChangePassword";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 

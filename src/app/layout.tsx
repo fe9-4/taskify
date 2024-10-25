@@ -30,8 +30,8 @@ export default function RootLayout({
     <html lang="ko">
       <body className={`${montserrat.variable} font-pretendard min-h-screen text-black03`}>
         <div id="modal-root"></div>
-        <ModalContainer />
         <ClientLayout>
+          <ModalContainer />
           <Sidebar />
           <Header />
           <main className="pt-[60px] md:pt-[70px]">{children}</main>
