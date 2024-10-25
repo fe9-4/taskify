@@ -47,9 +47,9 @@ const TestCard = () => {
     resolver: zodResolver(CardSchema),
     mode: "onChange",
     defaultValues: {
-      assigneeUserId: 4672, // 본인의 계정 아이디
-      dashboardId: 12046, // 대시보드 생성 아이디
-      columnId: 40754, // 컬럼 생성 아이디
+      assigneeUserId: 0, // 본인의 계정 아이디
+      dashboardId: 0, // 대시보드 생성 아이디
+      columnId: 0, // 컬럼 생성 아이디
       title: "",
       description: "",
       dueDate: "",
