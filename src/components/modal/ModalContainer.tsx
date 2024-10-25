@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Modal from "react-modal";
 import { useAtom, useAtomValue } from "jotai";
 import { AlertModalAtom, AlertModalTextAtom, CreateCardAtom, CreateDashboardAtom } from "@/store/modalAtom";
@@ -17,6 +17,12 @@ const ModalContainer = () => {
   const [isAlertOpen, setIsAlertOpen] = useAtom(AlertModalAtom);
 
   const alertText = useAtomValue(AlertModalTextAtom);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      Modal.setAppElement("#modal-root");
+    }
+  }, []);
 
   return (
     <>

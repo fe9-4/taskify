@@ -80,11 +80,7 @@ export const ActiveBtn = ({ disabled, children, onClick }: { disabled: boolean; 
       type="submit"
       disabled={disabled}
       className={cls(
-<<<<<<< HEAD
-        "h-[50px] w-full rounded-lg text-xl font-medium text-white md:w-[520px]",
-=======
         "h-[50px] w-full rounded-lg text-xl font-medium text-white",
->>>>>>> develop
         disabled ? "cursor-not-allowed bg-gray02" : "bg-violet01"
       )}
     >
@@ -120,10 +116,31 @@ export const CancelBtn = ({ children, onClick, ...props }: { children: string; o
   );
 };
 // 6) 확인 / 피그마 표기 : modal
-export const ConfirmBtn = ({ children, onClick, ...props }: { children: string; onClick: any; props?: any }) => {
+export const ConfirmBtn = ({
+  children,
+  onClick,
+  disabled,
+  extra,
+  ...props
+}: {
+  disabled?: boolean;
+  children: string;
+  onClick: any;
+  extra?: any;
+  props?: any;
+}) => {
   return (
-    <BaseBtn extra="size-full" onClick={onClick} props={props}>
-      <Content extra="bg-violet01 text-white font-semibold text-xs w-full h-full md:text-lg">{children}</Content>
+    <BaseBtn
+      disabled={disabled}
+      extra={cls("size-full", disabled ? "cursor-not-allowed bg-gray02" : "bg-violet01")}
+      onClick={onClick}
+      props={props}
+    >
+      <Content
+        extra={cls(disabled ? "bg-gray02" : "bg-violet01", "text-white font-semibold text-xs w-full h-full md:text-lg")}
+      >
+        {children}
+      </Content>
     </BaseBtn>
   );
 };

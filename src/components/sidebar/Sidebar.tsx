@@ -31,7 +31,7 @@ const Sidebar = () => {
   const fetchDashboardList = async (page: number, size: number) => {
     if (user) {
       try {
-        const res = await fetch(`/api/dashboard/list?page=${page}&size=${size}`, {
+        const res = await fetch(`/api/dashboards?page=${page}&size=${size}`, {
           method: "GET",
           credentials: "include",
         });
