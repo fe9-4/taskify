@@ -13,9 +13,9 @@ export const UserMenu: React.FC<UserMenuProps> = ({ isHomePage }) => {
   const [selectedDashboardId] = useState<number | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { user, logout } = useAuth();
-  const { members } = selectedDashboardId
-    ? useDashboardMember({ dashboardId: selectedDashboardId, page: 1, size: 10 })
-    : { members: null };
+  const { members } = useDashboardMember(
+    selectedDashboardId ? { dashboardId: selectedDashboardId, page: 1, size: 10 } : { dashboardId: 0 }
+  ) || { members: null };
 
   const handleLogout = async () => {
     try {
