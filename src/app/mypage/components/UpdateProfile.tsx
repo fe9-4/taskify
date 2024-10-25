@@ -43,7 +43,7 @@ const UpdateProfile = () => {
           throw new Error("FormData 생성 실패");
         }
 
-        const response = await axios.post<UploadUserProfileImageResponse>("/api/user/profile/image", formData, {
+        const response = await axios.post<UploadUserProfileImageResponse>("/api/users/me/image", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },

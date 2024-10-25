@@ -16,7 +16,7 @@ export const useAuth = () => {
   const { data: userData, isLoading } = useQuery({
     queryKey: ["userProfile"],
     queryFn: async () => {
-      const response = await axios.get("/api/user/profile");
+      const response = await axios.get("/api/users/me");
       return response.data?.user;
     },
     enabled: !user,

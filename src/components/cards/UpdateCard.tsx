@@ -214,9 +214,7 @@ const UpdateCard = () => {
 
         <div className="flex h-[42px] gap-3 md:h-[54px] md:gap-2">
           <CancelBtn onClick={() => ""}>취소</CancelBtn>
-          <ConfirmBtn type="submit" disabled={!isFormValid()}>
-            수정
-          </ConfirmBtn>
+          <ConfirmBtn onClick={handleSubmit}>수정</ConfirmBtn>
         </div>
       </form>
     </section>
