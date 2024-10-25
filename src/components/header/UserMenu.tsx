@@ -12,7 +12,8 @@ interface UserMenuProps {
 export const UserMenu: React.FC<UserMenuProps> = ({ isHomePage }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedDashboardId, setSelectedDashboardId] = useState<number | null>(null);
-  const dropdownRef = useRef<HTMLLIElement>(null);
+  // HTMLLIElement를 HTMLDivElement로 변경
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const { user, loading, logout } = useAuth();
   const { data: dashboardList } = useDashboardList();
   const { members } = selectedDashboardId

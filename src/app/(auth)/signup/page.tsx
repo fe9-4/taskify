@@ -14,8 +14,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 const SignupPage = () => {
   const router = useRouter();
-  // useAuth 훅에서 user와 setUser 함수 가져오기
-  const { user, setUser } = useAuth();
+  const { user } = useAuth();
 
   // 사용자가 이미 로그인한 경우 내 대시보드 페이지로 리다이렉트
   useEffect(() => {

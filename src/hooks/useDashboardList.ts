@@ -9,12 +9,12 @@ export const useDashboardList = () => {
     queryKey: ["dashboardList"],
     queryFn: async () => {
       const response = await axios.get("/api/dashboard/list");
+      // 응답 데이터를 UserDashboardSchema를 사용하여 검증 및 파싱
       const parsedData = UserDashboardSchema.parse(response.data).user;
-      //console.log("parsed data: ", parsedData);
+
       return parsedData;
     },
-    staleTime: 1000 * 60 * 5, // 5분 동안 데이터를 "신선"하다고 간주
-    refetchOnWindowFocus: false, // 창 포커스 시 자동 리페치 비활성화
+    staleTime: 1000 * 60 * 5, // 5분 동안 캐시 유효
   });
 };
 

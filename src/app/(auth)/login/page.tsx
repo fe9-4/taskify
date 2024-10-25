@@ -14,7 +14,6 @@ import { useEffect } from "react";
 
 const LoginPage = () => {
   const router = useRouter();
-  // useAuth 훅에서 user와 login 함수 가져오기
   const { user, login } = useAuth();
 
   const {
@@ -40,7 +39,7 @@ const LoginPage = () => {
 
   const onSubmit: SubmitHandler<Login> = async (data) => {
     try {
-      await login(data); // login 함수 호출
+      await login(data);
       reset();
       toast.success("로그인에 성공했습니다.");
     } catch (error) {
