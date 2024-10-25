@@ -68,7 +68,7 @@ const TestCard = () => {
         }
 
         const columnId = watch("columnId"); // 현재 선택된 columnId 가져오기
-        const response = await axios.post(`/api/column/${columnId}`, formData, {
+        const response = await axios.post(`/api/columns/${columnId}/card-image`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
