@@ -4,7 +4,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useWidth } from "@/hooks/useWidth";
 
@@ -28,6 +28,23 @@ export default function Header() {
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
+
+  const closeDropdown = useCallback(() => {
+    setIsDropdownOpen(false);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        closeDropdown();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [closeDropdown]);
 
   const isHomePage = pathname === "/";
 
@@ -99,10 +116,17 @@ export default function Header() {
                 <span className="hidden md:inline">{user.nickname}</span>
               </button>
               {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-20 rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
+                <div className="absolute right-0 mt-2 w-32 rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
+                  <Link
+                    href="/mypage"
+                    className="block px-4 py-2 text-base font-semibold text-gray01 hover:bg-violet-100"
+                    onClick={closeDropdown}
+                  >
+                    마이페이지
+                  </Link>
                   <button
                     onClick={handleLogout}
-                    className="block w-full px-4 py-2 text-left text-sm text-gray01 hover:bg-gray03"
+                    className="block w-full px-4 py-2 text-left text-base font-semibold text-gray01 hover:bg-violet-100"
                   >
                     로그아웃
                   </button>
