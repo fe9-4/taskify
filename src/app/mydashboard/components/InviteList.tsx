@@ -21,7 +21,6 @@ const InviteList = () => {
       const response = await axios.get(`/api/invitations?size=${size}&cursorId=${cursorId}`);
 
       if (response.status === 200) {
-        console.log(response.data)
         setInvitationList((prev) => [...prev, ...response.data.inviteList]);
         setCursorId(response.data.cursorId);
       }
