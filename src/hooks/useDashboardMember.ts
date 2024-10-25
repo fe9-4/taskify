@@ -6,6 +6,10 @@ import { MemberList, MemberListSchema, MemberForm } from "@/zodSchema/memberSche
 export const useDashboardMember = ({ dashboardId, page = 1, size = 10 }: MemberForm) => {
   // 멤버 목록을 가져오는 비동기 함수
   const fetchMembers = async (): Promise<MemberList> => {
+    if (dashboardId <= 0) {
+      return { members: [], totalCount: 0 };
+    }
+
     const response = await axios.get("/api/members", {
       params: {
         dashboardId,
@@ -29,10 +33,11 @@ export const useDashboardMember = ({ dashboardId, page = 1, size = 10 }: MemberF
     queryKey: ["dashboardMembers", dashboardId, page, size],
     queryFn: fetchMembers,
     staleTime: 1000 * 60 * 5, // 5분 동안 캐시 유효
+    enabled: !!dashboardId && dashboardId > 0, // dashboardId가 유효할 때만 쿼리 실행
   });
 
   return {
-    members,
+    members: members || { members: [] },
     isLoading,
     error,
     refetch,

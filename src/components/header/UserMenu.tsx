@@ -10,12 +10,10 @@ interface UserMenuProps {
 
 export const UserMenu: React.FC<UserMenuProps> = ({ isHomePage }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [selectedDashboardId] = useState<number | null>(null);
+  const [selectedDashboardId] = useState<number>(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { user, logout } = useAuth();
-  const { members } = useDashboardMember(
-    selectedDashboardId ? { dashboardId: selectedDashboardId, page: 1, size: 10 } : { dashboardId: 0 }
-  ) || { members: null };
+  const { members } = useDashboardMember({ dashboardId: selectedDashboardId, page: 1, size: 10 });
 
   const handleLogout = async () => {
     try {
@@ -80,7 +78,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ isHomePage }) => {
               className="block px-4 py-2 text-base font-semibold text-gray01 hover:bg-violet-100"
               onClick={closeDropdown}
             >
-              마이 페이지
+              마이페이지
             </Link>
             <button
               onClick={handleLogout}
@@ -90,7 +88,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ isHomePage }) => {
             </button>
           </div>
         )}
-        {selectedDashboardId && members && (
+        {selectedDashboardId > 0 && members && (
           <div className="absolute right-0 mt-2 flex -space-x-2 overflow-hidden">
             {members.members.slice(0, 5).map((member, index) => (
               <div

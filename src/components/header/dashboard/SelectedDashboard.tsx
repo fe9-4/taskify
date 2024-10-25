@@ -4,14 +4,9 @@ import { Dashboard } from "@/zodSchema/dashboardSchema";
 interface SelectedDashboardProps {
   selectedDashboardId: number | null;
   dashboards: Dashboard[];
-  onDashboardSelect: (id: number) => void;
 }
 
-export const SelectedDashboard: React.FC<SelectedDashboardProps> = ({
-  selectedDashboardId,
-  dashboards,
-  onDashboardSelect,
-}) => {
+export const SelectedDashboard: React.FC<SelectedDashboardProps> = ({ selectedDashboardId, dashboards }) => {
   // 대시보드를 최신순으로 정렬
   const sortedDashboards = dashboards.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
 

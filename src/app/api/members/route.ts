@@ -17,7 +17,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const size = searchParams.get("size") || "10";
 
     // dashboardId가 없으면 에러 반환
-    if (!dashboardId) {
+    if (!dashboardId || dashboardId === "0") {
       return NextResponse.json({ message: "대시보드 ID가 필요합니다." }, { status: 400 });
     }
 

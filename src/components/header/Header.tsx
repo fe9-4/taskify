@@ -47,7 +47,6 @@ export default function Header() {
         {!isHomePage && (
           <div className="flex flex-grow items-center">
             <DashboardMemberDisplay />
-            <div className="mx-4 h-8 w-px bg-gray-300"></div>
           </div>
         )}
         <UserMenu isHomePage={isHomePage} />

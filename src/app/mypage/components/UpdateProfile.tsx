@@ -31,7 +31,7 @@ const UpdateProfile = () => {
       });
       setProfileImageUrl(user.profileImageUrl || null);
     }
-  }, [user]);
+  }, [user, profileForm]);
 
   const { createFormData, isLoading: isFileLoading, error: fileError } = useFileUpload();
 
