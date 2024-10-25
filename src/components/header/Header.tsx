@@ -10,15 +10,17 @@ import { useAuth } from "@/hooks/useAuth";
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
-  const { fetchUser } = useAuth();
+  const { user, fetchUser } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
         await fetchUser();
-        if (pathname === "/") {
+        if (user && pathname === "/") {
           router.push("/mydashboard");
+        } else if (!user && pathname === "/") {
+          router.push("/");
         }
       } catch (error) {
         console.error("Failed to fetch user:", error);
@@ -28,7 +30,7 @@ export default function Header() {
     };
 
     checkAuthStatus();
-  }, [fetchUser, pathname, router]);
+  }, [user, fetchUser, pathname, router]);
 
   if (isLoading || pathname === "/login" || pathname === "/signup") {
     return null;
