@@ -4,8 +4,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, useRef } from "react";
-import axios from "axios";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useWidth } from "@/hooks/useWidth";
 
@@ -15,14 +14,12 @@ export default function Header() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLLIElement>(null);
   const { isLargeScreen } = useWidth();
-  const { user, setUser, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
 
   const handleLogout = async () => {
     try {
-      await axios.post("/api/auth/logout", {}, { withCredentials: true });
-      setUser(null);
+      await logout();
       setIsDropdownOpen(false);
-      router.push("/");
     } catch (error) {
       console.error("로그아웃 오류:", error);
     }
@@ -32,18 +29,44 @@ export default function Header() {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
+  const closeDropdown = useCallback(() => {
+    setIsDropdownOpen(false);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        closeDropdown();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [closeDropdown]);
+
   const isHomePage = pathname === "/";
 
   if (pathname === "/login" || pathname === "/signup") {
     return null;
   }
 
+  // 이니셜 생성 함수
+  const getInitials = (name: string) => {
+    return name.charAt(0).toUpperCase();
+  };
+
   return (
     <header
-      className={`fixed left-0 right-0 top-0 z-10 h-[60px] px-[24px] md:h-[70px] md:px-[40px] xl:px-[70px] ${isHomePage ? "bg-black" : "border-b border-gray03 bg-white"}`}
+      className={`fixed left-0 right-0 top-0 z-10 h-[60px] px-[24px] md:h-[70px] md:px-[40px] xl:px-[70px] ${
+        isHomePage ? "bg-black" : "border-b border-gray03 bg-white"
+      }`}
     >
       <nav
-        className={`flex h-full items-center ${isHomePage ? "justify-between" : "justify-end"} gap-[17px] pr-[24px] md:gap-[15px]`}
+        className={`flex h-full items-center ${
+          isHomePage ? "justify-between" : "justify-end"
+        } gap-[17px] pr-[24px] md:gap-[15px]`}
       >
         {/* 로고 및 사이트 이름 */}
         {isHomePage && (
@@ -75,17 +98,35 @@ export default function Header() {
             <li className="relative" ref={dropdownRef}>
               <button
                 onClick={toggleDropdown}
-                className={`text-base font-normal transition-colors duration-300 md:text-lg ${
+                className={`flex items-center space-x-2 text-base font-normal transition-colors duration-300 md:text-lg ${
                   isHomePage ? "text-white hover:text-gray03" : "text-black hover:text-violet01"
                 }`}
               >
-                {user.nickname}
+                {user.profileImageUrl ? (
+                  <Image src={user.profileImageUrl} alt="Profile" width={32} height={32} className="rounded-full" />
+                ) : (
+                  <div
+                    className={`flex h-8 w-8 items-center justify-center rounded-full ${
+                      isHomePage ? "bg-white text-black" : "bg-violet01 text-white"
+                    }`}
+                  >
+                    {getInitials(user.nickname)}
+                  </div>
+                )}
+                <span className="hidden md:inline">{user.nickname}</span>
               </button>
               {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-20 rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
+                <div className="absolute right-0 mt-2 w-32 rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
+                  <Link
+                    href="/mypage"
+                    className="block px-4 py-2 text-base font-semibold text-gray01 hover:bg-violet-100"
+                    onClick={closeDropdown}
+                  >
+                    마이페이지
+                  </Link>
                   <button
                     onClick={handleLogout}
-                    className="block w-full px-4 py-2 text-left text-sm text-gray01 hover:bg-gray03"
+                    className="block w-full px-4 py-2 text-left text-base font-semibold text-gray01 hover:bg-violet-100"
                   >
                     로그아웃
                   </button>
@@ -97,7 +138,9 @@ export default function Header() {
               {/* 로그인/회원가입 링크 */}
               <li>
                 <Link
-                  className={`text-base font-normal transition-colors duration-300 md:text-lg ${isHomePage ? "text-white hover:text-gray03" : "hover:text-violet01"}`}
+                  className={`text-base font-normal transition-colors duration-300 md:text-lg ${
+                    isHomePage ? "text-white hover:text-gray03" : "hover:text-violet01"
+                  }`}
                   href="/login"
                 >
                   로그인
@@ -105,7 +148,9 @@ export default function Header() {
               </li>
               <li>
                 <Link
-                  className={`text-base font-normal transition-colors duration-300 md:text-lg ${isHomePage ? "text-white hover:text-gray03" : "hover:text-violet01"}`}
+                  className={`text-base font-normal transition-colors duration-300 md:text-lg ${
+                    isHomePage ? "text-white hover:text-gray03" : "hover:text-violet01"
+                  }`}
                   href="/signup"
                 >
                   회원가입

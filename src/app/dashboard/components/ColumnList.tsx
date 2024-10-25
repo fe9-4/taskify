@@ -3,8 +3,8 @@ import toast from "react-hot-toast";
 import ColumnItem from "./ColumnItem";
 import { useEffect, useRef, useState } from "react";
 import { HiOutlineCog } from "react-icons/hi";
-import { NumChip } from "../chip/PlusAndNumChip";
-import { AddTodoBtn } from "../button/ButtonComponents";
+import { NumChip } from "../../../components/chip/PlusAndNumChip";
+import { AddTodoBtn } from "../../../components/button/ButtonComponents";
 import { ICard } from "@/types/dashboardType";
 
 interface IProps {
@@ -16,27 +16,31 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [cardList, setCardList] = useState<ICard[]>([]);
   const [cursorId, setCursorId] = useState<number>(1);
   const [hasMore, setHasMore] = useState(true);
+  const [size, setSize] = useState(3);
   const observeRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
-  
+
   const getCardList = async () => {
     if (!hasMore) return;
 
     try {
-      const response = await axios.get(`/api/dashboard/columnList?cursorId=${cursorId}&columnId=${columnId}`);
+      const response = await axios.get(`/api/dashboard/columnList?cursorId=${cursorId}&columnId=${columnId}&size=${size}`);
 
       if (response.status === 200) {
         setCardList((prev) => [...prev, ...response.data.cards]);
         setCursorId(response.data.cursorId);
       }
 
-      if (response.data.cards.length < 10) {
+      if (response.data.cards.length === 0) {
+        setHasMore(false);
+      } else if (response.data.cards.length < size) {
+        toast.success("더 가져올 카드가 없습니다.");
         setHasMore(false);
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error("ColumnList getCardList에서 api 오류 발생", error);
-        toast.error(error.response?.data.message);
+        toast.error(error.response?.data);
       }
     }
   };
@@ -47,7 +51,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
 
     observeRef.current = new IntersectionObserver((entries) => {
       const lastCardItem = entries[0];
-      
+
       if (lastCardItem.isIntersecting && hasMore) {
         getCardList();
       }
@@ -62,12 +66,15 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
         observeRef.current?.unobserve(loadingRef.current);
       }
     };
-  }, [hasMore]);
+  }, [hasMore, cursorId, size]);
 
   const handleAddTodo = () => {
     // 모달 만들어지면 모달 연결
-    console.log("모달 오픈");
   };
+
+  const handleEditModal = () => {
+    // 모달 만들어지면 모달 연결
+  }
 
   return (
     <div className="space-y-6 px-4 pt-4 md:border-b md:border-gray04 md:pb-6 xl:flex xl:min-h-screen xl:flex-col xl:border-b-0 xl:border-r">
@@ -79,7 +86,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
           </div>
           <NumChip num={cardList.length} />
         </div>
-        <button>
+        <button onClick={handleEditModal}>
           <HiOutlineCog className="size-[22px] text-gray01" />
         </button>
       </div>
