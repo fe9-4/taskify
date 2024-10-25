@@ -1,14 +1,12 @@
 import axios from "axios";
-import apiClient from "../../apiClient";
+import apiClient from "../apiClient";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
-interface IParams {
-  dashboardId: number;
-}
-
-export const GET = async (req: Request, { params }: { params: IParams }) => {
-  const { dashboardId } = params; 
+// 대시보드페이지 컬럼 조회
+export const GET = async (req: Request) => {
+  const { searchParams } = new URL(req.url);
+  const dashboardId = searchParams.get("dashboardId");
   const id = Number(dashboardId);
   
   const cookieStore = cookies();

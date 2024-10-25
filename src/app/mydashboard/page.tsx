@@ -26,7 +26,7 @@ const MyDashboard = () => {
   const getCurrentDashboards = useCallback(async () => {
     try {
       // 추가된 대시보드 추출
-      const response = await axios.get("/api/myDashboard", {
+      const response = await axios.get("/api/dashboards", {
         params: {
           page,
           cursorId,
@@ -61,7 +61,7 @@ const MyDashboard = () => {
     <div className="flex flex-col space-y-10 px-6 pt-6 md:px-8 md:pt-8">
       <div className="flex flex-col space-y-6 xl:w-[1022px]">
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
-          <div className="md:w-[247px] xl:w-[332px]">
+          <div className="flex justify-center md:justify-start md:w-[247px] xl:w-[332px]">
             <AddDashboardBtn onClick={() => setisCreateDashboardOpen(true)} />
           </div>
           {dashboardList?.length > 0

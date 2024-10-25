@@ -24,7 +24,7 @@ const DashboardDetail = () => {
 
   const getColumn = useCallback(async () => {
     try {
-      const response = await axios.get(`/api/dashboard/${dashboardId}`);
+      const response = await axios.get(`/api/columns?dashboardId=${dashboardId}`);
 
       if (response.status === 200) {
         setColumnList(response.data);

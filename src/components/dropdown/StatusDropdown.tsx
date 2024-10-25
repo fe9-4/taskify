@@ -13,7 +13,6 @@ interface IProps {
 
 // 상태값 변경함수를 보내서 드롭다운에서 값을 받아 쓰세요.
 // currentValue는 '할 일 수정' 모달에서 불러온 현재 값입니다.
-// 가장 바깥쪽 div 요소의 w-[217px]을 w-full로 바꿔서 적용해야 사용하시는 곳에 맞춰질수도 있습니다. (말씀해주시면 w-full로 수정해서 올리겠습니다.)
 const StatusDropdown = ({ setSelectedValue, currentValue }: IProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [value, setValue] = useState(currentValue || "toDo");

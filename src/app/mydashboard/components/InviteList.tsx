@@ -25,7 +25,7 @@ const InviteList = ({ invitationList, setInvitationList }: IProps) => {
 
   const handleAcceptInvitation = async (id: number) => {
     try {
-      const response = await axios.put(`/api/myDashboard/invitation/${id}`, {
+      const response = await axios.put(`/api/invitations/${id}`, {
         id,
         inviteAccepted: true
       });
@@ -45,7 +45,7 @@ const InviteList = ({ invitationList, setInvitationList }: IProps) => {
 
   const handleRefuseInvitation = async (id: number) => {
     try {
-      const response = await axios.put(`/api/myDashboard/invitation/${id}`, {
+      const response = await axios.put(`/api/invitations/${id}`, {
         id,
         inviteAccepted: false
       });

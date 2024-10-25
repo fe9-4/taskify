@@ -1,7 +1,7 @@
+import axios from "axios";
+import apiClient from "../apiClient";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import apiClient from "../../apiClient";
-import axios from "axios";
 
 export const GET = async (req: Request) => {
   const cookieStore = cookies();

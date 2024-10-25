@@ -24,7 +24,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
     if (!hasMore) return;
 
     try {
-      const response = await axios.get(`/api/dashboard/columnList?cursorId=${cursorId}&columnId=${columnId}&size=${size}`);
+      const response = await axios.get(`/api/cards?cursorId=${cursorId}&columnId=${columnId}&size=${size}`);
 
       if (response.status === 200) {
         setCardList((prev) => [...prev, ...response.data.cards]);

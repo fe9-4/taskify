@@ -3,6 +3,7 @@ import apiClient from "../apiClient";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
+// 내 대시보드 상단 대시보드 목록 조회 (cursorId 포함)
 export const GET = async (req: Request) => {
   const { searchParams } = new URL(req.url);
   const page = searchParams.get("page");

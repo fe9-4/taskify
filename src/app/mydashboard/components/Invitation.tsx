@@ -11,7 +11,7 @@ const Invitation = () => {
   
   const getInvitationList = useCallback(async () => {
     try {
-      const response = await axios.get("/api/myDashboard/invitation");
+      const response = await axios.get("/api/invitations");
 
       if (response.status === 200) {
         setInvitationList(response.data.invitations);
