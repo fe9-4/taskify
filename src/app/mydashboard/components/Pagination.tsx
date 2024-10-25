@@ -1,7 +1,6 @@
+import toast from "react-hot-toast";
 import { BackForwardBtn } from "@/components/button/ButtonComponents";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-
-import toast from "react-hot-toast";
 
 interface IProps {
   totalPage: number;
