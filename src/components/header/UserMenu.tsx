@@ -14,7 +14,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ isHomePage }) => {
   const [selectedDashboardId, setSelectedDashboardId] = useState<number | null>(null);
   // HTMLLIElement를 HTMLDivElement로 변경
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { user, loading, logout } = useAuth();
+  const { user, logout } = useAuth();
   const { data: dashboardList } = useDashboardList();
   const { members } = selectedDashboardId
     ? useDashboardMember({ dashboardId: selectedDashboardId, page: 1, size: 10 })
@@ -54,7 +54,7 @@ export const UserMenu: React.FC<UserMenuProps> = ({ isHomePage }) => {
     return name.charAt(0).toUpperCase();
   };
 
-  if (user && !loading) {
+  if (user) {
     return (
       <div className="relative" ref={dropdownRef}>
         <button
