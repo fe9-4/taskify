@@ -2,7 +2,7 @@
 
 import { DeleteCancelBtn } from "@/components/button/ButtonComponents";
 
-const DashboardMemberItem = () => {
+const DashboardMemberItem = ({ item }: any) => {
   let isMember; // 불린값 prop으로 받기 (구성원 OR 초대내역)
   const onClickDeleteMember = () => {
     // 구성원 삭제하기
@@ -10,6 +10,7 @@ const DashboardMemberItem = () => {
   const onClickCancerInvitation = () => {
     // 초대 취소하기
   };
+  const {} = item;
   return (
     <div className="w-full border-b border-gray04 px-5 md:px-7">
       <div className="flex items-center justify-between">

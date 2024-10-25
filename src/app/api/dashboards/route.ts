@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import apiClient from "@/app/api/apiClient";
 
 export async function GET(request: NextRequest) {
-  const cookieStore = await cookies();
+  const cookieStore = cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
 
   const { searchParams } = new URL(request.url);

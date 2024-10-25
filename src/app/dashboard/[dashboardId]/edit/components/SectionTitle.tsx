@@ -4,11 +4,15 @@ import { CiSquarePlus } from "react-icons/ci";
 
 // 초대하기 모달 추가
 const onClickInvitation = () => {};
-const MemberInfo = () => <div>이름</div>;
-const EmailInfo = () => <div>이메일</div>;
+const MemberInfo = () => <div className="text-base font-normal text-gray02 md:text-lg">이름</div>;
+const EmailInfo = () => <div className="text-base font-normal text-gray02 md:text-lg">이메일</div>;
 const InviteButton = () => (
-  <button type="button" onClick={onClickInvitation}>
-    초대하기 <CiSquarePlus />
+  <button
+    className="flex items-center gap-[10px] rounded bg-violet01 px-3 py-2 text-xs text-white"
+    type="button"
+    onClick={onClickInvitation}
+  >
+    초대하기 <CiSquarePlus strokeWidth={1} />
   </button>
 );
 
@@ -27,21 +31,21 @@ const SectionTitle = ({ sectionTitle }: { sectionTitle: string }) => {
     if (!isLast) setPage(page + 1);
   };
   return (
-    <div className="flex justify-between">
-      <h2 className="mb-6 text-2xl font-bold md:text-3xl">{sectionTitle}</h2>
-      <div className="flex gap-4">
-        <div>
-          {totalPage} 중 {page}
-        </div>
+    <div className="grid grid-cols-2 grid-rows-2 gap-3 md:flex md:justify-between">
+      <h2 className="col-start-1 text-2xl font-bold md:text-3xl">{sectionTitle}</h2>
+      <div className="item-center col-start-2 flex justify-end gap-3 text-xs md:gap-4 md:text-base">
+        {totalPage} 중 {page}
         <PaginationBtn
           disabledPrev={isFirst}
           disabledNext={isLast}
           onClickPrev={onClickPrev}
           onClickNext={onClickNext}
         />
-        {sectionTitle === "구성원" ? <MemberInfo /> : <EmailInfo />}
+      </div>
+      <div className="col-start-2 row-start-2 flex justify-end">
         {sectionTitle === "구성원" ? <></> : <InviteButton />}
       </div>
+      <div className="col-start-1 row-start-2">{sectionTitle === "구성원" ? <MemberInfo /> : <EmailInfo />}</div>
     </div>
   );
 };

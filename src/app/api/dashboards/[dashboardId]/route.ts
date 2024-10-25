@@ -1,6 +1,6 @@
 import axios from "axios";
 import apiClient from "../../apiClient";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
 interface IParams {
@@ -8,12 +8,12 @@ interface IParams {
 }
 
 export const GET = async (req: Request, { params }: { params: IParams }) => {
-  const { dashboardId } = params; 
+  const { dashboardId } = params;
   const id = Number(dashboardId);
-  
+
   const cookieStore = cookies();
   const token = cookieStore.get("accessToken")?.value;
-  
+
   if (!token) {
     return new NextResponse("사용자 정보를 찾을 수 없습니다.", { status: 401 });
   }
@@ -26,7 +26,7 @@ export const GET = async (req: Request, { params }: { params: IParams }) => {
     const response = await apiClient.get(`/columns?dashboardId=${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
-      }
+      },
     });
 
     if (response.status === 200) {
@@ -39,4 +39,38 @@ export const GET = async (req: Request, { params }: { params: IParams }) => {
       return new NextResponse("대시보드 조회 실패", { status: error.status });
     }
   }
-}
+};
+
+// 대시보드 수정 api
+export const PUT = async ({ params }: { params: IParams }) => {
+  const dashboardId = params.dashboardId;
+
+  const cookieStore = cookies();
+  const token = cookieStore.get("accessToken")?.value;
+
+  if (!token) {
+    return new NextResponse("사용자 정보를 찾을 수 없습니다.", { status: 401 });
+  }
+
+  if (isNaN(Number(dashboardId))) {
+    return new NextResponse("대시보드 정보 가져오기 실패", { status: 400 });
+  }
+
+  try {
+    const response = await apiClient.put(`/dashboards/${dashboardId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (response.status === 200) {
+      const data = response.data.data;
+      return NextResponse.json(data, { status: 200 });
+    }
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error("대시보드 수정 요청에서 오류 발생", error);
+      return new NextResponse("대시보드 수정 실패", { status: error.status });
+    }
+  }
+};

@@ -18,12 +18,6 @@ const ModalContainer = () => {
 
   const alertText = useAtomValue(AlertModalTextAtom);
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      Modal.setAppElement("#modal-root");
-    }
-  }, []);
-
   return (
     <>
       <ModalContent isOpen={isCreateDashboardOpen} onRequestClose={() => setIsCreateDashboardOpen(false)}>

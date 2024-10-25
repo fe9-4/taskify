@@ -8,6 +8,7 @@ import { ItemType } from "@/types/dashboardType";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useWidth } from "@/hooks/useWidth";
+import axios, { AxiosError } from "axios";
 
 const Sidebar = () => {
   const [page, setPage] = useState(1);
@@ -31,18 +32,13 @@ const Sidebar = () => {
   const fetchDashboardList = async (page: number, size: number) => {
     if (user) {
       try {
-        const res = await fetch(`/api/dashboards?page=${page}&size=${size}`, {
-          method: "GET",
-          credentials: "include",
-        });
-        if (!res.ok) {
-          throw new Error(`Failed to fetch data : ${res.status}`);
-        }
-        const data = await res.json();
+        const res = await axios.get(`/api/dashboards?page=${page}&size=${size}`);
+        const data = res.data;
         setDashboardList(data.user ? data.user.dashboards : []);
         setTotalCount(data.user.totalCount);
       } catch (err) {
-        console.error(err);
+        const error = err as AxiosError;
+        console.error(error.message);
       }
     }
   };
