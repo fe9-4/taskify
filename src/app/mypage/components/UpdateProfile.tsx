@@ -79,7 +79,7 @@ const UpdateProfile = () => {
 
   const onSubmitProfile: SubmitHandler<UpdateUserProfile> = async (data) => {
     try {
-      const response = await axios.put("/api/user/profile", {
+      const response = await axios.put("/api/users/me", {
         ...data,
         profileImageUrl: profileImageUrl,
       });

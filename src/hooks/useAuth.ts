@@ -46,7 +46,7 @@ export const useAuth = () => {
         const response = await axios.post("/api/auth/login", credentials, { withCredentials: true });
         setUser(response.data.user); // 로그인 후 사용자 정보 업데이트
         queryClient.invalidateQueries({ queryKey: ["userProfile"] }); // 사용자 정보 쿼리 무효화
-        router.push("/"); // 로그인 후 리다이렉트
+        router.push("/mydashboard"); // 로그인 후 리다이렉트
       } catch (error) {
         console.error("로그인 오류:", error);
       }
