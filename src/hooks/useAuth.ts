@@ -35,8 +35,15 @@ export const useAuth = () => {
         const response = await axios.post("/api/auth/login", credentials);
         setUser(response.data.user);
         router.push("/mydashboard");
+        return { success: true };
       } catch (error) {
-        console.error("Login error:", error);
+        if (axios.isAxiosError(error)) {
+          return {
+            success: false,
+            message: error.response?.data?.message || "로그인에 실패했습니다.",
+          };
+        }
+        return { success: false, message: "로그인 중 오류가 발생했습니다." };
       }
     },
     [setUser, router]

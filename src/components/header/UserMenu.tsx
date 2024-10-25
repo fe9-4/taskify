@@ -2,7 +2,6 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
-import { useDashboardList } from "@/hooks/useDashboardList";
 import { useDashboardMember } from "@/hooks/useDashboardMember";
 
 interface UserMenuProps {
@@ -11,11 +10,9 @@ interface UserMenuProps {
 
 export const UserMenu: React.FC<UserMenuProps> = ({ isHomePage }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [selectedDashboardId, setSelectedDashboardId] = useState<number | null>(null);
-  // HTMLLIElement를 HTMLDivElement로 변경
+  const [selectedDashboardId] = useState<number | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { user, logout } = useAuth();
-  const { data: dashboardList } = useDashboardList();
   const { members } = selectedDashboardId
     ? useDashboardMember({ dashboardId: selectedDashboardId, page: 1, size: 10 })
     : { members: null };
@@ -83,17 +80,8 @@ export const UserMenu: React.FC<UserMenuProps> = ({ isHomePage }) => {
               className="block px-4 py-2 text-base font-semibold text-gray01 hover:bg-violet-100"
               onClick={closeDropdown}
             >
-              마이페이지
+              마이 페이지
             </Link>
-            {dashboardList?.dashboards.map((dashboard) => (
-              <button
-                key={dashboard.id}
-                onClick={() => setSelectedDashboardId(dashboard.id)}
-                className="block w-full px-4 py-2 text-left text-base font-semibold text-gray01 hover:bg-violet-100"
-              >
-                {dashboard.title}
-              </button>
-            ))}
             <button
               onClick={handleLogout}
               className="block w-full px-4 py-2 text-left text-base font-semibold text-gray01 hover:bg-violet-100"

@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Logo } from "./Logo";
 import { UserMenu } from "./UserMenu";
 import { DashboardMemberDisplay } from "./dashboard/DashboardMemberDisplay";
@@ -10,29 +10,27 @@ import { useAuth } from "@/hooks/useAuth";
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, fetchUser } = useAuth();
+  const { fetchUser } = useAuth();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
         await fetchUser();
-        if (pathname === "/" && user) {
+        if (pathname === "/") {
           router.push("/mydashboard");
         }
       } catch (error) {
         console.error("Failed to fetch user:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    if (!user) {
-      checkAuthStatus();
-    } else if (pathname === "/") {
-      // httpOnly cookie 에 accessToken 이 있다면 checkAuthStatus 를 통해 사용자 정보를 불러오고 mydashboard 로 이동
-      router.push("/mydashboard");
-    }
-  }, [user, fetchUser, pathname, router]);
+    checkAuthStatus();
+  }, [fetchUser, pathname, router]);
 
-  if (pathname === "/login" || pathname === "/signup") {
+  if (isLoading || pathname === "/login" || pathname === "/signup") {
     return null;
   }
 

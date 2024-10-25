@@ -43,7 +43,7 @@ const SignupPage = () => {
   const onSubmit: SubmitHandler<Signup> = async (data) => {
     try {
       const { confirmPassword, ...signupData } = data;
-      const response = await axios.post("/api/users", signupData);
+      await axios.post("/api/users", signupData);
 
       toast.success("가입이 완료되었습니다");
       reset();
