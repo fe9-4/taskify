@@ -1,3 +1,4 @@
+"use client";
 import { DeleteDashboardBtn } from "@/components/button/ButtonComponents";
 import DashboardMemberList from "@/app/dashboard/[dashboardId]/edit/components/DashboardMemberList";
 import EditDashboard from "@/app/dashboard/[dashboardId]/edit/components/EditDashboard";
