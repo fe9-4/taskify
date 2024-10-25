@@ -116,9 +116,21 @@ export const CancelBtn = ({ children, onClick, ...props }: { children: string; o
   );
 };
 // 6) 확인 / 피그마 표기 : modal
-export const ConfirmBtn = ({ children, onClick, ...props }: { children: string; onClick: any; props?: any }) => {
+export const ConfirmBtn = ({
+  children,
+  onClick,
+  type,
+  disabled,
+  ...props
+}: {
+  children: string;
+  onClick?: any;
+  type: string;
+  disabled?: boolean;
+  props?: any;
+}) => {
   return (
-    <BaseBtn extra="size-full" onClick={onClick} props={props}>
+    <BaseBtn extra="size-full" onClick={onClick} type={type} disabled={disabled} props={props}>
       <Content extra="bg-violet01 text-white font-semibold text-xs w-full h-full md:text-lg">{children}</Content>
     </BaseBtn>
   );
