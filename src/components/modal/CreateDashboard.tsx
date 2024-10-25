@@ -14,7 +14,7 @@ const CreateDashboard = () => {
     watch,
     formState: { isValid },
   } = useForm({ mode: "onChange" });
-  const [, setisCreateDashboardOpen] = useAtom(CreateDashboardAtom);
+  const [, setIsCreateDashboardOpen] = useAtom(CreateDashboardAtom);
 
   // api 연결 전 버튼 테스트용
   const onSubmit = (data: any) => {
@@ -29,8 +29,7 @@ const CreateDashboard = () => {
         <SelectColorChip register={register} watch={watch} />
       </div>
       <div className="flex h-[54px] w-full gap-2">
-        <CancelBtn onClick={() => setisCreateDashboardOpen(false)}>취소</CancelBtn>
-        {/* title 및 color 미입력시 생성 버튼 비활성화 */}
+        <CancelBtn onClick={() => setIsCreateDashboardOpen(false)}>취소</CancelBtn>
         <ActiveBtn disabled={!isValid} onClick={handleSubmit(onSubmit)}>
           생성
         </ActiveBtn>
