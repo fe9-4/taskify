@@ -7,19 +7,30 @@ export const GET = async (req: Request) => {
   const cookieStore = cookies();
   const token = cookieStore.get("accessToken")?.value;
 
+  const { searchParams } = new URL(req.url);
+  const size = searchParams.get("size");
+  const cursorId = searchParams.get("cursorId");
+  
   if (!token) {
     return new NextResponse("사용자 정보를 찾을 수 없습니다.", { status: 401 });
   }
 
+  if (!size || !cursorId) {
+    return new NextResponse("초대목록 조회 요청값을 확인해주세요.", { status: 400 });
+  }
+  
   try {
-    const response = await apiClient.get("/invitations", {
+    const response = await apiClient.get(`/invitations?size=${size}&cursorId=${cursorId}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
     });
 
     if (response.status === 200) {
-      return NextResponse.json(response.data, { status: 200 });
+      const data = response.data;
+      const inviteList = data.invitations;
+      const cursorId = data.cursorId;
+      return NextResponse.json({inviteList, cursorId}, { status: 200 });
     }
   } catch (error) {
     if (axios.isAxiosError(error)) {
