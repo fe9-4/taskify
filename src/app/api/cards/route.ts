@@ -2,16 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import axios from "axios";
 import apiClient from "@/app/api/apiClient";
-
-// YYYY-MM-DD HH:MM 형식으로 날짜를 포맷팅하는 함수
-function formatDateTime(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  return `${year}-${month}-${day} ${hours}:${minutes}`;
-}
+import { formatDateTime } from "@/utils/dateFormat";
 
 // 할 일 생성
 export const POST = async (request: NextRequest) => {
@@ -45,28 +36,27 @@ export const POST = async (request: NextRequest) => {
     };
 
     // API 클라이언트를 사용하여 서버에 카드 생성 요청
-    const response = await apiClient.post("/cards", newCard, {
+    const response = await apiClient.post("/cards/", newCard, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "multipart/form-data",
       },
     });
 
     return NextResponse.json(response.data, { status: 201 });
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      console.error("카드 생성 중 오류 발생: ", error);
+      console.error("할 일 카드 생성 중 오류 발생: ", error);
 
       if (error.response) {
         return NextResponse.json({ message: error.response.data.message }, { status: error.status });
       }
     }
 
-    return NextResponse.json({ error: "카드 생성 중 오류가 발생했습니다." }, { status: 500 });
+    return NextResponse.json({ error: "할 일 카드 생성 중 오류가 발생했습니다." }, { status: 500 });
   }
 };
 
-// 할 일 수정
+// 할 일 카드 수정
 export const PUT = async (request: NextRequest) => {
   const cookieStore = cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
@@ -80,15 +70,19 @@ export const PUT = async (request: NextRequest) => {
     const response = await apiClient.put("/cards", formData, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "multipart/form-data",
       },
     });
 
-    return NextResponse.json({ user: response.data }, { status: 200 });
+    return NextResponse.json({ user: response.data }, { status: 201 });
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      console.error("할 일 수정 오류", error);
-      return new NextResponse("할 일 수정 실패", { status: error.status });
+      console.error("할 일 카드 수정 중 오류 발생: ", error);
+
+      if (error.response) {
+        return NextResponse.json({ message: error.response.data.message }, { status: error.status });
+      }
     }
+
+    return NextResponse.json("할 일 카드 수정 중 오류가 발생했습니다.", { status: 500 });
   }
 };

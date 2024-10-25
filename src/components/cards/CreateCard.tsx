@@ -3,18 +3,19 @@ import { z } from "zod";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChangeEvent, KeyboardEvent, useCallback, useState } from "react";
+import { useAtom } from "jotai";
+import { CreateCardAtom } from "@/store/modalAtom";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useFileUpload } from "@/hooks/useFileUpload";
 import { CardProps } from "@/types/cardType";
 import { formatDateTime } from "@/utils/dateFormat";
 import { CancelBtn, ConfirmBtn } from "@/components/button/ButtonComponents";
 import SearchDropdown from "@/components/dropdown/SearchDropdown";
 import InputItem from "@/components/input/InputItem";
-import InputFile from "@/components/input/InputFile";
 import InputDate from "@/components/input/InputDate";
 import InputTag from "@/components/input/InputTag";
-import { useFileUpload } from "@/hooks/useFileUpload";
-import { useAuth } from "@/hooks/useAuth";
+import InputFile from "@/components/input/InputFile";
 
 const CardSchema = z.object({
   assigneeUserId: z.number(),
@@ -34,8 +35,6 @@ const TestCard = () => {
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [tagInput, setTagInput] = useState("");
 
-  // type UpdateTodo = z.infer<typeof TodoSchema>;
-
   const {
     register,
     control,
@@ -48,9 +47,9 @@ const TestCard = () => {
     resolver: zodResolver(CardSchema),
     mode: "onChange",
     defaultValues: {
-      assigneeUserId: 4672,
-      dashboardId: 12046,
-      columnId: 40754,
+      assigneeUserId: 4672, // 본인의 계정 아이디
+      dashboardId: 12046, // 대시보드 생성 아이디
+      columnId: 40754, // 컬럼 생성 아이디
       title: "",
       description: "",
       dueDate: "",
@@ -78,11 +77,15 @@ const TestCard = () => {
         if (response.data?.imageUrl) {
           setImageUrl(response.data.imageUrl);
           setValue("imageUrl", response.data.imageUrl);
-          toast.success("카드 이미지 업로드 완료");
+          toast.success("카드 이미지 업로드가 완료되었습니다.");
         }
       } catch (error) {
-        console.error("카드 이미지 업로드 오류:", error);
-        toast.error("카드 이미지 업로드 실패");
+        if (axios.isAxiosError(error)) {
+          console.error("카드 이미지 업로드 오류: ", error);
+          toast.error("카드 이미지 업로드에 실패했습니다.");
+        } else {
+          toast.error("네트워크 오류가 발생했습니다.");
+        }
       }
     } else {
       setImageUrl(null);
@@ -106,16 +109,14 @@ const TestCard = () => {
       });
 
       if (response.data) {
-        toast.success("카드가 성공적으로 생성되었습니다.");
-        console.log("카드 생성 성공: ", response.data);
+        toast.success("카드가 생성되었습니다! 🎉");
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        toast.error("카드 생성 중 에러가 발생했습니다.");
-        console.error("카드 생성 실패:", error.response?.data?.message);
+        console.error("카드 생성 오류: ", error);
+        toast.error("카드 생성에 실패하였습니다.");
       } else {
         toast.error("네트워크 오류가 발생했습니다.");
-        console.error("알 수 없는 에러: ", error);
       }
     }
   };
@@ -226,6 +227,7 @@ const TestCard = () => {
         />
 
         <div className="flex h-[42px] gap-3 md:h-[54px] md:gap-2">
+          <CancelBtn onClick={() => ""}>취소</CancelBtn>
           <button type="submit" disabled={!isValid}>
             생성
           </button>

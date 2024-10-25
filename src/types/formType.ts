@@ -46,9 +46,9 @@ export interface InputDateProps {
 }
 
 export interface InputTagProps {
-  cardData: CardProps;
+  tags: string[];
   tagInput: string;
   onKeyDown: KeyboardEventHandler;
-  onClick: (tagRemove: string) => void;
+  onClick: (tag: string) => void;
   onChange: ChangeEventHandler;
 }
