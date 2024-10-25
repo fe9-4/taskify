@@ -175,9 +175,9 @@ const CreateCard = () => {
 
         <div className="flex h-[42px] gap-3 md:h-[54px] md:gap-2">
           <CancelBtn onClick={() => setIsCreateCardOpen(false)}>취소</CancelBtn>
-          <ConfirmBtn type="submit" disabled={!isFormValid()}>
+          {/* <ConfirmBtn type="submit" disabled={!isFormValid()}>
             생성
-          </ConfirmBtn>
+          </ConfirmBtn> */}
         </div>
       </form>
     </section>

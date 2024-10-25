@@ -80,7 +80,7 @@ export const ActiveBtn = ({ disabled, children, onClick }: { disabled: boolean; 
       type="submit"
       disabled={disabled}
       className={cls(
-        "h-[50px] w-[351px] rounded-lg text-xl font-medium text-white md:w-[520px]",
+        "h-[50px] w-full rounded-lg text-xl font-medium text-white",
         disabled ? "cursor-not-allowed bg-gray02" : "bg-violet01"
       )}
     >

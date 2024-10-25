@@ -43,7 +43,7 @@ const SearchDropdown = ({ inviteMemberList, setManager, currentManager }: IProps
 
   const handleSelectName = (name: ICurrentManager) => {
     setSelectedName(name);
-    setManager(name.nickname);
+    //setManager(name.nickname);
     setName("");
     setIsOpen(false);
   };

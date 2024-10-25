@@ -20,8 +20,8 @@ export const SignupSchema = z
 export type Signup = z.infer<typeof SignupSchema>;
 
 export const UpdateUserProfileSchema = z.object({
-  nickname: NicknameSchema,
-  profileImageUrl: z.string().url("올바른 URL 형식이 아닙니다."),
+  nickname: z.string().min(2, "닉네임은 2글자 이상이어야 합니다.").max(10, "닉네임은 10글자 이하여야 합니다."),
+  profileImageUrl: z.string().url().nullable().optional(),
 });
 
 export type UpdateUserProfile = z.infer<typeof UpdateUserProfileSchema>;

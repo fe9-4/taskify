@@ -1,6 +1,5 @@
 import { Metadata } from "next";
 import "../styles/globals.css";
-import { Toaster } from "react-hot-toast";
 import { Montserrat } from "next/font/google";
 import Header from "@/components/Header";
 import ModalContainer from "@/components/modal/ModalContainer";
@@ -31,13 +30,12 @@ export default function RootLayout({
     <html lang="ko">
       <body className={`${montserrat.variable} font-pretendard min-h-screen text-black03`}>
         <div id="modal-root"></div>
+        <ModalContainer />
         <ClientLayout>
-          <ModalContainer />
           <Sidebar />
           <Header />
           <main className="pt-[60px] md:pt-[70px]">{children}</main>
         </ClientLayout>
-        <Toaster toastOptions={{ success: { style: { fontSize: "14px" } }, error: { style: { fontSize: "14px" } } }} />
       </body>
     </html>
   );

@@ -1,5 +1,5 @@
 import { Login } from "@/zodSchema/authSchema";
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
@@ -17,11 +17,11 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
         httpOnly: true, // 브라우저에서 접근 불가
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict", // CSRF 방지
-        maxAge: 60 * 30, // 30분 동안 유효
+        maxAge: 60 * 60 * 24 * 14, // 14일 동안 유효
         path: "/",
       });
 
-      // 사용자 정보 반환
+      // 로그인 한 사용자 정보 반환
       return NextResponse.json({ user: response.data.user }, { status: 200 });
     }
 
@@ -34,40 +34,5 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
       }
     }
     return NextResponse.json({ message: "로그인 실패" }, { status: 500 });
-  }
-};
-
-export const GET = async (request: NextRequest) => {
-  try {
-    // 쿠키에서 accessToken 가져오기
-    const accessToken = cookies().get("accessToken");
-
-    if (!accessToken) {
-      return NextResponse.json({ user: null }, { status: 200 });
-    }
-
-    // user/profile API를 호출하여 사용자 정보 가져오기
-    const response = await axios.get(`${request.nextUrl.origin}/api/user/profile`, {
-      headers: {
-        Cookie: `accessToken=${accessToken.value}`,
-      },
-    });
-
-    if (response.status === 200) {
-      return NextResponse.json({ user: response.data.user }, { status: 200 });
-    } else {
-      // user/profile API에서 오류 발생 시
-      return NextResponse.json({ user: null }, { status: 200 });
-    }
-  } catch (error) {
-    console.error("사용자 정보 조회 실패:", error);
-    if (axios.isAxiosError(error)) {
-      // axios 에러 처리
-      return NextResponse.json(
-        { message: error.response?.data?.message || "사용자 정보 조회 실패" },
-        { status: error.response?.status || 500 }
-      );
-    }
-    return NextResponse.json({ message: "사용자 정보 조회 실패" }, { status: 500 });
   }
 };
