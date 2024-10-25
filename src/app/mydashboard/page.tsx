@@ -2,36 +2,43 @@
 
 import axios from "axios";
 import toast from "react-hot-toast";
-import Pagination from "@/components/myDashboard/Pagination";
-import Invitation from "@/components/myDashboard/Invitation";
+import Invitation from "@/app/mydashboard/components/Invitation";
+import Pagination from "./components/Pagination";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAtom } from "jotai";
 import { AddDashboardBtn, DashboardCard } from "@/components/button/ButtonComponents";
 import { IMyDashboard } from "@/types/myDashboardType";
 import { CreateDashboardAtom } from "@/store/modalAtom";
+import { myDashboardUpdateAtom } from "@/store/myDashboardAtom";
 
 const MyDashboard = () => {
   const router = useRouter();
 
   const [page, setPage] = useState(1);
+  const [cursorId, setCursorId] = useState<number | null>(1);
+  const [size, setSize] = useState(5);
   const [dashboardList, setDashboardList] = useState<IMyDashboard["dsahboards"]>([]);
   const [totalPage, setTotalPage] = useState(0);
   const [, setisCreateDashboardOpen] = useAtom(CreateDashboardAtom);
-
+  const [isUpdatedList, setIsUpdatedList] = useAtom(myDashboardUpdateAtom);
+  
   const getCurrentDashboards = useCallback(async () => {
     try {
       // 추가된 대시보드 추출
       const response = await axios.get("/api/myDashboard", {
         params: {
           page,
+          cursorId,
+          size
         },
       });
 
       if (response.status === 200) {
         const data = response.data;
         setDashboardList(data.dashboardList);
-        setTotalPage(Math.ceil(data.totalCount / 5));
+        setCursorId(data.cursorId !== null ? data.cursorId : 1);
+        setTotalPage(Math.ceil(data.totalCount / size));
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -39,11 +46,16 @@ const MyDashboard = () => {
         toast.error(error.response?.data);
       }
     }
-  }, [page]);
+  }, [page, cursorId, size]);
 
   useEffect(() => {
     getCurrentDashboards();
-  }, [getCurrentDashboards]);
+
+    if (isUpdatedList) {
+      getCurrentDashboards();
+      setIsUpdatedList(false);
+    }
+  }, [isUpdatedList, getCurrentDashboards, setIsUpdatedList]);
 
   return (
     <div className="flex flex-col space-y-10 px-6 pt-6 md:px-8 md:pt-8">

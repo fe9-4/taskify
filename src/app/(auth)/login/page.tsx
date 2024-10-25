@@ -14,8 +14,8 @@ import { useEffect } from "react";
 
 const LoginPage = () => {
   const router = useRouter();
-  // useAuth 훅에서 user와 setUser 함수 가져오기
-  const { user, setUser } = useAuth();
+  // useAuth 훅에서 user와 login 함수 가져오기
+  const { user, login } = useAuth();
 
   const {
     register,
@@ -31,29 +31,18 @@ const LoginPage = () => {
     },
   });
 
-  // 사용자가 이미 로그인한 경우 홈 페이지로 리다이렉트
+  // 사용자가 이미 로그인한 경우 내 대시보드 페이지로 리다이렉트
   useEffect(() => {
     if (user) {
-      router.push("/");
+      router.push("/mydashboard");
     }
   }, [user, router]);
 
   const onSubmit: SubmitHandler<Login> = async (data) => {
     try {
-      const response = await axios.post("/api/auth/login", {
-        email: data.email,
-        password: data.password,
-      });
-
-      if (response.data.user) {
-        // 로그인 성공 시 사용자 정보 설정
-        setUser(response.data.user);
-        reset();
-        router.push("/");
-        toast.success("로그인에 성공했습니다.");
-      } else {
-        throw new Error("로그인 실패");
-      }
+      await login(data); // login 함수 호출
+      reset();
+      toast.success("로그인에 성공했습니다.");
     } catch (error) {
       console.error("로그인 오류:", error);
       toast.error(
