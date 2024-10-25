@@ -10,7 +10,7 @@ const EditPage = () => {
   const { dashboardId } = useParams();
 
   return (
-    <main className="p-5">
+    <div className="p-5">
       <div className="flex items-center gap-[6px] md:gap-2">
         <IoIosArrowBack className="size-[18px]" />
         <Link href={`/dashboard/${dashboardId}`} className="text-base md:text-lg">
@@ -19,13 +19,15 @@ const EditPage = () => {
       </div>
       <div className="flex w-[620px] flex-col gap-4">
         <EditDashboard title="비브리지" />
-        <DashboardMemberList />
-        <DashboardMemberList />
+        {/* api 추가 필요 */}
+
+        <DashboardMemberList sectionTitle="구성원" />
+        <DashboardMemberList sectionTitle="초대 내역" />
       </div>
       <div className="mt-6">
         <DeleteDashboardBtn />
       </div>
-    </main>
+    </div>
   );
 };
 

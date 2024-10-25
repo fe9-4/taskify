@@ -51,11 +51,13 @@ const Sidebar = () => {
     fetchDashboardList(page, size);
   }, [user, page, size]);
 
+  const isFirst = page === 1;
+  const isLast = page === totalPage;
   const onClickPrev = () => {
-    if (page !== 1) setPage(page - 1);
+    if (!isFirst) setPage(page - 1);
   };
   const onClickNext = () => {
-    if (page !== totalPage) setPage(page + 1);
+    if (!isLast) setPage(page + 1);
   };
 
   if (pathname === "/" || pathname === "/login" || pathname === "/signup") return null;
@@ -68,8 +70,8 @@ const Sidebar = () => {
         <div className="absolute bottom-0 hidden md:mt-6 md:block xl:mt-8">
           {totalCount > size ? (
             <PaginationBtn
-              disabledPrev={page === 1}
-              disabledNext={page === totalPage}
+              disabledPrev={isFirst}
+              disabledNext={isLast}
               onClickPrev={onClickPrev}
               onClickNext={onClickNext}
             />
