@@ -42,7 +42,11 @@ export const GET = async (req: Request, { params }: { params: IParams }) => {
 };
 
 // 대시보드 수정 api
-export const PUT = async ({ params }: { params: IParams }) => {
+interface ValueType {
+  title: string;
+  color: string;
+}
+export const PUT = async ({ value, params }: { value: ValueType; params: IParams }) => {
   const dashboardId = params.dashboardId;
 
   const cookieStore = cookies();
@@ -55,9 +59,12 @@ export const PUT = async ({ params }: { params: IParams }) => {
   if (isNaN(Number(dashboardId))) {
     return new NextResponse("대시보드 정보 가져오기 실패", { status: 400 });
   }
-
+  const requestBody = {
+    title: value.title,
+    color: value.color,
+  };
   try {
-    const response = await apiClient.put(`/dashboards/${dashboardId}`, {
+    const response = await apiClient.put(`/dashboards/${dashboardId}`, requestBody, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

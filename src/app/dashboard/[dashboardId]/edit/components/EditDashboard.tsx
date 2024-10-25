@@ -16,9 +16,15 @@ const EditDashboard = ({ title }: { title: string }) => {
 
   const { dashboardId } = useParams();
 
-  const updateDashboard = async () => {
+  // 내가 만든 대시보드만 수정할 수 있음 -> 기존 대시보드 정보도 가져와야됨
+  // 대시보드 수정 api 요청
+  interface ValueType {
+    title: string;
+    color: string;
+  }
+  const updateDashboard = async (value: ValueType) => {
     try {
-      const res = await axios.put(`/api/dashboards/${dashboardId}`);
+      const res = await axios.put(`/api/dashboards/${dashboardId}`, value);
       const data = res.data;
       console.log(data);
     } catch (err) {
@@ -26,9 +32,11 @@ const EditDashboard = ({ title }: { title: string }) => {
       console.error(error.message);
     }
   };
-  // input에 입력한 값을 data로 가져오기
-  const onSubmit = (data: any) => {
-    updateDashboard();
+  // input에 입력한 값을 value로 가져오기
+  const onSubmit = (value: any) => {
+    updateDashboard(value);
+    console.log(value.title); // 입력한 대시보드 이름
+    console.log(value.color); // 선택한 색깔
   };
 
   return (
