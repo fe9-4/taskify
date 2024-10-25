@@ -13,8 +13,11 @@ export const useDashboardMember = ({ dashboardId, page = 1, size = 10 }: MemberF
         size,
       },
     });
+    console.log("API Response:", response.data); // 추가된 로그
     // 응답 데이터를 MemberListSchema를 사용하여 검증 및 파싱
-    return MemberListSchema.parse(response.data);
+    const parsedData = MemberListSchema.parse(response.data);
+    //console.log("Parsed Data:", parsedData); // 추가된 로그
+    return parsedData;
   };
 
   // React Query를 사용하여 멤버 목록 데이터 관리

@@ -16,7 +16,7 @@ export const MemberSchema = z.object({
   userId: z.number(),
   email: z.string(),
   nickname: z.string(),
-  profileImageUrl: z.string(),
+  profileImageUrl: z.string().nullable(),
   createdAt: DateSchema,
   updatedAt: DateSchema,
   isOwner: z.boolean(),
