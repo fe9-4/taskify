@@ -53,10 +53,10 @@ const DashboardMemberList = ({ sectionTitle }: { sectionTitle: string }) => {
 }
 */
 
-  const fetchDashboardInvitationList = async (page: number, size: number) => {
+  const fetchDashboardInvitationList = async () => {
     if (user) {
       try {
-        const res = await axios.get(`/api/dashboards/${dashboardId}/invitations?page=${page}&size=${size}`);
+        const res = await axios.get(`/api/dashboards/${dashboardId}/invitations`);
         const data = res.data;
         setInvitatingMemberList(data.user ? data.user.invitations : []);
         setTotalCount(data.user.totalCount);
@@ -67,8 +67,8 @@ const DashboardMemberList = ({ sectionTitle }: { sectionTitle: string }) => {
     }
   };
   useEffect(() => {
-    fetchDashboardInvitationList(page, size);
-  }, [user, page, size]);
+    fetchDashboardInvitationList();
+  }, [user, page, size, dashboardId]);
 
   return (
     <section className="w-full rounded-2xl bg-white px-4 py-5 md:px-7 md:py-8">
