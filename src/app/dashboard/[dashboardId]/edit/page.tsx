@@ -9,19 +9,39 @@ import axios, { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 
+interface DashboardInfoType {
+  id: number;
+  title: string;
+  color: string;
+  createdAt: string;
+  updatedAt: string;
+  userId: number;
+  createdByMe: boolean;
+}
 const EditPage = () => {
   const { dashboardId } = useParams();
-  const [dashboardInfo, setDashboardInfo] = useState([]);
+  const [dashboardInfo, setDashboardInfo] = useState<DashboardInfoType>();
   const { user } = useAuth();
 
   // 대시보드 정보 가져오기 (이름, 구성원?, 초대 내역?)
-
+  /*
+{
+  "id": 12067,
+  "title": "수정테스트",
+  "color": "#000000",
+  "createdAt": "2024-10-24T19:54:48.459Z",
+  "updatedAt": "2024-10-25T19:19:34.157Z",
+  "userId": 4668,
+  "createdByMe": true
+}
+  */
   const fetchDashboardInfo = async () => {
     if (user) {
       try {
-        const res = await axios.get(`/api`);
+        const res = await axios.get(`/api/dashboards/${dashboardId}`);
         const data = res.data;
-        // setDashboardInfo(data.user ? data.user.dashboards : []);
+        setDashboardInfo(data.user);
+        console.log(data);
       } catch (err) {
         const error = err as AxiosError;
         console.error(error.message);
@@ -42,7 +62,7 @@ const EditPage = () => {
         </Link>
       </div>
       <div className="flex w-[620px] flex-col gap-4">
-        <EditDashboard title="비브리지" />
+        <EditDashboard title={dashboardInfo?.title || "TITLE"} />
 
         <DashboardMemberList sectionTitle="구성원" />
         <DashboardMemberList sectionTitle="초대 내역" />

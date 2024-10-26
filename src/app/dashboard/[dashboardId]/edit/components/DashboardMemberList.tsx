@@ -61,8 +61,11 @@ const DashboardMemberList = ({ sectionTitle }: { sectionTitle: string }) => {
         setInvitatingMemberList(data.user ? data.user.invitations : []);
         setTotalCount(data.user.totalCount);
       } catch (err) {
-        const error = err as AxiosError;
-        console.error(error.message);
+        if (axios.isAxiosError(err)) {
+          console.error(err.message);
+        } else {
+          console.error("An unexpected error occurred", err);
+        }
       }
     }
   };

@@ -9,7 +9,7 @@ const DashboardItem = ({ item }: { item: ItemType }) => {
   const { color, title, createdByMe, id } = item;
 
   const pathname = usePathname();
-  const isSelected = pathname === `/dashboard/${id}`;
+  const isSelected = pathname === `/dashboard/${id}` || pathname === `/dashboard/${id}/edit`;
 
   let length = 5;
   const shortTitle = title.length > length ? title.slice(0, 5) + "..." : title;
