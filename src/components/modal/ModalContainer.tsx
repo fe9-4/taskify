@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import Modal from "react-modal";
 import { useAtom, useAtomValue } from "jotai";
 import { AlertModalAtom, AlertModalTextAtom, CreateCardAtom, CreateDashboardAtom } from "@/store/modalAtom";

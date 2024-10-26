@@ -20,11 +20,10 @@ const DashboardDetail = () => {
   const { dashboardId } = useParams();
 
   const [columnList, setColumnList] = useState<IColumnList["data"]>([]);
-  const [addColumn, setAddColumn] = useState(false);
 
   const getColumn = useCallback(async () => {
     try {
-      const response = await axios.get(`/api/dashboard/${dashboardId}`);
+      const response = await axios.get(`/api/columns?dashboardId=${dashboardId}`);
 
       if (response.status === 200) {
         setColumnList(response.data);
@@ -38,7 +37,6 @@ const DashboardDetail = () => {
   }, [dashboardId]);
 
   const handleColumnBtn = () => {
-    setAddColumn(!addColumn);
     // console.log("컬럼 추가 모달 오픈");
   };
 
@@ -47,7 +45,7 @@ const DashboardDetail = () => {
   }, [getColumn]);
 
   return (
-    <div className="flex flex-col space-y-6 pb-6 xl:flex-row xl:space-x-6 xl:space-y-0 overflow-auto">
+    <div className="flex flex-col space-y-6 overflow-auto pb-6 xl:flex-row xl:space-x-6 xl:space-y-0">
       <div className="flex flex-col space-y-6 xl:flex-row xl:space-y-0">
         {columnList.map((column) => (
           <ColumnList key={column.id} columnTitle={column.title} columnId={column.id} />

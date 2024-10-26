@@ -1,76 +1,127 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "axios";
-import { useAtomValue, useSetAtom } from "jotai";
-import { userAtom, loadingAtom } from "@/store/userAtoms";
 import { useRouter } from "next/navigation";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { Login } from "@/zodSchema/authSchema";
+import { atom, useAtom } from "jotai";
+import { User } from "@/zodSchema/commonSchema";
+
+// Jotai atom 생성
+export const userAtom = atom<User | null>(null);
 
 export const useAuth = () => {
-  const user = useAtomValue(userAtom);
-  const setUser = useSetAtom(userAtom);
-  const setLoading = useSetAtom(loadingAtom);
   const router = useRouter();
   const queryClient = useQueryClient();
+  const [user, setUser] = useAtom(userAtom);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
-  const { data: userData, isLoading } = useQuery({
-    queryKey: ["userProfile"],
+  // React Query를 사용하여 사용자 정보 가져오기
+  const {
+    data: userData,
+    error: userError,
+    refetch: refetchUser,
+    isLoading: isUserLoading,
+    isFetched: isUserFetched,
+  } = useQuery({
+    queryKey: ["user"],
     queryFn: async () => {
-      const response = await axios.get("/api/user/profile");
-      return response.data?.user;
+      const response = await axios.get("/api/users/me");
+      return response.data.user;
     },
-    enabled: !user,
-    staleTime: 1000 * 60 * 5, // 5분 동안 캐시 유효
-    retry: false, // 실패 시 재시도하지 않음
+    retry: 1,
+    staleTime: 1000 * 60 * 5,
+    refetchOnWindowFocus: false,
+    enabled: false, // 쿼리를 비활성화합니다
   });
 
+  // 사용자 데이터가 변경될 때마다 Jotai atom 업데이트
   useEffect(() => {
     if (userData) {
       setUser(userData);
-    } else if (!isLoading) {
+    } else if (isUserFetched) {
       setUser(null);
     }
-  }, [userData, setUser, isLoading]);
+  }, [userData, isUserFetched, setUser]);
 
+  // 사용자 데이터 가져오기 오류 처리
   useEffect(() => {
-    setLoading(isLoading);
-  }, [isLoading, setLoading]);
+    if (axios.isAxiosError(userError) && userError.response?.status === 401) {
+      setUser(null);
+    } else if (userError) {
+      console.error("사용자 정보 가져오기 실패:", userError);
+    }
+    if (userError) {
+      setIsInitialLoading(false);
+    }
+  }, [userError, setUser]);
 
-  const clearUserData = useCallback(() => {
-    setUser(null);
-  }, [setUser]);
+  // 로그인 mutation 설정
+  const loginMutation = useMutation({
+    mutationFn: async (credentials: Login) => {
+      const response = await axios.post("/api/auth/login", credentials);
+      return response.data.user;
+    },
+    onSuccess: (data) => {
+      setUser(data);
+      queryClient.setQueryData(["user"], data);
+      router.push("/mydashboard");
+    },
+    onError: (error) => {
+      if (axios.isAxiosError(error)) {
+        throw new Error(error.response?.data?.message || "로그인에 실패했습니다.");
+      }
+      throw new Error("로그인 중 오류가 발생했습니다.");
+    },
+  });
 
   const login = useCallback(
     async (credentials: Login) => {
       try {
-        const response = await axios.post("/api/auth/login", credentials, { withCredentials: true });
-        setUser(response.data.user); // 로그인 후 사용자 정보 업데이트
-        queryClient.invalidateQueries({ queryKey: ["userProfile"] }); // 사용자 정보 쿼리 무효화
-        router.push("/"); // 로그인 후 리다이렉트
+        // 로그인 요청 실행
+        await loginMutation.mutateAsync(credentials);
+        return { success: true };
       } catch (error) {
-        console.error("로그인 오류:", error);
+        return { success: false, message: (error as Error).message };
       }
     },
-    [setUser, queryClient, router]
+    [loginMutation]
   );
 
-  const logout = useCallback(async () => {
-    try {
-      await axios.post("/api/auth/logout", {}, { withCredentials: true });
-      clearUserData();
+  // 로그아웃 mutation 설정
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      await axios.post("/api/auth/logout", {});
+    },
+    onSuccess: () => {
+      setUser(null);
       queryClient.clear();
       router.push("/login");
-    } catch (error) {
+    },
+    onError: (error) => {
       console.error("로그아웃 오류:", error);
-    }
-  }, [clearUserData, router, queryClient]);
+    },
+  });
+
+  const logout = useCallback(() => {
+    // 로그아웃 요청 실행
+    logoutMutation.mutate();
+  }, [logoutMutation]);
 
   const updateUser = useCallback(
-    (updatedUserData: Partial<typeof user>) => {
+    (updatedUserData: Partial<User>) => {
       setUser((prevUser) => (prevUser ? { ...prevUser, ...updatedUserData } : null));
+      queryClient.setQueryData(["user"], (oldData: User | undefined) =>
+        oldData ? { ...oldData, ...updatedUserData } : undefined
+      );
     },
-    [setUser]
+    [setUser, queryClient]
   );
 
-  return { user, loading: isLoading, setUser, login, logout, updateUser };
+  useEffect(() => {
+    if (isUserFetched) {
+      setIsInitialLoading(false);
+    }
+  }, [isUserFetched]);
+
+  return { user, refetchUser, login, logout, updateUser, isUserLoading, isUserFetched, isInitialLoading };
 };

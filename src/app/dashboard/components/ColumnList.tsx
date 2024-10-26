@@ -6,6 +6,8 @@ import { HiOutlineCog } from "react-icons/hi";
 import { NumChip } from "../../../components/chip/PlusAndNumChip";
 import { AddTodoBtn } from "../../../components/button/ButtonComponents";
 import { ICard } from "@/types/dashboardType";
+import { useAtom } from "jotai";
+import { CreateCardAtom } from "@/store/modalAtom";
 
 interface IProps {
   columnTitle: string;
@@ -17,14 +19,15 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [cursorId, setCursorId] = useState<number>(1);
   const [hasMore, setHasMore] = useState(true);
   const [size, setSize] = useState(3);
+  const [, setIsCreateCardOpen] = useAtom(CreateCardAtom);
   const observeRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
-
+  
   const getCardList = async () => {
     if (!hasMore) return;
 
     try {
-      const response = await axios.get(`/api/dashboard/columnList?cursorId=${cursorId}&columnId=${columnId}&size=${size}`);
+      const response = await axios.get(`/api/cards?cursorId=${cursorId}&columnId=${columnId}&size=${size}`);
 
       if (response.status === 200) {
         setCardList((prev) => [...prev, ...response.data.cards]);
@@ -68,10 +71,6 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
     };
   }, [hasMore, cursorId, size]);
 
-  const handleAddTodo = () => {
-    // 모달 만들어지면 모달 연결
-  };
-
   const handleEditModal = () => {
     // 모달 만들어지면 모달 연결
   }
@@ -86,12 +85,12 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
           </div>
           <NumChip num={cardList.length} />
         </div>
-        <button onClick={handleEditModal}>
+        <button>
           <HiOutlineCog className="size-[22px] text-gray01" />
         </button>
       </div>
       <div className="flex flex-col space-y-2">
-        <AddTodoBtn onClick={handleAddTodo} />
+        <AddTodoBtn onClick={() => setIsCreateCardOpen(true)} />
         {cardList.length > 0 ? (
           cardList.map((item, i) => (
             <div key={item.cards.id}>

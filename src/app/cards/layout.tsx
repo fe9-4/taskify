@@ -1,5 +1,5 @@
 const CardLayout = ({ children }: { children: React.ReactNode }) => {
-  return <div className="bg-black px-3 py-4">{children}</div>;
+  return <div>{children}</div>;
 };
 
 export default CardLayout;

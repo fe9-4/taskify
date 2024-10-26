@@ -2,6 +2,7 @@ import { cls } from "@/lib/utils";
 import { BaseBtn, Content, ContentLeftAlign, PlusIcon } from "@/components/button/ButtonSetting";
 import { FaCrown, FaCircle } from "react-icons/fa";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import { ReactNode } from "react";
 
 // 1. 버튼 텍스트가 정해져있는 경우
 // 1) 컬럼 추가
@@ -73,14 +74,22 @@ export const DashboardCard = ({
 };
 
 // 2) form 채웠을때 활성화되는 버튼 (로그인, 회원가입, 각종 모달)
-export const ActiveBtn = ({ disabled, children, onClick }: { disabled: boolean; children: string; onClick: any }) => {
+export const ActiveBtn = ({
+  disabled,
+  children,
+  onClick,
+}: {
+  disabled: boolean;
+  children: ReactNode;
+  onClick: any;
+}) => {
   return (
     <button
       onClick={onClick}
       type="submit"
       disabled={disabled}
       className={cls(
-        "h-[50px] w-full rounded-lg text-xl font-medium text-white",
+        "flex h-[50px] w-full items-center justify-center rounded-lg text-xl font-medium text-white",
         disabled ? "cursor-not-allowed bg-gray02" : "bg-violet01"
       )}
     >
@@ -108,9 +117,19 @@ export const InsertBtn = ({ children, onClick }: { children: string; onClick: an
 };
 
 //5) 취소 / 피그마 표기 : modal
-export const CancelBtn = ({ children, onClick, ...props }: { children: string; onClick: any; props?: any }) => {
+export const CancelBtn = ({
+  children,
+  onClick,
+  type,
+  ...props
+}: {
+  children: string;
+  onClick: any;
+  type?: string;
+  props?: any;
+}) => {
   return (
-    <BaseBtn extra="size-full" onClick={onClick} props={props}>
+    <BaseBtn extra="size-full" onClick={onClick} type={type} props={props}>
       <Content extra="text-gray01 font-medium	text-xs md:text-lg">{children}</Content>
     </BaseBtn>
   );
@@ -121,16 +140,19 @@ export const ConfirmBtn = ({
   onClick,
   disabled,
   extra,
+  type,
   ...props
 }: {
   disabled?: boolean;
   children: string;
   onClick: any;
+  type: string;
   extra?: any;
   props?: any;
 }) => {
   return (
     <BaseBtn
+      type={type}
       disabled={disabled}
       extra={cls("size-full", disabled ? "cursor-not-allowed" : "")}
       onClick={onClick}

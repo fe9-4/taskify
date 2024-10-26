@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import toast from "react-hot-toast";
-import Invitation from "@/app/mydashboard/components/Invitation";
+import InviteList from "@/app/mydashboard/components/InviteList";
 import Pagination from "./components/Pagination";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -22,15 +22,15 @@ const MyDashboard = () => {
   const [totalPage, setTotalPage] = useState(0);
   const [, setisCreateDashboardOpen] = useAtom(CreateDashboardAtom);
   const [isUpdatedList, setIsUpdatedList] = useAtom(myDashboardUpdateAtom);
-  
+
   const getCurrentDashboards = useCallback(async () => {
     try {
       // 추가된 대시보드 추출
-      const response = await axios.get("/api/myDashboard", {
+      const response = await axios.get("/api/dashboards", {
         params: {
           page,
           cursorId,
-          size
+          size,
         },
       });
 
@@ -61,7 +61,7 @@ const MyDashboard = () => {
     <div className="flex flex-col space-y-10 px-6 pt-6 md:px-8 md:pt-8">
       <div className="flex flex-col space-y-6 xl:w-[1022px]">
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
-          <div className="md:w-[247px] xl:w-[332px]">
+          <div className="flex justify-center md:justify-start">
             <AddDashboardBtn onClick={() => setisCreateDashboardOpen(true)} />
           </div>
           {dashboardList?.length > 0
@@ -87,7 +87,7 @@ const MyDashboard = () => {
           <span className="text-center text-gray02 md:text-xl">아직 소속된 대시보드가 없어요.</span>
         )}
       </div>
-      <Invitation />
+      <InviteList />
     </div>
   );
 };
