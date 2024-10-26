@@ -43,7 +43,7 @@ export const AddTodoBtn = ({ onClick }: { onClick: () => void }) => {
 //4) 대시보드 삭제
 export const DeleteDashboardBtn = ({ onClick }: any) => {
   return (
-    <BaseBtn onClick={onClick}>
+    <BaseBtn onClick={onClick} extra="bg-gay03">
       <Content extra="h-[52px] w-[284px] text-lg font-medium md:h-[62px] md:w-80 md:text-xl">대시보드 삭제하기</Content>
     </BaseBtn>
   );
@@ -135,23 +135,34 @@ export const CancelBtn = ({
   );
 };
 // 6) 확인 / 피그마 표기 : modal
-
 export const ConfirmBtn = ({
   children,
   onClick,
-  type,
   disabled,
+  extra,
+  type,
   ...props
 }: {
-  children: string;
-  onClick?: any;
-  type: string;
   disabled?: boolean;
+  children: string;
+  onClick: any;
+  type: string;
+  extra?: any;
   props?: any;
 }) => {
   return (
-    <BaseBtn extra="size-full" onClick={onClick} type={type} disabled={disabled} props={props}>
-      <Content extra="bg-violet01 text-white font-semibold text-xs w-full h-full md:text-lg">{children}</Content>
+    <BaseBtn
+      type={type}
+      disabled={disabled}
+      extra={cls("size-full", disabled ? "cursor-not-allowed" : "")}
+      onClick={onClick}
+      props={props}
+    >
+      <Content
+        extra={cls(disabled ? "bg-gray02" : "bg-violet01", "text-white font-semibold text-xs w-full h-full md:text-lg")}
+      >
+        {children}
+      </Content>
     </BaseBtn>
   );
 };
