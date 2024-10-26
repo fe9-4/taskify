@@ -8,11 +8,11 @@ interface Props {
 }
 
 const COLORS = [
-  { value: "bg-green01", label: "Green" },
-  { value: "bg-purple01", label: "Purple" },
-  { value: "bg-orange01", label: "Orange" },
-  { value: "bg-blue01", label: "Blue" },
-  { value: "bg-pink01", label: "Pink" },
+  { value: "bg-green01", label: "Green", color: "#7AC555" },
+  { value: "bg-purple01", label: "Purple", color: "#760DDE" },
+  { value: "bg-orange01", label: "Orange", color: "#FFA500" },
+  { value: "bg-blue01", label: "Blue", color: "#76A6EA" },
+  { value: "bg-pink01", label: "Pink", color: "#E876EA" },
 ];
 
 const SelectColorChip = ({ register, watch }: Props) => {
@@ -23,9 +23,8 @@ const SelectColorChip = ({ register, watch }: Props) => {
       {COLORS.map((item) => (
         <label key={item.label} className="relative">
           <ColorChip color={item.value} />
-          {/* 선택 됬을 경우 check 아이콘 표시 */}
-          {selectedColor === item.value && <FaCheck className="absolute left-[3px] top-[3px] size-6 text-white" />}
-          <input type="radio" {...register("color", { required: true })} value={item.value} className="hidden" />
+          {selectedColor === item.color && <FaCheck className="absolute left-[3px] top-[3px] size-6 text-white" />}
+          <input type="radio" {...register("color", { required: true })} value={item.color} className="hidden" />
         </label>
       ))}
     </div>

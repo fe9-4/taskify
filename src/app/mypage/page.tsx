@@ -8,7 +8,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 const MyPage = () => {
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   const router = useRouter();
 
   const handleGoBack = () => {
@@ -17,8 +17,7 @@ const MyPage = () => {
 
   return (
     <div className="container mx-auto bg-gray05">
-      {loading && <div>로딩 중...</div>}
-      {!loading && user && (
+      {user && (
         <div className="w-full space-y-3 p-3 md:w-[548px] xl:w-[672px]">
           <div className="flex cursor-pointer items-center" onClick={handleGoBack}>
             <Image src="/icons/previous_arrow.svg" alt="돌아가기" width={20} height={20} />
@@ -30,7 +29,7 @@ const MyPage = () => {
           </div>
         </div>
       )}
-      {!loading && !user && <div>사용자 정보를 불러올 수 없습니다.</div>}
+      {!user && <div>사용자 정보를 불러올 수 없습니다.</div>}
     </div>
   );
 };

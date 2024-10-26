@@ -12,9 +12,8 @@ const InputTag = ({ tags, tagInput, onKeyDown, onClick, onChange }: InputTagProp
         {/* 태그가 있을 경우에만 태그 목록 렌더링 */}
         {tags && tags.length > 0 && (
           <div className="flex gap-2">
-            {/* 각 태그에 대해 TagChip 컴포넌트 렌더링 */}
-            {tags.map((tag: string, index: number) => (
-              <div key={index} onClick={() => onClick(tag)}>
+            {[...cardData.tags].map((tag, index) => (
+              <div onClick={() => onClick(tag)} key={`${tag}-${index + 1}`}>
                 <TagChip tag={tag} />
               </div>
             ))}

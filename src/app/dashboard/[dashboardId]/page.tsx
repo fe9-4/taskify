@@ -20,11 +20,10 @@ const DashboardDetail = () => {
   const { dashboardId } = useParams();
 
   const [columnList, setColumnList] = useState<IColumnList["data"]>([]);
-  const [addColumn, setAddColumn] = useState(false);
 
   const getColumn = useCallback(async () => {
     try {
-      const response = await axios.get(`/api/dashboard/${dashboardId}`);
+      const response = await axios.get(`/api/columns?dashboardId=${dashboardId}`);
 
       if (response.status === 200) {
         setColumnList(response.data);
@@ -38,7 +37,6 @@ const DashboardDetail = () => {
   }, [dashboardId]);
 
   const handleColumnBtn = () => {
-    setAddColumn(!addColumn);
     // console.log("컬럼 추가 모달 오픈");
   };
 

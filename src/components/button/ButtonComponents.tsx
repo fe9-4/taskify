@@ -2,6 +2,7 @@ import { cls } from "@/lib/utils";
 import { BaseBtn, Content, ContentLeftAlign, PlusIcon } from "@/components/button/ButtonSetting";
 import { FaCrown, FaCircle } from "react-icons/fa";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import { ReactNode } from "react";
 
 // 1. 버튼 텍스트가 정해져있는 경우
 // 1) 컬럼 추가
@@ -42,7 +43,7 @@ export const AddTodoBtn = ({ onClick }: { onClick: () => void }) => {
 //4) 대시보드 삭제
 export const DeleteDashboardBtn = ({ onClick }: any) => {
   return (
-    <BaseBtn onClick={onClick}>
+    <BaseBtn onClick={onClick} extra="bg-gay03">
       <Content extra="h-[52px] w-[284px] text-lg font-medium md:h-[62px] md:w-80 md:text-xl">대시보드 삭제하기</Content>
     </BaseBtn>
   );
@@ -73,14 +74,22 @@ export const DashboardCard = ({
 };
 
 // 2) form 채웠을때 활성화되는 버튼 (로그인, 회원가입, 각종 모달)
-export const ActiveBtn = ({ disabled, children, onClick }: { disabled: boolean; children: string; onClick: any }) => {
+export const ActiveBtn = ({
+  disabled,
+  children,
+  onClick,
+}: {
+  disabled: boolean;
+  children: ReactNode;
+  onClick: any;
+}) => {
   return (
     <button
       onClick={onClick}
       type="submit"
       disabled={disabled}
       className={cls(
-        "h-[50px] w-full rounded-lg text-xl font-medium text-white",
+        "flex h-[50px] w-full items-center justify-center rounded-lg text-xl font-medium text-white",
         disabled ? "cursor-not-allowed bg-gray02" : "bg-violet01"
       )}
     >
@@ -129,19 +138,31 @@ export const CancelBtn = ({
 export const ConfirmBtn = ({
   children,
   onClick,
-  type,
   disabled,
+  extra,
+  type,
   ...props
 }: {
-  children: string;
-  onClick?: any;
-  type: string;
   disabled?: boolean;
+  children: string;
+  onClick: any;
+  type: string;
+  extra?: any;
   props?: any;
 }) => {
   return (
-    <BaseBtn extra="size-full" onClick={onClick} type={type} disabled={disabled} props={props}>
-      <Content extra="bg-violet01 text-white font-semibold text-xs w-full h-full md:text-lg">{children}</Content>
+    <BaseBtn
+      type={type}
+      disabled={disabled}
+      extra={cls("size-full", disabled ? "cursor-not-allowed" : "")}
+      onClick={onClick}
+      props={props}
+    >
+      <Content
+        extra={cls(disabled ? "bg-gray02" : "bg-violet01", "text-white font-semibold text-xs w-full h-full md:text-lg")}
+      >
+        {children}
+      </Content>
     </BaseBtn>
   );
 };
