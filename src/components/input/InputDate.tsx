@@ -1,11 +1,11 @@
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { useRef, useState } from "react";
+import { forwardRef, useRef, useState } from "react";
 import { cls } from "@/lib/utils";
 import { InputDateProps } from "@/types/formType";
 import { MdOutlineCalendarToday as CalendarIcon } from "react-icons/md";
 
-const InputDate = ({ label, id, name, value, placeholder, onChange }: InputDateProps) => {
+const InputDate = forwardRef(({ label, id, name, value, placeholder, onChange }: InputDateProps, ref) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const datePickerRef = useRef<DatePicker>(null);
 
@@ -56,6 +56,6 @@ const InputDate = ({ label, id, name, value, placeholder, onChange }: InputDateP
       </div>
     </div>
   );
-};
+});
 
 export default InputDate;
