@@ -12,8 +12,6 @@ export const GET = async (request: NextRequest, { params }: { params: IParams })
   const page = searchParams.get("page") || 1;
   const size = searchParams.get("size") || 5;
   const dashboardId = params.dashboardId;
-  console.log(params);
-  console.log("콘솔 출력 테스트");
   const cookieStore = cookies();
   const token = cookieStore.get("accessToken")?.value;
 
