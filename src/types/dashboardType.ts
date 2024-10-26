@@ -27,7 +27,7 @@ export interface ICard {
   totalCount?: number;
 }
 
-export interface creatDashboard {
+export interface CreateDashboard {
   title: string;
   color: string;
 }

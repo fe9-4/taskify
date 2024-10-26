@@ -1,7 +1,8 @@
 import axios from "axios";
 import apiClient from "../../apiClient";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { CreateDashboard } from "@/types/dashboardType";
 
 interface IParams {
   dashboardId: number;
@@ -46,8 +47,9 @@ interface ValueType {
   title: string;
   color: string;
 }
-export const PUT = async ({ value, params }: { value: ValueType; params: IParams }) => {
+export const PUT = async (req: Request, { params }: { params: IParams }) => {
   const dashboardId = params.dashboardId;
+  const { title, color } = await req.json();
 
   const cookieStore = cookies();
   const token = cookieStore.get("accessToken")?.value;
@@ -59,9 +61,9 @@ export const PUT = async ({ value, params }: { value: ValueType; params: IParams
   if (isNaN(Number(dashboardId))) {
     return new NextResponse("대시보드 정보 가져오기 실패", { status: 400 });
   }
-  const requestBody = {
-    title: value.title,
-    color: value.color,
+  const requestBody: CreateDashboard = {
+    title,
+    color,
   };
   try {
     const response = await apiClient.put(`/dashboards/${dashboardId}`, requestBody, {

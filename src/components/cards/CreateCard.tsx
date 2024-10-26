@@ -233,7 +233,7 @@ const CreateCard = () => {
           <CancelBtn type="button" onClick={() => ""}>
             취소
           </CancelBtn>
-          <ConfirmBtn type="submit" disabled={!isValid}>
+          <ConfirmBtn type="submit" disabled={!isValid} onClick={onSubmit}>
             생성
           </ConfirmBtn>
         </div>

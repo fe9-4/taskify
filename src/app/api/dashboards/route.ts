@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import axios from "axios"
+import axios from "axios";
 import apiClient from "../apiClient";
-import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { CreateDashboard } from "@/types/dashboardType";
 
 // 내 대시보드 상단 대시보드 목록 조회 (cursorId 포함)
 export const GET = async (req: Request) => {
@@ -21,18 +21,21 @@ export const GET = async (req: Request) => {
   if (!page || !cursorId || !size) {
     return new NextResponse("대시보드 조회 요청값을 확인해주세요.", { status: 400 });
   }
-  
+
   try {
-    const response = await apiClient.get(`/dashboards?navigationMethod=pagination&cursorId=${cursorId}&page=${page}&size=${size}`, {
-      headers: {
-        Authorization: `Bearer ${token}`
+    const response = await apiClient.get(
+      `/dashboards?navigationMethod=pagination&cursorId=${cursorId}&page=${page}&size=${size}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       }
-    });
+    );
 
     if (response.status === 200) {
       const dashboardList = response.data.dashboards;
       const totalCount = response.data.totalCount;
-      const cursorId = response.data.cursorId; 
+      const cursorId = response.data.cursorId;
 
       return NextResponse.json({ dashboardList, totalCount, cursorId }, { status: 200 });
     }
@@ -42,7 +45,7 @@ export const GET = async (req: Request) => {
       return new NextResponse("대시보드 정보 가져오기 실패", { status: error.status });
     }
   }
-}
+};
 
 // 대시보드 생성
 export const POST = async (request: NextRequest) => {
@@ -54,7 +57,7 @@ export const POST = async (request: NextRequest) => {
   }
 
   try {
-    const formData: creatDashboard = await request.json();
+    const formData: CreateDashboard = await request.json();
     const response = await apiClient.post("/dashboards", formData, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
