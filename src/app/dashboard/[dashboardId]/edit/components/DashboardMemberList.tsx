@@ -51,7 +51,7 @@ const DashboardMemberList = ({ sectionTitle }: { sectionTitle: string }) => {
   "totalCount": 1
 }
 */
-
+  /* api 에러 발생하여 PR시 주석처리함
   const fetchDashboardMemberList = async (page: number, size: number) => {
     if (user) {
       try {
@@ -68,7 +68,7 @@ const DashboardMemberList = ({ sectionTitle }: { sectionTitle: string }) => {
   useEffect(() => {
     fetchDashboardMemberList(page, size);
   }, [user, page, size]);
-
+*/
   return (
     <section className="w-full rounded-2xl bg-white px-4 py-5 md:px-7 md:py-8">
       <SectionTitle sectionTitle={sectionTitle} />

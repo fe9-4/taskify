@@ -22,6 +22,7 @@ const EditDashboard = ({ title }: { title: string }) => {
     title: string;
     color: string;
   }
+  /*api 에러로 PR 시 주석처리
   const updateDashboard = async (value: ValueType) => {
     try {
       const res = await axios.put(`/api/dashboards/${dashboardId}`, value);
@@ -32,11 +33,12 @@ const EditDashboard = ({ title }: { title: string }) => {
       console.error(error.message);
     }
   };
+  */
   // input에 입력한 값을 value로 가져오기
   const onSubmit = (value: any) => {
-    updateDashboard(value);
-    console.log(value.title); // 입력한 대시보드 이름
-    console.log(value.color); // 선택한 색깔
+    // updateDashboard(value);
+    // console.log(value.title); // 입력한 대시보드 이름
+    // console.log(value.color); // 선택한 색깔
   };
 
   return (
