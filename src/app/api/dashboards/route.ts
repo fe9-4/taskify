@@ -7,9 +7,9 @@ import { CreateDashboard } from "@/types/dashboardType";
 // 내 대시보드 상단 대시보드 목록 조회 (cursorId 포함)
 export const GET = async (req: Request) => {
   const { searchParams } = new URL(req.url);
-  const page = searchParams.get("page");
-  const cursorId = searchParams.get("cursorId");
-  const size = searchParams.get("size");
+  let cursorId = searchParams.get("cursorId");
+  let page = searchParams.get("page");
+  let size = searchParams.get("size");
 
   const cookieStore = cookies();
   const token = cookieStore.get("accessToken")?.value;
@@ -18,8 +18,16 @@ export const GET = async (req: Request) => {
     return new NextResponse("사용자 정보를 찾을 수 없습니다.", { status: 401 });
   }
 
-  if (!page || !cursorId || !size) {
-    return new NextResponse("대시보드 조회 요청값을 확인해주세요.", { status: 400 });
+  if (!cursorId) {
+    cursorId = "0";
+  }
+
+  if (!page) {
+    page = "1";
+  }
+
+  if (!size) {
+    size = "10";
   }
 
   try {
@@ -37,7 +45,7 @@ export const GET = async (req: Request) => {
       const totalCount = response.data.totalCount;
       const cursorId = response.data.cursorId;
 
-      return NextResponse.json({ dashboardList, totalCount, cursorId }, { status: 200 });
+      return NextResponse.json({ dashboards: dashboardList, totalCount, cursorId }, { status: 200 });
     }
   } catch (error) {
     if (axios.isAxiosError(error)) {

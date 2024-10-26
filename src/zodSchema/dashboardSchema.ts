@@ -3,6 +3,7 @@ import { DateSchema } from "./commonSchema";
 
 // 대시보드 목록 요청 스키마
 export const DashboardFormSchema = z.object({
+  cursorId: z.number().optional(),
   page: z.number().optional(),
   size: z.number().optional(),
 });
