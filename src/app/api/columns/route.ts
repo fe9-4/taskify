@@ -8,23 +8,23 @@ export const GET = async (req: Request) => {
   const { searchParams } = new URL(req.url);
   const dashboardId = searchParams.get("dashboardId");
   const id = Number(dashboardId);
-  
+
   const cookieStore = cookies();
   const token = cookieStore.get("accessToken")?.value;
-  
+
   if (!token) {
     return new NextResponse("사용자 정보를 찾을 수 없습니다.", { status: 401 });
   }
 
-  if (isNaN(id)) {
-    return new NextResponse("대시보드 정보 가져오기 실패", { status: 400 });
-  }
+  // if (isNaN(id)) {
+  //   return new NextResponse("대시보드 정보 가져오기 실패", { status: 400 });
+  // }
 
   try {
     const response = await apiClient.get(`/columns?dashboardId=${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
-      }
+      },
     });
 
     if (response.status === 200) {
@@ -37,4 +37,4 @@ export const GET = async (req: Request) => {
       return new NextResponse("대시보드 조회 실패", { status: error.status });
     }
   }
-}
+};

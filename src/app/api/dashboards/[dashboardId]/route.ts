@@ -7,13 +7,13 @@ interface IParams {
   dashboardId: number;
 }
 // 대시보드 상세 조회
-export const GET = async ({ params }: { params: IParams }) => {
-  const dashboardId = params;
+export const GET = async (req: Request) => {
+  const { searchParams } = new URL(req.url);
+  const dashboardId = searchParams.get("dashboardId");
+  const id = Number(dashboardId);
 
   const cookieStore = cookies();
   const token = cookieStore.get("accessToken")?.value;
-  console.log(params);
-  console.log(dashboardId);
 
   if (!token) {
     return new NextResponse("사용자 정보를 찾을 수 없습니다.", { status: 401 });
@@ -25,7 +25,7 @@ export const GET = async ({ params }: { params: IParams }) => {
 
   try {
     // https://sp-taskify-api.vercel.app/9-4/dashboards/12067
-    const response = await apiClient.get(`/dashboards/${dashboardId}`, {
+    const response = await apiClient.get(`/dashboards/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

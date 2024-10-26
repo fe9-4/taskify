@@ -37,7 +37,7 @@ const EditPage = () => {
   */
   const fetchDashboardInfo = async () => {
     try {
-      const res = await axios.get(`/api/dashboards/${dashboardId}`);
+      const res = await axios.get(`/api/dashboards/dashboardId=${dashboardId}`);
       const data = res.data;
       console.log(dashboardId);
       setDashboardInfo(data.user);
@@ -49,7 +49,7 @@ const EditPage = () => {
   };
 
   useEffect(() => {
-    // fetchDashboardInfo();
+    fetchDashboardInfo();
   }, [user]);
 
   return (

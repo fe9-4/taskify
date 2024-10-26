@@ -70,7 +70,7 @@ const DashboardMemberList = ({ sectionTitle }: { sectionTitle: string }) => {
     }
   };
   useEffect(() => {
-    fetchDashboardInvitationList();
+    // fetchDashboardInvitationList();
   }, [user, page, size, dashboardId]);
 
   return (
