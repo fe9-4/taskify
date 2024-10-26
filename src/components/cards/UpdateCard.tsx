@@ -244,7 +244,7 @@ const TestCard2 = () => {
           <CancelBtn type="button" onClick={() => ""}>
             취소
           </CancelBtn>
-          <ConfirmBtn type="submit" disabled={!isValid}>
+          <ConfirmBtn type="submit" disabled={!isValid} onClick={onSubmit}>
             수정
           </ConfirmBtn>
         </div>
