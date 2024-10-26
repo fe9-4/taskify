@@ -14,7 +14,6 @@ import { useEffect } from "react";
 
 const LoginPage = () => {
   const router = useRouter();
-  // useAuth 훅에서 user와 login 함수 가져오기
   const { user, login } = useAuth();
 
   const {
@@ -31,7 +30,6 @@ const LoginPage = () => {
     },
   });
 
-  // 사용자가 이미 로그인한 경우 내 대시보드 페이지로 리다이렉트
   useEffect(() => {
     if (user) {
       router.push("/mydashboard");
@@ -40,20 +38,19 @@ const LoginPage = () => {
 
   const onSubmit: SubmitHandler<Login> = async (data) => {
     try {
-      await login(data); // login 함수 호출
-      reset();
-      toast.success("로그인에 성공했습니다.");
+      const result = await login(data);
+      if (result.success) {
+        reset();
+        toast.success("로그인에 성공했습니다.");
+      } else {
+        toast.error(result.message || "로그인에 실패했습니다.");
+      }
     } catch (error) {
       console.error("로그인 오류:", error);
-      toast.error(
-        axios.isAxiosError(error)
-          ? error.response?.data?.message || "로그인 중 오류가 발생했습니다."
-          : "로그인 중 오류가 발생했습니다."
-      );
+      toast.error("로그인 중 오류가 발생했습니다.");
     }
   };
 
-  // 이미 로그인한 사용자인 경우 로딩 상태 표시
   if (user) {
     return <div>로딩 중...</div>;
   }

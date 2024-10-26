@@ -40,7 +40,7 @@ const Pagination = ({ totalPage, setPage, page }: IProps) => {
     }
   };
 
-  return <PaginationBtn onClickNext={handlePageNext} onClickPrev={handlePagePrev} disabled={isDisabled} />;
+  return <PaginationBtn onClickNext={handlePageNext} onClickPrev={handlePagePrev} disabledPrev={isDisabled} disabledNext={isDisabled} />;
 };
 
 export default Pagination;

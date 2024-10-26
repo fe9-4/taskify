@@ -26,3 +26,8 @@ export interface ICard {
   cards: Iitem;
   totalCount?: number;
 }
+
+export interface creatDashboard {
+  title: string;
+  color: string;
+}
