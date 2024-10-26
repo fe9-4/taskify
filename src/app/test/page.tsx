@@ -79,12 +79,22 @@ export default function Home() {
         <CancelBtn onClick={onClick}>취소</CancelBtn>
       </div>
       <div className="h-[42px] w-[138px] md:h-12 md:w-[120px]">
-        <ConfirmBtn disabled={false} extra={`"cursor-not-allowed bg-gray02" : "bg-violet01"`} onClick={onClick}>
+        <ConfirmBtn
+          disabled={false}
+          type="active"
+          extra={`"cursor-not-allowed bg-gray02" : "bg-violet01"`}
+          onClick={onClick}
+        >
           확인
         </ConfirmBtn>
       </div>
       <div className="h-[42px] w-[138px] md:h-12 md:w-[120px]">
-        <ConfirmBtn disabled={true} extra={`"cursor-not-allowed bg-gray02" : "bg-violet01"`} onClick={onClick}>
+        <ConfirmBtn
+          disabled={true}
+          type="disabled"
+          extra={`"cursor-not-allowed bg-gray02" : "bg-violet01"`}
+          onClick={onClick}
+        >
           확인
         </ConfirmBtn>
       </div>

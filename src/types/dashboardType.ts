@@ -34,7 +34,7 @@ export interface ICard {
   cursorId?: number | null;
 }
 
-export interface creatDashboard {
+export interface CreateDashboard {
   title: string;
   color: string;
 }
