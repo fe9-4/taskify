@@ -18,6 +18,7 @@ import InputDate from "@/components/input/InputDate";
 import InputTag from "@/components/input/InputTag";
 import InputFile from "@/components/input/InputFile";
 import { useParams } from "next/navigation";
+import { useDashboardMember } from "@/hooks/useDashboardMember";
 
 const CardSchema = z.object({
   assigneeUserId: z.number(),
@@ -30,16 +31,39 @@ const CardSchema = z.object({
   imageUrl: z.string().nullable(), // null 값으로 설정
 });
 
-const CreateCard = () => {
+const CreateCard = ({ columnId }: { columnId?: number }) => {
   const { dashboardId } = useParams();
-  const { columnId } = useParams();
+  const id = Number(dashboardId); // number 타입의 dashboardId
+  const { members, isLoading, error, refetch } = useDashboardMember({ dashboardId: id, page: 1, size: 10 });
+  // const { columnId } = useParams();
 
   const { user } = useAuth();
-  const [inviteMember, setInviteMember] = useState([]);
-  const [Manager, setManager] = useState("");
   const { createFormData, isLoading: isFileLoading, error: fileError } = useFileUpload();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [tagInput, setTagInput] = useState("");
+
+  console.log("대시보드 아이디", dashboardId);
+  console.log("컬럼 아이디", columnId);
+  // console.log("멤버", members);
+
+  interface FormValues {
+    id: number;
+    nickname: string;
+    profileImageUrl: string | null;
+  }
+
+  interface UpdateCardProps {
+    assigneeUserId: number;
+    assignee: FormValues;
+    dashboardId: number;
+    columnId: number;
+    title: string;
+    description: string;
+    dueDate: string;
+    tags: string[];
+    imageUrl: string | File | null;
+    manager: FormValues;
+  }
 
   const {
     register,
@@ -49,18 +73,23 @@ const CreateCard = () => {
     watch,
     trigger,
     formState: { errors, isValid },
-  } = useForm<CardProps>({
+  } = useForm<UpdateCardProps>({
     resolver: zodResolver(CardSchema),
     mode: "onChange",
     defaultValues: {
       assigneeUserId: Number(user && user.id), // 본인의 계정 아이디
-      dashboardId: 12046, // 대시보드 생성 아이디
+      dashboardId: Number(dashboardId), // 대시보드 생성 아이디
       columnId: 40754, // 컬럼 생성 아이디
       title: "",
       description: "",
       dueDate: "",
       tags: [],
       imageUrl: null,
+      // manager: {
+      //   id: 0,
+      //   nickname: "",
+      //   profileImageUrl: null,
+      // },
     },
   });
 
@@ -163,7 +192,17 @@ const CreateCard = () => {
           <label htmlFor="assignee" className="text-lg font-medium text-black03">
             담당자
           </label>
-          <SearchDropdown inviteMemberList={inviteMember} setManager={setManager} />
+          <Controller
+            name="assignee"
+            control={control}
+            render={({ field }) => (
+              <SearchDropdown
+                inviteMemberList={members.members}
+                currentManager={field.value}
+                setManager={(manager) => field.onChange(manager)}
+              />
+            )}
+          />
         </div>
 
         <div className="flex flex-col gap-2">
@@ -233,7 +272,7 @@ const CreateCard = () => {
           <CancelBtn type="button" onClick={() => ""}>
             취소
           </CancelBtn>
-          <ConfirmBtn type="submit" disabled={!isValid}>
+          <ConfirmBtn type="submit" disabled={!isValid} onClick={handleSubmit(onSubmit)}>
             생성
           </ConfirmBtn>
         </div>

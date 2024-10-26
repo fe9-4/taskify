@@ -17,30 +17,53 @@ import InputDate from "@/components/input/InputDate";
 import InputTag from "@/components/input/InputTag";
 import InputFile from "@/components/input/InputFile";
 import { useParams } from "next/navigation";
+import { useDashboardMember } from "@/hooks/useDashboardMember";
+
+interface FormValues {
+  id: number;
+  nickname: string;
+  profileImageUrl: string | null;
+}
 
 interface UpdateCardProps {
   assigneeUserId: number;
+  assignee: FormValues;
+  dashboardId: number;
   columnId: number;
   title: string;
   description: string;
   dueDate: string;
   tags: string[];
   imageUrl: string | File | null;
+  manager: FormValues;
 }
 
 const UpdateCard = () => {
+  const { dashboardId, columnId, cardId } = useParams();
+  const id = Number(dashboardId); // number 타입의 dashboardId
+  const { members, isLoading, error, refetch } = useDashboardMember({
+    dashboardId: id,
+    page: 1,
+    size: 10,
+  });
+
   const [selectedValue, setSelectedValue] = useState("");
   const [currentValue, setCurrentValue] = useState("");
   const [inviteMember, setInviteMember] = useState([]);
   const [Manager, setManager] = useState("");
 
   const { user } = useAuth();
-  const { cardId, columnId } = useParams();
   const [updateCard, setUpdateCard] = useState();
   const [tagInput, setTagInput] = useState("");
 
   const { createFormData, isLoading: isFileLoading, error: fileError } = useFileUpload();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+  // console.log("카드리스트", cardList);
+  // console.log("컬럼 아이디", columnId);
+  console.log("대시보드 아이디", dashboardId);
+  console.log("멤버 아이디", user && user.id);
+  console.log("카드 상세 조회", updateCard);
 
   const {
     register,
@@ -53,12 +76,18 @@ const UpdateCard = () => {
   } = useForm<UpdateCardProps>({
     defaultValues: {
       assigneeUserId: Number(user && user.id), // 본인의 계정 아이디
-      columnId: Number(columnId), // 컬럼 생성 아이디
+      dashboardId: Number(dashboardId),
+      columnId: 40754, // 컬럼 생성 아이디
       title: "",
       description: "",
       dueDate: "",
       tags: [],
       imageUrl: null,
+      manager: {
+        id: 0,
+        nickname: "",
+        profileImageUrl: null,
+      },
     },
   });
 
@@ -67,15 +96,61 @@ const UpdateCard = () => {
     const fetchCardData = async () => {
       try {
         const response = await axios.get(`/api/cards/${cardId}`);
-        setUpdateCard(response.data);
-        reset(response.data); // 폼 초기값 설정
+        const data = response.data;
+        setUpdateCard(data);
+        reset({
+          title: data.title,
+          description: data.description,
+          dueDate: data.dueDate,
+          tags: data.tags,
+          imageUrl: data.imageUrl,
+          assignee: {
+            id: data.assignee.id,
+            nickname: data.assignee.nickname,
+            profileImageUrl: data.assignee.profileImageUrl,
+          },
+        });
       } catch (error) {
         console.error("카드 데이터 불러오기 실패:", error);
       }
     };
 
     fetchCardData();
-  }, [cardId]);
+  }, [cardId, reset]);
+
+  // 이미지 변경 핸들러
+  const handleImageChange = async (file: string | File | null) => {
+    if (file) {
+      try {
+        const formData = await createFormData(file);
+        if (!formData) {
+          throw new Error("FormData 생성 실패");
+        }
+
+        const columnId = watch("columnId"); // 현재 선택된 columnId 가져오기
+        const response = await axios.post(`/api/columns/${columnId}/card-image`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        if (response.data?.imageUrl) {
+          setImageUrl(response.data.imageUrl);
+          setValue("imageUrl", response.data.imageUrl);
+          toast.success("카드 이미지 업로드가 완료되었습니다.");
+        }
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          toast.error("카드 이미지 업로드에 실패했습니다.");
+        } else {
+          toast.error("네트워크 오류가 발생했습니다.");
+        }
+      }
+    } else {
+      setImageUrl(null);
+      setValue("imageUrl", null);
+    }
+  };
 
   const onSubmit = async (data: any) => {
     try {
@@ -130,39 +205,6 @@ const UpdateCard = () => {
     [setValue, watch]
   );
 
-  const handleImageChange = async (file: string | File | null) => {
-    if (file) {
-      try {
-        const formData = await createFormData(file);
-        if (!formData) {
-          throw new Error("FormData 생성 실패");
-        }
-
-        const columnId = watch("columnId"); // 현재 선택된 columnId 가져오기
-        const response = await axios.post(`/api/columns/${columnId}/card-image`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-
-        if (response.data?.imageUrl) {
-          setImageUrl(response.data.imageUrl);
-          setValue("imageUrl", response.data.imageUrl);
-          toast.success("카드 이미지 업로드가 완료되었습니다.");
-        }
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          toast.error("카드 이미지 업로드에 실패했습니다.");
-        } else {
-          toast.error("네트워크 오류가 발생했습니다.");
-        }
-      }
-    } else {
-      setImageUrl(null);
-      setValue("imageUrl", null);
-    }
-  };
-
   return (
     <section className="rounded-2xl bg-white p-8">
       <h3 className="mb-5 text-2xl font-bold text-black03 md:mb-6 md:text-3xl">할 일 수정</h3>
@@ -179,19 +221,36 @@ const UpdateCard = () => {
             <label htmlFor="assignee" className="text-lg font-medium text-black03">
               담당자
             </label>
-            <SearchDropdown inviteMemberList={inviteMember} setManager={setManager} {...register("assigneeUserId")} />
+            {/* <SearchDropdown inviteMemberList={members.members} {...register("assigneeUserId")} /> */}
+            <Controller
+              name="assignee"
+              control={control}
+              render={({ field }) => (
+                <SearchDropdown
+                  inviteMemberList={members.members}
+                  currentManager={field.value}
+                  setManager={(manager) => field.onChange(manager)}
+                />
+              )}
+            />
+            {/* <SearchDropdown
+              inviteMemberList={members.members}
+              setManager={() => ""}
+              {...register("assignee.nickname")}
+            />
+            <input {...register("assignee.nickname")} /> */}
           </div>
         </div>
 
         <div className="flex flex-col gap-2">
-          <label htmlFor="assignee" className="text-lg font-medium text-black03">
+          <label htmlFor="title" className="text-lg font-medium text-black03">
             제목 <span className="text-violet01">*</span>
           </label>
           <InputItem id="title" {...register("title")} errors={errors.title && errors.title.message} />
         </div>
 
         <div className="flex flex-col gap-2">
-          <label htmlFor="assignee" className="text-lg font-medium text-black03">
+          <label htmlFor="description" className="text-lg font-medium text-black03">
             설명 <span className="text-violet01">*</span>
           </label>
           <InputItem

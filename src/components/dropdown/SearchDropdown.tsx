@@ -16,21 +16,22 @@ import { HiCheck } from "react-icons/hi";
 // ];
 
 interface ICurrentManager {
-  email: string;
+  id: number;
   nickname: string;
+  profileImageUrl: string | null;
 }
 
 // currentManager는 '할 일 수정'에서 이 드롭다운메뉴를 사용하실 때 현재 담당자명입니다.
 interface IProps {
   inviteMemberList: ICurrentManager[];
-  setManager: Dispatch<SetStateAction<string>>;
-  currentManager?: ICurrentManager;
+  currentManager: ICurrentManager | undefined;
+  setManager: (manager: ICurrentManager) => void;
 }
 
 // 초대된 멤버들을 prop으로 받고 담당자명을 추출해서 사용하세요.
 const SearchDropdown = ({ inviteMemberList, setManager, currentManager }: IProps) => {
   const [name, setName] = useState("");
-  const [selectedName, setSelectedName] = useState<ICurrentManager | null>(null);
+  const [selectedName, setSelectedName] = useState<ICurrentManager | null>();
   const [isOpen, setIsOpen] = useState(false);
 
   const handleChangeName = (e: ChangeEvent<HTMLInputElement>) => {
@@ -41,16 +42,18 @@ const SearchDropdown = ({ inviteMemberList, setManager, currentManager }: IProps
     setIsOpen(value.length > 0);
   };
 
-  const handleSelectName = (name: ICurrentManager) => {
-    setSelectedName(name);
-    //setManager(name.nickname);
+  const handleSelectName = (manager: ICurrentManager) => {
+    setManager(manager);
     setName("");
     setIsOpen(false);
   };
 
-  const filteredNames = inviteMemberList?.filter(
-    (item) => item.nickname.includes(name) || item.email.toLowerCase().includes(name.toLowerCase())
-  );
+  // const filteredNames = inviteMemberList?.filter(
+  //   (item) =>
+  //     item.nickname.includes(name) || item.profileImageUrl?.toLowerCase().includes(name.toLowerCase()) || item.id
+  // );
+  // console.log("ddd", filteredNames);
+  // console.log("ggg", inviteMemberList);
 
   useEffect(() => {
     if (currentManager) {
@@ -65,7 +68,7 @@ const SearchDropdown = ({ inviteMemberList, setManager, currentManager }: IProps
         <div className="flex items-center space-x-2">
           {selectedName && (
             <span className="flex h-[26px] w-8 items-center justify-center rounded-full bg-[#A3C4A2] text-xs font-semibold text-white ring-white ring-offset-2">
-              {selectedName.email.charAt(0)}
+              {selectedName.nickname.charAt(0)}
             </span>
           )}
           <input
@@ -78,22 +81,19 @@ const SearchDropdown = ({ inviteMemberList, setManager, currentManager }: IProps
         </div>
         <FaCaretDown />
       </div>
-      {isOpen && filteredNames.length > 0 && (
+      {isOpen && inviteMemberList.length > 0 && (
         <div className="flex flex-col overflow-hidden rounded-bl-md rounded-br-md rounded-tl-md rounded-tr-md border border-gray03">
-          {filteredNames.map((item) => (
+          {inviteMemberList.map((item) => (
             <button
-              key={item.nickname}
-              className={cls(
-                "search-dropdown-custom-btn",
-                selectedName?.nickname !== item.nickname ? "px-0 pl-11 pr-4" : ""
-              )}
+              key={item.id}
+              className={cls("search-dropdown-custom-btn", selectedName?.id !== item.id ? "px-0 pl-11 pr-4" : "")}
               onClick={() => handleSelectName(item)}
             >
               {selectedName?.nickname === item.nickname && <HiCheck />}
               <span
                 className={`flex size-[26px] items-center justify-center rounded-full bg-[#A3C4A2] text-xs font-semibold text-white ring-white ring-offset-2`}
               >
-                {item.email.charAt(0)}
+                {item.nickname.charAt(0)}
               </span>
               <span className="text-lg">{item.nickname}</span>
             </button>
