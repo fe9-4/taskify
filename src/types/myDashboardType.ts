@@ -8,7 +8,7 @@ interface IDashboardList {
 }
 
 export interface IMyDashboard {
-  dsahboards: IDashboardList[];
+  dashboards: IDashboardList[];
   totalCount: number;
   cursorId: number;
 }
