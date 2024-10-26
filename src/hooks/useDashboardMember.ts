@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { MemberList, MemberListSchema, MemberForm } from "@/zodSchema/memberSchema";
+import { MemberForm, MemberList, MemberListSchema } from "@/zodSchema/memberSchema";
 
 // 대시보드 멤버 목록을 가져오는 커스텀 훅
-export const useDashboardMember = ({ dashboardId, page = 1, size = 10 }: MemberForm) => {
+export const useDashboardMember = ({ dashboardId, page, size }: MemberForm) => {
   // 멤버 목록을 가져오는 비동기 함수
   const fetchMembers = async (): Promise<MemberList> => {
     if (dashboardId <= 0) {
@@ -37,7 +37,7 @@ export const useDashboardMember = ({ dashboardId, page = 1, size = 10 }: MemberF
   });
 
   return {
-    members: members || { members: [] },
+    members: members || { members: [], totalCount: 0 },
     isLoading,
     error,
     refetch,
