@@ -1,8 +1,8 @@
 "use client";
 import { z } from "zod";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -26,7 +26,7 @@ const CardSchema = z.object({
   description: z.string().min(1, "설명은 필수입니다"),
   dueDate: z.string(),
   tags: z.array(z.string()),
-  imageUrl: z.string(),
+  imageUrl: z.string().nullable(),
 });
 
 const CreateCard = () => {
@@ -51,14 +51,14 @@ const CreateCard = () => {
     resolver: zodResolver(CardSchema),
     mode: "onChange",
     defaultValues: {
-      assigneeUserId: Number(user?.id) || 12046, // 기본값 설정
-      dashboardId: Number(params.dashboardId) || 12046, // URL 파라미터 또는 기본값
-      columnId: Number(params.columnId) || 40754, // URL 파라미터 또는 기본값
+      assigneeUserId: Number(user?.id) || 12046,
+      dashboardId: Number(params.dashboardId) || 12046,
+      columnId: Number(params.columnId) || 40754,
       title: "",
       description: "",
       dueDate: "",
       tags: [],
-      imageUrl: "",
+      imageUrl: null,
     },
   });
 
@@ -128,14 +128,101 @@ const CreateCard = () => {
     }
   };
 
-  // 태그 관련 함수들...
+  // 태그 추가 함수
+  const handleAddTag = (tag: string) => {
+    if (tagInput.trim() && !watch("tags").includes(tag)) {
+      setValue("tags", [...watch("tags"), tag]);
+      setTagInput("");
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAddTag(tagInput);
+    }
+  };
+
+  const handleTagChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setTagInput(e.target.value);
+  };
+
+  // 태그 삭제 함수
+  const handleTagClick = useCallback(
+    (tagRemove: string) => {
+      setValue(
+        "tags",
+        watch("tags").filter((tag: string) => tag !== tagRemove)
+      );
+    },
+    [setValue, watch]
+  );
 
   return (
     <section className="rounded-2xl bg-white p-8">
       <h3 className="mb-5 text-2xl font-bold text-black03 md:mb-6 md:text-3xl">할 일 생성</h3>
 
       <form onSubmit={handleSubmit(onSubmit)} className="grid gap-8">
-        {/* 폼 필드들... */}
+        <div className="flex flex-col gap-2">
+          <label htmlFor="assignee" className="text-lg font-medium text-black03">
+            담당자
+          </label>
+          <SearchDropdown inviteMemberList={inviteMember} setManager={setManager} />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label htmlFor="assignee" className="text-lg font-medium text-black03">
+            제목 <span className="text-violet01">*</span>
+          </label>
+          <InputItem id="title" {...register("title")} errors={errors.title && errors.title.message} />
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label htmlFor="assignee" className="text-lg font-medium text-black03">
+            설명 <span className="text-violet01">*</span>
+          </label>
+          <InputItem
+            id="description"
+            {...register("description", {
+              required: "설명은 필수입니다",
+              onChange: (e) => {
+                setValue("description", e.target.value);
+                trigger("description");
+              },
+            })}
+            isTextArea
+            size="description"
+            errors={errors.description && errors.description.message}
+          />
+        </div>
+
+        <Controller
+          name="dueDate"
+          control={control}
+          render={({ field }) => (
+            <InputDate
+              label="마감일"
+              id="dueDate"
+              name="dueDate"
+              value={field.value}
+              onChange={(date) => {
+                // date가 null일 경우 빈 문자열로 처리
+                const formattedDate = date ? formatDateTime(date) : "";
+                field.onChange(formattedDate);
+                setValue("dueDate", formattedDate);
+              }}
+              placeholder="날짜를 입력해 주세요"
+            />
+          )}
+        />
+
+        <InputTag
+          tags={watch("tags")}
+          tagInput={tagInput}
+          onKeyDown={handleKeyDown}
+          onClick={handleTagClick}
+          onChange={handleTagChange}
+        />
 
         <InputFile
           label="이미지"
