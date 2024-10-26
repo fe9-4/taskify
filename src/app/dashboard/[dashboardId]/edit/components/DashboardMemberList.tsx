@@ -53,7 +53,7 @@ const DashboardMemberList = ({ sectionTitle }: { sectionTitle: string }) => {
 }
 */
 
-  const fetchDashboardMemberList = async (page: number, size: number) => {
+  const fetchDashboardInvitationList = async (page: number, size: number) => {
     if (user) {
       try {
         const res = await axios.get(`/api/dashboards/${dashboardId}/invitations?page=${page}&size=${size}`);
@@ -67,7 +67,7 @@ const DashboardMemberList = ({ sectionTitle }: { sectionTitle: string }) => {
     }
   };
   useEffect(() => {
-    fetchDashboardMemberList(page, size);
+    fetchDashboardInvitationList(page, size);
   }, [user, page, size]);
 
   return (
