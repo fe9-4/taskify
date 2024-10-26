@@ -51,7 +51,7 @@ const CreateCard = () => {
     resolver: zodResolver(CardSchema),
     mode: "onChange",
     defaultValues: {
-      assigneeUserId: Number(user?.id) || 12046,
+      assigneeUserId: Number(user?.id) || 4672,
       dashboardId: Number(params.dashboardId) || 12046,
       columnId: Number(params.columnId) || 40754,
       title: "",
