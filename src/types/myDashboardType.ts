@@ -31,6 +31,6 @@ interface IInvitationList {
 }
 
 export interface IInvitation {
-  totalCount: number;
+  cursorId: number;
   invitations: IInvitationList[];
 }

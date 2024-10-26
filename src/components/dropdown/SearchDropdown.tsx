@@ -59,10 +59,6 @@ const SearchDropdown = ({ inviteMemberList, setManager, currentManager }: IProps
     }
   }, [currentManager]);
 
-  const colorList = [{ bg: "bg-[#A3C4A2]" }, { bg: "bg-[#EDC4A6]" }];
-
-  const { bg } = randomColor(colorList);
-
   return (
     <div className="flex w-full flex-col space-y-[2px] bg-white">
       <div className="flex h-[50px] w-full items-center justify-between overflow-hidden rounded-lg px-4 ring-1 ring-inset ring-gray03 transition-all focus-within:ring-violet01 focus:outline-none focus:ring-1 focus:ring-inset">
@@ -95,7 +91,7 @@ const SearchDropdown = ({ inviteMemberList, setManager, currentManager }: IProps
             >
               {selectedName?.nickname === item.nickname && <HiCheck />}
               <span
-                className={`flex size-[26px] items-center justify-center rounded-full ${bg} text-xs font-semibold text-white ring-white ring-offset-2`}
+                className={`flex size-[26px] items-center justify-center rounded-full bg-[#A3C4A2] text-xs font-semibold text-white ring-white ring-offset-2`}
               >
                 {item.email.charAt(0)}
               </span>

@@ -9,38 +9,40 @@ interface IProps {
 }
 
 const Pagination = ({ totalPage, setPage, page }: IProps) => {
-  const [isDisabled, setIsDisabled] = useState(false);
+  const [isDisabledNext, setIsDisabledNext] = useState(false);
+  const [isDisabledPrev, setIsDisabledPrev] = useState(false);
 
   useEffect(() => {
-    setIsDisabled(totalPage === page);
+    setIsDisabledNext(totalPage === page);
+    setIsDisabledPrev(totalPage === page);
   }, [page, totalPage]);
 
   const handlePageNext = () => {
     const nextPage = page + 1;
 
     if (nextPage > totalPage) {
-      setIsDisabled(true);
+      setIsDisabledNext(true);
       toast.error("마지막 페이지입니다.");
     } else {
       setPage(nextPage);
-      setIsDisabled(false);
-    }
-  };
-
+      setIsDisabledNext(false);
+    } 
+  }
+  
   const handlePagePrev = () => {
     const prevPage = page - 1;
 
     if (prevPage < 1) {
       setPage(1);
-      setIsDisabled(true);
+      setIsDisabledPrev(true);
       toast.error("첫 번째 페이지입니다.");
     } else {
       setPage(prevPage);
-      setIsDisabled(false);
+      setIsDisabledPrev(false);
     }
   };
 
-  return <PaginationBtn onClickNext={handlePageNext} onClickPrev={handlePagePrev} disabledPrev={isDisabled} disabledNext={isDisabled} />;
+  return <PaginationBtn onClickNext={handlePageNext} onClickPrev={handlePagePrev} disabledNext={isDisabledNext} disabledPrev={isDisabledPrev}   />
 };
 
 export default Pagination;
