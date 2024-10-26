@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import apiClient from "@/app/api/apiClient";
 
+//전체 대시보드 리스트 조회
 export async function GET(request: NextRequest) {
   const cookieStore = cookies();
   const accessToken = cookieStore.get("accessToken")?.value;

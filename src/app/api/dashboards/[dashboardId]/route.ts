@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
 interface IParams {
-  dashboardId: string;
+  dashboardId: number;
 }
 // 대시보드 상세 조회
 export const GET = async ({ params }: { params: IParams }) => {
