@@ -6,7 +6,16 @@ import { useForm } from "react-hook-form";
 import SelectColorChip from "@/components/chip/SelectColorChip";
 import axios, { AxiosError } from "axios";
 import { useParams } from "next/navigation";
-const EditDashboard = ({ title }: { title: string }) => {
+import toast from "react-hot-toast";
+import { DashboardInfoType, ValueType } from "@/types/dashboardType";
+
+const EditDashboard = ({
+  dashboardInfo,
+  onClickEdit,
+}: {
+  dashboardInfo: DashboardInfoType;
+  onClickEdit: (value: ValueType) => void;
+}) => {
   const {
     register,
     handleSubmit,
@@ -15,30 +24,27 @@ const EditDashboard = ({ title }: { title: string }) => {
   } = useForm({ mode: "onChange" });
 
   const { dashboardId } = useParams();
-
-  // 내가 만든 대시보드만 수정할 수 있음 -> 기존 대시보드 정보도 가져와야됨
+  const { title, color, createdByMe } = dashboardInfo;
   // 대시보드 수정 api 요청
-  interface ValueType {
-    title: string;
-    color: string;
-  }
-  /*api 에러로 PR 시 주석처리
+
   const updateDashboard = async (value: ValueType) => {
     try {
-      const res = await axios.put(`/api/dashboards/${dashboardId}`, value);
+      const res = await axios.put(`/api/dashboards/${dashboardId}?dashboardId=${dashboardId}`, value);
       const data = res.data;
-      console.log(data);
+      toast("대시보드 정보가 수정되었습니다");
     } catch (err) {
       const error = err as AxiosError;
       console.error(error.message);
+      toast("대시보드 변경에 실패했습니다");
     }
   };
-  */
+  // 실패시에는 state 값도 변경이 안되어야함..
+
   // input에 입력한 값을 value로 가져오기
-  const onSubmit = (value: any) => {
-    // updateDashboard(value);
-    // console.log(value.title); // 입력한 대시보드 이름
-    // console.log(value.color); // 선택한 색깔
+  const onSubmit = () => {
+    const formData = watch() as ValueType;
+    updateDashboard(formData);
+    onClickEdit(formData);
   };
 
   return (
@@ -49,7 +55,7 @@ const EditDashboard = ({ title }: { title: string }) => {
         <SelectColorChip register={register} watch={watch} />
       </div>
       <div className="flex h-[54px] w-full gap-2">
-        <ActiveBtn disabled={!isValid} onClick={handleSubmit(onSubmit)}>
+        <ActiveBtn disabled={!isValid && !createdByMe} onClick={handleSubmit(onSubmit)}>
           변경
         </ActiveBtn>
       </div>

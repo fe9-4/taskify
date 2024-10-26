@@ -6,37 +6,26 @@ import Link from "next/link";
 import { IoIosArrowBack } from "react-icons/io";
 import { useParams } from "next/navigation";
 import axios, { AxiosError } from "axios";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { NextResponse } from "next/server";
+import { DashboardInfoType, ValueType } from "@/types/dashboardType";
 
-interface DashboardInfoType {
-  id: number;
-  title: string;
-  color: string;
-  createdAt: string;
-  updatedAt: string;
-  userId: number;
-  createdByMe: boolean;
-}
 const EditPage = () => {
   const { dashboardId } = useParams();
-  const [dashboardInfo, setDashboardInfo] = useState<DashboardInfoType | null>(null);
+  const [dashboardInfo, setDashboardInfo] = useState<DashboardInfoType>({
+    id: 0,
+    title: "TITLE",
+    color: "#000000",
+    createdAt: "2024-01-01T19:54:48.459Z",
+    updatedAt: "2024-01-01T19:19:34.157Z",
+    userId: 0,
+    createdByMe: false,
+  });
   const { user } = useAuth();
 
-  // 대시보드 정보 가져오기 (이름, 구성원?, 초대 내역?)
-  /*
-{
-  "id": 12067,
-  "title": "수정테스트",
-  "color": "#000000",
-  "createdAt": "2024-10-24T19:54:48.459Z",
-  "updatedAt": "2024-10-25T19:19:34.157Z",
-  "userId": 4668,
-  "createdByMe": true
-}
-  */
-  const fetchDashboardInfo = async () => {
+  // 대시보드 정보 요청 - 대시보드 수정하고 새로운 정보 가져오기
+  const fetchDashboardInfo = useCallback(async () => {
     try {
       const res = await axios.get(`/api/dashboards/${dashboardId}?dashboardId=${dashboardId}`);
       setDashboardInfo(res.data);
@@ -44,11 +33,17 @@ const EditPage = () => {
       const error = err as AxiosError;
       console.error(error.message);
     }
-  };
+  }, [dashboardId]);
 
   useEffect(() => {
     fetchDashboardInfo();
-  }, [user]);
+  }, [user, fetchDashboardInfo]);
+
+  const onClickEdit = (value: ValueType) => {
+    const newTitle = value.title;
+    const newColor = value.color;
+    setDashboardInfo((prev) => ({ ...prev, title: newTitle, color: newColor }));
+  };
 
   return (
     <div className="flex w-[284px] flex-col p-5 md:w-[544px] xl:w-[620px]">
@@ -59,8 +54,7 @@ const EditPage = () => {
         </Link>
       </div>
       <div className="flex w-[620px] flex-col gap-4">
-        <EditDashboard title={dashboardInfo?.title || "TITLE"} />
-
+        <EditDashboard dashboardInfo={dashboardInfo} onClickEdit={onClickEdit} />
         <DashboardMemberList sectionTitle="구성원" />
         <DashboardMemberList sectionTitle="초대 내역" />
       </div>
