@@ -6,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import axios, { AxiosError } from "axios";
 import DashboardMemberItem from "./DashboardMemberItem";
 import { usePathname } from "next/navigation";
+import InvitationsItemType from "@/types/invitationType";
 
 const DashboardMemberList = ({ sectionTitle }: { sectionTitle: string }) => {
   // 이미 초대되어있는 멤버 = 구성원
@@ -13,7 +14,7 @@ const DashboardMemberList = ({ sectionTitle }: { sectionTitle: string }) => {
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(5);
   const [totalCount, setTotalCount] = useState<number>(0);
-  const [invitatingMemberList, setInvitatingMemberList] = useState([]);
+  const [invitatingMemberList, setInvitatingMemberList] = useState<InvitationsItemType[]>([]);
 
   const { user } = useAuth();
   const pathname = usePathname();
@@ -51,7 +52,7 @@ const DashboardMemberList = ({ sectionTitle }: { sectionTitle: string }) => {
   "totalCount": 1
 }
 */
-  /* api 에러 발생하여 PR시 주석처리함
+
   const fetchDashboardMemberList = async (page: number, size: number) => {
     if (user) {
       try {
@@ -68,12 +69,13 @@ const DashboardMemberList = ({ sectionTitle }: { sectionTitle: string }) => {
   useEffect(() => {
     fetchDashboardMemberList(page, size);
   }, [user, page, size]);
-*/
+
   return (
     <section className="w-full rounded-2xl bg-white px-4 py-5 md:px-7 md:py-8">
       <SectionTitle sectionTitle={sectionTitle} />
       <div>
-        {invitatingMemberList.length > 0 && invitatingMemberList.map((item) => <DashboardMemberItem item={item} />)}
+        {invitatingMemberList.length > 0 &&
+          invitatingMemberList.map((item) => <DashboardMemberItem key={item.id} item={item} />)}
       </div>
     </section>
   );
