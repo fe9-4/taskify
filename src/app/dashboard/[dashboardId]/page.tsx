@@ -6,6 +6,8 @@ import ColumnList from "@/app/dashboard/components/ColumnList";
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { AddColumnBtn } from "@/components/button/ButtonComponents";
+import { useAtom } from "jotai";
+import { CreateColumnAtom } from "@/store/modalAtom";
 
 interface IColumnData {
   id: number;
@@ -18,6 +20,7 @@ interface IColumnList {
 
 const DashboardDetail = () => {
   const { dashboardId } = useParams();
+  const [, setIsCreateColumnOpen] = useAtom(CreateColumnAtom);
 
   const [columnList, setColumnList] = useState<IColumnList["data"]>([]);
 
@@ -37,7 +40,7 @@ const DashboardDetail = () => {
   }, [dashboardId]);
 
   const handleColumnBtn = () => {
-    // console.log("컬럼 추가 모달 오픈");
+    setIsCreateColumnOpen(true);
   };
 
   useEffect(() => {
