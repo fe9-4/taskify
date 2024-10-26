@@ -4,7 +4,7 @@ import { MemberInitials } from "./MemberInitials";
 import { useDashboardList } from "@/hooks/useDashboardList";
 
 export const DashboardMemberDisplay: React.FC = () => {
-  const { data: dashboardList, isLoading, error } = useDashboardList();
+  const { data: dashboardList, isLoading, error } = useDashboardList({ page: 1, size: 1 });
   const [selectedDashboardId, setSelectedDashboardId] = useState<number | null>(null);
 
   useEffect(() => {

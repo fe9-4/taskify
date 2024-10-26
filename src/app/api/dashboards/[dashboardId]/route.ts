@@ -12,6 +12,10 @@ export const GET = async (req: Request, { params }: { params: IParams }) => {
   const { dashboardId } = params;
   const id = Number(dashboardId);
 
+  const { searchParams } = new URL(req.url);
+  const page = Number(searchParams.get("page")) || 1;
+  const size = Number(searchParams.get("size")) || 10;
+
   const cookieStore = cookies();
   const token = cookieStore.get("accessToken")?.value;
 
@@ -24,7 +28,7 @@ export const GET = async (req: Request, { params }: { params: IParams }) => {
   }
 
   try {
-    const response = await apiClient.get(`/columns?dashboardId=${id}`, {
+    const response = await apiClient.get(`/columns?dashboardId=${id}&page=${page}&size=${size}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
