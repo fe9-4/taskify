@@ -49,7 +49,7 @@ const EditPage = () => {
   };
 
   useEffect(() => {
-    fetchDashboardInfo();
+    // fetchDashboardInfo();
   }, [user]);
 
   return (

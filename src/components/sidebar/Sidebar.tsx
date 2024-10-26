@@ -32,16 +32,22 @@ const Sidebar = () => {
   const fetchDashboardList = async (page: number, size: number) => {
     if (user) {
       try {
-        const res = await axios.get(`/api/dashboards?page=${page}&size=${size}`);
+        const res = await axios.get("/api/dashboards", {
+          params: {
+            page,
+            cursorId: 1,
+            size,
+          },
+        });
         const data = res.data;
-        setDashboardList(data.user ? data.user.dashboards : []);
-        setTotalCount(data.user.totalCount);
+        setDashboardList(data.dashboards);
+        setTotalCount(data.totalCount);
       } catch (err) {
         const error = err as AxiosError;
         console.error(error.message);
       }
     }
-  };
+  }; // 라우트 통일해서 다시 데이터 불러오기
 
   useEffect(() => {
     fetchDashboardList(page, size);

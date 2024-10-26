@@ -33,11 +33,11 @@ export const GET = async (req: Request) => {
     );
 
     if (response.status === 200) {
-      const dashboardList = response.data.dashboards;
+      const dashboards = response.data.dashboards;
       const totalCount = response.data.totalCount;
       const cursorId = response.data.cursorId;
 
-      return NextResponse.json({ dashboardList, totalCount, cursorId }, { status: 200 });
+      return NextResponse.json({ dashboards, totalCount, cursorId }, { status: 200 });
     }
   } catch (error) {
     if (axios.isAxiosError(error)) {

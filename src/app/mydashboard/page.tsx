@@ -36,7 +36,7 @@ const MyDashboard = () => {
 
       if (response.status === 200) {
         const data = response.data;
-        setDashboardList(data.dashboardList);
+        setDashboardList(data.dashboards);
         setCursorId(data.cursorId !== null ? data.cursorId : 1);
         setTotalPage(Math.ceil(data.totalCount / size));
       }

@@ -8,7 +8,7 @@ interface IParams {
 }
 // 대시보드 상세 조회
 export const GET = async ({ params }: { params: IParams }) => {
-  const { dashboardId } = params;
+  const dashboardId = params;
 
   const cookieStore = cookies();
   const token = cookieStore.get("accessToken")?.value;
