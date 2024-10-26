@@ -1,37 +1,37 @@
-import { useState, useCallback } from "react";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import { IUploadType } from "@/types/uploadType";
 
-export const useFileUpload = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+interface UploadResponse {
+  profileImageUrl?: string;
+  imageUrl?: string;
+}
 
-  const createFormData = useCallback(async (file: string | File): Promise<FormData | null> => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
+export const useFileUpload = (uploadUrl: string, uploadType: IUploadType) => {
+  const uploadFileMutation = useMutation<string, Error, File>({
+    mutationFn: async (file: File) => {
       const formData = new FormData();
+      formData.append("image", file);
 
-      if (file instanceof File) {
-        // 파일 객체인 경우 직접 FormData에 추가
-        formData.append("image", file);
-      } else if (typeof file === "string") {
-        // URL 문자열인 경우 fetch를 사용하여 파일로 변환
-        const response = await fetch(file);
-        if (!response.ok) throw new Error("이미지를 가져오는데 실패했습니다");
-        const blob = await response.blob();
-        formData.append("image", blob, "image.jpg");
+      const response = await axios.post<UploadResponse>(uploadUrl, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (uploadType === "profile" && response.data?.profileImageUrl) {
+        return response.data.profileImageUrl;
+      } else if (uploadType === "card" && response.data?.imageUrl) {
+        return response.data.imageUrl;
       } else {
-        throw new Error("유효하지 않은 파일 형식입니다");
+        throw new Error("이미지 URL을 받지 못했습니다.");
       }
+    },
+  });
 
-      return formData;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다");
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  return { createFormData, isLoading, error };
+  return {
+    uploadFile: uploadFileMutation.mutateAsync,
+    isPending: uploadFileMutation.isPending,
+    error: uploadFileMutation.error?.message || null,
+  };
 };

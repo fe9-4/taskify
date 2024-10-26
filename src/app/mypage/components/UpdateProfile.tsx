@@ -8,85 +8,90 @@ import toast from "react-hot-toast";
 import { ActiveBtn } from "@/components/button/ButtonComponents";
 import InputItem from "@/components/input/InputItem";
 import { useAuth } from "@/hooks/useAuth";
-import { UpdateUserProfile, UpdateUserProfileSchema, UploadUserProfileImageResponse } from "@/zodSchema/userSchema";
+import { UpdateUserProfile, UpdateUserProfileSchema } from "@/zodSchema/userSchema";
 import InputFile from "@/components/input/InputFile";
 import { useFileUpload } from "@/hooks/useFileUpload";
+import { uploadType } from "@/types/uploadType";
 
 const UpdateProfile = () => {
   const { user, updateUser } = useAuth();
   const [isProfileChanged, setIsProfileChanged] = useState(false);
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null); // 미리보기 이미지 상태
+  const [fileToUpload, setFileToUpload] = useState<File | null>(null); // 업로드할 파일 상태
 
-  const profileForm = useForm<UpdateUserProfile>({
+  const { register, handleSubmit, watch, formState, reset, setValue } = useForm<UpdateUserProfile>({
     resolver: zodResolver(UpdateUserProfileSchema),
     defaultValues: { nickname: "", profileImageUrl: null },
     mode: "onChange",
   });
 
+  const watchedNickname = watch("nickname");
+
+  const {
+    uploadFile,
+    isPending: isFileLoading,
+    error: fileError,
+  } = useFileUpload("/api/users/me/image", uploadType.PROFILE);
+
+  // 사용자 정보가 변경되면 폼과 상태를 초기화
   useEffect(() => {
     if (user) {
-      profileForm.reset({
+      reset({
         nickname: user.nickname || "",
         profileImageUrl: user.profileImageUrl || null,
       });
       setProfileImageUrl(user.profileImageUrl || null);
     }
-  }, [user, profileForm]);
+  }, [user, reset]);
 
-  const { createFormData, isLoading: isFileLoading, error: fileError } = useFileUpload();
+  // isProfileChanged 업데이트
+  useEffect(() => {
+    const nicknameChanged = watchedNickname !== user?.nickname;
+    const imageChanged = (previewImage || "") !== (user?.profileImageUrl || "");
+    setIsProfileChanged(nicknameChanged || imageChanged);
+  }, [watchedNickname, previewImage, user]);
 
-  const handleProfileImageChange = async (file: string | File | null) => {
-    if (file) {
-      try {
-        const formData = await createFormData(file);
-        if (!formData) {
-          throw new Error("FormData 생성 실패");
-        }
-
-        const response = await axios.post<UploadUserProfileImageResponse>("/api/users/me/image", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-
-        if (response.data?.profileImageUrl) {
-          setProfileImageUrl(response.data.profileImageUrl);
-          profileForm.setValue("profileImageUrl", response.data.profileImageUrl);
-          setIsProfileChanged(true);
-          profileForm.trigger();
-          updateUser({ profileImageUrl: response.data.profileImageUrl });
-          toast.success("프로필 이미지 업로드 완료");
-        }
-      } catch (error) {
-        console.error("프로필 이미지 업로드 오류:", error);
-        toast.error("프로필 이미지 업로드 실패");
-      }
+  // 프로필 이미지 변경 핸들러
+  const handleProfileImageChange = (fileOrString: File | string | null) => {
+    if (fileOrString instanceof File) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewImage(reader.result as string); // 파일을 미리보기로 설정
+      };
+      reader.readAsDataURL(fileOrString); // 파일을 데이터 URL로 변환
+      setFileToUpload(fileOrString); // 업로드할 파일 설정
+    } else if (typeof fileOrString === "string") {
+      setPreviewImage(fileOrString); // 미리보기 이미지를 URL로 설정
+      setFileToUpload(null); // 파일은 없으므로 null로 설정
     } else {
-      setProfileImageUrl(null);
-      profileForm.setValue("profileImageUrl", null);
-      setIsProfileChanged(true);
-      profileForm.trigger();
-      updateUser({ profileImageUrl: undefined });
+      setPreviewImage(null); // 파일을 취소할 경우 상태 초기화
+      setFileToUpload(null);
     }
   };
 
+  // 닉네임 변경 핸들러
   const handleNicknameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newNickname = e.target.value;
-    profileForm.setValue("nickname", newNickname, { shouldValidate: true });
-    const isChanged = newNickname !== user?.nickname || profileImageUrl !== user?.profileImageUrl;
-    setIsProfileChanged(isChanged);
+    setValue("nickname", newNickname, { shouldValidate: true });
   };
 
+  // 프로필 제출 핸들러
   const onSubmitProfile: SubmitHandler<UpdateUserProfile> = async (data) => {
     try {
+      let imageUrl = profileImageUrl;
+      if (fileToUpload) {
+        imageUrl = await uploadFile(fileToUpload);
+      }
+
       const response = await axios.put("/api/users/me", {
         ...data,
-        profileImageUrl: profileImageUrl,
+        profileImageUrl: imageUrl,
       });
       updateUser(response.data.user);
       toast.success("프로필 업데이트 완료");
       setIsProfileChanged(false);
-      profileForm.reset();
+      reset();
     } catch (error) {
       toast.error("프로필 업데이트 실패");
     }
@@ -102,16 +107,16 @@ const UpdateProfile = () => {
               id="profile-image-input"
               label=""
               name="profileImage"
-              value={profileImageUrl}
+              value={previewImage || profileImageUrl}
               size="profile"
-              onChange={handleProfileImageChange}
+              onChange={handleProfileImageChange} // InputFile의 변경 핸들러
             />
           </div>
-          {isFileLoading && <p className="mt-2 text-center">이미지 업로드 중...</p>}
+          {isFileLoading && <div className="mt-2 flex justify-center">이미지 업로드 중...</div>}
           {fileError && <p className="text-error mt-2 text-center">{fileError}</p>}
         </div>
         <div className="mt-4 w-full md:mt-0 md:w-[276px] xl:w-[400px]">
-          <form onSubmit={profileForm.handleSubmit(onSubmitProfile)} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmitProfile)} className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-base font-normal text-black02 md:text-lg">
                 이메일
@@ -120,22 +125,22 @@ const UpdateProfile = () => {
             </div>
             <div>
               <label htmlFor="nickname" className="block text-base font-normal text-black02 md:text-lg">
-                닉네임
+                닉네임 <span className="text-red-600">*</span>
               </label>
               <InputItem
                 id="nickname"
                 type="text"
                 placeholder="닉네임 입력"
-                {...profileForm.register("nickname")}
-                onChange={handleNicknameChange}
+                {...register("nickname", { required: "닉네임은 필수 항목입니다." })} // 필수 항목으로 설정
+                onChange={handleNicknameChange} // 닉네임 변경 핸들러
               />
-              {profileForm.formState.errors.nickname && (
-                <p className="mt-1 text-sm text-red-600">{profileForm.formState.errors.nickname.message}</p>
+              {formState.errors.nickname && (
+                <p className="mt-1 text-sm text-red-600">{formState.errors.nickname.message}</p>
               )}
             </div>
             <ActiveBtn
-              disabled={!isProfileChanged || profileForm.formState.isSubmitting || !profileForm.formState.isValid}
-              onClick={profileForm.handleSubmit(onSubmitProfile)}
+              disabled={!isProfileChanged || formState.isSubmitting || !formState.isValid}
+              onClick={handleSubmit(onSubmitProfile)} // 제출 시 처리
             >
               저장
             </ActiveBtn>

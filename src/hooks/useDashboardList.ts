@@ -11,10 +11,7 @@ export const useDashboardList = ({ cursorId, page, size }: DashboardForm) => {
       const response = await axios.get("/api/dashboards", {
         params: { cursorId, page, size },
       });
-      // 응답 데이터를 DashboardListSchema 사용하여 검증 및 파싱
-      const data = DashboardListSchema.parse(response.data);
-      //console.log(data);
-      return data;
+      return DashboardListSchema.parse(response.data);
     },
     staleTime: 1000 * 60 * 5, // 5분 동안 캐시 유효
   });

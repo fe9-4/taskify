@@ -1,9 +1,7 @@
 "use client";
-import { z } from "zod";
-import { useForm, SubmitHandler, Controller, useFieldArray } from "react-hook-form";
-import { ChangeEvent, FormEvent, FormEventHandler, KeyboardEvent, useCallback, useEffect, useState } from "react";
-import { useAtom } from "jotai";
-import { CreateCardAtom } from "@/store/modalAtom";
+
+import { useForm, Controller, SubmitHandler } from "react-hook-form";
+import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -17,6 +15,7 @@ import InputDate from "@/components/input/InputDate";
 import InputTag from "@/components/input/InputTag";
 import InputFile from "@/components/input/InputFile";
 import { useParams } from "next/navigation";
+import { uploadType } from "@/types/uploadType";
 
 interface UpdateCardProps {
   assigneeUserId: number;
@@ -28,19 +27,19 @@ interface UpdateCardProps {
   imageUrl: string | File | null;
 }
 
-const TestCard2 = () => {
+const UpdateCard = () => {
   const [selectedValue, setSelectedValue] = useState("");
   const [currentValue, setCurrentValue] = useState("");
   const [inviteMember, setInviteMember] = useState([]);
-  const [Manager, setManager] = useState("");
+  const [manager, setManager] = useState("");
 
   const { user } = useAuth();
   const { cardId, columnId } = useParams();
-  const [updateCard, setUpdateCard] = useState();
+  const [updateCard, setUpdateCard] = useState([]);
   const [tagInput, setTagInput] = useState("");
-
-  const { createFormData, isLoading: isFileLoading, error: fileError } = useFileUpload();
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [fileToUpload, setFileToUpload] = useState<File | null>(null);
+  const [isCardChanged, setIsCardChanged] = useState(false);
 
   const {
     register,
@@ -52,8 +51,8 @@ const TestCard2 = () => {
     formState: { errors, isValid },
   } = useForm<UpdateCardProps>({
     defaultValues: {
-      assigneeUserId: Number(user && user.id), // 본인의 계정 아이디
-      columnId: Number(columnId), // 컬럼 생성 아이디
+      assigneeUserId: Number(user && user.id),
+      columnId: Number(columnId),
       title: "",
       description: "",
       dueDate: "",
@@ -62,27 +61,65 @@ const TestCard2 = () => {
     },
   });
 
-  // 카드 데이터를 가져오는 함수
+  const {
+    uploadFile,
+    isPending: isFileLoading,
+    error: fileError,
+  } = useFileUpload(`/api/columns/${columnId}/card-image`, uploadType.CARD);
+
   useEffect(() => {
     const fetchCardData = async () => {
       try {
         const response = await axios.get(`/api/cards/${cardId}`);
         setUpdateCard(response.data);
-        reset(response.data); // 폼 초기값 설정
+        reset(response.data);
+        setPreviewImage(response.data.imageUrl);
       } catch (error) {
         console.error("카드 데이터 불러오기 실패:", error);
       }
     };
 
     fetchCardData();
-  }, [cardId]);
+  }, [cardId, columnId, reset]);
 
-  const onSubmit = async (data: any) => {
+  useEffect(() => {
+    const subscription = watch((value, { name, type }) => {
+      if (name) {
+        setIsCardChanged(true);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [watch]);
+
+  const handleImageChange = (fileOrString: File | string | null) => {
+    if (fileOrString instanceof File) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewImage(reader.result as string);
+      };
+      reader.readAsDataURL(fileOrString);
+      setFileToUpload(fileOrString);
+    } else if (typeof fileOrString === "string") {
+      setPreviewImage(fileOrString);
+      setFileToUpload(null);
+    } else {
+      setPreviewImage(null);
+      setFileToUpload(null);
+    }
+    setIsCardChanged(true);
+  };
+
+  const onSubmit: SubmitHandler<UpdateCardProps> = async (data) => {
     try {
-      // FormData 대신 일반 객체 사용
+      let imageUrl = data.imageUrl;
+      if (fileToUpload) {
+        imageUrl = await uploadFile(fileToUpload);
+      }
+
       const jsonData = {
         ...data,
-        tags: JSON.stringify(data.tags), // 태그는 JSON 문자열로 변환
+        tags: JSON.stringify(data.tags),
+        imageUrl: imageUrl,
       };
 
       const response = await axios.put(`/api/cards/${cardId}`, jsonData);
@@ -90,6 +127,7 @@ const TestCard2 = () => {
 
       if (response.data) {
         toast.success("카드가 수정되었습니다! 🎉");
+        setIsCardChanged(false);
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -129,39 +167,6 @@ const TestCard2 = () => {
     },
     [setValue, watch]
   );
-
-  const handleImageChange = async (file: string | File | null) => {
-    if (file) {
-      try {
-        const formData = await createFormData(file);
-        if (!formData) {
-          throw new Error("FormData 생성 실패");
-        }
-
-        const columnId = watch("columnId"); // 현재 선택된 columnId 가져오기
-        const response = await axios.post(`/api/columns/${columnId}/card-image`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-
-        if (response.data?.imageUrl) {
-          setImageUrl(response.data.imageUrl);
-          setValue("imageUrl", response.data.imageUrl);
-          toast.success("카드 이미지 업로드가 완료되었습니다.");
-        }
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          toast.error("카드 이미지 업로드에 실패했습니다.");
-        } else {
-          toast.error("네트워크 오류가 발생했습니다.");
-        }
-      }
-    } else {
-      setImageUrl(null);
-      setValue("imageUrl", null);
-    }
-  };
 
   return (
     <section className="rounded-2xl bg-white p-8">
@@ -235,16 +240,19 @@ const TestCard2 = () => {
           label="이미지"
           id="imageUrl"
           name="imageUrl"
-          value={imageUrl}
+          value={previewImage}
           onChange={handleImageChange}
           size="todo"
         />
+
+        {isFileLoading && <p>이미지 업로드 중...</p>}
+        {fileError && <p className="text-error">{fileError}</p>}
 
         <div className="flex h-[42px] gap-3 md:h-[54px] md:gap-2">
           <CancelBtn type="button" onClick={() => ""}>
             취소
           </CancelBtn>
-          <ConfirmBtn type="submit" disabled={!isValid} onClick={onSubmit}>
+          <ConfirmBtn type="submit" disabled={!isValid || !isCardChanged} onClick={handleSubmit(onSubmit)}>
             수정
           </ConfirmBtn>
         </div>
@@ -253,4 +261,4 @@ const TestCard2 = () => {
   );
 };
 
-export default TestCard2;
+export default UpdateCard;

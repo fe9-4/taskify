@@ -17,10 +17,8 @@ export const useDashboardMember = ({ dashboardId, page, size }: MemberForm) => {
         size,
       },
     });
-    // 응답 데이터를 MemberListSchema를 사용하여 검증 및 파싱
-    const parsedData = MemberListSchema.parse(response.data);
 
-    return parsedData;
+    return MemberListSchema.parse(response.data);
   };
 
   // React Query를 사용하여 멤버 목록 데이터 관리
