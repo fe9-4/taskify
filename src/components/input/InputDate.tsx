@@ -58,4 +58,6 @@ const InputDate = forwardRef(({ label, id, name, value, placeholder, onChange }:
   );
 });
 
+InputDate.displayName = "InputDate";
+
 export default InputDate;

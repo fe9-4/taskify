@@ -18,7 +18,7 @@ const MyDashboard = () => {
   const [page, setPage] = useState(1);
   const [cursorId, setCursorId] = useState<number | null>(1);
   const [size, setSize] = useState(5);
-  const [dashboardList, setDashboardList] = useState<IMyDashboard["dsahboards"]>([]);
+  const [dashboardList, setDashboardList] = useState<IMyDashboard["dashboards"]>([]);
   const [totalPage, setTotalPage] = useState(0);
   const [, setisCreateDashboardOpen] = useAtom(CreateDashboardAtom);
   const [isUpdatedList, setIsUpdatedList] = useAtom(myDashboardUpdateAtom);
@@ -36,7 +36,7 @@ const MyDashboard = () => {
 
       if (response.status === 200) {
         const data = response.data;
-        setDashboardList(data.dashboardList);
+        setDashboardList(data.dashboards);
         setCursorId(data.cursorId !== null ? data.cursorId : 1);
         setTotalPage(Math.ceil(data.totalCount / size));
       }
