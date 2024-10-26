@@ -7,27 +7,15 @@ import { CreateDashboard } from "@/types/dashboardType";
 // 내 대시보드 상단 대시보드 목록 조회 (cursorId 포함)
 export const GET = async (req: Request) => {
   const { searchParams } = new URL(req.url);
-  let cursorId = searchParams.get("cursorId");
-  let page = searchParams.get("page");
-  let size = searchParams.get("size");
+  const cursorId = searchParams.get("cursorId");
+  const page = searchParams.get("page");
+  const size = searchParams.get("size");
 
   const cookieStore = cookies();
   const token = cookieStore.get("accessToken")?.value;
 
   if (!token) {
     return new NextResponse("사용자 정보를 찾을 수 없습니다.", { status: 401 });
-  }
-
-  if (!cursorId) {
-    cursorId = "0";
-  }
-
-  if (!page) {
-    page = "1";
-  }
-
-  if (!size) {
-    size = "10";
   }
 
   try {
