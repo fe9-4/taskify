@@ -25,8 +25,8 @@ const EditDashboard = ({
 
   const { dashboardId } = useParams();
   const { title, color, createdByMe } = dashboardInfo;
-  // 대시보드 수정 api 요청
 
+  // 대시보드 수정 api 요청
   const updateDashboard = async (value: ValueType) => {
     try {
       const res = await axios.put(`/api/dashboards/${dashboardId}?dashboardId=${dashboardId}`, value);
@@ -38,7 +38,8 @@ const EditDashboard = ({
       toast("대시보드 변경에 실패했습니다");
     }
   };
-  // 실패시에는 state 값도 변경이 안되어야함..
+  // 1.실패시에는 state 값도 변경이 안되어야함
+  // 2. 사이드바랑 헤더도 같이 변경되어야함
 
   // input에 입력한 값을 value로 가져오기
   const onSubmit = () => {

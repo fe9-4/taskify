@@ -22,7 +22,6 @@ export const GET = async (req: Request) => {
   }
 
   try {
-    // https://sp-taskify-api.vercel.app/9-4/dashboards/12067
     const response = await apiClient.get(`/dashboards/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -60,7 +59,6 @@ export const PUT = async (req: Request) => {
 
   try {
     const requestBody = await req.json();
-    //https://sp-taskify-api.vercel.app/9-4/dashboards/12067
     const response = await apiClient.put(`/dashboards/${id}`, requestBody, {
       headers: {
         Authorization: `Bearer ${token}`,
