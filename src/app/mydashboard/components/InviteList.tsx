@@ -50,16 +50,18 @@ const InviteList = () => {
       }
     });
 
-    if (loadingRef.current) {
-      observeRef.current.observe(loadingRef.current);
+    const currentLoadingRef = loadingRef.current;
+
+    if (currentLoadingRef) {
+      observeRef.current.observe(currentLoadingRef);
     }
 
     return () => {
-      if (loadingRef.current) {
-        observeRef.current?.unobserve(loadingRef.current);
+      if (currentLoadingRef) {
+        observeRef.current?.unobserve(currentLoadingRef);
       }
     };
-  }, [hasMore, cursorId, size]);
+  }, [hasMore, cursorId, size, getInvitationList]);
 
   return (
     <div

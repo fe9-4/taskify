@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
 import axios from "axios"
 import apiClient from "../apiClient";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { creatDashboard } from "@/types/dashboardType";
 
-// 내 대시보드 상단 대시보드 목록 조회 (cursorId 포함)
+// 내 대시보드 상단 대시보드 목록 조회, 사이드바 대시보드 조회 
 export const GET = async (req: Request) => {
   const { searchParams } = new URL(req.url);
   const page = searchParams.get("page");
@@ -30,11 +30,11 @@ export const GET = async (req: Request) => {
     });
 
     if (response.status === 200) {
-      const dashboardList = response.data.dashboards;
+      const dashboards = response.data.dashboards;
       const totalCount = response.data.totalCount;
       const cursorId = response.data.cursorId; 
 
-      return NextResponse.json({ dashboardList, totalCount, cursorId }, { status: 200 });
+      return NextResponse.json({ dashboards, totalCount, cursorId }, { status: 200 });
     }
   } catch (error) {
     if (axios.isAxiosError(error)) {

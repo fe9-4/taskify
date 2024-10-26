@@ -1,7 +1,7 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 import ColumnItem from "./ColumnItem";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { HiOutlineCog } from "react-icons/hi";
 import { NumChip } from "../../../components/chip/PlusAndNumChip";
 import { AddTodoBtn } from "../../../components/button/ButtonComponents";
@@ -23,7 +23,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const observeRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
   
-  const getCardList = async () => {
+  const getCardList = useCallback(async () => {
     if (!hasMore) return;
 
     try {
@@ -46,7 +46,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
         toast.error(error.response?.data);
       }
     }
-  };
+  }, [columnId, cursorId, hasMore, size]);
 
   // 카드아이템 무한스크롤
   useEffect(() => {
@@ -60,16 +60,18 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
       }
     });
 
-    if (loadingRef.current) {
-      observeRef.current.observe(loadingRef.current);
+    const currentLoadingRef = loadingRef.current;
+
+    if (currentLoadingRef) {
+      observeRef.current.observe(currentLoadingRef);
     }
 
     return () => {
-      if (loadingRef.current) {
-        observeRef.current?.unobserve(loadingRef.current);
+      if (currentLoadingRef) {
+        observeRef.current?.unobserve(currentLoadingRef);
       }
     };
-  }, [hasMore, cursorId, size]);
+  }, [hasMore, cursorId, size, getCardList]);
 
   const handleEditModal = () => {
     // 모달 만들어지면 모달 연결
