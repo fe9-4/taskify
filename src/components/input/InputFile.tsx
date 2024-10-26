@@ -26,7 +26,7 @@ const InputFile = ({ label, size, id, name, value, onChange }: InputFileProps) =
       reader.readAsDataURL(file);
       reader.onloadend = () => {
         if (reader.result && typeof reader.result === "string") {
-          setPreview(reader.result); 
+          setPreview(reader.result);
           onChange(reader.result);
         }
       };
@@ -34,7 +34,7 @@ const InputFile = ({ label, size, id, name, value, onChange }: InputFileProps) =
 
     e.currentTarget.value = "";
   };
-  
+
   const handleClick = () => {
     if (inputRef.current) {
       inputRef.current.click();
@@ -42,7 +42,7 @@ const InputFile = ({ label, size, id, name, value, onChange }: InputFileProps) =
   };
 
   return (
-    <div>
+    <div className="flex flex-col gap-2">
       {label && (
         <p
           className={cls(

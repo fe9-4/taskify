@@ -24,8 +24,8 @@ const Pagination = ({ totalPage, setPage, page }: IProps) => {
     } else {
       setPage(nextPage);
       setIsDisabled(false);
-    } 
-  }
+    }
+  };
 
   const handlePagePrev = () => {
     const prevPage = page - 1;
@@ -38,7 +38,7 @@ const Pagination = ({ totalPage, setPage, page }: IProps) => {
       setPage(prevPage);
       setIsDisabled(false);
     }
-  }
+  };
 
   return <PaginationBtn onClickNext={handlePageNext} onClickPrev={handlePagePrev} disabledPrev={isDisabled} disabledNext={isDisabled} />;
 };
