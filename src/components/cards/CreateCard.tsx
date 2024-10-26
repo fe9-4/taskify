@@ -17,7 +17,7 @@ import InputItem from "@/components/input/InputItem";
 import InputDate from "@/components/input/InputDate";
 import InputTag from "@/components/input/InputTag";
 import InputFile from "@/components/input/InputFile";
-import { useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 
 const CardSchema = z.object({
   assigneeUserId: z.number(),
@@ -31,9 +31,8 @@ const CardSchema = z.object({
 });
 
 const CreateCard = () => {
-  const searchParams = useSearchParams();
-  const dashboardId = searchParams.get("dashboardId");
-  const columnId = searchParams.get("columnId");
+  const { dashboardId } = useParams();
+  const { columnId } = useParams();
 
   const { user } = useAuth();
   const [inviteMember, setInviteMember] = useState([]);
@@ -55,8 +54,8 @@ const CreateCard = () => {
     mode: "onChange",
     defaultValues: {
       assigneeUserId: Number(user && user.id), // 본인의 계정 아이디
-      dashboardId: Number(dashboardId), // 대시보드 생성 아이디
-      columnId: Number(columnId), // 컬럼 생성 아이디
+      dashboardId: 12046, // 대시보드 생성 아이디
+      columnId: 40754, // 컬럼 생성 아이디
       title: "",
       description: "",
       dueDate: "",
@@ -107,7 +106,6 @@ const CreateCard = () => {
         tags: JSON.stringify(data.tags), // 태그는 JSON 문자열로 변환
       };
 
-      const columnId = watch("columnId");
       const response = await axios.post(`/api/cards`, jsonData, {
         headers: {
           "Content-Type": "application/json",
@@ -232,7 +230,9 @@ const CreateCard = () => {
         />
 
         <div className="flex h-[42px] gap-3 md:h-[54px] md:gap-2">
-          <CancelBtn onClick={() => ""}>취소</CancelBtn>
+          <CancelBtn type="button" onClick={() => ""}>
+            취소
+          </CancelBtn>
           <ConfirmBtn type="submit" disabled={!isValid}>
             생성
           </ConfirmBtn>
