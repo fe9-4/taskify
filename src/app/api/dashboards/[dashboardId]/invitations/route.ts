@@ -6,13 +6,14 @@ import apiClient from "@/app/api/apiClient";
 interface IParams {
   dashboardId: number;
 }
-
+// https://sp-taskify-api.vercel.app/9-4/dashboards/12067/invitations?page=1&size=10
 export const GET = async (request: NextRequest, { params }: { params: IParams }) => {
   const { searchParams } = new URL(request.url);
   const page = searchParams.get("page") || 1;
   const size = searchParams.get("size") || 5;
   const dashboardId = params.dashboardId;
-
+  console.log(params);
+  console.log("콘솔 출력 테스트");
   const cookieStore = cookies();
   const token = cookieStore.get("accessToken")?.value;
 
@@ -25,7 +26,7 @@ export const GET = async (request: NextRequest, { params }: { params: IParams })
   }
 
   try {
-    const response = await apiClient.get(`/dashboards/${dashboardId}/invitations?page=${page}&size=${size}`, {
+    const response = await apiClient.get(`dashboards/${dashboardId}/invitations?page=${page}&size=${size}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

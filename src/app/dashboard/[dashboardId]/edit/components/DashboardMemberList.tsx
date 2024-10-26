@@ -18,7 +18,39 @@ const DashboardMemberList = ({ sectionTitle }: { sectionTitle: string }) => {
   const { user } = useAuth();
   const pathname = usePathname();
 
-  const dashboardId = pathname.split("/").find((segment) => !isNaN(Number(segment)));
+  const dashboardId = pathname
+    .split("/")
+    .filter((segment) => !isNaN(Number(segment)))
+    .join("");
+
+  /*
+{
+  "invitations": [
+    {
+      "id": 13452,
+      "inviter": {
+        "id": 4668,
+        "email": "yelim@fe.fe",
+        "nickname": "yelim"
+      },
+      "teamId": "9-4",
+      "dashboard": {
+        "id": 12067,
+        "title": "수정테스트"
+      },
+      "invitee": {
+        "id": 4701,
+        "email": "cccwon5@naver.com",
+        "nickname": "슈퍼펭귄스"
+      },
+      "inviteAccepted": null,
+      "createdAt": "2024-10-26T08:59:15.950Z",
+      "updatedAt": "2024-10-26T08:59:15.950Z"
+    }
+  ],
+  "totalCount": 1
+}
+*/
 
   const fetchDashboardMemberList = async (page: number, size: number) => {
     if (user) {
@@ -36,6 +68,7 @@ const DashboardMemberList = ({ sectionTitle }: { sectionTitle: string }) => {
   useEffect(() => {
     fetchDashboardMemberList(page, size);
   }, [user, page, size]);
+
   return (
     <section className="w-full rounded-2xl bg-white px-4 py-5 md:px-7 md:py-8">
       <SectionTitle sectionTitle={sectionTitle} />
