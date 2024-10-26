@@ -13,9 +13,9 @@ const InputTag = ({ cardData, tagInput, onKeyDown, onClick, onChange }: InputTag
       <div className="flex h-[50px] w-full items-center gap-2 rounded-lg px-4 text-lg text-black03 placeholder-gray02 ring-1 ring-inset ring-gray03 transition-all focus-within:ring-violet01 focus:outline-none focus:ring-1 focus:ring-inset">
         {cardData.tags.length > 0 && (
           <div className="flex gap-2">
-            {[...cardData.tags].map((tag) => (
-              <div onClick={() => onClick(tag)}>
-                <TagChip tag={tag} key={cardData.assigneeUserId} />
+            {[...cardData.tags].map((tag, index) => (
+              <div onClick={() => onClick(tag)} key={`${tag}-${index + 1}`}>
+                <TagChip tag={tag} />
               </div>
             ))}
           </div>

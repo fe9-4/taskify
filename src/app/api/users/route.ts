@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { apiClient } from "../../apiClient";
+import { apiClient } from "@/app/api/apiClient";
 import { Signup, SignupResponse } from "@/zodSchema/userSchema";
 import { AxiosError } from "axios";
 

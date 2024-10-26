@@ -1,5 +1,5 @@
 import toast from "react-hot-toast";
-import { BackForwardBtn } from "@/components/button/ButtonComponents";
+import { PaginationBtn } from "@/components/button/ButtonComponents";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 interface IProps {
@@ -40,7 +40,7 @@ const Pagination = ({ totalPage, setPage, page }: IProps) => {
     }
   }
 
-  return <BackForwardBtn onClickNext={handlePageNext} onClickPrev={handlePagePrev} disabled={isDisabled} />
+  return <PaginationBtn onClickNext={handlePageNext} onClickPrev={handlePagePrev} disabledPrev={isDisabled} disabledNext={isDisabled} />;
 };
 
 export default Pagination;

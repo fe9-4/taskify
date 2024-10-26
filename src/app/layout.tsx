@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import "../styles/globals.css";
 import { Montserrat } from "next/font/google";
-import Header from "@/components/Header";
+import Header from "@/components/header/Header";
 import ModalContainer from "@/components/modal/ModalContainer";
 import ClientLayout from "./childrenLayout";
 import Sidebar from "@/components/sidebar/Sidebar";
