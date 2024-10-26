@@ -1,9 +1,24 @@
 import { Metadata } from "next";
-import "./globals.css";
+import "../styles/globals.css";
+import { Montserrat } from "next/font/google";
+import Header from "@/components/header/Header";
+import ModalContainer from "@/components/modal/ModalContainer";
+import ClientLayout from "./childrenLayout";
+import Sidebar from "@/components/sidebar/Sidebar";
+
+const montserrat = Montserrat({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  variable: "--font-montserrat",
+});
 
 export const metadata: Metadata = {
-  title: "코드잇 프론트엔드 9기 4팀 프로젝트",
-  description: "코드잇 프론트엔드 9기 4팀 프로젝트입니다.",
+  title: {
+    template: "%s | Taskify",
+    default: "새로운 일정관리 | Taskify",
+  },
+  description: "새로운 일정관리 | Taskify",
+  icons: { icon: "/icons/favicon.ico", shortcut: "/icons/favicon.ico" },
 };
 
 export default function RootLayout({
@@ -13,8 +28,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body>
-        {children}
+      <body className={`${montserrat.variable} font-pretendard min-h-screen text-black03`}>
+        <div id="modal-root"></div>
+        <ClientLayout>
+          <ModalContainer />
+          <Sidebar />
+          <Header />
+          <main className="pt-[60px] md:pt-[70px]">{children}</main>
+        </ClientLayout>
       </body>
     </html>
   );

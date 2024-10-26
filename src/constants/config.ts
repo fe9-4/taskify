@@ -1,6 +1,6 @@
 const config = {
-    teamId: "9-4",
-    apiUrl: process.env.NEXT_PUBLIC_API_URL,
+  API_URL: process.env.NEXT_PUBLIC_API_URL,
+  TEAM_ID: process.env.NEXT_PUBLIC_TEAM_ID,
 };
 
 export default config;
