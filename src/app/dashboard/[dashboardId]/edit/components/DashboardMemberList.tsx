@@ -66,17 +66,17 @@ const DashboardMemberList = ({ sectionTitle }: { sectionTitle: string }) => {
       }
     }
   };
-  useEffect(() => {
-    fetchDashboardMemberList(page, size);
-  }, [user, page, size]);
+  // useEffect(() => {
+  //   fetchDashboardMemberList(page, size);
+  // }, [user, page, size]);
 
   return (
     <section className="w-full rounded-2xl bg-white px-4 py-5 md:px-7 md:py-8">
       <SectionTitle sectionTitle={sectionTitle} />
-      <div>
+      {/* <div>
         {invitatingMemberList.length > 0 &&
           invitatingMemberList.map((item) => <DashboardMemberItem key={item.id} item={item} />)}
-      </div>
+      </div> */}
     </section>
   );
 };
