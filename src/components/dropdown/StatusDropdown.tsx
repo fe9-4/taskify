@@ -51,6 +51,7 @@ const StatusDropdown = ({ setSelectedValue, currentValue }: IProps) => {
   return (
     <div className="flex w-full flex-col space-y-[2px] md:w-[217px]" ref={dropdownRef}>
       <button
+        type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="flex h-[50px] w-full items-center justify-between overflow-hidden rounded-lg px-4 ring-1 ring-inset ring-gray03 transition-all focus-within:ring-violet01 focus:outline-none focus:ring-1 focus:ring-inset"
       >
@@ -61,6 +62,7 @@ const StatusDropdown = ({ setSelectedValue, currentValue }: IProps) => {
         <div className="flex flex-col overflow-hidden rounded-bl-md rounded-br-md rounded-tl-md rounded-tr-md border border-gray03">
           {btnArr.map((item) => (
             <button
+              type="button"
               key={item.value}
               onClick={() => handleSelectValue(item.value)}
               className={cls("status-dropdown-custom-btn", value !== item.value ? "px-0 pl-[46px] pr-4" : "")}

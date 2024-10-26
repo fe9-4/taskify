@@ -31,7 +31,7 @@ const UpdateProfile = () => {
       });
       setProfileImageUrl(user.profileImageUrl || null);
     }
-  }, [user]);
+  }, [user, profileForm]);
 
   const { createFormData, isLoading: isFileLoading, error: fileError } = useFileUpload();
 
@@ -43,7 +43,7 @@ const UpdateProfile = () => {
           throw new Error("FormData 생성 실패");
         }
 
-        const response = await axios.post<UploadUserProfileImageResponse>("/api/user/profile/image", formData, {
+        const response = await axios.post<UploadUserProfileImageResponse>("/api/users/me/image", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -79,7 +79,7 @@ const UpdateProfile = () => {
 
   const onSubmitProfile: SubmitHandler<UpdateUserProfile> = async (data) => {
     try {
-      const response = await axios.put("/api/user/profile", {
+      const response = await axios.put("/api/users/me", {
         ...data,
         profileImageUrl: profileImageUrl,
       });
