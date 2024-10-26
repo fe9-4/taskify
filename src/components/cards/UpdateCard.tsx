@@ -1,11 +1,13 @@
 "use client";
-
-import { useForm, Controller, SubmitHandler } from "react-hook-form";
-import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useState } from "react";
+import { z } from "zod";
+import { useForm, SubmitHandler, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useState, useEffect, ChangeEvent, useCallback } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useFileUpload } from "@/hooks/useFileUpload";
+import { CardProps } from "@/types/cardType";
 import { formatDateTime } from "@/utils/dateFormat";
 import { CancelBtn, ConfirmBtn } from "@/components/button/ButtonComponents";
 import StatusDropdown from "../dropdown/StatusDropdown";
@@ -17,25 +19,24 @@ import InputFile from "@/components/input/InputFile";
 import { useParams } from "next/navigation";
 import { uploadType } from "@/types/uploadType";
 
-interface UpdateCardProps {
-  assigneeUserId: number;
-  columnId: number;
-  title: string;
-  description: string;
-  dueDate: string;
-  tags: string[];
-  imageUrl: string | File | null;
-}
+const CardSchema = z.object({
+  assigneeUserId: z.number(),
+  columnId: z.number(),
+  title: z.string().min(1, "제목은 필수입니다"),
+  description: z.string().min(1, "설명은 필수입니다"),
+  dueDate: z.string(),
+  tags: z.array(z.string()),
+  imageUrl: z.string().nullable(),
+});
 
 const UpdateCard = () => {
   const [selectedValue, setSelectedValue] = useState("");
   const [currentValue, setCurrentValue] = useState("");
   const [inviteMember, setInviteMember] = useState([]);
   const [manager, setManager] = useState("");
-
   const { user } = useAuth();
   const { cardId, columnId } = useParams();
-  const [updateCard, setUpdateCard] = useState([]);
+  const [updateCard, setUpdateCard] = useState<CardProps | null>(null);
   const [tagInput, setTagInput] = useState("");
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [fileToUpload, setFileToUpload] = useState<File | null>(null);
@@ -43,22 +44,16 @@ const UpdateCard = () => {
 
   const {
     register,
-    handleSubmit,
-    reset,
     control,
+    handleSubmit,
     setValue,
     watch,
+    trigger,
+    reset,
     formState: { errors, isValid },
-  } = useForm<UpdateCardProps>({
-    defaultValues: {
-      assigneeUserId: Number(user && user.id),
-      columnId: Number(columnId),
-      title: "",
-      description: "",
-      dueDate: "",
-      tags: [],
-      imageUrl: null,
-    },
+  } = useForm<CardProps>({
+    resolver: zodResolver(CardSchema),
+    mode: "onChange",
   });
 
   const {
@@ -80,7 +75,13 @@ const UpdateCard = () => {
     };
 
     fetchCardData();
-  }, [cardId, columnId, reset]);
+  }, [cardId, reset]);
+
+  useEffect(() => {
+    if (user?.id) {
+      setValue("assigneeUserId", Number(user.id));
+    }
+  }, [user, setValue]);
 
   useEffect(() => {
     const subscription = watch((value, { name, type }) => {
@@ -109,7 +110,7 @@ const UpdateCard = () => {
     setIsCardChanged(true);
   };
 
-  const onSubmit: SubmitHandler<UpdateCardProps> = async (data) => {
+  const onSubmit: SubmitHandler<CardProps> = async (data) => {
     try {
       let imageUrl = data.imageUrl;
       if (fileToUpload) {
@@ -138,7 +139,6 @@ const UpdateCard = () => {
     }
   };
 
-  // 태그 추가 함수
   const handleAddTag = (tag: string) => {
     if (tagInput.trim() && !watch("tags").includes(tag)) {
       setValue("tags", [...watch("tags"), tag]);
@@ -146,7 +146,7 @@ const UpdateCard = () => {
     }
   };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
       handleAddTag(tagInput);
@@ -157,7 +157,6 @@ const UpdateCard = () => {
     setTagInput(e.target.value);
   };
 
-  // 태그 삭제 함수
   const handleTagClick = useCallback(
     (tagRemove: string) => {
       setValue(
@@ -189,20 +188,26 @@ const UpdateCard = () => {
         </div>
 
         <div className="flex flex-col gap-2">
-          <label htmlFor="assignee" className="text-lg font-medium text-black03">
+          <label htmlFor="title" className="text-lg font-medium text-black03">
             제목 <span className="text-violet01">*</span>
           </label>
           <InputItem id="title" {...register("title")} errors={errors.title && errors.title.message} />
         </div>
 
         <div className="flex flex-col gap-2">
-          <label htmlFor="assignee" className="text-lg font-medium text-black03">
+          <label htmlFor="description" className="text-lg font-medium text-black03">
             설명 <span className="text-violet01">*</span>
           </label>
           <InputItem
             id="description"
-            {...register("description")}
-            // isTextArea
+            {...register("description", {
+              required: "설명은 필수입니다",
+              onChange: (e) => {
+                setValue("description", e.target.value);
+                trigger("description");
+              },
+            })}
+            isTextArea
             size="description"
             errors={errors.description && errors.description.message}
           />
@@ -218,7 +223,6 @@ const UpdateCard = () => {
               name="dueDate"
               value={field.value}
               onChange={(date) => {
-                // date가 null일 경우 빈 문자열로 처리
                 const formattedDate = date ? formatDateTime(date) : "";
                 field.onChange(formattedDate);
                 setValue("dueDate", formattedDate);

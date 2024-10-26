@@ -9,24 +9,18 @@ import { useAuth } from "@/hooks/useAuth";
 
 export default function Header() {
   const pathname = usePathname();
-  const { user, refetchUser, isUserFetched, isInitialLoading } = useAuth();
+  const { user, isUserLoading, isUserFetched } = useAuth();
   const [isHomePage, setIsHomePage] = useState(pathname === "/");
 
   useEffect(() => {
     setIsHomePage(pathname === "/");
   }, [pathname]);
 
-  useEffect(() => {
-    if (!isUserFetched && pathname !== "/login" && pathname !== "/signup") {
-      refetchUser();
-    }
-  }, [isUserFetched, pathname, refetchUser]);
-
   if (pathname === "/login" || pathname === "/signup") {
     return null;
   }
 
-  const showHeader = isHomePage || (!isInitialLoading && user);
+  const showHeader = isHomePage || (!isUserLoading && user);
 
   if (!showHeader) {
     return null;

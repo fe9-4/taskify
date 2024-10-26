@@ -12,7 +12,7 @@ export const UserMenu = ({ isHomePage }: UserMenuProps) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedDashboardId] = useState<number>(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { user, logout } = useAuth();
+  const { user, logout, isUserLoading } = useAuth();
   const { members } = useDashboardMember({ dashboardId: selectedDashboardId, page: 1, size: 10 });
 
   const handleLogout = async () => {
@@ -49,83 +49,87 @@ export const UserMenu = ({ isHomePage }: UserMenuProps) => {
     return name.charAt(0).toUpperCase();
   };
 
-  if (user) {
+  if (isUserLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
     return (
-      <div className="relative" ref={dropdownRef}>
-        <button
-          onClick={toggleDropdown}
-          className={`flex items-center space-x-2 text-base font-normal transition-colors duration-300 md:text-lg ${
-            isHomePage ? "text-white hover:text-gray03" : "text-black hover:text-violet01"
-          }`}
-        >
-          {user.profileImageUrl ? (
-            <Image src={user.profileImageUrl} alt="Profile" width={32} height={32} className="rounded-full" />
-          ) : (
-            <div
-              className={`flex h-8 w-8 items-center justify-center rounded-full ${
-                isHomePage ? "bg-white text-black" : "bg-violet01 text-white"
-              }`}
-            >
-              {getInitials(user.nickname)}
-            </div>
-          )}
-          <span className="hidden md:inline">{user.nickname}</span>
-        </button>
-        {isDropdownOpen && (
-          <div className="absolute right-0 mt-2 w-64 rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
-            <Link
-              href="/mypage"
-              className="block px-4 py-2 text-base font-semibold text-gray01 hover:bg-violet-100"
-              onClick={closeDropdown}
-            >
-              마이페이지
-            </Link>
-            <button
-              onClick={handleLogout}
-              className="block w-full px-4 py-2 text-left text-base font-semibold text-gray01 hover:bg-violet-100"
-            >
-              로그아웃
-            </button>
-          </div>
-        )}
-        {selectedDashboardId > 0 && members && (
-          <div className="absolute right-0 mt-2 flex -space-x-2 overflow-hidden">
-            {members.members.slice(0, 5).map((member, index) => (
-              <div
-                key={member.id}
-                className={`relative z-${30 - index} flex h-8 w-8 items-center justify-center rounded-full bg-violet01 text-white ring-2 ring-white`}
-              >
-                {getInitials(member.nickname)}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      <ul className="flex list-none space-x-4">
+        <li>
+          <Link
+            className={`text-base font-normal transition-colors duration-300 md:text-lg ${
+              isHomePage ? "text-white hover:text-gray03" : "hover:text-violet01"
+            }`}
+            href="/login"
+          >
+            로그인
+          </Link>
+        </li>
+        <li>
+          <Link
+            className={`text-base font-normal transition-colors duration-300 md:text-lg ${
+              isHomePage ? "text-white hover:text-gray03" : "hover:text-violet01"
+            }`}
+            href="/signup"
+          >
+            회원가입
+          </Link>
+        </li>
+      </ul>
     );
   }
 
   return (
-    <ul className="flex list-none space-x-4">
-      <li>
-        <Link
-          className={`text-base font-normal transition-colors duration-300 md:text-lg ${
-            isHomePage ? "text-white hover:text-gray03" : "hover:text-violet01"
-          }`}
-          href="/login"
-        >
-          로그인
-        </Link>
-      </li>
-      <li>
-        <Link
-          className={`text-base font-normal transition-colors duration-300 md:text-lg ${
-            isHomePage ? "text-white hover:text-gray03" : "hover:text-violet01"
-          }`}
-          href="/signup"
-        >
-          회원가입
-        </Link>
-      </li>
-    </ul>
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={toggleDropdown}
+        className={`flex items-center space-x-2 text-base font-normal transition-colors duration-300 md:text-lg ${
+          isHomePage ? "text-white hover:text-gray03" : "text-black hover:text-violet01"
+        }`}
+      >
+        {user.profileImageUrl ? (
+          <Image src={user.profileImageUrl} alt="Profile" width={32} height={32} className="rounded-full" />
+        ) : (
+          <div
+            className={`flex h-8 w-8 items-center justify-center rounded-full ${
+              isHomePage ? "bg-white text-black" : "bg-violet01 text-white"
+            }`}
+          >
+            {getInitials(user.nickname)}
+          </div>
+        )}
+        <span className="hidden md:inline">{user.nickname}</span>
+      </button>
+      {isDropdownOpen && (
+        <div className="absolute right-0 mt-2 w-64 rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
+          <Link
+            href="/mypage"
+            className="block px-4 py-2 text-base font-semibold text-gray01 hover:bg-violet-100"
+            onClick={closeDropdown}
+          >
+            마이페이지
+          </Link>
+          <button
+            onClick={handleLogout}
+            className="block w-full px-4 py-2 text-left text-base font-semibold text-gray01 hover:bg-violet-100"
+          >
+            로그아웃
+          </button>
+        </div>
+      )}
+      {selectedDashboardId > 0 && members && (
+        <div className="absolute right-0 mt-2 flex -space-x-2 overflow-hidden">
+          {members.members.slice(0, 5).map((member, index) => (
+            <div
+              key={member.id}
+              className={`relative z-${30 - index} flex h-8 w-8 items-center justify-center rounded-full bg-violet01 text-white ring-2 ring-white`}
+            >
+              {getInitials(member.nickname)}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };

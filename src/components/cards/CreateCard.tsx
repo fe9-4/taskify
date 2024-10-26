@@ -51,7 +51,7 @@ const CreateCard = () => {
     resolver: zodResolver(CardSchema),
     mode: "onChange",
     defaultValues: {
-      assigneeUserId: Number(user?.id) || 4672,
+      assigneeUserId: 0,
       dashboardId: Number(params.dashboardId) || 12046,
       columnId: Number(params.columnId) || 40754,
       title: "",
@@ -61,6 +61,12 @@ const CreateCard = () => {
       imageUrl: null,
     },
   });
+
+  useEffect(() => {
+    if (user?.id) {
+      setValue("assigneeUserId", Number(user.id));
+    }
+  }, [user, setValue]);
 
   const currentColumnId = watch("columnId");
   const {
