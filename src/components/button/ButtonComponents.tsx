@@ -132,7 +132,7 @@ export const ConfirmBtn = ({
   return (
     <BaseBtn
       disabled={disabled}
-      extra={cls("size-full", disabled ? "cursor-not-allowed bg-gray02" : "bg-violet01")}
+      extra={cls("size-full", disabled ? "cursor-not-allowed" : "")}
       onClick={onClick}
       props={props}
     >
