@@ -28,7 +28,7 @@ interface UpdateCardProps {
   imageUrl: string | File | null;
 }
 
-const TestCard2 = () => {
+const UpdateCard = () => {
   const [selectedValue, setSelectedValue] = useState("");
   const [currentValue, setCurrentValue] = useState("");
   const [inviteMember, setInviteMember] = useState([]);
@@ -253,4 +253,4 @@ const TestCard2 = () => {
   );
 };
 
-export default TestCard2;
+export default UpdateCard;
