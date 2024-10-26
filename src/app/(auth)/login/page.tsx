@@ -43,7 +43,7 @@ const LoginPage = () => {
         reset();
         toast.success("로그인에 성공했습니다.");
       } else {
-        toast.error(result.message);
+        toast.error(result.message || "로그인에 실패했습니다.");
       }
     } catch (error) {
       console.error("로그인 오류:", error);

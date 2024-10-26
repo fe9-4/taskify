@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Logo } from "./Logo";
 import { UserMenu } from "./UserMenu";
@@ -9,34 +9,28 @@ import { useAuth } from "@/hooks/useAuth";
 
 export default function Header() {
   const pathname = usePathname();
-  const router = useRouter();
-  const { user, fetchUser } = useAuth();
-  const [isLoading, setIsLoading] = useState(true);
+  const { user, refetchUser, isUserFetched, isInitialLoading } = useAuth();
+  const [isHomePage, setIsHomePage] = useState(pathname === "/");
 
   useEffect(() => {
-    const checkAuthStatus = async () => {
-      try {
-        await fetchUser();
-        if (user && pathname === "/") {
-          router.push("/mydashboard");
-        } else if (!user && pathname === "/") {
-          router.push("/");
-        }
-      } catch (error) {
-        console.error("Failed to fetch user:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    setIsHomePage(pathname === "/");
+  }, [pathname]);
 
-    checkAuthStatus();
-  }, [user, fetchUser, pathname, router]);
+  useEffect(() => {
+    if (!isUserFetched && pathname !== "/login" && pathname !== "/signup") {
+      refetchUser();
+    }
+  }, [isUserFetched, pathname, refetchUser]);
 
-  if (isLoading || pathname === "/login" || pathname === "/signup") {
+  if (pathname === "/login" || pathname === "/signup") {
     return null;
   }
 
-  const isHomePage = pathname === "/";
+  const showHeader = isHomePage || (!isInitialLoading && user);
+
+  if (!showHeader) {
+    return null;
+  }
 
   return (
     <header
@@ -46,7 +40,7 @@ export default function Header() {
     >
       <nav className="flex h-full items-center justify-between">
         <div className="w-[67px] md:w-[160px] xl:w-[300px]">{isHomePage && <Logo isHomePage={isHomePage} />}</div>
-        {!isHomePage && (
+        {!isHomePage && user && (
           <div className="flex flex-grow items-center">
             <DashboardMemberDisplay />
           </div>
