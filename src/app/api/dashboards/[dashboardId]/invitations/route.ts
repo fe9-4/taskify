@@ -24,7 +24,7 @@ export const GET = async (request: NextRequest, { params }: { params: IParams })
   }
 
   try {
-    const response = await apiClient.get(`dashboards/${dashboardId}/invitations?page=${page}&size=${size}`, {
+    const response = await apiClient.get(`/dashboards/${dashboardId}/invitations?page=${page}&size=${size}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
