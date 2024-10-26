@@ -40,6 +40,7 @@ const EditPage = () => {
       try {
         const res = await axios.get(`/api/dashboards/${dashboardId}`);
         const data = res.data;
+        console.log(dashboardId);
         setDashboardInfo(data.user);
         console.log(data);
       } catch (err) {
