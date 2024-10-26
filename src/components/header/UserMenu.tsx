@@ -8,7 +8,7 @@ interface UserMenuProps {
   isHomePage: boolean;
 }
 
-export const UserMenu: React.FC<UserMenuProps> = ({ isHomePage }) => {
+export const UserMenu = ({ isHomePage }: UserMenuProps) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedDashboardId] = useState<number>(0);
   const dropdownRef = useRef<HTMLDivElement>(null);

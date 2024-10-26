@@ -5,7 +5,7 @@ import { useDashboardList } from "@/hooks/useDashboardList";
 import { Dashboard } from "@/zodSchema/dashboardSchema";
 import toast from "react-hot-toast";
 
-export const DashboardMemberDisplay: React.FC = () => {
+export const DashboardMemberDisplay = () => {
   const { data: dashboardList, isLoading, error } = useDashboardList({ page: 1, size: 10 });
   const [selectedDashboard, setSelectedDashboard] = useState<Dashboard | null>(null);
 

@@ -6,7 +6,7 @@ interface LogoProps {
   isHomePage: boolean;
 }
 
-export const Logo: React.FC<LogoProps> = ({ isHomePage }) => {
+export const Logo = ({ isHomePage }: LogoProps) => {
   const { isLargeScreen } = useWidth();
 
   if (!isHomePage) return null;

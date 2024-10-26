@@ -16,7 +16,7 @@ const pastelColors = [
   "bg-teal-200",
 ];
 
-export const MemberInitials: React.FC<MemberInitialsProps> = ({ dashboardId }) => {
+export const MemberInitials = ({ dashboardId }: MemberInitialsProps) => {
   const { members, isLoading, error } = useDashboardMember({ dashboardId, page: 1, size: 10 });
 
   if (isLoading) return <div>로딩 중...</div>;
