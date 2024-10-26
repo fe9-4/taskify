@@ -8,6 +8,7 @@ import { useParams } from "next/navigation";
 import axios, { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { NextResponse } from "next/server";
 
 interface DashboardInfoType {
   id: number;
@@ -35,12 +36,11 @@ const EditPage = () => {
   "createdByMe": true
 }
   */
+  let res: any;
   const fetchDashboardInfo = async () => {
     try {
-      const res = await axios.get(`/api/dashboards?dashboardId=${dashboardId}`);
-      const data = res.data;
-      console.log(res);
-      console.log(res.data);
+      res = await axios.get(`/api/dashboards/${dashboardId}?dashboardId=${dashboardId}`);
+      const data = res;
       setDashboardInfo(data);
     } catch (err) {
       const error = err as AxiosError;
@@ -50,6 +50,7 @@ const EditPage = () => {
 
   useEffect(() => {
     fetchDashboardInfo();
+    console.log(res);
   }, [user]);
 
   return (
