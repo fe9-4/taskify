@@ -37,11 +37,11 @@ const EditPage = () => {
   */
   const fetchDashboardInfo = async () => {
     try {
-      const res = await axios.get(`/api/dashboards/dashboardId=${dashboardId}`);
+      const res = await axios.get(`/api/dashboards?dashboardId=${dashboardId}`);
       const data = res.data;
-      console.log(dashboardId);
-      setDashboardInfo(data.user);
-      console.log(data);
+      console.log(res);
+      console.log(res.data);
+      setDashboardInfo(data);
     } catch (err) {
       const error = err as AxiosError;
       console.error(error.message);

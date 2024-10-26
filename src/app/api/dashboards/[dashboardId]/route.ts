@@ -19,7 +19,7 @@ export const GET = async (req: Request) => {
     return new NextResponse("사용자 정보를 찾을 수 없습니다.", { status: 401 });
   }
 
-  if (!dashboardId) {
+  if (!id) {
     return new NextResponse("대시보드 정보 가져오기 실패", { status: 400 });
   }
 
