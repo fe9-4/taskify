@@ -21,7 +21,7 @@ interface DashboardInfoType {
 }
 const EditPage = () => {
   const { dashboardId } = useParams();
-  const [dashboardInfo, setDashboardInfo] = useState<DashboardInfoType>();
+  const [dashboardInfo, setDashboardInfo] = useState<DashboardInfoType | null>(null);
   const { user } = useAuth();
 
   // 대시보드 정보 가져오기 (이름, 구성원?, 초대 내역?)
@@ -36,12 +36,10 @@ const EditPage = () => {
   "createdByMe": true
 }
   */
-  let res: any;
   const fetchDashboardInfo = async () => {
     try {
-      res = await axios.get(`/api/dashboards/${dashboardId}?dashboardId=${dashboardId}`);
-      const data = res;
-      setDashboardInfo(data);
+      const res = await axios.get(`/api/dashboards/${dashboardId}?dashboardId=${dashboardId}`);
+      setDashboardInfo(res.data);
     } catch (err) {
       const error = err as AxiosError;
       console.error(error.message);
@@ -50,7 +48,6 @@ const EditPage = () => {
 
   useEffect(() => {
     fetchDashboardInfo();
-    console.log(res);
   }, [user]);
 
   return (
