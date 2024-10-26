@@ -8,13 +8,6 @@ export const useDashboardList = ({ cursorId, page, size }: DashboardForm) => {
     queryKey: ["dashboardList", cursorId, page, size],
     // 대시보드 목록을 가져오는 비동기 함수
     queryFn: async () => {
-<<<<<<< HEAD
-      const response = await axios.get("/api/dashboards/list");
-      // 응답 데이터를 UserDashboardSchema를 사용하여 검증 및 파싱
-      const parsedData = UserDashboardSchema.parse(response.data).user;
-
-      return parsedData;
-=======
       const response = await axios.get("/api/dashboards", {
         params: { cursorId, page, size },
       });
@@ -22,7 +15,6 @@ export const useDashboardList = ({ cursorId, page, size }: DashboardForm) => {
       const data = DashboardListSchema.parse(response.data);
       //console.log(data);
       return data;
->>>>>>> develop
     },
     staleTime: 1000 * 60 * 5, // 5분 동안 캐시 유효
   });

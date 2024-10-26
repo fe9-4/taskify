@@ -2,11 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
 import apiClient from "../apiClient";
 import { cookies } from "next/headers";
-<<<<<<< HEAD
-import { creatDashboard } from "@/types/dashboardType";
-=======
 import { CreateDashboard } from "@/types/dashboardType";
->>>>>>> develop
 
 // 내 대시보드 상단 대시보드 목록 조회 (cursorId 포함)
 export const GET = async (req: NextRequest) => {
@@ -22,28 +18,6 @@ export const GET = async (req: NextRequest) => {
     return NextResponse.json({ error: "사용자 정보를 찾을 수 없습니다." }, { status: 401 });
   }
 
-<<<<<<< HEAD
-  if (!page || !cursorId || !size) {
-    return new NextResponse("대시보드 조회 요청값을 확인해주세요.", { status: 400 });
-  }
-
-  try {
-    const response = await apiClient.get(
-      `/dashboards?navigationMethod=pagination&cursorId=${cursorId}&page=${page}&size=${size}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    if (response.status === 200) {
-      const dashboards = response.data.dashboards;
-      const totalCount = response.data.totalCount;
-      const cursorId = response.data.cursorId;
-
-      return NextResponse.json({ dashboards, totalCount, cursorId }, { status: 200 });
-=======
   try {
     let url = `/dashboards?navigationMethod=pagination&page=${page}&size=${size}`;
     if (cursorId) {
@@ -58,7 +32,6 @@ export const GET = async (req: NextRequest) => {
 
     if (response.status === 200) {
       return NextResponse.json(response.data, { status: 200 });
->>>>>>> develop
     }
   } catch (error) {
     if (axios.isAxiosError(error)) {
