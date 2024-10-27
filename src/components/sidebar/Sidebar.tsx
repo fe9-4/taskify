@@ -9,15 +9,18 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useWidth } from "@/hooks/useWidth";
 import axios, { AxiosError } from "axios";
+import { useDashboardList } from "@/hooks/useDashboardList";
+import { Dashboard } from "@/zodSchema/dashboardSchema";
 
 const Sidebar = () => {
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(10);
   const [totalCount, setTotalCount] = useState<number>(0);
-  const [dashboardList, setDashboardList] = useState<ItemType[]>([]);
+  const [dashboardList, setDashboardList] = useState<Dashboard[]>([]);
   const { user } = useAuth();
   const pathname = usePathname();
   const { isLargeScreen } = useWidth();
+  const { data } = useDashboardList({ cursorId: 1, page, size });
 
   useEffect(() => {
     if (isLargeScreen) {
@@ -27,32 +30,15 @@ const Sidebar = () => {
     }
   }, [isLargeScreen]);
 
-  const totalPage: number = Math.ceil(totalCount / size);
-
-  const fetchDashboardList = async (page: number, size: number) => {
-    if (user) {
-      try {
-        const res = await axios.get("/api/dashboards", {
-          params: {
-            page,
-            cursorId: 1,
-            size,
-          },
-        });
-        const data = res.data;
-        setDashboardList(data.dashboards);
-        setTotalCount(data.totalCount);
-      } catch (err) {
-        const error = err as AxiosError;
-        console.error(error.message);
-      }
-    }
-  }; // 라우트 통일해서 다시 데이터 불러오기
-
   useEffect(() => {
-    fetchDashboardList(page, size);
+    if (data) {
+      setDashboardList(data.dashboards);
+      setTotalCount(data.totalCount);
+      console.log(data);
+    }
   }, [user, page, size]);
 
+  const totalPage: number = Math.ceil(totalCount / size);
   const isFirst = page === 1;
   const isLast = page === totalPage;
   const onClickPrev = () => {
