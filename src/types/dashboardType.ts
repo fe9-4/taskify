@@ -14,7 +14,7 @@ interface IAssignee {
   profileImageUrl: string | null;
   id: number;
 }
-interface Iitem {
+export interface Iitem {
   id: number;
   title: string;
   description: string;
@@ -29,7 +29,7 @@ interface Iitem {
 }
 
 export interface ICard {
-  cards: Iitem;
+  cards: Iitem[];
   totalCount?: number;
   cursorId?: number | null;
 }

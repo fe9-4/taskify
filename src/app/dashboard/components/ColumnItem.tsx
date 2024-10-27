@@ -1,9 +1,13 @@
 import { HiOutlineCalendar } from "react-icons/hi";
 import Image from "next/image";
 import TagChip from "@/components/chip/TagChip";
-import { ICard } from "@/types/dashboardType";
+import { Iitem } from "@/types/dashboardType";
 
-const ColumnItem = ({ cards }: ICard) => {
+interface IProps {
+  cards: Iitem;
+}
+
+const ColumnItem = ({ cards }: IProps) => {
   return (
     <button className="border-b pb-6 md:border-0 md:pb-0 w-full">
       <div className="mt-4 flex flex-col space-y-2 rounded-md border border-gray03 bg-white p-3 md:flex-row md:items-center md:space-x-2 md:space-y-0 md:px-4 xl:flex-col xl:space-x-0 xl:space-y-[6px]">
