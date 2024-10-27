@@ -5,20 +5,14 @@ import { useRouter } from "next/navigation";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { Login } from "@/zodSchema/authSchema";
 import { User } from "@/zodSchema/commonSchema";
-
-// 사용자 상태를 위한 atom 생성
-const userAtom = atom<User | null>(null);
+import { userAtom } from "@/store/userAtoms";
 
 export const useAuth = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [user, setUser] = useAtom(userAtom);
 
-  const {
-    error: userError,
-    isLoading: isUserLoading,
-    isFetched: isUserFetched,
-  } = useQuery({
+  const { isLoading: isUserLoading, isFetched: isUserFetched } = useQuery({
     queryKey: ["user"],
     queryFn: async () => {
       const response = await axios.get("/api/users/me");
