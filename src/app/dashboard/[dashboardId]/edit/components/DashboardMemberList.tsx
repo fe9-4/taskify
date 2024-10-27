@@ -1,87 +1,31 @@
-"use client";
-
+import { useDashboardMember } from "@/hooks/useDashboardMember";
+import { MemberList } from "@/zodSchema/memberSchema";
 import { useEffect, useState } from "react";
-import SectionTitle from "./SectionTitle";
-import { useAuth } from "@/hooks/useAuth";
-import axios, { AxiosError } from "axios";
-import DashboardMemberItem from "./DashboardMemberItem";
-import { usePathname } from "next/navigation";
-import InvitationsItemType from "@/types/invitationType";
+import MemberItem from "./MemberItem";
 
-const DashboardMemberList = ({ sectionTitle }: { sectionTitle: string }) => {
-  // 이미 초대되어있는 멤버 = 구성원
-  // 초대 진행중인 멤버 = 초대 내역
+const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
   const [page, setPage] = useState(1);
-  const [size, setSize] = useState(5);
-  const [totalCount, setTotalCount] = useState<number>(0);
-  const [invitatingMemberList, setInvitatingMemberList] = useState<InvitationsItemType[]>([]);
+  const size = 5;
+  const { members, isLoading, error, refetch } = useDashboardMember({ dashboardId, page, size });
+  const [memberList, setMemberList] = useState<MemberList>({ members: [], totalCount: 0 });
 
-  const { user } = useAuth();
-  const pathname = usePathname();
-
-  const dashboardId = pathname
-    .split("/")
-    .filter((segment) => !isNaN(Number(segment)))
-    .join("");
-
-  /*
-{
-  "invitations": [
-    {
-      "id": 13452,
-      "inviter": {
-        "id": 4668,
-        "email": "yelim@fe.fe",
-        "nickname": "yelim"
-      },
-      "teamId": "9-4",
-      "dashboard": {
-        "id": 12067,
-        "title": "수정테스트"
-      },
-      "invitee": {
-        "id": 4701,
-        "email": "cccwon5@naver.com",
-        "nickname": "슈퍼펭귄스"
-      },
-      "inviteAccepted": null,
-      "createdAt": "2024-10-26T08:59:15.950Z",
-      "updatedAt": "2024-10-26T08:59:15.950Z"
-    }
-  ],
-  "totalCount": 1
-}
-*/
-
-  const fetchDashboardInvitationList = async () => {
-    if (user) {
-      try {
-        const res = await axios.get(`/api/dashboards/${dashboardId}/invitations`);
-        const data = res.data;
-        setInvitatingMemberList(data.user ? data.user.invitations : []);
-        setTotalCount(data.user.totalCount);
-      } catch (err) {
-        if (axios.isAxiosError(err)) {
-          console.error(err.message);
-        } else {
-          console.error("An unexpected error occurred", err);
-        }
-      }
-    }
-  };
   useEffect(() => {
-    // fetchDashboardInvitationList();
-  }, [user, page, size, dashboardId]);
+    if (members) setMemberList(members);
+    console.log(members);
+  }, []);
 
   return (
-    <section className="w-full rounded-2xl bg-white px-4 py-5 md:px-7 md:py-8">
-      <SectionTitle sectionTitle={sectionTitle} />
-      {/* <div>
-        {invitatingMemberList.length > 0 &&
-          invitatingMemberList.map((item) => <DashboardMemberItem key={item.id} item={item} />)}
-      </div> */}
-    </section>
+    <div>
+      {memberList.members.length ? (
+        <div>
+          {memberList.members.map((member) => (
+            <MemberItem key={member.id} member={member} />
+          ))}
+        </div>
+      ) : (
+        <div>아직 초대된 멤버가 없습니다</div>
+      )}
+    </div>
   );
 };
-
 export default DashboardMemberList;

@@ -1,7 +1,8 @@
 "use client";
 
 import { DeleteCancelBtn } from "@/components/button/ButtonComponents";
-import InvitationsItemType from "@/types/invitationType";
+import { Member } from "@/zodSchema/memberSchema";
+import Image from "next/image";
 /*
 {
   "invitations": [
@@ -30,36 +31,24 @@ import InvitationsItemType from "@/types/invitationType";
   "totalCount": 1
 }
 */
-const DashboardMemberItem = ({ item }: { item: InvitationsItemType }) => {
+const MemberItem = ({ member }: { member: Member }) => {
+  const { nickname, profileImageUrl } = member;
+
   const onClickDeleteMember = () => {
-    // 구성원 삭제하기
+    // 구성원 삭제하기 api
   };
-  const onClickCancerInvitation = () => {
-    // 초대 취소하기
-  };
-  const { invitee, inviteAccepted } = item;
-  const { email, nickname } = invitee;
 
   return (
     <div className="w-full border-b border-gray04 px-5 md:px-7">
       <div className="flex items-center justify-between">
-        {inviteAccepted ? (
-          //프로필이미지 + 이름
-          <div>
-            <div className="rounded-full">{email.split("")[0]}</div>
-            <div>{nickname}</div>
-            <DeleteCancelBtn onClick={onClickDeleteMember}>삭제</DeleteCancelBtn>
-          </div>
-        ) : (
-          // 이메일
-          <div>
-            <div>{email}</div>
-            <DeleteCancelBtn onClick={onClickCancerInvitation}>취소</DeleteCancelBtn>
-          </div>
+        {profileImageUrl && (
+          <Image src={profileImageUrl} width={30} height={30} alt="프로필" className="rounded-full" />
         )}
+        <div>{nickname}</div>
+        <DeleteCancelBtn onClick={onClickDeleteMember}>삭제</DeleteCancelBtn>
       </div>
     </div>
   );
 };
 
-export default DashboardMemberItem;
+export default MemberItem;

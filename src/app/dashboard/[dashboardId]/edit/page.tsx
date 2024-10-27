@@ -1,6 +1,6 @@
 "use client";
 import { DeleteDashboardBtn } from "@/components/button/ButtonComponents";
-import DashboardMemberList from "@/app/dashboard/[dashboardId]/edit/components/DashboardMemberList";
+import EditSection from "@/app/dashboard/[dashboardId]/edit/components/EditSection";
 import EditDashboard from "@/app/dashboard/[dashboardId]/edit/components/EditDashboard";
 import Link from "next/link";
 import { IoIosArrowBack } from "react-icons/io";
@@ -8,7 +8,6 @@ import { useParams } from "next/navigation";
 import axios, { AxiosError } from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { NextResponse } from "next/server";
 import { DashboardInfoType, ValueType } from "@/types/dashboardType";
 
 const EditPage = () => {
@@ -55,8 +54,8 @@ const EditPage = () => {
       </div>
       <div className="flex w-[620px] flex-col gap-4">
         <EditDashboard dashboardInfo={dashboardInfo} onClickEdit={onClickEdit} />
-        <DashboardMemberList sectionTitle="구성원" />
-        <DashboardMemberList sectionTitle="초대 내역" />
+        <EditSection sectionTitle="구성원" />
+        <EditSection sectionTitle="초대 내역" />
       </div>
       <div className="mt-6">
         <DeleteDashboardBtn />

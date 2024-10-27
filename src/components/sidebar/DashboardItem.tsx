@@ -21,7 +21,6 @@ const DashboardItem = ({ item }: { item: any }) => {
         "flex h-10 w-10 items-center justify-center rounded-[4px] md:w-full md:py-2 md:pl-[10px] md:pr-0 xl:p-3",
         isSelected ? "bg-violet02" : ""
       )}
-      onClick={() => console.log(pathname, isSelected)}
     >
       <div className="flex w-full justify-center md:w-full md:items-center md:justify-start md:gap-4">
         <FaCircle fill={color} width={8} height={8} className="size-2 flex-shrink-0" />

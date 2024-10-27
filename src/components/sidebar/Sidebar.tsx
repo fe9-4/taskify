@@ -4,11 +4,9 @@ import Button from "./Button";
 import DashboardList from "./DashboardList";
 import Logo from "./Logo";
 import { PaginationBtn } from "../button/ButtonComponents";
-import { ItemType } from "@/types/dashboardType";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useWidth } from "@/hooks/useWidth";
-import axios, { AxiosError } from "axios";
 import { useDashboardList } from "@/hooks/useDashboardList";
 import { Dashboard } from "@/zodSchema/dashboardSchema";
 
@@ -34,7 +32,6 @@ const Sidebar = () => {
     if (data) {
       setDashboardList(data.dashboards);
       setTotalCount(data.totalCount);
-      console.log(data);
     }
   }, [user, page, size]);
 
