@@ -1,6 +1,6 @@
 import toast from "react-hot-toast";
 import { PaginationBtn } from "@/components/button/ButtonComponents";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 interface IProps {
   totalPage: number;
@@ -11,6 +11,11 @@ interface IProps {
 const Pagination = ({ totalPage, setPage, page }: IProps) => {
   const [isDisabledNext, setIsDisabledNext] = useState(false);
   const [isDisabledPrev, setIsDisabledPrev] = useState(false);
+
+  useEffect(() => {
+    setIsDisabledPrev(page === 1);
+    setIsDisabledNext(page === totalPage);
+  }, [page, totalPage]);
 
   const handlePageNext = () => {
     const nextPage = page + 1;

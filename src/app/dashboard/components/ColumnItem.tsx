@@ -17,7 +17,7 @@ const ColumnItem = ({ cards }: IProps) => {
             alt="카드 이미지1"
             width={260}
             height={150}
-            className="w-full object-cover md:h-[53px] md:w-[90px] xl:h-40 xl:w-full"
+            className="w-full object-cover md:h-[53px] md:w-[90px] xl:h-40 xl:w-full rounded-md"
             priority={true}
           />
         ) : null}
@@ -36,7 +36,7 @@ const ColumnItem = ({ cards }: IProps) => {
                   <span className="text-xs font-medium text-gray01">{cards.dueDate}</span>
                 </div>
                 <span className="flex size-[22px] items-center justify-center rounded-full bg-[#A3C4A2] text-[10px] font-semibold text-white md:size-6 md:text-xs">
-                  {cards.assignee.nickname}
+                  {cards.assignee.nickname.charAt(0)}
                 </span>
               </div>
             </div>
