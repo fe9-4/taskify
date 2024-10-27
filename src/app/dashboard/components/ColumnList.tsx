@@ -22,7 +22,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [, setIsCreateCardOpen] = useAtom(CreateCardAtom);
   const observeRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
-  
+
   const getCardList = async () => {
     if (!hasMore) return;
 
@@ -73,7 +73,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
 
   const handleEditModal = () => {
     // 모달 만들어지면 모달 연결
-  }
+  };
 
   return (
     <div className="space-y-6 px-4 pt-4 md:border-b md:border-gray04 md:pb-6 xl:flex xl:min-h-screen xl:flex-col xl:border-b-0 xl:border-r">
