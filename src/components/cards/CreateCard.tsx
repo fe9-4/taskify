@@ -1,4 +1,5 @@
 "use client";
+
 import { z } from "zod";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,19 +18,14 @@ import InputTag from "@/components/input/InputTag";
 import InputFile from "@/components/input/InputFile";
 import { useParams } from "next/navigation";
 import { uploadType } from "@/types/uploadType";
+import { CardForm, CardFormSchema, CardResponseSchema } from "@/zodSchema/cardSchema";
 
-const CardSchema = z.object({
-  assigneeUserId: z.number(),
-  dashboardId: z.number(),
-  columnId: z.number(),
-  title: z.string().min(1, "제목은 필수입니다"),
-  description: z.string().min(1, "설명은 필수입니다"),
-  dueDate: z.string(),
-  tags: z.array(z.string()),
-  imageUrl: z.string().nullable(),
-});
+interface CreateCardProps {
+  closePopup: () => void;
+  onCardCreated: (cardId: number) => void;
+}
 
-const CreateCard = () => {
+export default function CreateCard({ closePopup, onCardCreated }: CreateCardProps) {
   const params = useParams();
   const { user } = useAuth();
   const [inviteMember, setInviteMember] = useState([]);
@@ -47,8 +43,8 @@ const CreateCard = () => {
     watch,
     trigger,
     formState: { errors, isValid },
-  } = useForm<CardProps>({
-    resolver: zodResolver(CardSchema),
+  } = useForm<CardForm>({
+    resolver: zodResolver(CardFormSchema),
     mode: "onChange",
     defaultValues: {
       assigneeUserId: 0,
@@ -121,9 +117,13 @@ const CreateCard = () => {
         },
       });
 
-      if (response.data) {
+      const validatedResponse = CardResponseSchema.parse(response.data);
+
+      if (validatedResponse) {
         toast.success("카드가 생성되었습니다! 🎉");
         setIsCardChanged(false);
+        onCardCreated(response.data.id);
+        closePopup();
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -134,7 +134,6 @@ const CreateCard = () => {
     }
   };
 
-  // 태그 추가 함수
   const handleAddTag = (tag: string) => {
     if (tagInput.trim() && !watch("tags").includes(tag)) {
       setValue("tags", [...watch("tags"), tag]);
@@ -153,7 +152,6 @@ const CreateCard = () => {
     setTagInput(e.target.value);
   };
 
-  // 태그 삭제 함수
   const handleTagClick = useCallback(
     (tagRemove: string) => {
       setValue(
@@ -165,27 +163,27 @@ const CreateCard = () => {
   );
 
   return (
-    <section className="rounded-2xl bg-white p-8">
-      <h3 className="mb-5 text-2xl font-bold text-black03 md:mb-6 md:text-3xl">할 일 생성</h3>
+    <section className="mx-auto max-w-2xl rounded-2xl bg-background p-6 shadow-lg md:p-8">
+      <h3 className="mb-6 text-2xl font-bold text-foreground md:mb-8 md:text-3xl">할 일 생성</h3>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="grid gap-8">
-        <div className="flex flex-col gap-2">
-          <label htmlFor="assignee" className="text-lg font-medium text-black03">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 md:space-y-8">
+        <div className="space-y-2">
+          <label htmlFor="assignee" className="text-lg font-medium text-foreground">
             담당자
           </label>
           <SearchDropdown inviteMemberList={inviteMember} setManager={setManager} />
         </div>
 
-        <div className="flex flex-col gap-2">
-          <label htmlFor="assignee" className="text-lg font-medium text-black03">
-            제목 <span className="text-violet01">*</span>
+        <div className="space-y-2">
+          <label htmlFor="title" className="text-lg font-medium text-foreground">
+            제목 <span className="text-primary">*</span>
           </label>
           <InputItem id="title" {...register("title")} errors={errors.title && errors.title.message} />
         </div>
 
-        <div className="flex flex-col gap-2">
-          <label htmlFor="assignee" className="text-lg font-medium text-black03">
-            설명 <span className="text-violet01">*</span>
+        <div className="space-y-2">
+          <label htmlFor="description" className="text-lg font-medium text-foreground">
+            설명 <span className="text-primary">*</span>
           </label>
           <InputItem
             id="description"
@@ -212,12 +210,12 @@ const CreateCard = () => {
               name="dueDate"
               value={field.value}
               onChange={(date) => {
-                // date가 null일 경우 빈 문자열로 처리
                 const formattedDate = date ? formatDateTime(date) : "";
                 field.onChange(formattedDate);
                 setValue("dueDate", formattedDate);
               }}
               placeholder="날짜를 입력해 주세요"
+              width="w-[287px] md:w-[472px]"
             />
           )}
         />
@@ -239,11 +237,11 @@ const CreateCard = () => {
           size="todo"
         />
 
-        {isFileLoading && <p>이미지 업로드 중...</p>}
-        {fileError && <p className="text-error">{fileError}</p>}
+        {isFileLoading && <p className="text-muted-foreground text-sm">이미지 업로드 중...</p>}
+        {fileError && <p className="text-destructive text-sm">{fileError}</p>}
 
-        <div className="flex h-[42px] gap-3 md:h-[54px] md:gap-2">
-          <CancelBtn type="button" onClick={() => ""}>
+        <div className="flex gap-3 md:gap-4">
+          <CancelBtn type="button" onClick={closePopup}>
             취소
           </CancelBtn>
           <ConfirmBtn type="submit" disabled={!isValid || !isCardChanged} onClick={handleSubmit(onSubmit)}>
@@ -253,6 +251,4 @@ const CreateCard = () => {
       </form>
     </section>
   );
-};
-
-export default CreateCard;
+}

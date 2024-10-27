@@ -1,5 +1,5 @@
 "use client";
-import { z } from "zod";
+
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useEffect, ChangeEvent, useCallback } from "react";
@@ -18,24 +18,20 @@ import InputTag from "@/components/input/InputTag";
 import InputFile from "@/components/input/InputFile";
 import { useParams } from "next/navigation";
 import { uploadType } from "@/types/uploadType";
+import { CardForm, CardFormSchema, CardResponseSchema } from "@/zodSchema/cardSchema";
 
-const CardSchema = z.object({
-  assigneeUserId: z.number(),
-  columnId: z.number(),
-  title: z.string().min(1, "제목은 필수입니다"),
-  description: z.string().min(1, "설명은 필수입니다"),
-  dueDate: z.string(),
-  tags: z.array(z.string()),
-  imageUrl: z.string().nullable(),
-});
+interface UpdateCardProps {
+  closePopup: () => void;
+  cardId: number;
+}
 
-const UpdateCard = () => {
+export default function UpdateCard({ closePopup, cardId }: UpdateCardProps) {
   const [selectedValue, setSelectedValue] = useState("");
   const [currentValue, setCurrentValue] = useState("");
   const [inviteMember, setInviteMember] = useState([]);
   const [manager, setManager] = useState("");
   const { user } = useAuth();
-  const { cardId, columnId } = useParams();
+  const { columnId } = useParams();
   const [updateCard, setUpdateCard] = useState<CardProps | null>(null);
   const [tagInput, setTagInput] = useState("");
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -51,8 +47,8 @@ const UpdateCard = () => {
     trigger,
     reset,
     formState: { errors, isValid },
-  } = useForm<CardProps>({
-    resolver: zodResolver(CardSchema),
+  } = useForm<CardForm>({
+    resolver: zodResolver(CardFormSchema),
     mode: "onChange",
   });
 
@@ -110,7 +106,7 @@ const UpdateCard = () => {
     setIsCardChanged(true);
   };
 
-  const onSubmit: SubmitHandler<CardProps> = async (data) => {
+  const onSubmit: SubmitHandler<CardForm> = async (data) => {
     try {
       let imageUrl = data.imageUrl;
       if (fileToUpload) {
@@ -124,11 +120,12 @@ const UpdateCard = () => {
       };
 
       const response = await axios.put(`/api/cards/${cardId}`, jsonData);
-      setUpdateCard(response.data);
+      const validatedResponse = CardResponseSchema.parse(response.data);
 
-      if (response.data) {
+      if (validatedResponse) {
         toast.success("카드가 수정되었습니다! 🎉");
         setIsCardChanged(false);
+        closePopup();
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -168,35 +165,35 @@ const UpdateCard = () => {
   );
 
   return (
-    <section className="rounded-2xl bg-white p-8">
-      <h3 className="mb-5 text-2xl font-bold text-black03 md:mb-6 md:text-3xl">할 일 수정</h3>
+    <section className="mx-auto max-w-2xl rounded-2xl bg-background p-6 shadow-lg md:p-8">
+      <h3 className="mb-6 text-2xl font-bold text-foreground md:mb-8 md:text-3xl">할 일 수정</h3>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="grid gap-8">
-        <div className="grid gap-8 md:flex md:gap-7">
-          <div className="flex flex-col gap-2">
-            <label htmlFor="assignee" className="text-lg font-medium text-black03">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 md:space-y-8">
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2">
+            <label htmlFor="status" className="text-lg font-medium text-foreground">
               상태
             </label>
             <StatusDropdown setSelectedValue={setSelectedValue} currentValue={currentValue} />
           </div>
-          <div className="flex flex-col gap-2">
-            <label htmlFor="assignee" className="text-lg font-medium text-black03">
+          <div className="space-y-2">
+            <label htmlFor="assignee" className="text-lg font-medium text-foreground">
               담당자
             </label>
             <SearchDropdown inviteMemberList={inviteMember} setManager={setManager} {...register("assigneeUserId")} />
           </div>
         </div>
 
-        <div className="flex flex-col gap-2">
-          <label htmlFor="title" className="text-lg font-medium text-black03">
-            제목 <span className="text-violet01">*</span>
+        <div className="space-y-2">
+          <label htmlFor="title" className="text-lg font-medium text-foreground">
+            제목 <span className="text-primary">*</span>
           </label>
           <InputItem id="title" {...register("title")} errors={errors.title && errors.title.message} />
         </div>
 
-        <div className="flex flex-col gap-2">
-          <label htmlFor="description" className="text-lg font-medium text-black03">
-            설명 <span className="text-violet01">*</span>
+        <div className="space-y-2">
+          <label htmlFor="description" className="text-lg font-medium text-foreground">
+            설명 <span className="text-primary">*</span>
           </label>
           <InputItem
             id="description"
@@ -228,6 +225,7 @@ const UpdateCard = () => {
                 setValue("dueDate", formattedDate);
               }}
               placeholder="날짜를 입력해 주세요"
+              width="w-[287px] md:w-[472px]"
             />
           )}
         />
@@ -249,11 +247,11 @@ const UpdateCard = () => {
           size="todo"
         />
 
-        {isFileLoading && <p>이미지 업로드 중...</p>}
-        {fileError && <p className="text-error">{fileError}</p>}
+        {isFileLoading && <p className="text-muted-foreground text-sm">이미지 업로드 중...</p>}
+        {fileError && <p className="text-destructive text-sm">{fileError}</p>}
 
-        <div className="flex h-[42px] gap-3 md:h-[54px] md:gap-2">
-          <CancelBtn type="button" onClick={() => ""}>
+        <div className="flex gap-3 md:gap-4">
+          <CancelBtn type="button" onClick={closePopup}>
             취소
           </CancelBtn>
           <ConfirmBtn type="submit" disabled={!isValid || !isCardChanged} onClick={handleSubmit(onSubmit)}>
@@ -263,6 +261,4 @@ const UpdateCard = () => {
       </form>
     </section>
   );
-};
-
-export default UpdateCard;
+}
