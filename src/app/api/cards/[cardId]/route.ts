@@ -19,10 +19,6 @@ export const PUT = async (request: NextRequest, { params }: { params: { cardId: 
     const body = await request.json();
     const { assigneeUserId, columnId, title, description, dueDate, tags, imageUrl } = body;
 
-    // 태그를 JSON 문자열에서 배열로 변환
-    const parsedTags = JSON.parse(tags);
-    // const parsedTags = Array.isArray(tags) ? tags : JSON.parse(tags);
-
     // dueDate를 YYYY-MM-DD HH:MM 형식으로 변환
     const formattedDueDate = dueDate ? formatDateTime(new Date(dueDate)) : null;
 
@@ -33,7 +29,7 @@ export const PUT = async (request: NextRequest, { params }: { params: { cardId: 
       title,
       description,
       dueDate: formattedDueDate,
-      tags: parsedTags,
+      tags,
       imageUrl,
     };
 
