@@ -12,7 +12,6 @@ import { UpdateUserProfile, UpdateUserProfileSchema } from "@/zodSchema/userSche
 import InputFile from "@/components/input/InputFile";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { uploadType } from "@/types/uploadType";
-import Logo from "@/app/loading";
 
 const UpdateProfile = () => {
   const { user, updateUser } = useAuth();

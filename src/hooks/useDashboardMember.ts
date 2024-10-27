@@ -10,15 +10,23 @@ export const useDashboardMember = ({ dashboardId, page, size }: MemberForm) => {
       return { members: [], totalCount: 0 };
     }
 
-    const response = await axios.get("/api/members", {
-      params: {
-        dashboardId,
-        page,
-        size,
-      },
-    });
+    try {
+      const response = await axios.get("/api/members", {
+        params: {
+          dashboardId,
+          page,
+          size,
+        },
+      });
 
-    return MemberListSchema.parse(response.data);
+      return MemberListSchema.parse(response.data);
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 500) {
+        console.error("대시보드 멤버 목록을 불러오는 중 오류가 발생했습니다.");
+      }
+    }
+
+    return { members: [], totalCount: 0 };
   };
 
   // React Query를 사용하여 멤버 목록 데이터 관리

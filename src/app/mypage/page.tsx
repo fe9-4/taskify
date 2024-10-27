@@ -6,7 +6,7 @@ import UpdateProfile from "@/app/mypage/components/UpdateProfile";
 import ChangePassword from "@/app/mypage/components/ChangePassword";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import Loading from "@/app/loading";
+import { FaSpinner } from "react-icons/fa";
 
 const MyPage = () => {
   const { isInitialLoading } = useAuth();
@@ -17,7 +17,11 @@ const MyPage = () => {
   };
 
   if (isInitialLoading) {
-    return <Loading />;
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-gray05 bg-opacity-50">
+        <FaSpinner className="text-primary h-12 w-12 animate-spin" />
+      </div>
+    );
   }
 
   return (

@@ -27,10 +27,10 @@ const Sidebar = () => {
     }
   }, [isLargeScreen]);
 
-  const totalPage: number = Math.ceil(totalCount / size);
+  useEffect(() => {
+    if (!user || !user.id || pathname === "/") return;
 
-  const fetchDashboardList = async (page: number, size: number) => {
-    if (user) {
+    const fetchDashboardList = async (page: number, size: number) => {
       try {
         const res = await axios.get(`/api/dashboards?page=${page}&size=${size}`);
         const data = res.data;
@@ -40,13 +40,12 @@ const Sidebar = () => {
         const error = err as AxiosError;
         console.error(error.message);
       }
-    }
-  };
+    };
 
-  useEffect(() => {
     fetchDashboardList(page, size);
-  }, [user, page, size]);
+  }, [user, page, size, pathname]);
 
+  const totalPage: number = Math.ceil(totalCount / size);
   const isFirst = page === 1;
   const isLast = page === totalPage;
   const onClickPrev = () => {
