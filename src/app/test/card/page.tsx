@@ -45,7 +45,7 @@ export default function CardTest() {
       {isCreatePopupOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black02 bg-opacity-50">
           <div className="w-[327px] rounded-lg bg-gray05 p-6 md:w-[584px]">
-            <CreateCard closePopup={closeCreatePopup} onCardCreated={handleCardCreated} />
+            <CreateCard />
           </div>
         </div>
       )}
@@ -53,7 +53,7 @@ export default function CardTest() {
       {isUpdatePopupOpen && selectedCardId && (
         <div className="fixed inset-0 flex items-center justify-center bg-black02 bg-opacity-50">
           <div className="w-[327px] rounded-lg bg-gray05 p-6 md:w-[584px]">
-            <UpdateCard closePopup={closeUpdatePopup} cardId={selectedCardId} />
+            <UpdateCard cardId={selectedCardId} />
           </div>
         </div>
       )}

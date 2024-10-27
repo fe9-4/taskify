@@ -20,12 +20,7 @@ import { useParams } from "next/navigation";
 import { uploadType } from "@/types/uploadType";
 import { CardForm, CardFormSchema, CardResponseSchema } from "@/zodSchema/cardSchema";
 
-interface CreateCardProps {
-  closePopup: () => void;
-  onCardCreated: (cardId: number) => void;
-}
-
-export default function CreateCard({ closePopup, onCardCreated }: CreateCardProps) {
+export default function CreateCard() {
   const params = useParams();
   const { user } = useAuth();
   const [inviteMember, setInviteMember] = useState([]);
@@ -122,8 +117,6 @@ export default function CreateCard({ closePopup, onCardCreated }: CreateCardProp
       if (validatedResponse) {
         toast.success("카드가 생성되었습니다! 🎉");
         setIsCardChanged(false);
-        onCardCreated(response.data.id);
-        closePopup();
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -241,7 +234,7 @@ export default function CreateCard({ closePopup, onCardCreated }: CreateCardProp
         {fileError && <p className="text-destructive text-sm">{fileError}</p>}
 
         <div className="flex gap-3 md:gap-4">
-          <CancelBtn type="button" onClick={closePopup}>
+          <CancelBtn type="button" onClick={() => {}}>
             취소
           </CancelBtn>
           <ConfirmBtn type="submit" disabled={!isValid || !isCardChanged} onClick={handleSubmit(onSubmit)}>

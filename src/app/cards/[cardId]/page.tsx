@@ -1,7 +1,11 @@
-import UpdateCard from "@/components/cards/UpdateCard";
+"use client";
 
-const UpdateCardForm = async () => {
-  return <UpdateCard />;
+import UpdateCard from "@/components/cards/UpdateCard";
+import { useParams } from "next/navigation";
+
+const UpdateCardForm = () => {
+  const { cardId } = useParams();
+  return <UpdateCard cardId={Number(cardId)} />;
 };
 
 export default UpdateCardForm;

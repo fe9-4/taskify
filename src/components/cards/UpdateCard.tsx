@@ -20,12 +20,7 @@ import { useParams } from "next/navigation";
 import { uploadType } from "@/types/uploadType";
 import { CardForm, CardFormSchema, CardResponseSchema } from "@/zodSchema/cardSchema";
 
-interface UpdateCardProps {
-  closePopup: () => void;
-  cardId: number;
-}
-
-export default function UpdateCard({ closePopup, cardId }: UpdateCardProps) {
+export default function UpdateCard({ cardId }: { cardId: number }) {
   const [selectedValue, setSelectedValue] = useState("");
   const [currentValue, setCurrentValue] = useState("");
   const [inviteMember, setInviteMember] = useState([]);
@@ -125,7 +120,6 @@ export default function UpdateCard({ closePopup, cardId }: UpdateCardProps) {
       if (validatedResponse) {
         toast.success("카드가 수정되었습니다! 🎉");
         setIsCardChanged(false);
-        closePopup();
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -251,7 +245,7 @@ export default function UpdateCard({ closePopup, cardId }: UpdateCardProps) {
         {fileError && <p className="text-destructive text-sm">{fileError}</p>}
 
         <div className="flex gap-3 md:gap-4">
-          <CancelBtn type="button" onClick={closePopup}>
+          <CancelBtn type="button" onClick={() => {}}>
             취소
           </CancelBtn>
           <ConfirmBtn type="submit" disabled={!isValid || !isCardChanged} onClick={handleSubmit(onSubmit)}>
