@@ -1,3 +1,4 @@
+import { atom, useAtom } from "jotai";
 import { useCallback } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -5,12 +6,15 @@ import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { Login } from "@/zodSchema/authSchema";
 import { User } from "@/zodSchema/commonSchema";
 
+// 사용자 상태를 위한 atom 생성
+const userAtom = atom<User | null>(null);
+
 export const useAuth = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const [user, setUser] = useAtom(userAtom);
 
   const {
-    data: user,
     error: userError,
     isLoading: isUserLoading,
     isFetched: isUserFetched,
@@ -18,6 +22,7 @@ export const useAuth = () => {
     queryKey: ["user"],
     queryFn: async () => {
       const response = await axios.get("/api/users/me");
+      setUser(response.data.user);
       return response.data.user;
     },
     retry: 1,
@@ -31,6 +36,7 @@ export const useAuth = () => {
       return response.data.user;
     },
     onSuccess: (data) => {
+      setUser(data);
       queryClient.setQueryData(["user"], data);
       router.push("/mydashboard");
     },
@@ -59,6 +65,7 @@ export const useAuth = () => {
       await axios.post("/api/auth/logout", {});
     },
     onSuccess: () => {
+      setUser(null);
       queryClient.setQueryData(["user"], null);
       queryClient.clear();
       router.push("/login");
@@ -74,11 +81,12 @@ export const useAuth = () => {
 
   const updateUser = useCallback(
     (updatedUserData: Partial<User>) => {
+      setUser((oldUser) => (oldUser ? { ...oldUser, ...updatedUserData } : null));
       queryClient.setQueryData(["user"], (oldData: User | undefined) =>
         oldData ? { ...oldData, ...updatedUserData } : undefined
       );
     },
-    [queryClient]
+    [queryClient, setUser]
   );
 
   return {

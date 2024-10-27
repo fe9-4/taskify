@@ -12,6 +12,7 @@ import { UpdateUserProfile, UpdateUserProfileSchema } from "@/zodSchema/userSche
 import InputFile from "@/components/input/InputFile";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { uploadType } from "@/types/uploadType";
+import Logo from "@/app/loading";
 
 const UpdateProfile = () => {
   const { user, updateUser } = useAuth();
@@ -102,17 +103,17 @@ const UpdateProfile = () => {
       <div className="text-xl font-bold md:text-3xl">프로필</div>
       <div className="md:flex md:space-x-6">
         <div className="md:flex-1">
-          <div className="flex items-center justify-center md:justify-start">
+          <div className="flex items-center justify-start">
             <InputFile
               id="profile-image-input"
               label=""
               name="profileImage"
               value={previewImage || profileImageUrl}
               size="profile"
-              onChange={handleProfileImageChange} // InputFile의 변경 핸들러
+              onChange={handleProfileImageChange}
             />
           </div>
-          {isFileLoading && <div className="mt-2 flex justify-center">이미지 업로드 중...</div>}
+          {isFileLoading && <div>이미지 업로드 중...</div>}
           {fileError && <p className="text-error mt-2 text-center">{fileError}</p>}
         </div>
         <div className="mt-4 w-full md:mt-0 md:w-[276px] xl:w-[400px]">

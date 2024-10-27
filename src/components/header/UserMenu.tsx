@@ -2,7 +2,6 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
-import { useDashboardMember } from "@/hooks/useDashboardMember";
 
 interface UserMenuProps {
   isHomePage: boolean;
@@ -10,14 +9,12 @@ interface UserMenuProps {
 
 export const UserMenu = ({ isHomePage }: UserMenuProps) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [selectedDashboardId] = useState<number>(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { user, logout, isUserLoading } = useAuth();
-  const { members } = useDashboardMember({ dashboardId: selectedDashboardId, page: 1, size: 10 });
 
   const handleLogout = async () => {
     try {
-      await logout();
+      logout();
       setIsDropdownOpen(false);
     } catch (error) {
       console.error("로그아웃 오류:", error);
@@ -89,7 +86,15 @@ export const UserMenu = ({ isHomePage }: UserMenuProps) => {
         }`}
       >
         {user.profileImageUrl ? (
-          <Image src={user.profileImageUrl} alt="Profile" width={32} height={32} className="rounded-full" />
+          <div className="h-8 w-8 overflow-hidden rounded-full">
+            <Image
+              src={user.profileImageUrl}
+              alt="Profile"
+              width={32}
+              height={32}
+              className="h-full w-full object-cover"
+            />
+          </div>
         ) : (
           <div
             className={`flex h-8 w-8 items-center justify-center rounded-full ${
@@ -102,7 +107,7 @@ export const UserMenu = ({ isHomePage }: UserMenuProps) => {
         <span className="hidden md:inline">{user.nickname}</span>
       </button>
       {isDropdownOpen && (
-        <div className="absolute right-0 mt-2 w-64 rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
+        <div className="absolute right-0 mt-2 w-28 rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
           <Link
             href="/mypage"
             className="block px-4 py-2 text-base font-semibold text-gray01 hover:bg-violet-100"
@@ -110,24 +115,19 @@ export const UserMenu = ({ isHomePage }: UserMenuProps) => {
           >
             마이페이지
           </Link>
+          <Link
+            href="/mydashboard"
+            className="block px-4 py-2 text-base font-semibold text-gray01 hover:bg-violet-100"
+            onClick={closeDropdown}
+          >
+            내 대시보드
+          </Link>
           <button
             onClick={handleLogout}
             className="block w-full px-4 py-2 text-left text-base font-semibold text-gray01 hover:bg-violet-100"
           >
             로그아웃
           </button>
-        </div>
-      )}
-      {selectedDashboardId > 0 && members && (
-        <div className="absolute right-0 mt-2 flex -space-x-2 overflow-hidden">
-          {members.members.slice(0, 5).map((member, index) => (
-            <div
-              key={member.id}
-              className={`relative z-${30 - index} flex h-8 w-8 items-center justify-center rounded-full bg-violet01 text-white ring-2 ring-white`}
-            >
-              {getInitials(member.nickname)}
-            </div>
-          ))}
         </div>
       )}
     </div>

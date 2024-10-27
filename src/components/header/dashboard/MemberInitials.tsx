@@ -1,5 +1,6 @@
 import React from "react";
 import { useDashboardMember } from "@/hooks/useDashboardMember";
+import Logo from "@/app/loading";
 
 interface MemberInitialsProps {
   dashboardId: number;
@@ -19,7 +20,7 @@ const pastelColors = [
 export const MemberInitials = ({ dashboardId }: MemberInitialsProps) => {
   const { members, isLoading, error } = useDashboardMember({ dashboardId, page: 1, size: 10 });
 
-  if (isLoading) return <div>로딩 중...</div>;
+  if (isLoading) return <div>로딩중...</div>;
   if (error) return <div>에러 발생: {error.message}</div>;
   if (!members) return null;
 
