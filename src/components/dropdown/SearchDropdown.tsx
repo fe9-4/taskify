@@ -1,21 +1,12 @@
 "use client";
 
-import { cls, randomColor } from "@/lib/utils";
-import { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react";
+import { cls } from "@/lib/utils";
+import { ChangeEvent, useEffect, useState } from "react";
 import { FaCaretDown } from "react-icons/fa";
 import { HiCheck } from "react-icons/hi";
 
-// 작동방식을 보고싶으시면 이 데이터를 활용해보세요. 사용하실 때는 필터링 대상으로 바꿔주셔야 합니다.
-// const DUMMY_PEOPLE = [
-//   { email: "hong@test.com", nickname: "홍길동" },
-//   { email: "Kim@test.com", nickname: "김길동" },
-//   { email: "Mun@test.com", nickname: "문창기" },
-//   { email: "Yun@test.com", nickname: "윤길동" },
-//   { email: "Park@test.com", nickname: "박길동" },
-//   { email: "Lee@test.com", nickname: "이길동" },
-// ];
-
 interface ICurrentManager {
+  userId: number;
   email: string;
   nickname: string;
 }
@@ -23,7 +14,7 @@ interface ICurrentManager {
 // currentManager는 '할 일 수정'에서 이 드롭다운메뉴를 사용하실 때 현재 담당자명입니다.
 interface IProps {
   inviteMemberList: ICurrentManager[];
-  setManager: Dispatch<SetStateAction<string>>;
+  setManager: (manager: ICurrentManager) => void;
   currentManager?: ICurrentManager;
 }
 
@@ -41,9 +32,9 @@ const SearchDropdown = ({ inviteMemberList, setManager, currentManager }: IProps
     setIsOpen(value.length > 0);
   };
 
-  const handleSelectName = (name: ICurrentManager) => {
-    setSelectedName(name);
-    //setManager(name.nickname);
+  const handleSelectName = (manager: ICurrentManager) => {
+    setSelectedName(manager);
+    setManager(manager);
     setName("");
     setIsOpen(false);
   };
@@ -65,7 +56,7 @@ const SearchDropdown = ({ inviteMemberList, setManager, currentManager }: IProps
         <div className="flex items-center space-x-2">
           {selectedName && (
             <span className="flex h-[26px] w-8 items-center justify-center rounded-full bg-[#A3C4A2] text-xs font-semibold text-white ring-white ring-offset-2">
-              {selectedName.email.charAt(0)}
+              {selectedName?.email?.charAt(0) || ""}
             </span>
           )}
           <input
@@ -82,14 +73,14 @@ const SearchDropdown = ({ inviteMemberList, setManager, currentManager }: IProps
         <div className="flex flex-col overflow-hidden rounded-bl-md rounded-br-md rounded-tl-md rounded-tr-md border border-gray03">
           {filteredNames.map((item) => (
             <button
-              key={item.nickname}
+              key={item.userId}
               className={cls(
                 "search-dropdown-custom-btn",
-                selectedName?.nickname !== item.nickname ? "px-0 pl-11 pr-4" : ""
+                selectedName?.userId !== item.userId ? "px-0 pl-11 pr-4" : ""
               )}
               onClick={() => handleSelectName(item)}
             >
-              {selectedName?.nickname === item.nickname && <HiCheck />}
+              {selectedName?.userId === item.userId && <HiCheck />}
               <span
                 className={`flex size-[26px] items-center justify-center rounded-full bg-[#A3C4A2] text-xs font-semibold text-white ring-white ring-offset-2`}
               >

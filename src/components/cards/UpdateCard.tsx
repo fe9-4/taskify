@@ -19,19 +19,28 @@ import InputFile from "@/components/input/InputFile";
 import { useParams } from "next/navigation";
 import { uploadType } from "@/types/uploadType";
 import { CardForm, CardFormSchema, CardResponseSchema } from "@/zodSchema/cardSchema";
+import { useDashboardMember } from "@/hooks/useDashboardMember";
 
-export default function UpdateCard({ cardId }: { cardId: number }) {
+interface UpdateCardProps {
+  cardId: number;
+  closePopup: () => void;
+}
+
+export default function UpdateCard({ cardId, closePopup }: UpdateCardProps) {
   const [selectedValue, setSelectedValue] = useState("");
   const [currentValue, setCurrentValue] = useState("");
-  const [inviteMember, setInviteMember] = useState([]);
   const [manager, setManager] = useState("");
   const { user } = useAuth();
-  const { columnId } = useParams();
+  const params = useParams();
   const [updateCard, setUpdateCard] = useState<CardProps | null>(null);
   const [tagInput, setTagInput] = useState("");
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [fileToUpload, setFileToUpload] = useState<File | null>(null);
   const [isCardChanged, setIsCardChanged] = useState(false);
+  const [currentAssignee, setCurrentAssignee] = useState<{ id: number; email: string; nickname: string } | null>(null);
+
+  const dashboardId = Number(params.dashboardId) || 12046;
+  const { members } = useDashboardMember({ dashboardId, page: 1, size: 100 });
 
   const {
     register,
@@ -47,32 +56,54 @@ export default function UpdateCard({ cardId }: { cardId: number }) {
     mode: "onChange",
   });
 
+  const currentColumnId = watch("columnId");
   const {
     uploadFile,
     isPending: isFileLoading,
     error: fileError,
-  } = useFileUpload(`/api/columns/${columnId}/card-image`, uploadType.CARD);
+  } = useFileUpload(`/api/columns/${currentColumnId}/card-image`, uploadType.CARD);
 
   useEffect(() => {
     const fetchCardData = async () => {
       try {
         const response = await axios.get(`/api/cards/${cardId}`);
-        setUpdateCard(response.data);
-        reset(response.data);
-        setPreviewImage(response.data.imageUrl);
+        const cardData = response.data;
+        setUpdateCard(cardData);
+        reset(cardData);
+        setPreviewImage(cardData.imageUrl);
+
+        // 현재 담당자 정보 설정
+        if (cardData.assignee) {
+          setCurrentAssignee({
+            id: cardData.assignee.id,
+            email: cardData.assignee.email,
+            nickname: cardData.assignee.nickname,
+          });
+          setValue("assigneeUserId", cardData.assignee.id);
+        }
       } catch (error) {
         console.error("카드 데이터 불러오기 실패:", error);
       }
     };
 
     fetchCardData();
-  }, [cardId, reset]);
+  }, [cardId, reset, setValue]);
 
+  // 멤버 리스트가 로드되면 현재 담당자 정보 설정
   useEffect(() => {
-    if (user?.id) {
-      setValue("assigneeUserId", Number(user.id));
+    if (members.members && members.members.length > 0) {
+      const assigneeUserId = watch("assigneeUserId");
+      const currentMember = members.members.find((member) => member.id === assigneeUserId);
+      if (currentMember) {
+        setCurrentAssignee({
+          id: currentMember.id,
+          email: currentMember.email,
+          nickname: currentMember.nickname,
+        });
+        setManager(currentMember.nickname);
+      }
     }
-  }, [user, setValue]);
+  }, [members.members, watch]);
 
   useEffect(() => {
     const subscription = watch((value, { name, type }) => {
@@ -120,6 +151,7 @@ export default function UpdateCard({ cardId }: { cardId: number }) {
       if (validatedResponse) {
         toast.success("카드가 수정되었습니다! 🎉");
         setIsCardChanged(false);
+        closePopup();
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -174,7 +206,14 @@ export default function UpdateCard({ cardId }: { cardId: number }) {
             <label htmlFor="assignee" className="text-lg font-medium text-foreground">
               담당자
             </label>
-            <SearchDropdown inviteMemberList={inviteMember} setManager={setManager} {...register("assigneeUserId")} />
+            <SearchDropdown
+              inviteMemberList={members.members || []}
+              setManager={(selectedManager) => {
+                setValue("assigneeUserId", selectedManager.id);
+                setCurrentAssignee(selectedManager);
+              }}
+              currentManager={currentAssignee || undefined}
+            />
           </div>
         </div>
 
@@ -245,7 +284,7 @@ export default function UpdateCard({ cardId }: { cardId: number }) {
         {fileError && <p className="text-destructive text-sm">{fileError}</p>}
 
         <div className="flex gap-3 md:gap-4">
-          <CancelBtn type="button" onClick={() => {}}>
+          <CancelBtn type="button" onClick={closePopup}>
             취소
           </CancelBtn>
           <ConfirmBtn type="submit" disabled={!isValid || !isCardChanged} onClick={handleSubmit(onSubmit)}>

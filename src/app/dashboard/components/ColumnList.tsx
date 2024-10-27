@@ -8,6 +8,7 @@ import { AddTodoBtn } from "../../../components/button/ButtonComponents";
 import { ICard } from "@/types/dashboardType";
 import { useAtom } from "jotai";
 import { CreateCardAtom } from "@/store/modalAtom";
+import { useSetAtom } from "jotai";
 
 interface IProps {
   columnTitle: string;
@@ -19,10 +20,10 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [cursorId, setCursorId] = useState<number>(1);
   const [hasMore, setHasMore] = useState(true);
   const [size, setSize] = useState(3);
-  const [, setIsCreateCardOpen] = useAtom(CreateCardAtom);
+  const setCreateCardAtom = useSetAtom(CreateCardAtom);
   const observeRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
-  
+
   const getCardList = async () => {
     if (!hasMore) return;
 
@@ -73,7 +74,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
 
   const handleEditModal = () => {
     // 모달 만들어지면 모달 연결
-  }
+  };
 
   return (
     <div className="space-y-6 px-4 pt-4 md:border-b md:border-gray04 md:pb-6 xl:flex xl:min-h-screen xl:flex-col xl:border-b-0 xl:border-r">
@@ -90,7 +91,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
         </button>
       </div>
       <div className="flex flex-col space-y-2">
-        <AddTodoBtn onClick={() => setIsCreateCardOpen(true)} />
+        <AddTodoBtn onClick={() => setCreateCardAtom({ isOpen: true, columnId })} />
         {cardList.length > 0 ? (
           cardList.map((item, i) => (
             <div key={item.cards.id}>

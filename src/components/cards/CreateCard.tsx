@@ -1,6 +1,5 @@
 "use client";
 
-import { z } from "zod";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useEffect, ChangeEvent, useCallback } from "react";
@@ -19,16 +18,42 @@ import InputFile from "@/components/input/InputFile";
 import { useParams } from "next/navigation";
 import { uploadType } from "@/types/uploadType";
 import { CardForm, CardFormSchema, CardResponseSchema } from "@/zodSchema/cardSchema";
+import { useDashboardMember } from "@/hooks/useDashboardMember";
+import { useAtomValue, useSetAtom } from "jotai";
+import { CreateCardAtom } from "@/store/modalAtom";
 
-export default function CreateCard() {
+interface CreateCardProps {
+  closePopup: () => void;
+  onCardCreated: (cardId: number) => void;
+}
+
+interface ICurrentManager {
+  id: number;
+  email: string;
+  nickname: string;
+}
+
+export default function CreateCard({ closePopup, onCardCreated }: CreateCardProps) {
   const params = useParams();
-  const { user } = useAuth();
-  const [inviteMember, setInviteMember] = useState([]);
-  const [manager, setManager] = useState("");
+  const createCardAtom = useAtomValue(CreateCardAtom);
+  const [currentManager, setCurrentManager] = useState<ICurrentManager | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [fileToUpload, setFileToUpload] = useState<File | null>(null);
   const [tagInput, setTagInput] = useState("");
   const [isCardChanged, setIsCardChanged] = useState(false);
+
+  const dashboardId = Number(params.dashboardId);
+  const columnId = createCardAtom.columnId;
+
+  if (dashboardId === undefined) {
+    throw new Error("dashboardId 가 없습니다.");
+  }
+
+  if (columnId === undefined) {
+    throw new Error("columnId 가 없습니다.");
+  }
+
+  const { members } = useDashboardMember({ dashboardId, page: 1, size: 100 });
 
   const {
     register,
@@ -43,8 +68,8 @@ export default function CreateCard() {
     mode: "onChange",
     defaultValues: {
       assigneeUserId: 0,
-      dashboardId: Number(params.dashboardId) || 12046,
-      columnId: Number(params.columnId) || 40754,
+      dashboardId: dashboardId,
+      columnId: columnId || undefined,
       title: "",
       description: "",
       dueDate: "",
@@ -53,11 +78,14 @@ export default function CreateCard() {
     },
   });
 
+  // 멤버 리스트가 로드되면 첫 번째 항목을 기본값으로 설정
   useEffect(() => {
-    if (user?.id) {
-      setValue("assigneeUserId", Number(user.id));
+    if (members.members && members.members.length > 0) {
+      const firstMember = members.members[0];
+      setValue("assigneeUserId", firstMember.userId);
+      setCurrentManager(firstMember);
     }
-  }, [user, setValue]);
+  }, [members.members, setValue]);
 
   const currentColumnId = watch("columnId");
   const {
@@ -117,6 +145,8 @@ export default function CreateCard() {
       if (validatedResponse) {
         toast.success("카드가 생성되었습니다! 🎉");
         setIsCardChanged(false);
+        onCardCreated(validatedResponse.id);
+        closePopup();
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -155,6 +185,13 @@ export default function CreateCard() {
     [setValue, watch]
   );
 
+  const setCreateCardAtom = useSetAtom(CreateCardAtom);
+
+  const handleClosePopup = () => {
+    setCreateCardAtom({ isOpen: false, columnId: null });
+    closePopup();
+  };
+
   return (
     <section className="mx-auto max-w-2xl rounded-2xl bg-background p-6 shadow-lg md:p-8">
       <h3 className="mb-6 text-2xl font-bold text-foreground md:mb-8 md:text-3xl">할 일 생성</h3>
@@ -164,7 +201,14 @@ export default function CreateCard() {
           <label htmlFor="assignee" className="text-lg font-medium text-foreground">
             담당자
           </label>
-          <SearchDropdown inviteMemberList={inviteMember} setManager={setManager} />
+          <SearchDropdown
+            inviteMemberList={members.members || []}
+            setManager={(selectedManager: ICurrentManager) => {
+              setValue("assigneeUserId", selectedManager.userId);
+              setCurrentManager(selectedManager);
+            }}
+            currentManager={currentManager || undefined}
+          />
         </div>
 
         <div className="space-y-2">
@@ -234,7 +278,7 @@ export default function CreateCard() {
         {fileError && <p className="text-destructive text-sm">{fileError}</p>}
 
         <div className="flex gap-3 md:gap-4">
-          <CancelBtn type="button" onClick={() => {}}>
+          <CancelBtn type="button" onClick={handleClosePopup}>
             취소
           </CancelBtn>
           <ConfirmBtn type="submit" disabled={!isValid || !isCardChanged} onClick={handleSubmit(onSubmit)}>
