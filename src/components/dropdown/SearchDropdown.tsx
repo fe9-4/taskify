@@ -4,12 +4,7 @@ import { cls } from "@/lib/utils";
 import { ChangeEvent, useEffect, useState } from "react";
 import { FaCaretDown } from "react-icons/fa";
 import { HiCheck } from "react-icons/hi";
-
-interface ICurrentManager {
-  userId: number;
-  email: string;
-  nickname: string;
-}
+import { ICurrentManager } from "@/types/currentManager";
 
 // currentManager는 '할 일 수정'에서 이 드롭다운메뉴를 사용하실 때 현재 담당자명입니다.
 interface IProps {

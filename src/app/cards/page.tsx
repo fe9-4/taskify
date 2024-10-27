@@ -8,12 +8,12 @@ const CreateCardForm = () => {
   const [, setIsCreateCardOpen] = useAtom(CreateCardAtom);
 
   const openCreateCardModal = () => {
-    setIsCreateCardOpen(true);
+    setIsCreateCardOpen({ isOpen: true, columnId: null });
   };
 
   const handleCardCreated = (cardId: number) => {
     //console.log("Created card with ID:", cardId);
-    setIsCreateCardOpen(false);
+    setIsCreateCardOpen({ isOpen: false, columnId: null });
   };
 
   return (

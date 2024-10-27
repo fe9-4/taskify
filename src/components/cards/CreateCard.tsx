@@ -21,16 +21,11 @@ import { CardForm, CardFormSchema, CardResponseSchema } from "@/zodSchema/cardSc
 import { useDashboardMember } from "@/hooks/useDashboardMember";
 import { useAtomValue, useSetAtom } from "jotai";
 import { CreateCardAtom } from "@/store/modalAtom";
+import { ICurrentManager } from "@/types/currentManager";
 
 interface CreateCardProps {
   closePopup: () => void;
   onCardCreated: (cardId: number) => void;
-}
-
-interface ICurrentManager {
-  id: number;
-  email: string;
-  nickname: string;
 }
 
 export default function CreateCard({ closePopup, onCardCreated }: CreateCardProps) {

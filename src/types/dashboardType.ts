@@ -12,7 +12,8 @@ export interface ItemType {
 interface IAssignee {
   nickname: string;
 }
-interface Iitem {
+
+export interface Iitem {
   id: number;
   title: string;
   description: string;

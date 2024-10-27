@@ -20,6 +20,7 @@ import { useParams } from "next/navigation";
 import { uploadType } from "@/types/uploadType";
 import { CardForm, CardFormSchema, CardResponseSchema } from "@/zodSchema/cardSchema";
 import { useDashboardMember } from "@/hooks/useDashboardMember";
+import { ICurrentManager } from "@/types/currentManager";
 
 interface UpdateCardProps {
   cardId: number;
@@ -37,7 +38,7 @@ export default function UpdateCard({ cardId, closePopup }: UpdateCardProps) {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [fileToUpload, setFileToUpload] = useState<File | null>(null);
   const [isCardChanged, setIsCardChanged] = useState(false);
-  const [currentAssignee, setCurrentAssignee] = useState<{ id: number; email: string; nickname: string } | null>(null);
+  const [currentAssignee, setCurrentAssignee] = useState<ICurrentManager | null>(null);
 
   const dashboardId = Number(params.dashboardId) || 12046;
   const { members } = useDashboardMember({ dashboardId, page: 1, size: 100 });
@@ -73,13 +74,10 @@ export default function UpdateCard({ cardId, closePopup }: UpdateCardProps) {
         setPreviewImage(cardData.imageUrl);
 
         // 현재 담당자 정보 설정
-        if (cardData.assignee) {
-          setCurrentAssignee({
-            id: cardData.assignee.id,
-            email: cardData.assignee.email,
-            nickname: cardData.assignee.nickname,
-          });
-          setValue("assigneeUserId", cardData.assignee.id);
+        const assignee: ICurrentManager = cardData.assignee;
+        if (assignee) {
+          setCurrentAssignee(assignee);
+          setValue("assigneeUserId", assignee.userId);
         }
       } catch (error) {
         console.error("카드 데이터 불러오기 실패:", error);
@@ -93,13 +91,16 @@ export default function UpdateCard({ cardId, closePopup }: UpdateCardProps) {
   useEffect(() => {
     if (members.members && members.members.length > 0) {
       const assigneeUserId = watch("assigneeUserId");
-      const currentMember = members.members.find((member) => member.id === assigneeUserId);
+      const currentMember = members.members.find((member) => member.userId === assigneeUserId);
       if (currentMember) {
-        setCurrentAssignee({
+        const assignee: ICurrentManager = {
           id: currentMember.id,
+          userId: currentMember.userId,
           email: currentMember.email,
           nickname: currentMember.nickname,
-        });
+          profileImageUrl: currentMember.profileImageUrl,
+        };
+        setCurrentAssignee(assignee);
         setManager(currentMember.nickname);
       }
     }
@@ -208,8 +209,8 @@ export default function UpdateCard({ cardId, closePopup }: UpdateCardProps) {
             </label>
             <SearchDropdown
               inviteMemberList={members.members || []}
-              setManager={(selectedManager) => {
-                setValue("assigneeUserId", selectedManager.id);
+              setManager={(selectedManager: ICurrentManager) => {
+                setValue("assigneeUserId", selectedManager.userId);
                 setCurrentAssignee(selectedManager);
               }}
               currentManager={currentAssignee || undefined}
