@@ -7,29 +7,38 @@ import { PaginationBtn } from "@/components/button/ButtonComponents";
 import { CiSquarePlus } from "react-icons/ci";
 import { useAtom } from "jotai";
 import { InvitationDashboardAtom } from "@/store/modalAtom";
+import InviteItem from "./InviteItem";
 /* 초대 res
 {
   "invitations": [
     {
       "id": 13452,
+
       "inviter": {
         "id": 4668,
         "email": "yelim@fe.fe",
         "nickname": "yelim"
       },
+
       "teamId": "9-4",
+      
       "dashboard": {
         "id": 12067,
         "title": "수정테스트"
       },
+
       "invitee": {
         "id": 4701,
         "email": "cccwon5@naver.com",
         "nickname": "슈퍼펭귄스"
       },
+
       "inviteAccepted": null,
+
       "createdAt": "2024-10-26T08:59:15.950Z",
+
       "updatedAt": "2024-10-26T08:59:15.950Z"
+      
     }
   ],
   "totalCount": 1
@@ -41,7 +50,7 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const size = 5;
-  const [inviteList, setInvitateList] = useState<Member[]>([]);
+  const [inviteList, setInviteList] = useState<Member[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
   const [invitationId, setInvitationId] = useState();
@@ -62,11 +71,10 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
       setIsLoading(true);
       const res = await axios.get(`/api/dashboards/${dashboardId}/invitations?page=${page}&size=${size}`);
       const data = res.data;
-      console.log(res);
-      console.log(data);
-      // setInvitateList(data.user ? data.user.invitations : []);
-      // setTotalCount(data.user.totalCount);
-      // setInvitationId(data.invitations.id);
+      setInviteList(data.invitations || []);
+      console.log("data", data);
+      setTotalCount(data.totalCount);
+      setInvitationId(data.invitations.id);
     } catch (err) {
       if (axios.isAxiosError(err)) {
         console.error(err.message);
@@ -78,6 +86,18 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
   useEffect(() => {
     fetchDashboardInvitationList();
   }, [dashboardId]);
+
+  useEffect(() => {
+    if (!isLoading && inviteList.length > 0) {
+      const uniqueMembers = inviteList.filter(
+        (member, index, self) => index === self.findIndex((m) => m.userId === member.userId)
+      );
+
+      if (uniqueMembers.length !== inviteList.length) {
+        setInviteList(uniqueMembers);
+      }
+    }
+  }, [isLoading]);
 
   const onClickDeleteInvitation = (id: number) => {
     const deleteMember = async (id: number) => {
@@ -96,15 +116,6 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
     };
     deleteMember(id);
   };
-
-  useEffect(() => {
-    const uniqueMembers = inviteList.filter(
-      (member, index, self) => index === self.findIndex((m) => m.userId === member.userId)
-    );
-    if (inviteList.length > 0) {
-      setInvitateList(uniqueMembers);
-    }
-  }, [isLoading, inviteList]);
 
   return (
     <>
@@ -137,8 +148,8 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
 
       <ul>
         <li>
-          {inviteList.map((member) => (
-            <MemberItem key={member.id} member={member} onClick={onClickDeleteInvitation} />
+          {inviteList.map((item) => (
+            <InviteItem key={item.id} item={item} />
           ))}
         </li>
       </ul>

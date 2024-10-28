@@ -32,7 +32,7 @@ export const GET = async (request: NextRequest, { params }: { params: IParams })
     });
     console.log("초대목록 api요청");
     if (response.status === 200) {
-      const data = response.data.data;
+      const data = response.data;
       return NextResponse.json(data, { status: 200 });
     }
   } catch (error) {
