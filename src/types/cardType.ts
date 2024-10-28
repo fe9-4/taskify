@@ -22,3 +22,17 @@ export interface CreateCardProps extends CardProps {
 export interface UpdateCardProps extends CardProps {
   assignee: FormValues;
 }
+
+export interface CardDataProps {
+  id: number;
+  title: string;
+  description: string;
+  tags: string[];
+  dueDate: string;
+  assignee: FormValues;
+  imageUrl: string;
+  teamId: string;
+  columnId: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
