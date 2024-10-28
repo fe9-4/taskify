@@ -56,9 +56,6 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
     <>
       <div className="flex items-center justify-between px-5 py-6 md:px-7 md:py-[26px]">
         <h2 className="col-start-1 text-2xl font-bold md:text-3xl">구성원</h2>
-        {isLoading ? <div>멤버 정보를 불러오고 있어요</div> : <></>}
-        {error ? <div>멤버 정보를 불러오는데 실패했습니다</div> : <></>}
-        {!members ? <div>아직 초대된 멤버가 없습니다</div> : <></>}
         <div className="flex items-center gap-3 md:gap-4">
           <div>
             {totalPage} 중 {page}
@@ -71,6 +68,10 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
           />
         </div>
       </div>
+
+      {isLoading ? <div>멤버 정보를 불러오고 있어요</div> : <></>}
+      {error ? <div>멤버 정보를 불러오는데 실패했습니다</div> : <></>}
+      {!members ? <div>아직 초대된 멤버가 없습니다</div> : <></>}
 
       <ul>
         <li>

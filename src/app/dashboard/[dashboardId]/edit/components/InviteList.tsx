@@ -107,9 +107,6 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
     <>
       <div className="flex items-center justify-between px-5 py-6 md:px-7 md:py-[26px]">
         <h2 className="col-start-1 text-2xl font-bold md:text-3xl">초대 내역</h2>
-        {isLoading ? <div>초대 내역을 불러오고 있어요</div> : <></>}
-        {error ? <div>초대 내역을 불러오는데 실패했습니다</div> : <></>}
-        {!inviteList ? <div>아직 초대된 멤버가 없습니다</div> : <></>}
         <div className="flex items-center gap-3 md:gap-4">
           <div>
             {totalPage} 중 {page}
@@ -122,6 +119,10 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
           />
         </div>
       </div>
+
+      {isLoading ? <div>초대 내역을 불러오고 있어요</div> : <></>}
+      {error ? <div>초대 내역을 불러오는데 실패했습니다</div> : <></>}
+      {inviteList.length === 0 ? <div>아직 초대된 멤버가 없습니다</div> : <></>}
 
       <ul>
         <li>
