@@ -8,19 +8,22 @@ import {
   AlertModalTextAtom,
   CreateCardAtom,
   CreateDashboardAtom,
+  DetailCardAtom,
   UpdateCardAtom,
 } from "@/store/modalAtom";
 import CreateDashboard from "@/components/modal/CreateDashboard";
 import ModalContent from "./ModalContent";
-import CreateCard from "../cards/CreateCard";
 import AlertModal from "./AlertModal";
-import UpdateCard from "../cards/UpdateCard";
+import CreateCard from "@/components/modal/cards/CreateCard";
+import DetailCard from "@/components/modal/cards/DetailCard";
+import UpdateCard from "@/components/modal/cards/UpdateCard";
 
 Modal.setAppElement("#modal-root");
 
 const ModalContainer = () => {
   const [isCreateDashboardOpen, setIsCreateDashboardOpen] = useAtom(CreateDashboardAtom);
   const [isCreateCardOpen, setIsCreateCardOpen] = useAtom(CreateCardAtom);
+  const [isDetailCardOpen, setIsDetailCardOpen] = useAtom(DetailCardAtom);
   const [isUpdateCardOpen, setIsUpdateCardOpen] = useAtom(UpdateCardAtom);
   const [isAlertOpen, setIsAlertOpen] = useAtom(AlertModalAtom);
 
@@ -31,12 +34,19 @@ const ModalContainer = () => {
       <ModalContent isOpen={isCreateDashboardOpen} onRequestClose={() => setIsCreateDashboardOpen(false)}>
         <CreateDashboard />
       </ModalContent>
+
       <ModalContent isOpen={isCreateCardOpen} onRequestClose={() => setIsCreateCardOpen(false)}>
         <CreateCard />
       </ModalContent>
+
+      <ModalContent isOpen={isDetailCardOpen} onRequestClose={() => setIsDetailCardOpen(false)}>
+        <DetailCard />
+      </ModalContent>
+
       <ModalContent isOpen={isUpdateCardOpen} onRequestClose={() => setIsUpdateCardOpen(false)}>
         <UpdateCard />
       </ModalContent>
+
       <ModalContent isOpen={isAlertOpen} onRequestClose={() => setIsAlertOpen(false)}>
         <AlertModal text={alertText} />
       </ModalContent>

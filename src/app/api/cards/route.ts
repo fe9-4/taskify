@@ -33,7 +33,7 @@ export const POST = async (request: NextRequest) => {
     };
 
     // API 클라이언트를 사용하여 서버에 카드 생성 요청
-    const response = await apiClient.post("/cards/", newCard, {
+    const response = await apiClient.post("/cards", newCard, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
