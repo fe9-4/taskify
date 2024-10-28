@@ -4,7 +4,34 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { Member } from "@/zodSchema/memberSchema";
 import { PaginationBtn } from "@/components/button/ButtonComponents";
-
+/* 초대 res
+{
+  "invitations": [
+    {
+      "id": 13452,
+      "inviter": {
+        "id": 4668,
+        "email": "yelim@fe.fe",
+        "nickname": "yelim"
+      },
+      "teamId": "9-4",
+      "dashboard": {
+        "id": 12067,
+        "title": "수정테스트"
+      },
+      "invitee": {
+        "id": 4701,
+        "email": "cccwon5@naver.com",
+        "nickname": "슈퍼펭귄스"
+      },
+      "inviteAccepted": null,
+      "createdAt": "2024-10-26T08:59:15.950Z",
+      "updatedAt": "2024-10-26T08:59:15.950Z"
+    }
+  ],
+  "totalCount": 1
+}
+*/
 const InviteList = ({ dashboardId }: { dashboardId: number }) => {
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
@@ -90,12 +117,7 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
       <ul>
         <li>
           {inviteList.map((member) => (
-            <MemberItem
-              key={member.id}
-              memberListLength={inviteList.length}
-              member={member}
-              onClick={onClickDeleteMember}
-            />
+            <MemberItem key={member.id} member={member} onClick={onClickDeleteMember} />
           ))}
         </li>
       </ul>

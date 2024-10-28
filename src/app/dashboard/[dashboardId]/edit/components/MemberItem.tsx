@@ -5,43 +5,8 @@ import { cls } from "@/lib/utils";
 import { Member } from "@/zodSchema/memberSchema";
 import Image from "next/image";
 import toast from "react-hot-toast";
-/* 초대 res
-{
-  "invitations": [
-    {
-      "id": 13452,
-      "inviter": {
-        "id": 4668,
-        "email": "yelim@fe.fe",
-        "nickname": "yelim"
-      },
-      "teamId": "9-4",
-      "dashboard": {
-        "id": 12067,
-        "title": "수정테스트"
-      },
-      "invitee": {
-        "id": 4701,
-        "email": "cccwon5@naver.com",
-        "nickname": "슈퍼펭귄스"
-      },
-      "inviteAccepted": null,
-      "createdAt": "2024-10-26T08:59:15.950Z",
-      "updatedAt": "2024-10-26T08:59:15.950Z"
-    }
-  ],
-  "totalCount": 1
-}
-*/
-const MemberItem = ({
-  member,
-  onClick,
-  memberListLength,
-}: {
-  member: Member;
-  onClick: (userId: number, nickname: string) => void;
-  memberListLength: number;
-}) => {
+
+const MemberItem = ({ member, onClick }: { member: Member; onClick: (userId: number, nickname: string) => void }) => {
   const { nickname, profileImageUrl, userId, id } = member;
 
   const onClickDeleteMember = (userId: number, nickname: string) => {
@@ -61,12 +26,8 @@ const MemberItem = ({
     "bg-teal-200",
   ];
   return (
-    <div
-      className={cls(
-        "flex w-full justify-between border-b border-gray04 px-5 py-3 md:px-7 md:py-4",
-        memberListLength === 1 ? "border-b-0" : ""
-      )}
-    >
+    // border 스타일 추후 수정
+    <div className={cls("flex w-full justify-between border-b border-gray04 px-5 py-3 md:px-7 md:py-4")}>
       <div className="flex items-center gap-2 md:gap-3">
         <div className="size-[38px] overflow-hidden rounded-full">
           {profileImageUrl ? (

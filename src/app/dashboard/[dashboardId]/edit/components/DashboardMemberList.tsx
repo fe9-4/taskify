@@ -56,7 +56,7 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
   if (error) return <div>멤버 정보를 불러오는데 실패했습니다</div>;
   if (!members) return <div>아직 초대된 멤버가 없습니다</div>;
   return (
-    <section className="mx-4 my-5 w-full rounded-2xl bg-white md:mx-7 md:my-8">
+    <>
       <div className="flex items-center justify-between px-5 py-6 md:px-7 md:py-[26px]">
         <h2 className="col-start-1 text-2xl font-bold md:text-3xl">구성원</h2>
         <div className="flex items-center gap-3 md:gap-4">
@@ -75,16 +75,11 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
       <ul>
         <li>
           {memberList.map((member) => (
-            <MemberItem
-              key={member.id}
-              memberListLength={memberList.length}
-              member={member}
-              onClick={onClickDeleteMember}
-            />
+            <MemberItem key={member.id} member={member} onClick={onClickDeleteMember} />
           ))}
         </li>
       </ul>
-    </section>
+    </>
   );
 };
 export default DashboardMemberList;
