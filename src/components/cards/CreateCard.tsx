@@ -2,7 +2,7 @@
 import { z } from "zod";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useCallback, useState } from "react";
 import { useAtom } from "jotai";
 import { CreateCardAtom } from "@/store/modalAtom";
 import axios from "axios";
