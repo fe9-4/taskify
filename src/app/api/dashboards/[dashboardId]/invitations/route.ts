@@ -24,7 +24,7 @@ export const GET = async (request: NextRequest, { params }: { params: IParams })
   }
 
   try {
-    const response = await apiClient.get(`dashboards/${dashboardId}/invitations?page=${page}&size=${size}`, {
+    const response = await apiClient.get(`/dashboards/${dashboardId}/invitations?page=${page}&size=${size}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -38,6 +38,32 @@ export const GET = async (request: NextRequest, { params }: { params: IParams })
     if (axios.isAxiosError(error)) {
       console.error("대시보드 초대 내역 GET 요청 오류 발생", error);
       return new NextResponse("대시보드 초대 내역 조회 실패", { status: error.status });
+    }
+  }
+};
+
+// 대시보드 초대하기
+export const POST = async (request: NextRequest, { params }: { params: { dashboardId: string } }) => {
+  const cookieStore = cookies();
+  const accessToken = cookieStore.get("accessToken")?.value;
+  const { dashboardId } = params;
+
+  if (!accessToken) {
+    return NextResponse.json({ error: "인증되지 않은 사용자" }, { status: 401 });
+  }
+
+  try {
+    const formData = await request.json();
+    const response = await apiClient.post(`/dashboards/${dashboardId}/invitations`, formData, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    return NextResponse.json({ user: response.data }, { status: 200 });
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      return new NextResponse(JSON.stringify({ message: "컬럼 생성 실패" }), { status: error.status });
     }
   }
 };

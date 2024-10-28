@@ -6,6 +6,8 @@ import ColumnList from "@/app/dashboard/components/ColumnList";
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { AddColumnBtn } from "@/components/button/ButtonComponents";
+import { useAtom } from "jotai";
+import { ColumnTitlesAtom, CreateColumnAtom } from "@/store/modalAtom";
 
 interface IColumnData {
   id: number;
@@ -18,6 +20,8 @@ interface IColumnList {
 
 const DashboardDetail = () => {
   const { dashboardId } = useParams();
+  const [isCreateColumnOpen, setIsCreateColumnOpen] = useAtom(CreateColumnAtom);
+  const [, setColumnTitles] = useAtom(ColumnTitlesAtom);
 
   const [columnList, setColumnList] = useState<IColumnList["data"]>([]);
 
@@ -37,12 +41,14 @@ const DashboardDetail = () => {
   }, [dashboardId]);
 
   const handleColumnBtn = () => {
-    // console.log("컬럼 추가 모달 오픈");
+    const columTitles = columnList.map((column) => column.title);
+    setColumnTitles(columTitles);
+    setIsCreateColumnOpen(true);
   };
 
   useEffect(() => {
     getColumn();
-  }, [getColumn]);
+  }, [getColumn, isCreateColumnOpen]);
 
   return (
     <div className="flex flex-col space-y-6 overflow-auto pb-6 xl:flex-row xl:space-x-6 xl:space-y-0">
@@ -52,7 +58,7 @@ const DashboardDetail = () => {
         ))}
       </div>
       <div className="px-4 xl:px-0 xl:pt-[66px]">
-        <AddColumnBtn onClick={handleColumnBtn} />
+        {columnList.length < 10 && <AddColumnBtn onClick={handleColumnBtn} />}
       </div>
     </div>
   );
