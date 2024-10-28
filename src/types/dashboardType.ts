@@ -11,6 +11,8 @@ export interface ItemType {
 // 컬럼의 카드 추가 타입
 interface IAssignee {
   nickname: string;
+  profileImageUrl: string | null;
+  id: number;
 }
 
 export interface Iitem {
@@ -19,13 +21,18 @@ export interface Iitem {
   description: string;
   tags: string[];
   dueDate: string;
-  imageUrl?: string;
   assignee: IAssignee;
+  imageUrl: string | null;
+  teamId: string;
+  columnId: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ICard {
-  cards: Iitem;
+  cards: Iitem[];
   totalCount?: number;
+  cursorId?: number | null;
 }
 
 export interface CreateDashboard {

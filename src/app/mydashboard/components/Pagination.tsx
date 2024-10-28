@@ -13,8 +13,8 @@ const Pagination = ({ totalPage, setPage, page }: IProps) => {
   const [isDisabledPrev, setIsDisabledPrev] = useState(false);
 
   useEffect(() => {
-    setIsDisabledNext(totalPage === page);
-    setIsDisabledPrev(totalPage === page);
+    setIsDisabledPrev(page === 1);
+    setIsDisabledNext(page === totalPage);
   }, [page, totalPage]);
 
   const handlePageNext = () => {

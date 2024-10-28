@@ -16,28 +16,30 @@ interface IProps {
 
 const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [cardList, setCardList] = useState<Iitem[]>([]);
-  const [cursorId, setCursorId] = useState<number | null>(1);
   const [hasMore, setHasMore] = useState(true);
   const [size] = useState(3);
   const setCreateCardAtom = useSetAtom(CreateCardAtom);
   const observeRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
-
   const getCardList = useCallback(async () => {
     if (!hasMore) return;
 
     try {
-      const response = await axios.get(`/api/cards?cursorId=${cursorId}&columnId=${columnId}&size=${size}`);
+      const response = await axios.get(`/api/cards?size=${size}&columnId=${columnId}`);
 
       if (response.status === 200) {
-        setCardList((prev) => [...prev, ...response.data.cards]);
-        setCursorId(response.data.cursorId);
+        const newCardList = response.data.cards;
+
+        setCardList((prev) => {
+          const existingId = new Set(prev.map((card) => card.id));
+          const filteredNewCardList = newCardList.filter((card: Iitem) => !existingId.has(card.id));
+          return [...prev, ...filteredNewCardList];
+        });
       }
 
       if (response.data.cards.length === 0) {
         setHasMore(false);
       } else if (response.data.cards.length < size) {
-        toast.success("더 가져올 카드가 없습니다.");
         setHasMore(false);
       }
     } catch (error) {
@@ -46,7 +48,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
         toast.error(error.response?.data);
       }
     }
-  }, [cursorId, columnId, size, hasMore]);
+  }, [columnId, size, hasMore]);
 
   useEffect(() => {
     getCardList();
@@ -59,16 +61,18 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
       }
     });
 
-    if (loadingRef.current) {
-      observeRef.current.observe(loadingRef.current);
+    const currentLoadingRef = loadingRef.current;
+
+    if (currentLoadingRef) {
+      observeRef.current.observe(currentLoadingRef);
     }
 
     return () => {
-      if (loadingRef.current && observeRef.current) {
-        observeRef.current.unobserve(loadingRef.current);
+      if (currentLoadingRef) {
+        observeRef.current?.unobserve(currentLoadingRef);
       }
     };
-  }, [getCardList, hasMore]);
+  }, [hasMore, size, getCardList]);
 
   const handleEditModal = () => {
     // 모달 만들어지면 모달 연결

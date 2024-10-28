@@ -3,13 +3,12 @@ import toast from "react-hot-toast";
 import Image from "next/image";
 import InviteItem from "@/app/mydashboard/components/InviteItem";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { IInvitation } from "@/types/myDashboardType";
+import { IInvitation, IInvitationList } from "@/types/myDashboardType";
 import { cls } from "@/lib/utils";
 
 const InviteList = () => {
   const [invitationList, setInvitationList] = useState<IInvitation["invitations"]>([]);
   const [size, setSize] = useState(10);
-  const [cursorId, setCursorId] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const observeRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
@@ -18,17 +17,21 @@ const InviteList = () => {
     if (!hasMore) return;
 
     try {
-      const response = await axios.get(`/api/invitations?size=${size}&cursorId=${cursorId}`);
+      const response = await axios.get(`/api/invitations?size=${size}`);
 
       if (response.status === 200) {
-        setInvitationList((prev) => [...prev, ...response.data.inviteList]);
-        setCursorId(response.data.cursorId);
+        const newInviteList = response.data;
+
+        setInvitationList((prev) => {
+          const existingId = new Set(prev.map((item) => item.id));
+          const filteredNewInviteList = newInviteList.filter((item: IInvitationList) => !existingId.has(item.id));
+          return [...prev, ...filteredNewInviteList];
+        });
       }
 
       if (response.data.inviteList.length === 0) {
         setHasMore(false);
       } else if (response.data.inviteList.length < size) {
-        toast.success("더 가져올 초대목록이 없습니다.");
         setHasMore(false);
       }
     } catch (error) {
@@ -37,7 +40,7 @@ const InviteList = () => {
         toast.error(error.response?.data);
       }
     }
-  }, [hasMore, size, cursorId]);
+  }, [hasMore, size]);
 
   useEffect(() => {
     getInvitationList();
@@ -50,21 +53,23 @@ const InviteList = () => {
       }
     });
 
-    if (loadingRef.current) {
-      observeRef.current.observe(loadingRef.current);
+    const currentLoadingRef = loadingRef.current;
+
+    if (currentLoadingRef) {
+      observeRef.current.observe(currentLoadingRef);
     }
 
     return () => {
-      if (loadingRef.current) {
-        observeRef.current?.unobserve(loadingRef.current);
+      if (currentLoadingRef) {
+        observeRef.current?.unobserve(currentLoadingRef);
       }
     };
-  }, [hasMore, cursorId, size]);
+  }, [hasMore, size, getInvitationList]);
 
   return (
     <div
       className={cls(
-        "flex flex-col space-y-[105px] bg-white px-5 pb-20 pt-6 xl:w-[1022px]",
+        "flex flex-col space-y-[105px] max-h-[770px] overflow-auto bg-white px-5 pb-20 pt-6 xl:w-[1022px]",
         invitationList.length > 0 ? "space-y-[10px] pb-6" : ""
       )}
     >
