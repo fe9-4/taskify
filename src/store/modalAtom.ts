@@ -1,13 +1,16 @@
 import { atom } from "jotai";
 
-export const CreateDashboardAtom = atom(false);
-export const CreateCardAtom = atom(false);
+export const CreateCardAtom = atom<boolean>(false);
+export const CreateCardParamsAtom = atom<string>("");
+export const DetailCardAtom = atom<boolean>(false);
+export const DetailCardParamsAtom = atom<string>("");
+export const UpdateCardAtom = atom<boolean>(false);
+export const UpdateCardParamsAtom = atom<string>("");
 
-export const UpdateCardAtom = atom(false);
-export const UpdateCardParamsAtom = atom("");
+export const CreateDashboardAtom = atom<boolean>(false);
+export const AlertModalAtom = atom<boolean>(false);
+export const CreateColumnAtom = atom<boolean>(false);
+export const InvitationDashboardAtom = atom<boolean>(false);
 
-export const DetailCardAtom = atom(false);
-export const DetailCardParamsAtom = atom("");
-
-export const AlertModalAtom = atom(false);
-export const AlertModalTextAtom = atom("");
+export const AlertModalTextAtom = atom<string>("");
+export const ColumnTitlesAtom = atom<string[]>([]);

@@ -10,6 +10,8 @@ import {
   CreateDashboardAtom,
   DetailCardAtom,
   UpdateCardAtom,
+  CreateColumnAtom,
+  InvitationDashboardAtom,
 } from "@/store/modalAtom";
 import CreateDashboard from "@/components/modal/CreateDashboard";
 import ModalContent from "./ModalContent";
@@ -17,6 +19,8 @@ import AlertModal from "./AlertModal";
 import CreateCard from "@/components/modal/cards/CreateCard";
 import DetailCard from "@/components/modal/cards/DetailCard";
 import UpdateCard from "@/components/modal/cards/UpdateCard";
+import CreateColumn from "./CreateColumn";
+import InvitationDashboard from "./InvitationDashboard";
 
 Modal.setAppElement("#modal-root");
 
@@ -25,8 +29,9 @@ const ModalContainer = () => {
   const [isCreateCardOpen, setIsCreateCardOpen] = useAtom(CreateCardAtom);
   const [isDetailCardOpen, setIsDetailCardOpen] = useAtom(DetailCardAtom);
   const [isUpdateCardOpen, setIsUpdateCardOpen] = useAtom(UpdateCardAtom);
+  const [isCreateColumnOpen, setIsCreateColumnOpen] = useAtom(CreateColumnAtom);
+  const [isInvitationDashboardOpen, setIsInvitationDashboardOpen] = useAtom(InvitationDashboardAtom);
   const [isAlertOpen, setIsAlertOpen] = useAtom(AlertModalAtom);
-
   const alertText = useAtomValue(AlertModalTextAtom);
 
   return (
@@ -45,6 +50,14 @@ const ModalContainer = () => {
 
       <ModalContent isOpen={isUpdateCardOpen} onRequestClose={() => setIsUpdateCardOpen(false)}>
         <UpdateCard />
+      </ModalContent>
+
+      <ModalContent isOpen={isCreateColumnOpen} onRequestClose={() => setIsCreateColumnOpen(false)}>
+        <CreateColumn />
+      </ModalContent>
+
+      <ModalContent isOpen={isInvitationDashboardOpen} onRequestClose={() => setIsInvitationDashboardOpen(false)}>
+        <InvitationDashboard />
       </ModalContent>
 
       <ModalContent isOpen={isAlertOpen} onRequestClose={() => setIsAlertOpen(false)}>

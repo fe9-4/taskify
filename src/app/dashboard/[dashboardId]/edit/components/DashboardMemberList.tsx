@@ -1,84 +1,86 @@
-"use client";
-
+import { useDashboardMember } from "@/hooks/useDashboardMember";
 import { useEffect, useState } from "react";
-import SectionTitle from "./SectionTitle";
-import { useAuth } from "@/hooks/useAuth";
-import axios, { AxiosError } from "axios";
-import DashboardMemberItem from "./DashboardMemberItem";
-import { usePathname } from "next/navigation";
-import InvitationsItemType from "@/types/invitationType";
+import MemberItem from "./MemberItem";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { Member } from "@/zodSchema/memberSchema";
+import { PaginationBtn } from "@/components/button/ButtonComponents";
 
-const DashboardMemberList = ({ sectionTitle }: { sectionTitle: string }) => {
-  // 이미 초대되어있는 멤버 = 구성원
-  // 초대 진행중인 멤버 = 초대 내역
+const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
   const [page, setPage] = useState(1);
-  const [size, setSize] = useState(5);
-  const [totalCount, setTotalCount] = useState<number>(0);
-  const [invitatingMemberList, setInvitatingMemberList] = useState<InvitationsItemType[]>([]);
+  const size = 4;
+  const { members, isLoading, error, refetch } = useDashboardMember({ dashboardId, page, size });
 
-  const { user } = useAuth();
-  const pathname = usePathname();
-
-  const dashboardId = pathname
-    .split("/")
-    .filter((segment) => !isNaN(Number(segment)))
-    .join("");
-
-  /*
-{
-  "invitations": [
-    {
-      "id": 13452,
-      "inviter": {
-        "id": 4668,
-        "email": "yelim@fe.fe",
-        "nickname": "yelim"
-      },
-      "teamId": "9-4",
-      "dashboard": {
-        "id": 12067,
-        "title": "수정테스트"
-      },
-      "invitee": {
-        "id": 4701,
-        "email": "cccwon5@naver.com",
-        "nickname": "슈퍼펭귄스"
-      },
-      "inviteAccepted": null,
-      "createdAt": "2024-10-26T08:59:15.950Z",
-      "updatedAt": "2024-10-26T08:59:15.950Z"
-    }
-  ],
-  "totalCount": 1
-}
-*/
-
-  const fetchDashboardMemberList = async (page: number, size: number) => {
-    if (user) {
-      try {
-        const res = await axios.get(`/api/dashboards/${dashboardId}/invitations?page=${page}&size=${size}`);
-        const data = res.data;
-        setInvitatingMemberList(data.user ? data.user.invitations : []);
-        setTotalCount(data.user.totalCount);
-      } catch (err) {
-        const error = err as AxiosError;
-        console.error(error.message);
-      }
-    }
+  const [memberList, setMemberList] = useState<Member[]>([]);
+  const totalCount = members.totalCount;
+  const totalPage: number = Math.ceil(totalCount / size);
+  const isFirst = page === 1;
+  const isLast = page === totalPage;
+  const onClickPrev = () => {
+    if (!isFirst) setPage(page - 1);
   };
-  // useEffect(() => {
-  //   fetchDashboardMemberList(page, size);
-  // }, [user, page, size]);
+  const onClickNext = () => {
+    if (!isLast) setPage(page + 1);
+  };
+
+  // 삭제 요청 시 서버에서 삭제는 되는데 브라우저에서는 500 에러 반환하는 문제 해결해야함
+  const onClickDeleteMember = (id: number, nickname: string) => {
+    const deleteMember = async (id: number) => {
+      try {
+        const response = await axios.delete(`/api/members/${id}`);
+        if (response.status === 204) {
+          toast.success(`멤버 ${nickname}가 삭제되었습니다`);
+          setMemberList(members.members.filter((member) => member.userId !== id));
+          refetch();
+        } else {
+          toast.error("삭제하는 중 오류가 발생했습니다.");
+        }
+      } catch (err) {
+        console.error(`Error deleting member: ${id}`, err);
+        toast.error("삭제하는 중 오류가 발생했습니다.");
+      }
+    };
+    deleteMember(id);
+  };
+
+  useEffect(() => {
+    const uniqueMembers = members.members.filter(
+      (member, index, self) => index === self.findIndex((m) => m.userId === member.userId)
+    );
+    if (!isLoading && members && members.members.length > 0) {
+      setMemberList(uniqueMembers);
+    }
+  }, [isLoading]);
 
   return (
-    <section className="w-full rounded-2xl bg-white px-4 py-5 md:px-7 md:py-8">
-      <SectionTitle sectionTitle={sectionTitle} />
-      {/* <div>
-        {invitatingMemberList.length > 0 &&
-          invitatingMemberList.map((item) => <DashboardMemberItem key={item.id} item={item} />)}
-      </div> */}
-    </section>
+    <>
+      <div className="flex items-center justify-between px-5 py-6 md:px-7 md:py-[26px]">
+        <h2 className="col-start-1 text-2xl font-bold md:text-3xl">구성원</h2>
+        <div className="flex items-center gap-3 md:gap-4">
+          <div>
+            {totalPage} 중 {page}
+          </div>
+          <PaginationBtn
+            disabledNext={isFirst && totalPage > size}
+            disabledPrev={isLast && totalPage > size}
+            onClickPrev={onClickPrev}
+            onClickNext={onClickNext}
+          />
+        </div>
+      </div>
+
+      {isLoading ? <div>멤버 정보를 불러오고 있어요</div> : <></>}
+      {error ? <div>멤버 정보를 불러오는데 실패했습니다</div> : <></>}
+      {!members ? <div>아직 초대된 멤버가 없습니다</div> : <></>}
+
+      <ul>
+        <li>
+          {memberList.map((member) => (
+            <MemberItem key={member.id} member={member} onClick={onClickDeleteMember} />
+          ))}
+        </li>
+      </ul>
+    </>
   );
 };
-
 export default DashboardMemberList;
