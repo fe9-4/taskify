@@ -11,21 +11,21 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
 
   useEffect(() => {
     if (members) setMemberList(members);
+    console.log(dashboardId);
     console.log(members);
-  }, []);
+  }, [members]);
 
+  if (isLoading) return <div>멤버 정보를 불러오고 있어요</div>;
+  if (error) return <div>멤버 정보를 불러오는데 실패했습니다</div>;
+  if (!members) return <div>아직 초대된 멤버가 없습니다</div>;
   return (
-    <div>
-      {memberList.members.length ? (
-        <div>
-          {memberList.members.map((member) => (
-            <MemberItem key={member.id} member={member} />
-          ))}
-        </div>
-      ) : (
-        <div>아직 초대된 멤버가 없습니다</div>
-      )}
-    </div>
+    <ul>
+      <li>
+        {memberList.members.map((member) => (
+          <MemberItem key={member.id} member={member} />
+        ))}
+      </li>
+    </ul>
   );
 };
 export default DashboardMemberList;

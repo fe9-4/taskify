@@ -55,7 +55,6 @@ const EditPage = () => {
       <div className="flex w-[620px] flex-col gap-4">
         <EditDashboard dashboardInfo={dashboardInfo} onClickEdit={onClickEdit} />
         <EditSection sectionTitle="구성원" />
-        <EditSection sectionTitle="초대 내역" />
       </div>
       <div className="mt-6">
         <DeleteDashboardBtn />
