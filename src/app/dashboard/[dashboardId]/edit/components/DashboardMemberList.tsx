@@ -1,21 +1,25 @@
 import { useDashboardMember } from "@/hooks/useDashboardMember";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MemberItem from "./MemberItem";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { Member } from "@/zodSchema/memberSchema";
 
 const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
   const [page, setPage] = useState(1);
   const size = 5;
   const { members, isLoading, error, refetch } = useDashboardMember({ dashboardId, page, size });
 
+  // const [memberList, setMemberList] = useState<Member[]>([]);
+
   const onClickDeleteMember = (id: number, nickname: string) => {
     const deleteMember = async (id: number) => {
       try {
-        console.log(id);
-        // const res = await axios.delete(`/api/members/${id}`);
-        // console.log(res.data);
-        // toast.success(`멤버 ${nickname}가 삭제되었습니다`);
+        const res = await axios.delete(`/api/members/${id}`);
+        console.log(res.data);
+        toast.success(`멤버 ${nickname}가 삭제되었습니다`);
+        // setMemberList(members.members.filter((member) => member.userId !== id));
+        // console.log(memberList);
         refetch();
       } catch (err) {
         console.error(`Error deleting member: ${id}`, err);
@@ -24,9 +28,15 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
     };
     deleteMember(id);
   };
-  const memberList = members.members.filter(
+
+  const uniqueMembers = members.members.filter(
     (member, index, self) => index === self.findIndex((m) => m.userId === member.userId)
   );
+  // useEffect(() => {
+  //   if (members) {
+  //   setMemberList(uniqueMembers);
+  //   }
+  // }, []);
 
   if (isLoading) return <div>멤버 정보를 불러오고 있어요</div>;
   if (error) return <div>멤버 정보를 불러오는데 실패했습니다</div>;
@@ -34,7 +44,7 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
   return (
     <ul>
       <li>
-        {memberList.map((member) => (
+        {uniqueMembers.map((member) => (
           <MemberItem key={member.id} member={member} onClick={onClickDeleteMember} />
         ))}
       </li>

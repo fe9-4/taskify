@@ -33,12 +33,14 @@ import toast from "react-hot-toast";
 }
 */
 const MemberItem = ({ member, onClick }: { member: Member; onClick: (userId: number, nickname: string) => void }) => {
-  const { nickname, profileImageUrl, userId } = member;
+  const { nickname, profileImageUrl, userId, id } = member;
 
   const onClickDeleteMember = (userId: number, nickname: string) => {
-    if (member.isOwner === false) {
+    if (member.isOwner) {
+      toast.error("대시보드를 생성한 유저는 삭제할 수 없습니다");
+    } else {
       onClick(userId, nickname);
-    } else toast("대시보드를 생성한 유저는 삭제할 수 없습니다");
+    }
   };
   const pastelColors = [
     "bg-blue-200",
@@ -69,7 +71,7 @@ const MemberItem = ({ member, onClick }: { member: Member; onClick: (userId: num
         </div>
         <div>{nickname}</div>
       </div>
-      <DeleteCancelBtn onClick={() => onClickDeleteMember(userId, nickname)}>삭제</DeleteCancelBtn>
+      <DeleteCancelBtn onClick={() => onClickDeleteMember(id, nickname)}>삭제</DeleteCancelBtn>
     </div>
   );
 };
