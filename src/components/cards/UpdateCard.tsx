@@ -24,13 +24,8 @@ import { useAtom } from "jotai";
 import useLoading from "@/hooks/useLoading";
 import { UpdateCardAtom } from "@/store/modalAtom";
 
-interface Props {
-  columnId: number;
-  cardData: any;
-}
-
-const UpdateCard = ({ columnId, cardData: initalCardData }: Props) => {
-  const { dashboardId, cardId } = useParams();
+const UpdateCard = () => {
+  const { dashboardId, columnId, cardId } = useParams();
   const { members } = useDashboardMember({
     dashboardId: Number(dashboardId),
   });
@@ -41,7 +36,7 @@ const UpdateCard = ({ columnId, cardData: initalCardData }: Props) => {
   const { user } = useAuth();
   const { createFormData, isLoading: isFileLoading, error: fileError } = useFileUpload();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [cardData, setCardData] = useState(initalCardData);
+  const [cardData, setCardData] = useState();
   const [tagInput, setTagInput] = useState("");
 
   const [, setIsUpdateCardOpen] = useAtom(UpdateCardAtom);
