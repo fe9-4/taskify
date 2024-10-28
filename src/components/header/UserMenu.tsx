@@ -2,15 +2,23 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/hooks/useAuth";
+import React from "react";
 
 interface UserMenuProps {
   isHomePage: boolean;
+}
+
+interface MenuItem {
+  href: string;
+  label: string;
+  onClick?: () => void;
 }
 
 export const UserMenu = ({ isHomePage }: UserMenuProps) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { user, logout, isInitialLoading } = useAuth();
+
   const handleLogout = async () => {
     try {
       logout();
@@ -49,29 +57,35 @@ export const UserMenu = ({ isHomePage }: UserMenuProps) => {
     return <div>Loading...</div>;
   }
 
+  // 로그인하지 않은 사용자를 위한 메뉴 아이템
+  const authMenuItems: MenuItem[] = [
+    { href: "/login", label: "로그인" },
+    { href: "/signup", label: "회원가입" },
+  ];
+
+  // 로그인한 사용자를 위한 드롭다운 메뉴 아이템
+  const dropdownMenuItems: MenuItem[] = [
+    { href: "/mypage", label: "마이페이지" },
+    { href: "/mydashboard", label: "내 대시보드" },
+    { href: "#", label: "로그아웃", onClick: handleLogout },
+  ];
+
+  const menuItemClassName = `text-base font-normal transition-colors duration-300 md:text-lg ${
+    isHomePage ? "text-white hover:text-gray03" : "hover:text-violet01"
+  }`;
+
+  const dropdownItemClassName = "block px-4 py-2 text-base font-semibold text-gray01 hover:bg-violet-100";
+
   if (!user) {
     return (
       <ul className="flex list-none space-x-4">
-        <li>
-          <Link
-            className={`text-base font-normal transition-colors duration-300 md:text-lg ${
-              isHomePage ? "text-white hover:text-gray03" : "hover:text-violet01"
-            }`}
-            href="/login"
-          >
-            로그인
-          </Link>
-        </li>
-        <li>
-          <Link
-            className={`text-base font-normal transition-colors duration-300 md:text-lg ${
-              isHomePage ? "text-white hover:text-gray03" : "hover:text-violet01"
-            }`}
-            href="/signup"
-          >
-            회원가입
-          </Link>
-        </li>
+        {authMenuItems.map((item) => (
+          <li key={item.label}>
+            <Link className={menuItemClassName} href={item.href}>
+              {item.label}
+            </Link>
+          </li>
+        ))}
       </ul>
     );
   }
@@ -107,26 +121,19 @@ export const UserMenu = ({ isHomePage }: UserMenuProps) => {
       </button>
       {isDropdownOpen && (
         <div className="absolute right-0 mt-2 w-28 rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5">
-          <Link
-            href="/mypage"
-            className="block px-4 py-2 text-base font-semibold text-gray01 hover:bg-violet-100"
-            onClick={closeDropdown}
-          >
-            마이페이지
-          </Link>
-          <Link
-            href="/mydashboard"
-            className="block px-4 py-2 text-base font-semibold text-gray01 hover:bg-violet-100"
-            onClick={closeDropdown}
-          >
-            내 대시보드
-          </Link>
-          <button
-            onClick={handleLogout}
-            className="block w-full px-4 py-2 text-left text-base font-semibold text-gray01 hover:bg-violet-100"
-          >
-            로그아웃
-          </button>
+          {dropdownMenuItems.map((item) => (
+            <React.Fragment key={item.label}>
+              {item.onClick ? (
+                <button onClick={item.onClick} className={`w-full text-left ${dropdownItemClassName}`}>
+                  {item.label}
+                </button>
+              ) : (
+                <Link href={item.href} className={dropdownItemClassName} onClick={closeDropdown}>
+                  {item.label}
+                </Link>
+              )}
+            </React.Fragment>
+          ))}
         </div>
       )}
     </div>
