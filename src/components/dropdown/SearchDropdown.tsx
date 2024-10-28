@@ -73,7 +73,7 @@ const SearchDropdown = ({ inviteMemberList, setManager, currentManager }: IProps
               key={item.userId}
               className={cls(
                 "search-dropdown-custom-btn",
-                selectedMember?.userId !== item.userId ? "px-0 pl-11 pr-4" : ""
+                selectedMember?.nickname !== item.nickname ? "px-0 pl-11 pr-4" : ""
               )}
               onClick={() => handleSelectName(item)}
             >
