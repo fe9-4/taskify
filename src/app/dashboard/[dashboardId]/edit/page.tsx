@@ -1,6 +1,5 @@
 "use client";
 import { DeleteDashboardBtn } from "@/components/button/ButtonComponents";
-import EditSection from "@/app/dashboard/[dashboardId]/edit/components/EditSection";
 import EditDashboard from "@/app/dashboard/[dashboardId]/edit/components/EditDashboard";
 import Link from "next/link";
 import { IoIosArrowBack } from "react-icons/io";
@@ -9,6 +8,9 @@ import axios, { AxiosError } from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { DashboardInfoType, ValueType } from "@/types/dashboardType";
+import DashboardMemberList from "./components/DashboardMemberList";
+import InviteList from "./components/InviteList";
+import Section from "./components/Section";
 
 const EditPage = () => {
   const { dashboardId } = useParams();
@@ -43,7 +45,7 @@ const EditPage = () => {
     const newColor = value.color;
     setDashboardInfo((prev) => ({ ...prev, title: newTitle, color: newColor }));
   };
-
+  const id = Number(dashboardId);
   return (
     <div className="flex w-[284px] flex-col p-5 md:w-[544px] xl:w-[620px]">
       <div className="flex items-center gap-[6px] md:gap-2">
@@ -54,7 +56,12 @@ const EditPage = () => {
       </div>
       <div className="flex w-[620px] flex-col gap-4">
         <EditDashboard dashboardInfo={dashboardInfo} onClickEdit={onClickEdit} />
-        <EditSection />
+        <Section>
+          <DashboardMemberList dashboardId={id} />
+        </Section>
+        {/* <Section>
+          <InviteList dashboardId={id} />
+        </Section> */}
       </div>
       <div className="mt-6">
         <DeleteDashboardBtn />

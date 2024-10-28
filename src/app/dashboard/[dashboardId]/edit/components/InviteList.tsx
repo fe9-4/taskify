@@ -1,4 +1,3 @@
-import { useDashboardMember } from "@/hooks/useDashboardMember";
 import { useEffect, useState } from "react";
 import MemberItem from "./MemberItem";
 import axios from "axios";
@@ -6,13 +5,14 @@ import toast from "react-hot-toast";
 import { Member } from "@/zodSchema/memberSchema";
 import { PaginationBtn } from "@/components/button/ButtonComponents";
 
-const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
+const InviteList = ({ dashboardId }: { dashboardId: number }) => {
   const [page, setPage] = useState(1);
-  const size = 4;
-  const { members, isLoading, error, refetch } = useDashboardMember({ dashboardId, page, size });
+  const [totalCount, setTotalCount] = useState(0);
+  const size = 5;
+  const [inviteList, setInvitateList] = useState<Member[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(false);
 
-  const [memberList, setMemberList] = useState<Member[]>([]);
-  const totalCount = members.totalCount;
   const totalPage: number = Math.ceil(totalCount / size);
   const isFirst = page === 1;
   const isLast = page === totalPage;
@@ -23,15 +23,31 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
     if (!isLast) setPage(page + 1);
   };
 
-  // 삭제 요청 시 서버에서 삭제는 되는데 브라우저에서는 500 에러 반환하는 문제 해결해야함
+  const fetchDashboardInvitationList = async () => {
+    try {
+      const res = await axios.get(`/api/dashboards/${dashboardId}/invitations`);
+      const data = res.data;
+      setInvitateList(data.user ? data.user.invitations : []);
+      setTotalCount(data.totalCount);
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        console.error(err.message);
+      } else {
+        console.error("An unexpected error occurred", err);
+      }
+    }
+  };
+  useEffect(() => {
+    fetchDashboardInvitationList();
+  }, [dashboardId]);
+
   const onClickDeleteMember = (id: number, nickname: string) => {
     const deleteMember = async (id: number) => {
       try {
         const response = await axios.delete(`/api/members/${id}`);
         if (response.status === 204) {
           toast.success(`멤버 ${nickname}가 삭제되었습니다`);
-          setMemberList(members.members.filter((member) => member.userId !== id));
-          refetch();
+          // setInvitateList(members.members.filter((member) => member.userId !== id));
         } else {
           toast.error("삭제하는 중 오류가 발생했습니다.");
         }
@@ -44,19 +60,18 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
   };
 
   useEffect(() => {
-    const uniqueMembers = members.members.filter(
+    const uniqueMembers = inviteList.filter(
       (member, index, self) => index === self.findIndex((m) => m.userId === member.userId)
     );
-    if (!isLoading && members && members.members.length > 0) {
-      setMemberList(uniqueMembers);
+    if (inviteList.length > 0) {
+      setInvitateList(uniqueMembers);
     }
   }, [isLoading]);
 
   if (isLoading) return <div>멤버 정보를 불러오고 있어요</div>;
   if (error) return <div>멤버 정보를 불러오는데 실패했습니다</div>;
-  if (!members) return <div>아직 초대된 멤버가 없습니다</div>;
   return (
-    <section className="mx-4 my-5 w-full rounded-2xl bg-white md:mx-7 md:my-8">
+    <>
       <div className="flex items-center justify-between px-5 py-6 md:px-7 md:py-[26px]">
         <h2 className="col-start-1 text-2xl font-bold md:text-3xl">구성원</h2>
         <div className="flex items-center gap-3 md:gap-4">
@@ -74,17 +89,17 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
 
       <ul>
         <li>
-          {memberList.map((member) => (
+          {inviteList.map((member) => (
             <MemberItem
               key={member.id}
-              memberListLength={memberList.length}
+              memberListLength={inviteList.length}
               member={member}
               onClick={onClickDeleteMember}
             />
           ))}
         </li>
       </ul>
-    </section>
+    </>
   );
 };
-export default DashboardMemberList;
+export default InviteList;
