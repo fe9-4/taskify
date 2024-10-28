@@ -1,11 +1,11 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 import ColumnItem from "./ColumnItem";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { HiOutlineCog } from "react-icons/hi";
 import { NumChip } from "../../../components/chip/PlusAndNumChip";
 import { AddTodoBtn } from "../../../components/button/ButtonComponents";
-import { ICard } from "@/types/dashboardType";
+import { ICard, Iitem } from "@/types/dashboardType";
 import { useAtom } from "jotai";
 import { CreateCardAtom } from "@/store/modalAtom";
 
@@ -15,29 +15,37 @@ interface IProps {
 }
 
 const ColumnList = ({ columnTitle, columnId }: IProps) => {
-  const [cardList, setCardList] = useState<ICard[]>([]);
-  const [cursorId, setCursorId] = useState<number>(1);
+  const [cardList, setCardList] = useState<ICard["cards"]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [size, setSize] = useState(3);
   const [, setIsCreateCardOpen] = useAtom(CreateCardAtom);
   const observeRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
+<<<<<<< HEAD
 
   const getCardList = async () => {
+=======
+  
+  const getCardList = useCallback(async () => {
+>>>>>>> develop
     if (!hasMore) return;
 
     try {
-      const response = await axios.get(`/api/cards?cursorId=${cursorId}&columnId=${columnId}&size=${size}`);
+      const response = await axios.get(`/api/cards?size=${size}&columnId=${columnId}`);
 
       if (response.status === 200) {
-        setCardList((prev) => [...prev, ...response.data.cards]);
-        setCursorId(response.data.cursorId);
+        const newCardList = response.data.cards;
+        
+        setCardList((prev) => {
+          const existingId = new Set(prev.map((card) => card.id));
+          const filteredNewCardList = newCardList.filter((card: Iitem) => !existingId.has(card.id));
+          return [...prev, ...filteredNewCardList];
+        });
       }
 
       if (response.data.cards.length === 0) {
         setHasMore(false);
       } else if (response.data.cards.length < size) {
-        toast.success("더 가져올 카드가 없습니다.");
         setHasMore(false);
       }
     } catch (error) {
@@ -46,7 +54,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
         toast.error(error.response?.data);
       }
     }
-  };
+  }, [columnId, hasMore, size]);
 
   // 카드아이템 무한스크롤
   useEffect(() => {
@@ -60,16 +68,18 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
       }
     });
 
-    if (loadingRef.current) {
-      observeRef.current.observe(loadingRef.current);
+    const currentLoadingRef = loadingRef.current;
+
+    if (currentLoadingRef) {
+      observeRef.current.observe(currentLoadingRef);
     }
 
     return () => {
-      if (loadingRef.current) {
-        observeRef.current?.unobserve(loadingRef.current);
+      if (currentLoadingRef) {
+        observeRef.current?.unobserve(currentLoadingRef);
       }
     };
-  }, [hasMore, cursorId, size]);
+  }, [hasMore, size, getCardList]);
 
   const handleEditModal = () => {
     // 모달 만들어지면 모달 연결
@@ -93,8 +103,8 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
         <AddTodoBtn onClick={() => setIsCreateCardOpen(true)} />
         {cardList.length > 0 ? (
           cardList.map((item, i) => (
-            <div key={item.cards.id}>
-              <ColumnItem cards={item.cards} />
+            <div key={item.id}>
+              <ColumnItem cards={item} />
               {i === cardList.length - 1 && <div ref={loadingRef} className="h-[1px]" />}
             </div>
           ))
