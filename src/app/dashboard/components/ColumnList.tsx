@@ -7,7 +7,7 @@ import { NumChip } from "../../../components/chip/PlusAndNumChip";
 import { AddTodoBtn } from "../../../components/button/ButtonComponents";
 import { ICard, Iitem } from "@/types/dashboardType";
 import { useAtom } from "jotai";
-import { CreateCardAtom } from "@/store/modalAtom";
+import { CreateCardAtom, EditColumnAtom } from "@/store/modalAtom";
 
 interface IProps {
   columnTitle: string;
@@ -19,9 +19,10 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [hasMore, setHasMore] = useState(true);
   const [size, setSize] = useState(3);
   const [, setIsCreateCardOpen] = useAtom(CreateCardAtom);
+  const [, setIsEditColumnOpen] = useAtom(EditColumnAtom);
   const observeRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
-  
+
   const getCardList = useCallback(async () => {
     if (!hasMore) return;
 
@@ -30,7 +31,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
 
       if (response.status === 200) {
         const newCardList = response.data.cards;
-        
+
         setCardList((prev) => {
           const existingId = new Set(prev.map((card) => card.id));
           const filteredNewCardList = newCardList.filter((card: Iitem) => !existingId.has(card.id));
@@ -77,8 +78,8 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   }, [hasMore, size, getCardList]);
 
   const handleEditModal = () => {
-    // 모달 만들어지면 모달 연결
-  }
+    setIsEditColumnOpen(true);
+  };
 
   return (
     <div className="space-y-6 px-4 pt-4 md:border-b md:border-gray04 md:pb-6 xl:flex xl:min-h-screen xl:flex-col xl:border-b-0 xl:border-r">
@@ -90,7 +91,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
           </div>
           <NumChip num={cardList.length} />
         </div>
-        <button>
+        <button onClick={handleEditModal}>
           <HiOutlineCog className="size-[22px] text-gray01" />
         </button>
       </div>
