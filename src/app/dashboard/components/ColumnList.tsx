@@ -21,13 +21,8 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [, setIsCreateCardOpen] = useAtom(CreateCardAtom);
   const observeRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
-<<<<<<< HEAD
 
-  const getCardList = async () => {
-=======
-  
   const getCardList = useCallback(async () => {
->>>>>>> develop
     if (!hasMore) return;
 
     try {
@@ -35,7 +30,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
 
       if (response.status === 200) {
         const newCardList = response.data.cards;
-        
+
         setCardList((prev) => {
           const existingId = new Set(prev.map((card) => card.id));
           const filteredNewCardList = newCardList.filter((card: Iitem) => !existingId.has(card.id));
