@@ -30,7 +30,7 @@ const EditDashboard = ({ dashboardId }: { dashboardId: number }) => {
   // 대시보드 정보 요청 - 대시보드 수정하고 새로운 정보 가져오기
   const fetchDashboardInfo = useCallback(async () => {
     try {
-      const res = await axios.get(`/api/dashboards/${dashboardId}?dashboardId=${dashboardId}`);
+      const res = await axios.get(`/api/dashboards/${dashboardId}`);
       setDashboardInfo(res.data);
     } catch (err) {
       const error = err as AxiosError;
@@ -51,8 +51,9 @@ const EditDashboard = ({ dashboardId }: { dashboardId: number }) => {
   // 대시보드 수정 api 요청
   const updateDashboard = async (value: ValueType) => {
     try {
-      const res = await axios.put(`/api/dashboards/${dashboardId}?dashboardId=${dashboardId}`, value);
+      const res = await axios.put(`/api/dashboards/${dashboardId}`, value);
       const data = res.data;
+      console.log(data);
       toast.success("대시보드 정보가 수정되었습니다");
     } catch (err) {
       const error = err as AxiosError;

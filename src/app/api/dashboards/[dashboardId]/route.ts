@@ -42,9 +42,8 @@ export const GET = async (req: Request, { params }: { params: IParams }) => {
 };
 
 // 대시보드 수정 api
-export const PUT = async (req: Request) => {
-  const { searchParams } = new URL(req.url);
-  const dashboardId = searchParams.get("dashboardId");
+export const PUT = async (req: Request, { params }: { params: IParams }) => {
+  const { dashboardId } = params;
   const id = Number(dashboardId);
 
   const cookieStore = cookies();
