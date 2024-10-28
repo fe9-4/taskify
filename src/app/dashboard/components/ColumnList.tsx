@@ -1,12 +1,12 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 import ColumnItem from "./ColumnItem";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { HiOutlineCog } from "react-icons/hi";
 import { NumChip } from "../../../components/chip/PlusAndNumChip";
 import { AddTodoBtn } from "../../../components/button/ButtonComponents";
-import { Iitem } from "@/types/dashboardType";
-import { useSetAtom } from "jotai";
+import { ICard, Iitem } from "@/types/dashboardType";
+import { useAtom } from "jotai";
 import { CreateCardAtom } from "@/store/modalAtom";
 
 interface IProps {
@@ -15,12 +15,13 @@ interface IProps {
 }
 
 const ColumnList = ({ columnTitle, columnId }: IProps) => {
-  const [cardList, setCardList] = useState<Iitem[]>([]);
+  const [cardList, setCardList] = useState<ICard["cards"]>([]);
   const [hasMore, setHasMore] = useState(true);
-  const [size] = useState(3);
-  const setCreateCardAtom = useSetAtom(CreateCardAtom);
+  const [size, setSize] = useState(3);
+  const [, setIsCreateCardOpen] = useAtom(CreateCardAtom);
   const observeRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
+
   const getCardList = useCallback(async () => {
     if (!hasMore) return;
 
@@ -48,8 +49,9 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
         toast.error(error.response?.data);
       }
     }
-  }, [columnId, size, hasMore]);
+  }, [columnId, hasMore, size]);
 
+  // 카드아이템 무한스크롤
   useEffect(() => {
     getCardList();
 
@@ -88,12 +90,12 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
           </div>
           <NumChip num={cardList.length} />
         </div>
-        <button onClick={handleEditModal}>
+        <button>
           <HiOutlineCog className="size-[22px] text-gray01" />
         </button>
       </div>
       <div className="flex flex-col space-y-2">
-        <AddTodoBtn onClick={() => setCreateCardAtom({ isOpen: true, columnId })} />
+        <AddTodoBtn onClick={() => setIsCreateCardOpen(true)} />
         {cardList.length > 0 ? (
           cardList.map((item, i) => (
             <div key={item.id}>
