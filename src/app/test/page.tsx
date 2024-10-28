@@ -14,7 +14,13 @@ import {
   InsertBtn,
   PaginationBtn,
 } from "@/components/button/ButtonComponents";
-import { AlertModalAtom, AlertModalTextAtom, CreateCardAtom, CreateDashboardAtom } from "@/store/modalAtom";
+import {
+  AlertModalAtom,
+  AlertModalTextAtom,
+  CreateCardAtom,
+  CreateDashboardAtom,
+  InvitationDashboardAtom,
+} from "@/store/modalAtom";
 import { useAtom } from "jotai";
 
 export default function Home() {
@@ -22,6 +28,7 @@ export default function Home() {
   const [, setIsCreateCard] = useAtom(CreateCardAtom);
   const [, setIsAlertOpen] = useAtom(AlertModalAtom);
   const [, setAlertText] = useAtom(AlertModalTextAtom);
+  const [, setIsInvitationDashboardOpen] = useAtom(InvitationDashboardAtom);
   const onClick = () => {
     console.log(`클릭 테스트`);
   };
@@ -36,8 +43,7 @@ export default function Home() {
       <div>
         <AddTodoBtn
           onClick={() => {
-            setAlertText("비밀번호가 일치하지 않습니다.");
-            setIsAlertOpen(true);
+            setIsInvitationDashboardOpen(true);
           }}
         />
       </div>

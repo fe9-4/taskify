@@ -2,12 +2,10 @@ import axios from "axios";
 import apiClient from "../../apiClient";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { CreateDashboard } from "@/types/dashboardType";
-
 interface IParams {
   dashboardId: number;
 }
-
+// 대시보드 상세 조회
 export const GET = async (req: Request, { params }: { params: IParams }) => {
   const { dashboardId } = params;
   const id = Number(dashboardId);
@@ -45,15 +43,11 @@ export const GET = async (req: Request, { params }: { params: IParams }) => {
     }
   }
 };
-
 // 대시보드 수정 api
-interface ValueType {
-  title: string;
-  color: string;
-}
-export const PUT = async (req: Request, { params }: { params: IParams }) => {
-  const dashboardId = params.dashboardId;
-  const { title, color } = await req.json();
+export const PUT = async (req: Request) => {
+  const { searchParams } = new URL(req.url);
+  const dashboardId = searchParams.get("dashboardId");
+  const id = Number(dashboardId);
 
   const cookieStore = cookies();
   const token = cookieStore.get("accessToken")?.value;
@@ -62,28 +56,27 @@ export const PUT = async (req: Request, { params }: { params: IParams }) => {
     return new NextResponse("사용자 정보를 찾을 수 없습니다.", { status: 401 });
   }
 
-  if (isNaN(Number(dashboardId))) {
+  if (!id) {
     return new NextResponse("대시보드 정보 가져오기 실패", { status: 400 });
   }
-  const requestBody: CreateDashboard = {
-    title,
-    color,
-  };
+
   try {
-    const response = await apiClient.put(`/dashboards/${dashboardId}`, requestBody, {
+    const requestBody = await req.json();
+
+    const response = await apiClient.put(`/dashboards/${id}`, requestBody, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
 
     if (response.status === 200) {
-      const data = response.data.data;
+      const data = response.data;
       return NextResponse.json(data, { status: 200 });
     }
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.error("대시보드 수정 요청에서 오류 발생", error);
-      return new NextResponse("대시보드 수정 실패", { status: error.status });
+      return new NextResponse("대시보드 수정 실패", { status: error.response?.status || 500 });
     }
   }
 };

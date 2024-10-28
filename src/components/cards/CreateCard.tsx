@@ -2,10 +2,9 @@
 
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, useEffect, ChangeEvent, useCallback } from "react";
+import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useAuth } from "@/hooks/useAuth";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { CardProps } from "@/types/cardType";
 import { formatDateTime } from "@/utils/dateFormat";
@@ -23,12 +22,7 @@ import { useAtomValue, useSetAtom } from "jotai";
 import { CreateCardAtom } from "@/store/modalAtom";
 import { ICurrentManager } from "@/types/currentManager";
 
-interface CreateCardProps {
-  closePopup: () => void;
-  onCardCreated: (cardId: number) => void;
-}
-
-export default function CreateCard({ closePopup, onCardCreated }: CreateCardProps) {
+export default function CreateCard() {
   const params = useParams();
   const createCardAtom = useAtomValue(CreateCardAtom);
   const [currentManager, setCurrentManager] = useState<ICurrentManager | null>(null);
@@ -38,15 +32,16 @@ export default function CreateCard({ closePopup, onCardCreated }: CreateCardProp
   const [isCardChanged, setIsCardChanged] = useState(false);
 
   const dashboardId = Number(params.dashboardId);
-  const columnId = createCardAtom.columnId;
+  // 이 부분 수정해주세요.
+  //const columnId = createCardAtom.columnId;
 
   if (dashboardId === undefined) {
     throw new Error("dashboardId 가 없습니다.");
   }
 
-  if (columnId === undefined) {
-    throw new Error("columnId 가 없습니다.");
-  }
+  // if (columnId === undefined) {
+  //   throw new Error("columnId 가 없습니다.");
+  // }
 
   const { members } = useDashboardMember({ dashboardId, page: 1, size: 100 });
 
@@ -64,7 +59,8 @@ export default function CreateCard({ closePopup, onCardCreated }: CreateCardProp
     defaultValues: {
       assigneeUserId: 0,
       dashboardId: dashboardId,
-      columnId: columnId || undefined,
+      // columnId: columnId || undefined,
+      columnId: 0,
       title: "",
       description: "",
       dueDate: "",
@@ -140,8 +136,8 @@ export default function CreateCard({ closePopup, onCardCreated }: CreateCardProp
       if (validatedResponse) {
         toast.success("카드가 생성되었습니다! 🎉");
         setIsCardChanged(false);
-        onCardCreated(validatedResponse.id);
-        closePopup();
+        // onCardCreated(validatedResponse.id);
+        // closePopup();
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -183,8 +179,8 @@ export default function CreateCard({ closePopup, onCardCreated }: CreateCardProp
   const setCreateCardAtom = useSetAtom(CreateCardAtom);
 
   const handleClosePopup = () => {
-    setCreateCardAtom({ isOpen: false, columnId: null });
-    closePopup();
+    //setCreateCardAtom({ isOpen: false, columnId: null });
+    //closePopup();
   };
 
   return (

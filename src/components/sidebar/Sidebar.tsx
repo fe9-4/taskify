@@ -4,20 +4,21 @@ import Button from "./Button";
 import DashboardList from "./DashboardList";
 import Logo from "./Logo";
 import { PaginationBtn } from "../button/ButtonComponents";
-import { ItemType } from "@/types/dashboardType";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useWidth } from "@/hooks/useWidth";
-import axios, { AxiosError } from "axios";
+import { useDashboardList } from "@/hooks/useDashboardList";
+import { Dashboard } from "@/zodSchema/dashboardSchema";
 
 const Sidebar = () => {
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(10);
   const [totalCount, setTotalCount] = useState<number>(0);
-  const [dashboardList, setDashboardList] = useState<ItemType[]>([]);
+  const [dashboardList, setDashboardList] = useState<Dashboard[]>([]);
   const { user } = useAuth();
   const pathname = usePathname();
   const { isLargeScreen } = useWidth();
+  const { data } = useDashboardList({ cursorId: 1, page, size });
 
   useEffect(() => {
     if (isLargeScreen) {
@@ -28,22 +29,11 @@ const Sidebar = () => {
   }, [isLargeScreen]);
 
   useEffect(() => {
-    if (!user || !user.id || pathname === "/") return;
-
-    const fetchDashboardList = async (page: number, size: number) => {
-      try {
-        const res = await axios.get(`/api/dashboards?page=${page}&size=${size}`);
-        const data = res.data;
-        setDashboardList(data.user ? data.user.dashboards : []);
-        setTotalCount(data.user.totalCount);
-      } catch (err) {
-        const error = err as AxiosError;
-        console.error(error.message);
-      }
-    };
-
-    fetchDashboardList(page, size);
-  }, [user, page, size, pathname]);
+    if (data) {
+      setDashboardList(data.dashboards);
+      setTotalCount(data.totalCount);
+    }
+  }, [user, page, size]);
 
   const totalPage: number = Math.ceil(totalCount / size);
   const isFirst = page === 1;

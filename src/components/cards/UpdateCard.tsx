@@ -22,12 +22,7 @@ import { CardForm, CardFormSchema, CardResponseSchema } from "@/zodSchema/cardSc
 import { useDashboardMember } from "@/hooks/useDashboardMember";
 import { ICurrentManager } from "@/types/currentManager";
 
-interface UpdateCardProps {
-  cardId: number;
-  closePopup: () => void;
-}
-
-export default function UpdateCard({ cardId, closePopup }: UpdateCardProps) {
+export default function UpdateCard() {
   const [selectedValue, setSelectedValue] = useState("");
   const [currentValue, setCurrentValue] = useState("");
   const [manager, setManager] = useState("");
@@ -42,6 +37,9 @@ export default function UpdateCard({ cardId, closePopup }: UpdateCardProps) {
 
   const dashboardId = Number(params.dashboardId);
   const { members } = useDashboardMember({ dashboardId, page: 1, size: 100 });
+  const cardId = Number(params.cardId);
+  // 이 부분 수정해 주세요.
+  //const cardId = useAtomValue("cardId");
 
   const {
     register,
@@ -152,7 +150,7 @@ export default function UpdateCard({ cardId, closePopup }: UpdateCardProps) {
       if (validatedResponse) {
         toast.success("카드가 수정되었습니다! 🎉");
         setIsCardChanged(false);
-        closePopup();
+        //closePopup();
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -190,6 +188,11 @@ export default function UpdateCard({ cardId, closePopup }: UpdateCardProps) {
     },
     [setValue, watch]
   );
+
+  const handleClosePopup = () => {
+    //setCreateCardAtom({ isOpen: false, columnId: null });
+    //closePopup();
+  };
 
   return (
     <section className="mx-auto max-w-2xl rounded-2xl bg-background p-6 shadow-lg md:p-8">
@@ -285,7 +288,7 @@ export default function UpdateCard({ cardId, closePopup }: UpdateCardProps) {
         {fileError && <p className="text-destructive text-sm">{fileError}</p>}
 
         <div className="flex gap-3 md:gap-4">
-          <CancelBtn type="button" onClick={closePopup}>
+          <CancelBtn type="button" onClick={handleClosePopup}>
             취소
           </CancelBtn>
           <ConfirmBtn type="submit" disabled={!isValid || !isCardChanged} onClick={handleSubmit(onSubmit)}>
