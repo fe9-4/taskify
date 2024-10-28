@@ -32,8 +32,6 @@ const SearchDropdown = ({ validation, setValue, inviteMemberList, setManager, cu
   const [isOpen, setIsOpen] = useState(false);
 
   const handleChangeName = (e: ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
-
     const { value } = e.target;
     const res = inviteMemberList.filter((data) => data.nickname.includes(value));
 
