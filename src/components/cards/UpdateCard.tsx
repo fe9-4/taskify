@@ -40,7 +40,7 @@ export default function UpdateCard({ cardId, closePopup }: UpdateCardProps) {
   const [isCardChanged, setIsCardChanged] = useState(false);
   const [currentAssignee, setCurrentAssignee] = useState<ICurrentManager | null>(null);
 
-  const dashboardId = Number(params.dashboardId) || 12046;
+  const dashboardId = Number(params.dashboardId);
   const { members } = useDashboardMember({ dashboardId, page: 1, size: 100 });
 
   const {
