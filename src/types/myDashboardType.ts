@@ -13,7 +13,7 @@ export interface IMyDashboard {
   cursorId: number;
 }
 
-interface IInvitationList {
+export interface IInvitationList {
   id: number;
   inviter: {
     nickname: string;
