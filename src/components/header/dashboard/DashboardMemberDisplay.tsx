@@ -2,63 +2,128 @@ import React, { useEffect, useState } from "react";
 import { SelectedDashboard } from "./SelectedDashboard";
 import { MemberInitials } from "./MemberInitials";
 import { useDashboardList } from "@/hooks/useDashboardList";
+import { useDashboardMember } from "@/hooks/useDashboardMember";
 import toast from "react-hot-toast";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
+import { useSetAtom } from "jotai";
+import { InvitationDashboardAtom } from "@/store/modalAtom";
 
 export const DashboardMemberDisplay = () => {
   const router = useRouter();
-  const { data: dashboardList, isLoading, error } = useDashboardList({ page: 1, size: 10 });
+  const params = useParams();
+  // URL에서 현재 대시보드 ID 추출
+  const currentDashboardId = params?.dashboardId ? Number(params.dashboardId) : null;
+
+  // 초대하기 모달 상태 관리
+  const setIsInvitationDashboardOpen = useSetAtom(InvitationDashboardAtom);
+
+  // 대시보드 목록과 멤버 목록 조회
+  const {
+    data: dashboardList,
+    isLoading: isDashboardLoading,
+    error: dashboardError,
+  } = useDashboardList({ page: 1, size: 10 });
+  const {
+    members,
+    isLoading: isMemberLoading,
+    error: memberError,
+  } = useDashboardMember({
+    dashboardId: currentDashboardId || 0,
+    page: 1,
+    size: 100,
+  });
+
+  // 현재 대시보드 정보 상태 관리
   const [dashboardId, setDashboardId] = useState<number | null>(null);
   const [dashboardTitle, setDashboardTitle] = useState<string | null>(null);
+  const [isOwner, setIsOwner] = useState<boolean>(false);
 
+  // 현재 대시보드 정보 설정
   useEffect(() => {
-    if (dashboardList && dashboardList.dashboards.length > 0) {
-      setDashboardId(dashboardList.dashboards[0].id);
-      setDashboardTitle(dashboardList.dashboards[0].title);
+    if (dashboardList?.dashboards && currentDashboardId) {
+      const currentDashboard = dashboardList.dashboards.find((dashboard) => dashboard.id === currentDashboardId);
+
+      if (currentDashboard) {
+        setDashboardId(currentDashboard.id);
+        setDashboardTitle(currentDashboard.title);
+        setIsOwner(currentDashboard.createdByMe);
+      }
     }
-  }, [dashboardList]);
+  }, [dashboardList, currentDashboardId]);
 
+  // 에러 처리
   useEffect(() => {
-    if (error) {
+    if (dashboardError) {
       toast.error("대시보드 목록을 불러오는 중 오류가 발생했습니다");
-      console.error(error.message);
+      console.error(dashboardError.message);
     }
-  }, [error]);
+    if (memberError) {
+      toast.error("멤버 목록을 불러오는 중 오류가 발생했습니다");
+      console.error(memberError.message);
+    }
+  }, [dashboardError, memberError]);
 
-  if (isLoading || error) return null;
+  // 초대하기 버튼 클릭 핸들러
+  const handleInviteClick = () => {
+    setIsInvitationDashboardOpen(true);
+  };
+
+  // 관리 버튼 클릭 핸들러
+  const handleSettingClick = () => {
+    router.push(`/dashboard/${currentDashboardId}/edit`);
+  };
+
+  // 로딩 중이거나 에러 발생 시 렌더링하지 않음
+  if (isDashboardLoading || isMemberLoading || dashboardError || memberError) return null;
+
+  // 대시보드 소유자 여부 확인
+  const isDashboardOwner = currentDashboardId && isOwner;
 
   return (
     <div className="flex h-full w-full items-center justify-between">
+      {/* 대시보드 제목 영역 */}
       <div className="w-[100px] pl-1 md:w-[180px]">
         <SelectedDashboard title={dashboardTitle} />
       </div>
 
+      {/* 대시보드 관리 버튼 영역 */}
       <div className="flex items-center gap-2 pr-1">
-        <div
-          onClick={() => router.push("/mypage")}
-          className="flex h-[30px] w-[49px] cursor-pointer items-center justify-center gap-1 rounded-lg border border-gray03 md:h-[36px] md:w-[85px]"
-        >
-          <Image
-            src="/images/header/setting.svg"
-            alt="관리"
-            width={20}
-            height={20}
-            className="hidden md:inline-block"
-          />
-          <span className="text-center">관리</span>
-        </div>
-        <div className="flex h-[30px] w-[73px] items-center justify-center gap-1 rounded-lg border border-gray03 md:h-[36px] md:w-[109px]">
-          <Image
-            src="/images/header/invitation.svg"
-            alt="초대하기"
-            width={20}
-            height={20}
-            className="hidden md:inline-block"
-          />
-          <span className="text-center">초대하기</span>
-        </div>
+        {isDashboardOwner && (
+          <>
+            {/* 관리 버튼 */}
+            <div
+              onClick={handleSettingClick}
+              className="flex h-[30px] w-[49px] cursor-pointer items-center justify-center gap-1 rounded-lg border border-gray03 md:h-[36px] md:w-[85px]"
+            >
+              <Image
+                src="/images/header/setting.svg"
+                alt="관리"
+                width={20}
+                height={20}
+                className="hidden md:inline-block"
+              />
+              <span className="text-center">관리</span>
+            </div>
+            {/* 초대하기 버튼 */}
+            <div
+              onClick={handleInviteClick}
+              className="flex h-[30px] w-[73px] cursor-pointer items-center justify-center gap-1 rounded-lg border border-gray03 md:h-[36px] md:w-[109px]"
+            >
+              <Image
+                src="/images/header/invitation.svg"
+                alt="초대하기"
+                width={20}
+                height={20}
+                className="hidden md:inline-block"
+              />
+              <span className="text-center">초대하기</span>
+            </div>
+          </>
+        )}
+        {/* 멤버 이니셜 표시 */}
         {dashboardId && <MemberInitials dashboardId={dashboardId} />}
+        {/* 구분선 */}
         <div className="mx-4 h-8 w-px bg-gray-300"></div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { DashboardForm, DashboardList, DashboardListSchema } from "@/zodSchema/dashboardSchema";
+import toast from "react-hot-toast";
 
 export const useDashboardList = ({ cursorId, page, size }: DashboardForm) => {
   return useQuery<DashboardList, Error>({
@@ -15,7 +16,7 @@ export const useDashboardList = ({ cursorId, page, size }: DashboardForm) => {
         return DashboardListSchema.parse(response.data);
       } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status === 500) {
-          console.error("대시보드 목록을 불러오는 중 오류가 발생했습니다.");
+          toast.error("해당 대시보드 아이디는 존재하지 않습니다.");
         }
         throw error;
       }
