@@ -68,10 +68,11 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
           />
         </div>
       </div>
-
-      {isLoading ? <div>멤버 정보를 불러오고 있어요</div> : <></>}
-      {error ? <div>멤버 정보를 불러오는데 실패했습니다</div> : <></>}
-      {!members ? <div>아직 초대된 멤버가 없습니다</div> : <></>}
+      <div className="px-5 md:px-7">
+        {isLoading ? <div>멤버 정보를 불러오고 있어요</div> : <></>}
+        {error ? <div>멤버 정보를 불러오는데 실패했습니다</div> : <></>}
+        {!members ? <div>아직 초대된 멤버가 없습니다</div> : <></>}
+      </div>
 
       <ul>
         <li>

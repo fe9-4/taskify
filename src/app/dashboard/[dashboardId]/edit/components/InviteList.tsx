@@ -4,6 +4,9 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { Member } from "@/zodSchema/memberSchema";
 import { PaginationBtn } from "@/components/button/ButtonComponents";
+import { CiSquarePlus } from "react-icons/ci";
+import { useAtom } from "jotai";
+import { InvitationDashboardAtom } from "@/store/modalAtom";
 /* 초대 res
 {
   "invitations": [
@@ -42,6 +45,7 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
   const [invitationId, setInvitationId] = useState();
+  const [, setIsInvitationDashboardOpen] = useAtom(InvitationDashboardAtom);
 
   const totalPage: number = Math.ceil(totalCount / size);
   const isFirst = page === 1;
@@ -58,15 +62,14 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
       setIsLoading(true);
       const res = await axios.get(`/api/dashboards/${dashboardId}/invitations?page=${page}&size=${size}`);
       const data = res.data;
+      console.log(res);
       console.log(data);
-      setInvitateList(data.user ? data.user.invitations : []);
-      setTotalCount(data.user.totalCount);
-      setInvitationId(data.invitations.id);
+      // setInvitateList(data.user ? data.user.invitations : []);
+      // setTotalCount(data.user.totalCount);
+      // setInvitationId(data.invitations.id);
     } catch (err) {
       if (axios.isAxiosError(err)) {
         console.error(err.message);
-      } else {
-        console.error("An unexpected error occurred", err);
       }
     } finally {
       setIsLoading(false);
@@ -81,7 +84,7 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
       try {
         const response = await axios.delete(`/api/dashboards/${dashboardId}/invitations/${invitationId}`);
         if (response.status === 204) {
-          toast.success(`초대를 취소합니다.`);
+          toast.success(`멤보 초대를 취소합니다.`);
           // setInvitateList(members.members.filter((member) => member.userId !== id));
         } else {
           toast.error("삭제하는 중 오류가 발생했습니다.");
@@ -101,7 +104,7 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
     if (inviteList.length > 0) {
       setInvitateList(uniqueMembers);
     }
-  }, [isLoading]);
+  }, [isLoading, inviteList]);
 
   return (
     <>
@@ -117,12 +120,20 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
             onClickPrev={onClickPrev}
             onClickNext={onClickNext}
           />
+          <button
+            className="flex items-center gap-[10px] rounded bg-violet01 px-3 py-2 text-xs text-white"
+            type="button"
+            onClick={() => setIsInvitationDashboardOpen(true)}
+          >
+            초대하기 <CiSquarePlus strokeWidth={1} />
+          </button>
         </div>
       </div>
-
-      {isLoading ? <div>초대 내역을 불러오고 있어요</div> : <></>}
-      {error ? <div>초대 내역을 불러오는데 실패했습니다</div> : <></>}
-      {inviteList.length === 0 ? <div>아직 초대된 멤버가 없습니다</div> : <></>}
+      <div className="px-5 md:px-7">
+        {isLoading ? <div>초대 내역을 불러오고 있어요</div> : <></>}
+        {error ? <div>초대 내역을 불러오는데 실패했습니다</div> : <></>}
+        {inviteList.length === 0 ? <div>아직 초대된 멤버가 없습니다</div> : <></>}
+      </div>
 
       <ul>
         <li>

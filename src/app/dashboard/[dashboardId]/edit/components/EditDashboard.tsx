@@ -5,17 +5,11 @@ import InputItem from "@/components/input/InputItem";
 import { useForm } from "react-hook-form";
 import SelectColorChip from "@/components/chip/SelectColorChip";
 import axios, { AxiosError } from "axios";
-import { useParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { DashboardInfoType, ValueType } from "@/types/dashboardType";
+import { useCallback, useEffect, useState } from "react";
 
-const EditDashboard = ({
-  dashboardInfo,
-  onClickEdit,
-}: {
-  dashboardInfo: DashboardInfoType;
-  onClickEdit: (value: ValueType) => void;
-}) => {
+const EditDashboard = ({ dashboardId }: { dashboardId: number }) => {
   const {
     register,
     handleSubmit,
@@ -23,8 +17,36 @@ const EditDashboard = ({
     formState: { isValid },
   } = useForm({ mode: "onChange" });
 
-  const { dashboardId } = useParams();
+  const [dashboardInfo, setDashboardInfo] = useState<DashboardInfoType>({
+    id: 0,
+    title: "TITLE",
+    color: "#000000",
+    createdAt: "2024-01-01T19:54:48.459Z",
+    updatedAt: "2024-01-01T19:19:34.157Z",
+    userId: 0,
+    createdByMe: false,
+  });
   const { title, color, createdByMe } = dashboardInfo;
+  // 대시보드 정보 요청 - 대시보드 수정하고 새로운 정보 가져오기
+  const fetchDashboardInfo = useCallback(async () => {
+    try {
+      const res = await axios.get(`/api/dashboards/${dashboardId}?dashboardId=${dashboardId}`);
+      setDashboardInfo(res.data);
+    } catch (err) {
+      const error = err as AxiosError;
+      console.error(error.message);
+    }
+  }, [dashboardId]);
+
+  useEffect(() => {
+    fetchDashboardInfo();
+  }, [fetchDashboardInfo]);
+
+  const onClickEdit = (value: ValueType) => {
+    const newTitle = value.title;
+    const newColor = value.color;
+    setDashboardInfo((prev) => ({ ...prev, title: newTitle, color: newColor }));
+  };
 
   // 대시보드 수정 api 요청
   const updateDashboard = async (value: ValueType) => {
@@ -50,7 +72,7 @@ const EditDashboard = ({
 
   return (
     <div className="w-full rounded-2xl bg-white px-4 py-5 md:px-7 md:py-8">
-      <h2 className="mb-6 text-2xl font-bold md:text-3xl">{title}</h2>
+      <h2 className="mb-6 text-2xl font-bold md:text-3xl">{title || "TITLE"}</h2>
       <InputItem id="title" {...register("title", { required: true })} label="대시보드 이름" type="text" />
       <div className="mb-8 mt-4 md:mb-10">
         <SelectColorChip register={register} watch={watch} />
