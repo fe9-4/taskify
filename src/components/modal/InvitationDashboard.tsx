@@ -20,34 +20,41 @@ const InvitationDashboard = () => {
   const currentDashboardId = params?.dashboardId ? Number(params.dashboardId) : null;
   const { user } = useAuth();
 
-  // 대시보드 멤버 여부 확인
-  const { members } = useDashboardMember({
+  // 1. 대시보드 정보 조회
+  const {
+    getDashboardById,
+    isLoading: isDashboardLoading,
+    error: dashboardError,
+  } = useDashboardList({
+    page: 1,
+    size: 10,
+    showErrorToast: true,
+    customErrorMessage: "대시보드를 찾을 수 없습니다.",
+  });
+
+  // 1. 현재 대시보드 정보 가져오기
+  const currentDashboard = currentDashboardId ? getDashboardById(currentDashboardId) : null;
+  const isOwner = currentDashboard?.createdByMe;
+
+  // 2. 대시보드 멤버 여부 확인
+  const {
+    memberData,
+    isLoading: isMemberLoading,
+    error: memberError,
+  } = useDashboardMember({
     dashboardId: currentDashboardId || 0,
     page: 1,
     size: 100,
+    showErrorToast: true,
+    customErrorMessage: "멤버 목록을 불러오는데 실패했습니다.",
   });
-  const isMember = members.members.length > 0;
 
-  // 대시보드 목록 조회
-  const { data: dashboardList, error: dashboardError } = useDashboardList({ page: 1, size: 10 });
-
-  // 대시보드 에러 처리
-  useEffect(() => {
-    if (dashboardError) {
-      setIsInvitationDashboardOpen(false);
-      router.back();
-    }
-  }, [dashboardError, setIsInvitationDashboardOpen, router]);
-
-  const isOwner = dashboardList?.dashboards.some(
-    (dashboard) => dashboard.id === currentDashboardId && dashboard.createdByMe
-  );
-
-  // 초대 목록 조회
+  // 3. 초대 목록 조회
   const { invitationList, inviteMember } = useInvitation({
     dashboardId: currentDashboardId || 0,
   });
 
+  // useForm 훅 설정
   const {
     register,
     handleSubmit,
@@ -58,16 +65,39 @@ const InvitationDashboard = () => {
       FormSchema.refine((data) => data.email !== user?.email, {
         message: "본인은 초대할 수 없습니다.",
         path: ["email"],
-      }).refine((data) => !members.members.some((member) => member.email === data.email), {
+      }).refine((data) => !memberData.list.some((member) => member.email === data.email), {
         message: "이미 대시보드의 멤버입니다.",
         path: ["email"],
       })
     ),
   });
 
+  // 이메일 유효성 검사
+  const email = watch("email");
+  const isValid = email && !errors.email;
+
+  // 에러 처리
+  useEffect(() => {
+    if (dashboardError || memberError) {
+      setIsInvitationDashboardOpen(false);
+      router.push("/mydashboard");
+    }
+  }, [dashboardError, memberError, setIsInvitationDashboardOpen, router]);
+
+  // 로딩 중이거나 대시보드가 없는 경우
+  if (isDashboardLoading || !currentDashboard) {
+    return null;
+  }
+
+  // 초대 권한이 없는 경우 모달을 표시하지 않음
+  if (!isOwner) {
+    setIsInvitationDashboardOpen(false);
+    return null;
+  }
+
   const onSubmit = async (data: FormData) => {
     // 초대 권한 확인
-    if (!isOwner && !isMember) {
+    if (!isOwner) {
       toast.error("초대 권한이 없습니다.");
       return;
     }
@@ -93,16 +123,6 @@ const InvitationDashboard = () => {
     }
   };
 
-  const email = watch("email");
-  const isValid = email && !errors.email;
-  const isLoading = false;
-
-  // 초대 권한이 없는 경우 모달을 표시하지 않음
-  if (!isOwner && !isMember) {
-    setIsInvitationDashboardOpen(false);
-    return null;
-  }
-
   return (
     <div className="w-[327px] rounded-lg bg-white px-4 py-6 md:w-[568px] md:p-6">
       <h2 className="mb-4 text-2xl font-bold md:mb-6 md:text-3xl">초대하기</h2>
@@ -116,7 +136,7 @@ const InvitationDashboard = () => {
       />
       <div className="mt-6 flex h-[54px] w-full gap-2">
         <CancelBtn onClick={() => setIsInvitationDashboardOpen(false)}>취소</CancelBtn>
-        <ConfirmBtn disabled={!isValid || isLoading} onClick={handleSubmit(onSubmit)}>
+        <ConfirmBtn disabled={!isValid || isDashboardLoading || isMemberLoading} onClick={handleSubmit(onSubmit)}>
           생성
         </ConfirmBtn>
       </div>

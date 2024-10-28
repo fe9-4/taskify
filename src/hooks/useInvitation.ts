@@ -55,11 +55,11 @@ export const useInvitation = ({ dashboardId }: UseInvitationProps) => {
   };
 
   return {
-    invitationList,
-    isLoading,
-    error,
-    inviteMember,
-    isInviting,
-    isAlreadyInvited,
+    invitationList, // 초대 목록 데이터
+    isLoading, // 초대 목록 로딩 상태
+    error, // 초대 목록 조회 에러
+    inviteMember, // 초대하기 함수
+    isInviting, // 초대 진행 중 상태
+    isAlreadyInvited, // 이미 초대된 이메일인지 확인하는 함수
   };
 };

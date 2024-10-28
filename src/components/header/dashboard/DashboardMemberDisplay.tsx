@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { SelectedDashboard } from "./SelectedDashboard";
 import { MemberInitials } from "./MemberInitials";
 import { useDashboardList } from "@/hooks/useDashboardList";
 import { useDashboardMember } from "@/hooks/useDashboardMember";
-import toast from "react-hot-toast";
 import Image from "next/image";
 import { useRouter, useParams } from "next/navigation";
 import { useSetAtom } from "jotai";
@@ -12,57 +11,38 @@ import { InvitationDashboardAtom } from "@/store/modalAtom";
 export const DashboardMemberDisplay = () => {
   const router = useRouter();
   const params = useParams();
-  // URL에서 현재 대시보드 ID 추출
   const currentDashboardId = params?.dashboardId ? Number(params.dashboardId) : null;
 
   // 초대하기 모달 상태 관리
   const setIsInvitationDashboardOpen = useSetAtom(InvitationDashboardAtom);
 
-  // 대시보드 목록과 멤버 목록 조회
+  // 대시보드 목록 조회
   const {
-    data: dashboardList,
+    getDashboardById,
     isLoading: isDashboardLoading,
     error: dashboardError,
-  } = useDashboardList({ page: 1, size: 10 });
+  } = useDashboardList({
+    page: 1,
+    size: 10,
+    showErrorToast: true,
+    customErrorMessage: "대시보드를 찾을 수 없습니다.",
+  });
+
+  // 현재 대시보드 정보 가져오기
+  const currentDashboard = currentDashboardId ? getDashboardById(currentDashboardId) : null;
+
+  // 멤버 목록 조회
   const {
-    members,
+    memberData,
     isLoading: isMemberLoading,
     error: memberError,
   } = useDashboardMember({
     dashboardId: currentDashboardId || 0,
     page: 1,
     size: 100,
+    showErrorToast: true,
+    customErrorMessage: "멤버 목록을 불러오는데 실패했습니다.",
   });
-
-  // 현재 대시보드 정보 상태 관리
-  const [dashboardId, setDashboardId] = useState<number | null>(null);
-  const [dashboardTitle, setDashboardTitle] = useState<string | null>(null);
-  const [isOwner, setIsOwner] = useState<boolean>(false);
-
-  // 현재 대시보드 정보 설정
-  useEffect(() => {
-    if (dashboardList?.dashboards && currentDashboardId) {
-      const currentDashboard = dashboardList.dashboards.find((dashboard) => dashboard.id === currentDashboardId);
-
-      if (currentDashboard) {
-        setDashboardId(currentDashboard.id);
-        setDashboardTitle(currentDashboard.title);
-        setIsOwner(currentDashboard.createdByMe);
-      }
-    }
-  }, [dashboardList, currentDashboardId]);
-
-  // 에러 처리
-  useEffect(() => {
-    if (dashboardError) {
-      toast.error("대시보드 목록을 불러오는 중 오류가 발생했습니다");
-      console.error(dashboardError.message);
-    }
-    if (memberError) {
-      toast.error("멤버 목록을 불러오는 중 오류가 발생했습니다");
-      console.error(memberError.message);
-    }
-  }, [dashboardError, memberError]);
 
   // 초대하기 버튼 클릭 핸들러
   const handleInviteClick = () => {
@@ -78,13 +58,13 @@ export const DashboardMemberDisplay = () => {
   if (isDashboardLoading || isMemberLoading || dashboardError || memberError) return null;
 
   // 대시보드 소유자 여부 확인
-  const isDashboardOwner = currentDashboardId && isOwner;
+  const isDashboardOwner = currentDashboard?.createdByMe;
 
   return (
     <div className="flex h-full w-full items-center justify-between">
       {/* 대시보드 제목 영역 */}
       <div className="w-[100px] pl-1 md:w-[180px]">
-        <SelectedDashboard title={dashboardTitle} />
+        <SelectedDashboard title={currentDashboard?.title || null} />
       </div>
 
       {/* 대시보드 관리 버튼 영역 */}
@@ -122,7 +102,7 @@ export const DashboardMemberDisplay = () => {
           </>
         )}
         {/* 멤버 이니셜 표시 */}
-        {dashboardId && <MemberInitials dashboardId={dashboardId} />}
+        {currentDashboardId && memberData.total > 0 && <MemberInitials dashboardId={currentDashboardId} />}
         {/* 구분선 */}
         <div className="mx-4 h-8 w-px bg-gray-300"></div>
       </div>
