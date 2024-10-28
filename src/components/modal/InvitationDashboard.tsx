@@ -12,7 +12,6 @@ import { useDashboardMember } from "@/hooks/useDashboardMember";
 import { FormData, FormSchema } from "@/zodSchema/invitationSchema";
 import { useDashboardList } from "@/hooks/useDashboardList";
 import { useInvitation } from "@/hooks/useInvitation";
-import axios from "axios";
 
 const InvitationDashboard = () => {
   const [, setIsInvitationDashboardOpen] = useAtom(InvitationDashboardAtom);
