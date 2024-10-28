@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
-import axios from "axios";
+import axios from "axios"
 import apiClient from "../apiClient";
+import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { CreateDashboard } from "@/types/dashboardType";
 
-// 내 대시보드 상단 대시보드 목록 조회 (cursorId 포함)
+// 내 대시보드 상단 대시보드 목록 조회, 사이드바 대시보드 조회 
 export const GET = async (req: NextRequest) => {
   const searchParams = req.nextUrl.searchParams;
   const cursorId = searchParams.get("cursorId");
