@@ -1,21 +1,39 @@
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import InputItem from "../input/InputItem";
 import { CancelBtn, ConfirmBtn } from "../button/ButtonComponents";
-import { useAtom } from "jotai";
-import { CreateColumnAtom } from "@/store/modalAtom";
+import { useAtom, useAtomValue } from "jotai";
+import { ColumnTitlesAtom, CreateColumnAtom } from "@/store/modalAtom";
 import { useParams } from "next/navigation";
+import useLoading from "@/hooks/useLoading";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 const CreateColumn = () => {
   const [, setIsCreateColumnOpen] = useAtom(CreateColumnAtom);
-  const dashboardId = useParams();
+  const { dashboardId } = useParams();
+  const { isLoading, withLoading } = useLoading();
+  const ColumnTitles = useAtomValue(ColumnTitlesAtom);
   const {
     register,
     handleSubmit,
+    control,
     formState: { isValid },
   } = useForm();
 
-  const onSubmit = (data: any) => {
-    console.log({ ...data, ...dashboardId });
+  const title = useWatch({ control, name: "title" });
+  const isDuplicate = ColumnTitles.includes(title);
+
+  const onSubmit = async (data: any) => {
+    await withLoading(async () => {
+      try {
+        await axios.post("/api/columns", { ...data, dashboardId: Number(dashboardId) });
+        toast.success("컬럼 생성 완료");
+        setIsCreateColumnOpen(false);
+      } catch (error) {
+        toast.error("컬럼 생성 실패");
+        setIsCreateColumnOpen(false);
+      }
+    });
   };
 
   return (
@@ -27,10 +45,11 @@ const CreateColumn = () => {
         label="이름"
         type="text"
         placeholder="새 컬럼 이름을 적어주세요"
+        errors={isDuplicate ? "중복된 컬럼 이름입니다." : ""}
       />
       <div className="mt-6 flex h-[54px] w-full gap-2">
         <CancelBtn onClick={() => setIsCreateColumnOpen(false)}>취소</CancelBtn>
-        <ConfirmBtn disabled={!isValid} onClick={handleSubmit(onSubmit)}>
+        <ConfirmBtn disabled={!isValid || isLoading || isDuplicate} onClick={handleSubmit(onSubmit)}>
           생성
         </ConfirmBtn>
       </div>
