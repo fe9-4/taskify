@@ -28,7 +28,7 @@ export default function Home() {
   return (
     <div className="m-4 flex flex-col gap-4">
       <div>
-        <AddColumnBtn onClick={() => setIsCreateCard(true)} />
+        <AddColumnBtn onClick={() => setIsCreateCard({ isOpen: true, columnId: null })} />
       </div>
       <div>
         <AddDashboardBtn onClick={() => setIsCreateDashboardOpen(true)} />

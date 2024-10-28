@@ -34,7 +34,7 @@ export const useAuth = () => {
         }
       } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status === 401) {
-          console.log("Cookie에 accessToken이 없습니다.");
+          console.error("Cookie에 accessToken이 없습니다.");
         }
         throw error;
       }

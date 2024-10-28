@@ -1,12 +1,12 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 import ColumnItem from "./ColumnItem";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { HiOutlineCog } from "react-icons/hi";
 import { NumChip } from "../../../components/chip/PlusAndNumChip";
 import { AddTodoBtn } from "../../../components/button/ButtonComponents";
-import { ICard, Iitem } from "@/types/dashboardType";
-import { useAtom } from "jotai";
+import { Iitem } from "@/types/dashboardType";
+import { useSetAtom } from "jotai";
 import { CreateCardAtom } from "@/store/modalAtom";
 
 interface IProps {
@@ -15,13 +15,12 @@ interface IProps {
 }
 
 const ColumnList = ({ columnTitle, columnId }: IProps) => {
-  const [cardList, setCardList] = useState<ICard["cards"]>([]);
+  const [cardList, setCardList] = useState<Iitem[]>([]);
   const [hasMore, setHasMore] = useState(true);
-  const [size, setSize] = useState(3);
-  const [, setIsCreateCardOpen] = useAtom(CreateCardAtom);
+  const [size] = useState(3);
+  const setCreateCardAtom = useSetAtom(CreateCardAtom);
   const observeRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
-  
   const getCardList = useCallback(async () => {
     if (!hasMore) return;
 
@@ -30,7 +29,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
 
       if (response.status === 200) {
         const newCardList = response.data.cards;
-        
+
         setCardList((prev) => {
           const existingId = new Set(prev.map((card) => card.id));
           const filteredNewCardList = newCardList.filter((card: Iitem) => !existingId.has(card.id));
@@ -49,9 +48,8 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
         toast.error(error.response?.data);
       }
     }
-  }, [columnId, hasMore, size]);
+  }, [columnId, size, hasMore]);
 
-  // 카드아이템 무한스크롤
   useEffect(() => {
     getCardList();
 
@@ -78,7 +76,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
 
   const handleEditModal = () => {
     // 모달 만들어지면 모달 연결
-  }
+  };
 
   return (
     <div className="space-y-6 px-4 pt-4 md:border-b md:border-gray04 md:pb-6 xl:flex xl:min-h-screen xl:flex-col xl:border-b-0 xl:border-r">
@@ -90,12 +88,12 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
           </div>
           <NumChip num={cardList.length} />
         </div>
-        <button>
+        <button onClick={handleEditModal}>
           <HiOutlineCog className="size-[22px] text-gray01" />
         </button>
       </div>
       <div className="flex flex-col space-y-2">
-        <AddTodoBtn onClick={() => setIsCreateCardOpen(true)} />
+        <AddTodoBtn onClick={() => setCreateCardAtom({ isOpen: true, columnId })} />
         {cardList.length > 0 ? (
           cardList.map((item, i) => (
             <div key={item.id}>
