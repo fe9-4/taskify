@@ -41,3 +41,29 @@ export const GET = async (request: NextRequest, { params }: { params: IParams })
     }
   }
 };
+
+// 대시보드 초대하기
+export const POST = async (request: NextRequest, { params }: { params: { dashboardId: string } }) => {
+  const cookieStore = cookies();
+  const accessToken = cookieStore.get("accessToken")?.value;
+  const { dashboardId } = params;
+
+  if (!accessToken) {
+    return NextResponse.json({ error: "인증되지 않은 사용자" }, { status: 401 });
+  }
+
+  try {
+    const formData = await request.json();
+    const response = await apiClient.post(`/dashboards/${dashboardId}/invitations`, formData, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    return NextResponse.json({ user: response.data }, { status: 200 });
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      return new NextResponse(JSON.stringify({ message: "컬럼 생성 실패" }), { status: error.status });
+    }
+  }
+};

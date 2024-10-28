@@ -144,9 +144,9 @@ export const ConfirmBtn = ({
   ...props
 }: {
   disabled?: boolean;
-  children: string;
+  children: ReactNode;
   onClick: any;
-  type: string;
+  type?: string;
   extra?: any;
   props?: any;
 }) => {

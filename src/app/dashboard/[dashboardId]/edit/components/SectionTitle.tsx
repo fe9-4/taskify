@@ -1,16 +1,17 @@
 import { PaginationBtn } from "@/components/button/ButtonComponents";
+import { InvitationDashboardAtom } from "@/store/modalAtom";
+import { useAtom } from "jotai";
 import { useState } from "react";
 import { CiSquarePlus } from "react-icons/ci";
 
 // 초대하기 모달 추가
-const onClickInvitation = () => {};
 const MemberInfo = () => <div className="text-base font-normal text-gray02 md:text-lg">이름</div>;
 const EmailInfo = () => <div className="text-base font-normal text-gray02 md:text-lg">이메일</div>;
-const InviteButton = () => (
+const InviteButton = ({ onClick }: { onClick: () => void }) => (
   <button
     className="flex items-center gap-[10px] rounded bg-violet01 px-3 py-2 text-xs text-white"
     type="button"
-    onClick={onClickInvitation}
+    onClick={onClick}
   >
     초대하기 <CiSquarePlus strokeWidth={1} />
   </button>
@@ -19,11 +20,13 @@ const InviteButton = () => (
 const SectionTitle = ({ sectionTitle }: { sectionTitle: string }) => {
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState<number>(0);
+  const [, setIsInvitationDashboardOpen] = useAtom(InvitationDashboardAtom);
 
   const size = sectionTitle === "구성원" ? 4 : 5;
   const totalPage: number = Math.ceil(totalCount / size);
   const isFirst = page === 1;
   const isLast = page === totalPage;
+
   const onClickPrev = () => {
     if (!isFirst) setPage(page - 1);
   };
@@ -43,7 +46,7 @@ const SectionTitle = ({ sectionTitle }: { sectionTitle: string }) => {
         />
       </div>
       <div className="col-start-2 row-start-2 flex justify-end">
-        {sectionTitle === "구성원" ? <></> : <InviteButton />}
+        {sectionTitle === "구성원" ? <></> : <InviteButton onClick={() => setIsInvitationDashboardOpen(true)} />}
       </div>
       <div className="col-start-1 row-start-2">{sectionTitle === "구성원" ? <MemberInfo /> : <EmailInfo />}</div>
     </div>
