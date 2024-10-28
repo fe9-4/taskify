@@ -42,7 +42,15 @@ const MemberItem = ({ member }: { member: Member }) => {
     <div className="w-full border-b border-gray04 px-5 md:px-7">
       <div className="flex items-center justify-between">
         {profileImageUrl && (
-          <Image src={profileImageUrl} width={30} height={30} alt="프로필" className="rounded-full" />
+          <div className="overflow-hidden">
+            <Image
+              src={profileImageUrl}
+              width={50}
+              height={50}
+              alt="프로필"
+              className="size-[38px] rounded-full object-center"
+            />
+          </div>
         )}
         <div>{nickname}</div>
         <DeleteCancelBtn onClick={onClickDeleteMember}>삭제</DeleteCancelBtn>
