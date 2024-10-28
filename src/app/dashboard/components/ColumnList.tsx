@@ -7,7 +7,7 @@ import { NumChip } from "../../../components/chip/PlusAndNumChip";
 import { AddTodoBtn } from "../../../components/button/ButtonComponents";
 import { ICard, Iitem } from "@/types/dashboardType";
 import { useAtom } from "jotai";
-import { CreateCardAtom, DetailCardAtom, DetailCardParamsAtom } from "@/store/modalAtom";
+import { CreateCardAtom, CreateCardParamsAtom, DetailCardAtom, DetailCardParamsAtom } from "@/store/modalAtom";
 
 interface IProps {
   columnTitle: string;
@@ -19,6 +19,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [hasMore, setHasMore] = useState(true);
   const [size, setSize] = useState(3);
   const [, setIsCreateCardOpen] = useAtom(CreateCardAtom);
+  const [, setIsCreateCardParams] = useAtom(CreateCardParamsAtom);
   const [, setIsDetailCardOpen] = useAtom(DetailCardAtom);
   const [, setIsDetailCardParams] = useAtom(DetailCardParamsAtom);
   const observeRef = useRef<IntersectionObserver | null>(null);
@@ -97,7 +98,12 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
         </button>
       </div>
       <div className="flex flex-col space-y-2">
-        <AddTodoBtn onClick={() => setIsCreateCardOpen(true)} />
+        <AddTodoBtn
+          onClick={() => {
+            setIsCreateCardOpen(true);
+            setIsCreateCardParams(String(columnId));
+          }}
+        />
         {cardList.length > 0 ? (
           cardList.map((item, i) => (
             <div key={item.id}>

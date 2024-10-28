@@ -19,7 +19,6 @@ interface IProps {
   currentManager: ICurrentManager;
   setManager: (manager: ICurrentManager) => void;
   setValue: UseFormSetValue<CreateCardProps | UpdateCardProps>;
-  // value: ICurrentManager | any;
   validation: UseFormRegisterReturn;
   errors?: FieldErrors;
 }
@@ -35,14 +34,14 @@ const SearchDropdown = ({ validation, setValue, inviteMemberList, setManager, cu
   const handleChangeName = (e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
 
-    // const { value } = e.target;
-    const res = inviteMemberList.filter((data) => data.nickname.includes(e.target.value));
+    const { value } = e.target;
+    const res = inviteMemberList.filter((data) => data.nickname.includes(value));
 
-    setName(e.target.value);
+    setName(value);
     setSelectedName(null);
-    setIsOpen(e.target.value.length > 0);
+    setIsOpen(value.length > 0);
 
-    if (e.target.value === res[0]?.nickname) {
+    if (value === res[0]?.nickname) {
       setValue("assigneeUserId", res[0]?.id);
     }
   };
@@ -65,7 +64,7 @@ const SearchDropdown = ({ validation, setValue, inviteMemberList, setManager, cu
 
   return (
     <section className="flex flex-col gap-2">
-      <label htmlFor="assignee" className="text-lg font-medium text-black03">
+      <label htmlFor="assignee" className="text-lg font-medium text-black03 md:text-xl">
         담당자
       </label>
       <div className="flex w-full flex-col space-y-[2px] bg-white" ref={dropdownRef}>

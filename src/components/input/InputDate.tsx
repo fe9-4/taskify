@@ -23,7 +23,7 @@ const InputDate = forwardRef(({ label, id, name, value, placeholder, onChange }:
 
   return (
     <div className="flex flex-col gap-2">
-      {label && <label className="text-lg font-medium text-black03">{label}</label>}
+      {label && <label className="text-lg font-medium text-black03 md:text-xl">{label}</label>}
 
       <div className="relative flex items-center">
         <CalendarIcon

@@ -4,7 +4,7 @@ import { InputTagProps } from "@/types/formType";
 const InputTag = ({ tags, tagInput, onKeyDown, onClick, onChange }: InputTagProps) => {
   return (
     <div className="relative flex flex-col gap-2">
-      <label htmlFor="tags" className="text-lg font-medium text-black03">
+      <label htmlFor="tags" className="text-lg font-medium text-black03 md:text-xl">
         태그
       </label>
 

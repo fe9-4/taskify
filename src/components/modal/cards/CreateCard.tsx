@@ -20,18 +20,19 @@ import InputDate from "@/components/input/InputDate";
 import InputTag from "@/components/input/InputTag";
 import InputFile from "@/components/input/InputFile";
 
-import { useAtom } from "jotai";
-import { CreateCardAtom } from "@/store/modalAtom";
+import { useAtom, useAtomValue } from "jotai";
+import { CreateCardAtom, CreateCardParamsAtom } from "@/store/modalAtom";
 
 const CreateCard = () => {
   const { user } = useAuth();
-  const { dashboardId, columnId } = useParams();
+  const { dashboardId } = useParams();
   const { members } = useDashboardMember({ dashboardId: Number(dashboardId) });
 
   const { createFormData, isLoading: isFileLoading, error: fileError } = useFileUpload();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [tagInput, setTagInput] = useState("");
 
+  const columnId = useAtomValue(CreateCardParamsAtom);
   const [, setIsCreateCardOpen] = useAtom(CreateCardAtom);
   const { isLoading, withLoading } = useLoading();
 
@@ -49,7 +50,7 @@ const CreateCard = () => {
     defaultValues: {
       assigneeUserId: Number(user && user.id),
       dashboardId: Number(dashboardId),
-      columnId: 40993,
+      columnId: Number(columnId),
       title: "",
       description: "",
       dueDate: "",
@@ -80,7 +81,7 @@ const CreateCard = () => {
           throw new Error("FormData 생성 실패");
         }
 
-        const columnId = watch("columnId"); // 현재 선택된 columnId 가져오기
+        const columnId = watch("columnId");
         const response = await axios.post(`/api/columns/${columnId}/card-image`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
@@ -146,31 +147,29 @@ const CreateCard = () => {
           )}
         />
 
-        <div className="flex flex-col gap-2">
-          <label htmlFor="assignee" className="text-lg font-medium text-black03">
-            제목 <span className="text-violet01">*</span>
-          </label>
-          <InputItem id="title" {...register("title")} errors={errors.title && errors.title.message} />
-        </div>
+        <InputItem
+          label="제목"
+          id="title"
+          {...register("title")}
+          errors={errors.title && errors.title.message}
+          required
+        />
 
-        <div className="flex flex-col gap-2">
-          <label htmlFor="assignee" className="text-lg font-medium text-black03">
-            설명 <span className="text-violet01">*</span>
-          </label>
-          <InputItem
-            id="description"
-            {...register("description", {
-              required: "설명은 필수입니다",
-              onChange: (e) => {
-                setValue("description", e.target.value);
-                trigger("description");
-              },
-            })}
-            isTextArea
-            size="description"
-            errors={errors.description && errors.description.message}
-          />
-        </div>
+        <InputItem
+          label="설명"
+          id="description"
+          {...register("description", {
+            required: "설명은 필수입니다",
+            onChange: (e) => {
+              setValue("description", e.target.value);
+              trigger("description");
+            },
+          })}
+          isTextArea
+          size="description"
+          required
+          errors={errors.description && errors.description.message}
+        />
 
         <Controller
           name="dueDate"
@@ -222,7 +221,7 @@ const CreateCard = () => {
           <CancelBtn type="button" onClick={() => setIsCreateCardOpen(false)}>
             취소
           </CancelBtn>
-          <ConfirmBtn type="submit" disabled={!isFormValid || isLoading} onClick={handleSubmit(onSubmit)}>
+          <ConfirmBtn type="submit" disabled={!isValid || isLoading}>
             생성
           </ConfirmBtn>
         </div>
