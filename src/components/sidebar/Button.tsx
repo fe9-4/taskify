@@ -6,7 +6,7 @@ const Button = () => {
   const [, setisCreateDashboardOpen] = useAtom(CreateDashboardAtom);
 
   return (
-    <div className="flex justify-between">
+    <div className="flex justify-center md:justify-between">
       <div className="hidden w-full font-semibold text-gray01 md:block md:text-xs md:leading-5">Dash Boards</div>
       <button
         type="button"
