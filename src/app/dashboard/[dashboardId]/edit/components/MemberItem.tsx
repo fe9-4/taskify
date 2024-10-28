@@ -31,11 +31,11 @@ import Image from "next/image";
   "totalCount": 1
 }
 */
-const MemberItem = ({ member }: { member: Member }) => {
+const MemberItem = ({ member, onClick }: { member: Member; onClick: (id: number) => void }) => {
   const { nickname, profileImageUrl, id } = member;
 
-  const onClickDeleteMember = () => {
-    // 구성원 삭제하기 api
+  const onClickDeleteMember = (id: number) => {
+    onClick(id);
   };
   const pastelColors = [
     "bg-blue-200",
@@ -66,7 +66,7 @@ const MemberItem = ({ member }: { member: Member }) => {
         </div>
         <div>{nickname}</div>
       </div>
-      <DeleteCancelBtn onClick={onClickDeleteMember}>삭제</DeleteCancelBtn>
+      <DeleteCancelBtn onClick={() => onClickDeleteMember(id)}>삭제</DeleteCancelBtn>
     </div>
   );
 };
