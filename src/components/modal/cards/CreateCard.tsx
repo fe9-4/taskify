@@ -28,7 +28,6 @@ const CreateCard = () => {
   const { user } = useAuth();
   const { dashboardId } = useParams();
   const { members } = useDashboardMember({ dashboardId: Number(dashboardId) });
-
   const columnId = useAtomValue(CreateCardParamsAtom);
   const [, setIsCreateCardOpen] = useAtom(CreateCardAtom);
   const { isLoading, withLoading } = useLoading();
@@ -75,8 +74,7 @@ const CreateCard = () => {
   const dueDate = useWatch({ control, name: "dueDate" });
   const tags = useWatch({ control, name: "tags" });
 
-  // 폼의 전체 유효성 체크
-  const isFormValid = isValid && !!dueDate && tags.length > 0 && !!imageUrl;
+  const isFormValid = isValid && !!dueDate && tags.length > 0 && !!imageUrl && !isFileUploading;
 
   const handleAddTag = (tag: string) => {
     if (tagInput.trim() && !tags.includes(tag)) {
@@ -85,7 +83,6 @@ const CreateCard = () => {
     }
   };
 
-  // 이미지 변경 핸들러 (이미지를 넣지 않으면 카드 생성 실패함)
   const handleImageChange = async (file: string | File | null) => {
     if (!file) {
       setImageUrl(null);

@@ -17,9 +17,6 @@ export const POST = async (request: NextRequest) => {
     const body = await request.json();
     const { assigneeUserId, dashboardId, columnId, title, description, dueDate, tags, imageUrl } = body;
 
-    // 태그를 JSON 문자열에서 배열로 변환
-    const parsedTags = JSON.parse(tags);
-
     // dueDate를 YYYY-MM-DD HH:MM 형식으로 변환
     const formattedDueDate = dueDate ? formatDateTime(new Date(dueDate)) : null;
 
@@ -31,12 +28,12 @@ export const POST = async (request: NextRequest) => {
       title,
       description,
       dueDate: formattedDueDate,
-      tags: parsedTags,
+      tags,
       imageUrl,
     };
 
     // API 클라이언트를 사용하여 서버에 카드 생성 요청
-    const response = await apiClient.post("/cards/", newCard, {
+    const response = await apiClient.post("/cards", newCard, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },

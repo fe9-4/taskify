@@ -1,35 +1,12 @@
 import { z } from "zod";
 
-export const CardFormSchema = z.object({
-  assigneeUserId: z.number(),
+export const CardSchema = z.object({
+  assigneeUserId: z.number().min(1, "담당자를 선택해주세요"),
   dashboardId: z.number(),
   columnId: z.number(),
   title: z.string().min(1, "제목은 필수입니다"),
   description: z.string().min(1, "설명은 필수입니다"),
-  dueDate: z.string(),
-  tags: z.array(z.string()),
+  dueDate: z.string().min(1, "날짜를 선택해주세요"),
+  tags: z.array(z.string()).min(1, "태그를 1개 이상 입력해주세요"),
   imageUrl: z.string().nullable(),
 });
-
-export type CardForm = z.infer<typeof CardFormSchema>;
-
-export const CardResponseSchema = z.object({
-  id: z.number(),
-  title: z.string(),
-  description: z.string(),
-  tags: z.array(z.string()),
-  dueDate: z.string(),
-  assignee: z.object({
-    profileImageUrl: z.string().nullable(),
-    nickname: z.string(),
-    id: z.number(),
-  }),
-  imageUrl: z.string(),
-  teamId: z.string(),
-  columnId: z.number(),
-  dashboardId: z.number(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-});
-
-export type CardResponse = z.infer<typeof CardResponseSchema>;

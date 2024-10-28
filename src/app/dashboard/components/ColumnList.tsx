@@ -7,7 +7,7 @@ import { NumChip } from "../../../components/chip/PlusAndNumChip";
 import { AddTodoBtn } from "../../../components/button/ButtonComponents";
 import { ICard, Iitem } from "@/types/dashboardType";
 import { useAtom } from "jotai";
-import { CreateCardAtom } from "@/store/modalAtom";
+import { CreateCardAtom, CreateCardParamsAtom, DetailCardAtom, DetailCardParamsAtom } from "@/store/modalAtom";
 
 interface IProps {
   columnTitle: string;
@@ -19,6 +19,9 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [hasMore, setHasMore] = useState(true);
   const [size, setSize] = useState(3);
   const [, setIsCreateCardOpen] = useAtom(CreateCardAtom);
+  const [, setIsCreateCardParams] = useAtom(CreateCardParamsAtom);
+  const [, setIsDetailCardOpen] = useAtom(DetailCardAtom);
+  const [, setIsDetailCardParams] = useAtom(DetailCardParamsAtom);
   const observeRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
 
@@ -95,12 +98,25 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
         </button>
       </div>
       <div className="flex flex-col space-y-2">
-        <AddTodoBtn onClick={() => setIsCreateCardOpen(true)} />
+        <AddTodoBtn
+          onClick={() => {
+            setIsCreateCardOpen(true);
+            setIsCreateCardParams(String(columnId));
+          }}
+        />
         {cardList.length > 0 ? (
           cardList.map((item, i) => (
             <div key={item.id}>
-              <ColumnItem cards={item} />
-              {i === cardList.length - 1 && <div ref={loadingRef} className="h-[1px]" />}
+              <button
+                className="size-full"
+                onClick={() => {
+                  setIsDetailCardOpen(true);
+                  setIsDetailCardParams(String(item.id));
+                }}
+              >
+                <ColumnItem cards={item} />
+                {i === cardList.length - 1 && <div ref={loadingRef} className="h-[1px]" />}
+              </button>
             </div>
           ))
         ) : (
