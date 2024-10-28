@@ -32,17 +32,25 @@ import Image from "next/image";
 }
 */
 const MemberItem = ({ member }: { member: Member }) => {
-  const { nickname, profileImageUrl } = member;
+  const { nickname, profileImageUrl, id } = member;
 
   const onClickDeleteMember = () => {
     // 구성원 삭제하기 api
   };
-
+  const pastelColors = [
+    "bg-blue-200",
+    "bg-green-200",
+    "bg-yellow-200",
+    "bg-purple-200",
+    "bg-indigo-200",
+    "bg-red-200",
+    "bg-teal-200",
+  ];
   return (
-    <div className="w-full border-b border-gray04 px-5 md:px-7">
-      <div className="flex items-center justify-between">
-        {profileImageUrl && (
-          <div className="overflow-hidden">
+    <div className="flex w-full justify-between border-b border-gray04 px-5 py-3 md:px-7 md:py-4">
+      <div className="flex items-center gap-2 md:gap-3">
+        <div className="size-[38px] overflow-hidden rounded-full">
+          {profileImageUrl ? (
             <Image
               src={profileImageUrl}
               width={50}
@@ -50,11 +58,15 @@ const MemberItem = ({ member }: { member: Member }) => {
               alt="프로필"
               className="size-[38px] rounded-full object-center"
             />
-          </div>
-        )}
+          ) : (
+            <div className={`flex size-full items-center justify-center ${pastelColors[id % pastelColors.length]}`}>
+              {nickname.slice(0, 1)}
+            </div>
+          )}
+        </div>
         <div>{nickname}</div>
-        <DeleteCancelBtn onClick={onClickDeleteMember}>삭제</DeleteCancelBtn>
       </div>
+      <DeleteCancelBtn onClick={onClickDeleteMember}>삭제</DeleteCancelBtn>
     </div>
   );
 };
