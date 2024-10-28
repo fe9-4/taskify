@@ -39,7 +39,7 @@ export const GET = async (req: Request) => {
   }
 };
 
-// 대시보드 생성
+// 컬럼 생성
 export const POST = async (request: NextRequest) => {
   const cookieStore = cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
