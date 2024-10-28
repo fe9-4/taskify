@@ -1,6 +1,6 @@
 import axios from "axios";
 import apiClient from "../apiClient";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
 // 대시보드페이지 컬럼 조회
@@ -35,6 +35,31 @@ export const GET = async (req: Request) => {
     if (axios.isAxiosError(error)) {
       console.error("대시보드 상세페이지 GET 요청에서 오류 발생", error);
       return new NextResponse("대시보드 조회 실패", { status: error.status });
+    }
+  }
+};
+
+// 컬럼 생성
+export const POST = async (request: NextRequest) => {
+  const cookieStore = cookies();
+  const accessToken = cookieStore.get("accessToken")?.value;
+
+  if (!accessToken) {
+    return NextResponse.json({ error: "인증되지 않은 사용자" }, { status: 401 });
+  }
+
+  try {
+    const formData = await request.json();
+    const response = await apiClient.post("/columns", formData, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    return NextResponse.json({ user: response.data }, { status: 200 });
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      return new NextResponse(JSON.stringify({ message: "컬럼 생성 실패" }), { status: error.status });
     }
   }
 };

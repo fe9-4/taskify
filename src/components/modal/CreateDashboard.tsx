@@ -52,7 +52,7 @@ const CreateDashboard = () => {
       </div>
       <div className="flex h-[54px] w-full gap-2">
         <CancelBtn onClick={() => setIsCreateDashboardOpen(false)}>취소</CancelBtn>
-        <ActiveBtn disabled={!isValid || isLoading} onClick={handleSubmit(onSubmit)}>
+        <ConfirmBtn disabled={!isValid || isLoading} onClick={handleSubmit(onSubmit)}>
           {isLoading ? (
             <>
               <div className="h-5 w-5 animate-spin rounded-full border-4 border-solid border-white border-t-transparent" />
@@ -60,7 +60,7 @@ const CreateDashboard = () => {
           ) : (
             "생성"
           )}
-        </ActiveBtn>
+        </ConfirmBtn>
       </div>
     </div>
   );
