@@ -10,16 +10,14 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
   const size = 5;
   const { members, isLoading, error, refetch } = useDashboardMember({ dashboardId, page, size });
 
-  // const [memberList, setMemberList] = useState<Member[]>([]);
+  const [memberList, setMemberList] = useState<Member[]>([]);
 
   const onClickDeleteMember = (id: number, nickname: string) => {
     const deleteMember = async (id: number) => {
       try {
-        const res = await axios.delete(`/api/members/${id}`);
-        console.log(res.data);
+        await axios.delete(`/api/members/${id}`);
         toast.success(`멤버 ${nickname}가 삭제되었습니다`);
-        // setMemberList(members.members.filter((member) => member.userId !== id));
-        // console.log(memberList);
+        setMemberList(members.members.filter((member) => member.userId !== id));
         refetch();
       } catch (err) {
         console.error(`Error deleting member: ${id}`, err);
@@ -29,14 +27,14 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
     deleteMember(id);
   };
 
-  const uniqueMembers = members.members.filter(
-    (member, index, self) => index === self.findIndex((m) => m.userId === member.userId)
-  );
-  // useEffect(() => {
-  //   if (members) {
-  //   setMemberList(uniqueMembers);
-  //   }
-  // }, []);
+  useEffect(() => {
+    const uniqueMembers = members.members.filter(
+      (member, index, self) => index === self.findIndex((m) => m.userId === member.userId)
+    );
+    if (!isLoading && members && members.members.length > 0) {
+      setMemberList(uniqueMembers);
+    }
+  }, [isLoading]);
 
   if (isLoading) return <div>멤버 정보를 불러오고 있어요</div>;
   if (error) return <div>멤버 정보를 불러오는데 실패했습니다</div>;
@@ -44,7 +42,7 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
   return (
     <ul>
       <li>
-        {uniqueMembers.map((member) => (
+        {memberList.map((member) => (
           <MemberItem key={member.id} member={member} onClick={onClickDeleteMember} />
         ))}
       </li>
