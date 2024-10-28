@@ -30,13 +30,13 @@ export const GET = async (request: NextRequest, { params }: { params: IParams })
     });
 
     if (response.status === 200) {
-      const data = response.data.data;
+      const data = response.data;
       return NextResponse.json(data, { status: 200 });
     }
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      console.error("대시보드 초대 내역 GET 요청 오류 발생", error);
-      return new NextResponse("대시보드 초대 내역 조회 실패", { status: error.status });
+      console.error("대시보드 초대 내역 DELETE 요청 오류 발생", error);
+      return new NextResponse("대시보드 초대 DELETE 실패", { status: error.status });
     }
   }
 };

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import MemberItem from "./MemberItem";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { Member } from "@/zodSchema/memberSchema";
@@ -92,29 +91,25 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
       const uniqueMembers = inviteList.filter(
         (member, index, self) => index === self.findIndex((m) => m.userId === member.userId)
       );
-
       if (uniqueMembers.length !== inviteList.length) {
         setInviteList(uniqueMembers);
       }
     }
   }, [isLoading]);
 
-  const onClickDeleteInvitation = (id: number) => {
-    const deleteMember = async (id: number) => {
-      try {
-        const response = await axios.delete(`/api/dashboards/${dashboardId}/invitations/${invitationId}`);
-        if (response.status === 204) {
-          toast.success(`멤보 초대를 취소합니다.`);
-          // setInvitateList(members.members.filter((member) => member.userId !== id));
-        } else {
-          toast.error("삭제하는 중 오류가 발생했습니다.");
-        }
-      } catch (err) {
-        console.error(`Error deleting member: ${id}`, err);
+  const onClickCancelInvitation = async (id: number) => {
+    try {
+      const response = await axios.delete(`/api/dashboards/${dashboardId}/invitations/${id}`);
+      if (response.status === 204) {
+        toast.success(`멤버 초대를 취소합니다.`);
+        // setInvitateList(members.members.filter((member) => member.userId !== id));
+      } else {
         toast.error("삭제하는 중 오류가 발생했습니다.");
       }
-    };
-    deleteMember(id);
+    } catch (err) {
+      console.error(`Error deleting member: ${id}`, err);
+      toast.error("삭제하는 중 오류가 발생했습니다.");
+    }
   };
 
   return (
@@ -126,8 +121,8 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
             {totalPage} 중 {page}
           </div>
           <PaginationBtn
-            disabledNext={isFirst && totalPage > size}
-            disabledPrev={isLast && totalPage > size}
+            disabledPrev={isFirst && totalPage < size}
+            disabledNext={isLast && totalPage < size}
             onClickPrev={onClickPrev}
             onClickNext={onClickNext}
           />
@@ -149,7 +144,7 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
       <ul>
         <li>
           {inviteList.map((item) => (
-            <InviteItem key={item.id} item={item} />
+            <InviteItem key={item.id} item={item} onClick={onClickCancelInvitation} />
           ))}
         </li>
       </ul>
