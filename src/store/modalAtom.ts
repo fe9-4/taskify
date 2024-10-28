@@ -8,5 +8,5 @@ export const EditColumnAtom = atom<boolean>(false);
 export const InvitationDashboardAtom = atom<boolean>(false);
 
 export const AlertModalTextAtom = atom<string>("");
-export const ColumnAtom = atom({});
+export const ColumnAtom = atom<{ columnId: number; title: string }>({ columnId: 0, title: "" });
 export const ColumnTitlesAtom = atom<string[]>([]);

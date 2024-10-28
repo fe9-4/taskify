@@ -7,7 +7,8 @@ import { NumChip } from "../../../components/chip/PlusAndNumChip";
 import { AddTodoBtn } from "../../../components/button/ButtonComponents";
 import { ICard, Iitem } from "@/types/dashboardType";
 import { useAtom } from "jotai";
-import { CreateCardAtom, EditColumnAtom } from "@/store/modalAtom";
+import { ColumnAtom, CreateCardAtom, EditColumnAtom } from "@/store/modalAtom";
+import { set } from "zod";
 
 interface IProps {
   columnTitle: string;
@@ -20,6 +21,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [size, setSize] = useState(3);
   const [, setIsCreateCardOpen] = useAtom(CreateCardAtom);
   const [, setIsEditColumnOpen] = useAtom(EditColumnAtom);
+  const [, setColumnAtom] = useAtom(ColumnAtom);
   const observeRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
 
@@ -78,6 +80,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   }, [hasMore, size, getCardList]);
 
   const handleEditModal = () => {
+    setColumnAtom({ title: columnTitle, columnId });
     setIsEditColumnOpen(true);
   };
 

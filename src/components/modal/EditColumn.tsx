@@ -2,8 +2,7 @@ import { useForm, useWatch } from "react-hook-form";
 import InputItem from "../input/InputItem";
 import { CancelBtn, ConfirmBtn } from "../button/ButtonComponents";
 import { useAtom, useAtomValue } from "jotai";
-import { ColumnTitlesAtom, EditColumnAtom } from "@/store/modalAtom";
-import { useParams } from "next/navigation";
+import { ColumnAtom, ColumnTitlesAtom, EditColumnAtom } from "@/store/modalAtom";
 import useLoading from "@/hooks/useLoading";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -11,15 +10,15 @@ import { IoIosClose } from "react-icons/io";
 
 const EditColumn = () => {
   const [, setIsEditColumnOpen] = useAtom(EditColumnAtom);
-  const { dashboardId } = useParams();
   const { isLoading, withLoading } = useLoading();
   const ColumnTitles = useAtomValue(ColumnTitlesAtom);
+  const Column = useAtomValue(ColumnAtom);
   const {
     register,
     handleSubmit,
     control,
     formState: { isValid },
-  } = useForm();
+  } = useForm({ defaultValues: { title: Column.title } });
 
   const title = useWatch({ control, name: "title" });
   const isDuplicate = ColumnTitles.includes(title);
@@ -27,7 +26,8 @@ const EditColumn = () => {
   const onSubmit = async (data: any) => {
     await withLoading(async () => {
       try {
-        console.log("test");
+        await axios.put(`/api/columns/${Column.columnId}`, { ...data, columnId: Column.columnId });
+        console.log(Column, ColumnTitles);
         toast.success("컬럼 수정 완료");
         // setIsEditColumnOpen(false);
       } catch (error) {
@@ -41,8 +41,8 @@ const EditColumn = () => {
     <div className="w-[327px] rounded-lg bg-white px-4 py-6 md:w-[568px] md:p-6">
       <div className="mb-4 flex justify-between md:mb-6">
         <h2 className="text-2xl font-bold md:text-3xl">컬럼 관리</h2>
-        <button className="">
-          <IoIosClose />
+        <button className="size-9" onClick={() => setIsEditColumnOpen(false)}>
+          <IoIosClose className="size-9 text-[#6b6b6b]" />
         </button>
       </div>
       <InputItem
@@ -56,7 +56,7 @@ const EditColumn = () => {
       <div className="mt-6 flex h-[54px] w-full gap-2">
         <CancelBtn onClick={() => setIsEditColumnOpen(false)}>삭제</CancelBtn>
         <ConfirmBtn disabled={!isValid || isLoading || isDuplicate} onClick={handleSubmit(onSubmit)}>
-          생성
+          수정
         </ConfirmBtn>
       </div>
     </div>
