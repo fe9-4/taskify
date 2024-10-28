@@ -3,6 +3,7 @@
 import { DeleteCancelBtn } from "@/components/button/ButtonComponents";
 import { Member } from "@/zodSchema/memberSchema";
 import Image from "next/image";
+import toast from "react-hot-toast";
 /*
 {
   "invitations": [
@@ -35,7 +36,9 @@ const MemberItem = ({ member, onClick }: { member: Member; onClick: (id: number)
   const { nickname, profileImageUrl, id } = member;
 
   const onClickDeleteMember = (id: number) => {
-    onClick(id);
+    if (member.isOwner === false) {
+      onClick(id);
+    } else toast("대시보드를 생성한 유저는 삭제할 수 없습니다");
   };
   const pastelColors = [
     "bg-blue-200",

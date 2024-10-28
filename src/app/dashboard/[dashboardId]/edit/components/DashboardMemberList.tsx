@@ -1,6 +1,8 @@
 import { useDashboardMember } from "@/hooks/useDashboardMember";
 import { useState } from "react";
 import MemberItem from "./MemberItem";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
   const [page, setPage] = useState(1);
@@ -8,7 +10,12 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
   const { members, isLoading, error, refetch } = useDashboardMember({ dashboardId, page, size });
 
   const onClickDeleteMember = (id: number) => {
-    console.log(id);
+    const deleteMember = async () => {
+      await axios.delete(`/api/members/${id}`);
+    };
+    deleteMember();
+    toast("삭제가 완료되었습니다.");
+    // refetch();
   };
 
   if (isLoading) return <div>멤버 정보를 불러오고 있어요</div>;
