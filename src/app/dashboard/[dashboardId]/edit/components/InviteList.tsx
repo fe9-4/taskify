@@ -32,6 +32,8 @@ import { PaginationBtn } from "@/components/button/ButtonComponents";
   "totalCount": 1
 }
 */
+
+// onClick={() => setIsInvitationDashboardOpen(true)}
 const InviteList = ({ dashboardId }: { dashboardId: number }) => {
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
@@ -39,6 +41,7 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
   const [inviteList, setInvitateList] = useState<Member[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [invitationId, setInvitationId] = useState();
 
   const totalPage: number = Math.ceil(totalCount / size);
   const isFirst = page === 1;
@@ -52,28 +55,33 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
 
   const fetchDashboardInvitationList = async () => {
     try {
-      const res = await axios.get(`/api/dashboards/${dashboardId}/invitations`);
+      setIsLoading(true);
+      const res = await axios.get(`/api/dashboards/${dashboardId}/invitations?page=${page}&size=${size}`);
       const data = res.data;
+      console.log(data);
       setInvitateList(data.user ? data.user.invitations : []);
-      setTotalCount(data.totalCount);
+      setTotalCount(data.user.totalCount);
+      setInvitationId(data.invitations.id);
     } catch (err) {
       if (axios.isAxiosError(err)) {
         console.error(err.message);
       } else {
         console.error("An unexpected error occurred", err);
       }
+    } finally {
+      setIsLoading(false);
     }
   };
   useEffect(() => {
     fetchDashboardInvitationList();
   }, [dashboardId]);
 
-  const onClickDeleteMember = (id: number, nickname: string) => {
+  const onClickDeleteInvitation = (id: number) => {
     const deleteMember = async (id: number) => {
       try {
-        const response = await axios.delete(`/api/members/${id}`);
+        const response = await axios.delete(`/api/dashboards/${dashboardId}/invitations/${invitationId}`);
         if (response.status === 204) {
-          toast.success(`멤버 ${nickname}가 삭제되었습니다`);
+          toast.success(`초대를 취소합니다.`);
           // setInvitateList(members.members.filter((member) => member.userId !== id));
         } else {
           toast.error("삭제하는 중 오류가 발생했습니다.");
@@ -95,12 +103,13 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
     }
   }, [isLoading]);
 
-  if (isLoading) return <div>멤버 정보를 불러오고 있어요</div>;
-  if (error) return <div>멤버 정보를 불러오는데 실패했습니다</div>;
   return (
     <>
       <div className="flex items-center justify-between px-5 py-6 md:px-7 md:py-[26px]">
-        <h2 className="col-start-1 text-2xl font-bold md:text-3xl">구성원</h2>
+        <h2 className="col-start-1 text-2xl font-bold md:text-3xl">초대 내역</h2>
+        {isLoading ? <div>초대 내역을 불러오고 있어요</div> : <></>}
+        {error ? <div>초대 내역을 불러오는데 실패했습니다</div> : <></>}
+        {!inviteList ? <div>아직 초대된 멤버가 없습니다</div> : <></>}
         <div className="flex items-center gap-3 md:gap-4">
           <div>
             {totalPage} 중 {page}
@@ -117,7 +126,7 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
       <ul>
         <li>
           {inviteList.map((member) => (
-            <MemberItem key={member.id} member={member} onClick={onClickDeleteMember} />
+            <MemberItem key={member.id} member={member} onClick={onClickDeleteInvitation} />
           ))}
         </li>
       </ul>

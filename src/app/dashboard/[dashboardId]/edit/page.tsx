@@ -59,9 +59,9 @@ const EditPage = () => {
         <Section>
           <DashboardMemberList dashboardId={id} />
         </Section>
-        {/* <Section>
+        <Section>
           <InviteList dashboardId={id} />
-        </Section> */}
+        </Section>
       </div>
       <div className="mt-6">
         <DeleteDashboardBtn />
