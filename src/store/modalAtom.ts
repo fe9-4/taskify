@@ -14,3 +14,5 @@ export const InvitationDashboardAtom = atom<boolean>(false);
 
 export const AlertModalTextAtom = atom<string>("");
 export const ColumnTitlesAtom = atom<string[]>([]);
+
+export const AlertModalConfirmAtom = atom<(() => void) | null>(null);

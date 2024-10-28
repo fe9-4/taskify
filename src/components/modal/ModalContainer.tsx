@@ -12,6 +12,7 @@ import {
   UpdateCardAtom,
   CreateColumnAtom,
   InvitationDashboardAtom,
+  AlertModalConfirmAtom,
 } from "@/store/modalAtom";
 import CreateDashboard from "@/components/modal/CreateDashboard";
 import ModalContent from "./ModalContent";
@@ -33,6 +34,7 @@ const ModalContainer = () => {
   const [isInvitationDashboardOpen, setIsInvitationDashboardOpen] = useAtom(InvitationDashboardAtom);
   const [isAlertOpen, setIsAlertOpen] = useAtom(AlertModalAtom);
   const alertText = useAtomValue(AlertModalTextAtom);
+  const [onConfirm] = useAtom(AlertModalConfirmAtom);
 
   return (
     <>
@@ -61,7 +63,7 @@ const ModalContainer = () => {
       </ModalContent>
 
       <ModalContent isOpen={isAlertOpen} onRequestClose={() => setIsAlertOpen(false)}>
-        <AlertModal text={alertText} />
+        {onConfirm && <AlertModal text={alertText} onConfirm={onConfirm} />}
       </ModalContent>
     </>
   );

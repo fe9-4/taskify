@@ -1,6 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAtom, useAtomValue } from "jotai";
-import { DetailCardAtom, DetailCardParamsAtom, UpdateCardAtom, UpdateCardParamsAtom } from "@/store/modalAtom";
+import {
+  AlertModalAtom,
+  AlertModalConfirmAtom,
+  AlertModalTextAtom,
+  DetailCardAtom,
+  DetailCardParamsAtom,
+  UpdateCardAtom,
+  UpdateCardParamsAtom,
+} from "@/store/modalAtom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import Image from "next/image";
@@ -15,15 +23,20 @@ const buttonBaseClasses =
 const DetailCard = () => {
   const cardId = useAtomValue(DetailCardParamsAtom);
   const [cardData, setCardData] = useState<CardDataProps>();
+
   const [, setIsDetailCardOpen] = useAtom(DetailCardAtom);
   const [, setIsUpdateCardOpen] = useAtom(UpdateCardAtom);
   const [, setIsUpdateCardParams] = useAtom(UpdateCardParamsAtom);
+
+  const [, setIsAlertOpen] = useAtom(AlertModalAtom);
+  const [, setAlertText] = useAtom(AlertModalTextAtom);
+  const [, setOnConfirm] = useAtom(AlertModalConfirmAtom);
 
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const getCardList = async () => {
+    const getCardData = async () => {
       try {
         const response = await axios.get(`/api/cards/${cardId}`);
         setCardData(response.data);
@@ -33,8 +46,27 @@ const DetailCard = () => {
         }
       }
     };
-    getCardList();
+
+    getCardData();
   }, [cardId]);
+
+  const ondelete = async () => {
+    try {
+      const response = await axios.delete(`/api/cards/${cardId}`);
+      if (response.status === 201) toast.success("카드가 삭제되었습니다.");
+      setIsDetailCardOpen(false);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        toast.error("카드 삭제에 실패하였습니다.");
+      }
+    }
+  };
+
+  const handleDelete = () => {
+    setAlertText("정말 삭제하시겠습니까?");
+    setOnConfirm(() => ondelete);
+    setIsAlertOpen(true);
+  };
 
   const toggleDropdown = useCallback(() => setIsOpen((prev) => !prev), []);
   const closeModal = useCallback(() => setIsDetailCardOpen(false), [setIsDetailCardOpen]);
@@ -63,7 +95,7 @@ const DetailCard = () => {
     <section className="grid w-[327px] gap-3 rounded-lg bg-white p-4 md:w-[678px] md:px-6 md:py-8">
       {cardData &&
         [cardData].map((card) => (
-          <div className="grid">
+          <div key={card.id} className="grid">
             <div className="mb-4 flex flex-col justify-between md:flex-row-reverse md:items-center">
               <div className="relative ml-auto flex items-center gap-4 md:gap-6">
                 <button onClick={toggleDropdown} className="relative size-5 md:size-7">
@@ -74,7 +106,9 @@ const DetailCard = () => {
                     <button className={buttonBaseClasses} onClick={handleUpdate}>
                       수정하기
                     </button>
-                    <button className={buttonBaseClasses}>삭제하기</button>
+                    <button className={buttonBaseClasses} onClick={handleDelete}>
+                      삭제하기
+                    </button>
                   </div>
                 )}
                 <button onClick={closeModal} className="relative size-3 md:size-4">

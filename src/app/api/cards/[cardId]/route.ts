@@ -83,3 +83,34 @@ export const GET = async (request: NextRequest, { params }: { params: { cardId: 
     return NextResponse.json({ error: "할 일 카드 조회 중 오류가 발생했습니다." }, { status: 500 });
   }
 };
+
+// 할 일 카드 삭제
+export const DELETE = async (request: NextRequest, { params }: { params: { cardId: number } }) => {
+  const cookieStore = cookies();
+  const accessToken = cookieStore.get("accessToken")?.value;
+  const cardId = params.cardId;
+
+  if (!accessToken) {
+    return NextResponse.json({ error: "인증되지 않은 사용자" }, { status: 401 });
+  }
+
+  try {
+    const response = await apiClient.delete(`/cards/${cardId}`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
+    return NextResponse.json(response.data, { status: 201 });
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error("할 일 카드 삭제 중 오류 발생: ", error);
+
+      if (error.response) {
+        return NextResponse.json({ message: error.response.data.message }, { status: error.status });
+      }
+    }
+
+    return NextResponse.json({ error: "할 일 카드 삭제 중 오류가 발생했습니다." }, { status: 500 });
+  }
+};
