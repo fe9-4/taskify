@@ -4,7 +4,7 @@ import { DeleteCancelBtn } from "@/components/button/ButtonComponents";
 import { Member } from "@/zodSchema/memberSchema";
 import Image from "next/image";
 import toast from "react-hot-toast";
-/*
+/* 초대 res
 {
   "invitations": [
     {
@@ -32,12 +32,12 @@ import toast from "react-hot-toast";
   "totalCount": 1
 }
 */
-const MemberItem = ({ member, onClick }: { member: Member; onClick: (id: number, nickname: string) => void }) => {
-  const { nickname, profileImageUrl, id } = member;
+const MemberItem = ({ member, onClick }: { member: Member; onClick: (userId: number, nickname: string) => void }) => {
+  const { nickname, profileImageUrl, userId } = member;
 
-  const onClickDeleteMember = (id: number, nickname: string) => {
+  const onClickDeleteMember = (userId: number, nickname: string) => {
     if (member.isOwner === false) {
-      onClick(id, nickname);
+      onClick(userId, nickname);
     } else toast("대시보드를 생성한 유저는 삭제할 수 없습니다");
   };
   const pastelColors = [
@@ -62,14 +62,14 @@ const MemberItem = ({ member, onClick }: { member: Member; onClick: (id: number,
               className="size-[38px] rounded-full object-center"
             />
           ) : (
-            <div className={`flex size-full items-center justify-center ${pastelColors[id % pastelColors.length]}`}>
+            <div className={`flex size-full items-center justify-center ${pastelColors[userId % pastelColors.length]}`}>
               {nickname.slice(0, 1)}
             </div>
           )}
         </div>
         <div>{nickname}</div>
       </div>
-      <DeleteCancelBtn onClick={() => onClickDeleteMember(id, nickname)}>삭제</DeleteCancelBtn>
+      <DeleteCancelBtn onClick={() => onClickDeleteMember(userId, nickname)}>삭제</DeleteCancelBtn>
     </div>
   );
 };

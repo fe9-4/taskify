@@ -12,17 +12,21 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
   const onClickDeleteMember = (id: number, nickname: string) => {
     const deleteMember = async (id: number) => {
       try {
-        const res = await axios.delete(`/api/members/${id}`);
-        console.log(res);
-        toast(`멤버 ${nickname}가 삭제되었습니다`);
+        console.log(id);
+        // const res = await axios.delete(`/api/members/${id}`);
+        // console.log(res.data);
+        // toast.success(`멤버 ${nickname}가 삭제되었습니다`);
         refetch();
       } catch (err) {
-        console.error(`Error deleting member: ${nickname}`, error);
-        toast("삭제하는 중 오류가 발생했습니다.");
+        console.error(`Error deleting member: ${id}`, err);
+        toast.error("삭제하는 중 오류가 발생했습니다.");
       }
     };
     deleteMember(id);
   };
+  const memberList = members.members.filter(
+    (member, index, self) => index === self.findIndex((m) => m.userId === member.userId)
+  );
 
   if (isLoading) return <div>멤버 정보를 불러오고 있어요</div>;
   if (error) return <div>멤버 정보를 불러오는데 실패했습니다</div>;
@@ -30,7 +34,7 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
   return (
     <ul>
       <li>
-        {members.members.map((member) => (
+        {memberList.map((member) => (
           <MemberItem key={member.id} member={member} onClick={onClickDeleteMember} />
         ))}
       </li>

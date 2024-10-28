@@ -31,11 +31,11 @@ const EditDashboard = ({
     try {
       const res = await axios.put(`/api/dashboards/${dashboardId}?dashboardId=${dashboardId}`, value);
       const data = res.data;
-      toast("대시보드 정보가 수정되었습니다");
+      toast.success("대시보드 정보가 수정되었습니다");
     } catch (err) {
       const error = err as AxiosError;
       console.error(error.message);
-      toast("대시보드 변경에 실패했습니다");
+      toast.error("대시보드 변경에 실패했습니다");
     }
   };
   // 1.실패시에는 state 값도 변경이 안되어야함
