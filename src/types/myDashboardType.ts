@@ -22,6 +22,7 @@ export interface IInvitationList {
   teamId: string;
   dashboard: {
     title: string;
+    id: number;
   };
   invitee: {
     nickname: string;

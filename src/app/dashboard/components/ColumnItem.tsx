@@ -17,10 +17,19 @@ const ColumnItem = ({ cards }: IProps) => {
             alt="카드 이미지1"
             width={260}
             height={150}
-            className="w-full object-cover md:h-[53px] md:w-[90px] xl:h-40 xl:w-full rounded-md"
+            className="w-full max-h-[150px] object-cover md:h-[53px] md:w-[90px] xl:h-40 xl:w-full rounded-md"
             priority={true}
           />
-        ) : null}
+        ) : (
+          <Image
+          src="/images/cardImg1.png"
+          alt="카드 이미지1"
+          width={260}
+          height={150}
+          className="w-full object-cover md:h-[53px] md:w-[90px] xl:h-40 xl:w-full rounded-md"
+          priority={true}
+        />
+        )}
         <div className="flex flex-col space-y-[6px] md:w-full md:flex-row md:space-x-[6px] xl:flex-col">
           <div className="flex w-full flex-col space-y-[6px]">
             <h3 className="text-start font-medium">{cards.title}</h3>

@@ -50,7 +50,7 @@ const DashboardDetail = () => {
     getColumn();
   }, [getColumn, isCreateColumnOpen]);
 
-  return (
+  return ( 
     <div className="flex flex-col space-y-6 overflow-auto pb-6 xl:flex-row xl:space-x-6 xl:space-y-0">
       <div className="flex flex-col space-y-6 xl:flex-row xl:space-y-0">
         {columnList.map((column) => (
