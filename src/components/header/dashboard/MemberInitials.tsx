@@ -71,7 +71,7 @@ export const MemberInitials = ({ dashboardId }: MemberInitialsProps) => {
           <li
             key={member.id}
             className={`relative z-${30 - index} -mr-2 flex h-8 w-8 items-center justify-center rounded-full ${
-              index === array.length - 1 ? "bg-pink-200" : pastelColors[index % pastelColors.length]
+              pastelColors[index % pastelColors.length]
             } text-gray-700 ring-2 ring-white`}
           >
             {member.nickname.charAt(0).toUpperCase()}
