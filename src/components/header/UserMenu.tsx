@@ -10,7 +10,7 @@ interface UserMenuProps {
 export const UserMenu = ({ isHomePage }: UserMenuProps) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { user, logout, isUserLoading } = useAuth();
+  const { user, logout, isInitialLoading } = useAuth();
   const handleLogout = async () => {
     try {
       logout();
@@ -45,7 +45,7 @@ export const UserMenu = ({ isHomePage }: UserMenuProps) => {
     return name.charAt(0).toUpperCase();
   };
 
-  if (isUserLoading) {
+  if (isInitialLoading) {
     return <div>Loading...</div>;
   }
 
