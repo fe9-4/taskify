@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import SectionTitle from "./SectionTitle";
 import { useAuth } from "@/hooks/useAuth";
 import axios, { AxiosError } from "axios";
 import MemberItem from "./MemberItem";
@@ -9,11 +8,9 @@ import { usePathname } from "next/navigation";
 import InvitationsItemType from "@/types/invitationType";
 import DashboardMemberList from "./DashboardMemberList";
 
-const EditSection = ({ sectionTitle }: { sectionTitle: string }) => {
-  // 이미 초대되어있는 멤버 = 구성원
-  // 초대 진행중인 멤버 = 초대 내역
-  const [page, setPage] = useState(1);
-  const [size, setSize] = useState(5);
+const EditSection = () => {
+  // const [page, setPage] = useState(1);
+  // const [size, setSize] = useState(5);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [invitatingMemberList, setInvitatingMemberList] = useState<InvitationsItemType[]>([]);
 
@@ -45,11 +42,10 @@ const EditSection = ({ sectionTitle }: { sectionTitle: string }) => {
   };
   useEffect(() => {
     // fetchDashboardInvitationList();
-  }, [user, page, size, dashboardId]);
+  }, [user, dashboardId]);
 
   return (
-    <section className="w-full rounded-2xl bg-white px-4 py-5 md:px-7 md:py-8">
-      <SectionTitle sectionTitle={sectionTitle} />
+    <section className="mx-4 my-5 w-full rounded-2xl bg-white md:mx-7 md:my-8">
       <DashboardMemberList dashboardId={id} />
     </section>
   );

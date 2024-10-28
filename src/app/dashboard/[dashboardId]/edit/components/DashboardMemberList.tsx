@@ -4,6 +4,9 @@ import MemberItem from "./MemberItem";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { Member } from "@/zodSchema/memberSchema";
+import Pagination from "@/app/mydashboard/components/Pagination";
+import { PaginationBtn } from "@/components/button/ButtonComponents";
+import { cls } from "@/lib/utils";
 
 const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
   const [page, setPage] = useState(1);
@@ -11,14 +14,29 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
   const { members, isLoading, error, refetch } = useDashboardMember({ dashboardId, page, size });
 
   const [memberList, setMemberList] = useState<Member[]>([]);
+  const totalCount = members.totalCount;
+  const totalPage: number = Math.ceil(totalCount / size);
+  const isFirst = page === 1;
+  const isLast = page === totalPage;
+  const onClickPrev = () => {
+    if (!isFirst) setPage(page - 1);
+  };
+  const onClickNext = () => {
+    if (!isLast) setPage(page + 1);
+  };
 
+  // 삭제 요청 시 서버에서 삭제는 되는데 브라우저에서는 500 에러 반환하는 문제 해결해야함
   const onClickDeleteMember = (id: number, nickname: string) => {
     const deleteMember = async (id: number) => {
       try {
-        await axios.delete(`/api/members/${id}`);
-        toast.success(`멤버 ${nickname}가 삭제되었습니다`);
-        setMemberList(members.members.filter((member) => member.userId !== id));
-        refetch();
+        const response = await axios.delete(`/api/members/${id}`);
+        if (response.status === 204) {
+          toast.success(`멤버 ${nickname}가 삭제되었습니다`);
+          setMemberList(members.members.filter((member) => member.userId !== id));
+          refetch();
+        } else {
+          toast.error("삭제하는 중 오류가 발생했습니다.");
+        }
       } catch (err) {
         console.error(`Error deleting member: ${id}`, err);
         toast.error("삭제하는 중 오류가 발생했습니다.");
@@ -40,13 +58,35 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
   if (error) return <div>멤버 정보를 불러오는데 실패했습니다</div>;
   if (!members) return <div>아직 초대된 멤버가 없습니다</div>;
   return (
-    <ul>
-      <li>
-        {memberList.map((member) => (
-          <MemberItem key={member.id} member={member} onClick={onClickDeleteMember} />
-        ))}
-      </li>
-    </ul>
+    <>
+      <div className="flex items-center justify-between px-5 py-6 md:px-7 md:py-[26px]">
+        <h2 className="col-start-1 text-2xl font-bold md:text-3xl">구성원</h2>
+        <div className="flex items-center gap-3 md:gap-4">
+          <div>
+            {totalPage} 중 {page}
+          </div>
+          <PaginationBtn
+            disabledNext={isFirst && totalPage > size}
+            disabledPrev={isLast && totalPage > size}
+            onClickPrev={onClickPrev}
+            onClickNext={onClickNext}
+          />
+        </div>
+      </div>
+
+      <ul>
+        <li>
+          {memberList.map((member) => (
+            <MemberItem
+              key={member.id}
+              memberListLength={memberList.length}
+              member={member}
+              onClick={onClickDeleteMember}
+            />
+          ))}
+        </li>
+      </ul>
+    </>
   );
 };
 export default DashboardMemberList;
