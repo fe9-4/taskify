@@ -51,7 +51,7 @@ const DashboardDetail = () => {
           <ColumnList key={column.id} columnTitle={column.title} columnId={column.id} />
         ))}
       </div>
-      <div className="flex h-fit justify-center xl:justify-start xl:pt-[66px]">
+      <div className="px-4 xl:px-0 xl:pt-[66px]">
         <AddColumnBtn onClick={handleColumnBtn} />
       </div>
     </div>

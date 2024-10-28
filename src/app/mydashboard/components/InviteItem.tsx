@@ -94,7 +94,7 @@ const InviteItem = ({ invitationList, setInvitationList }: IProps) => {
             <h3 className="text-gray02 md:hidden">초대자</h3>
             <span className="md:w-16 md:text-center">{item.inviter.nickname}</span>
           </div>
-          <div>
+          <div className="w-full">
             <CombiBtn
               value={["수락", "거절"]}
               onClickAccept={() => handleAcceptInvitation(item.id)}

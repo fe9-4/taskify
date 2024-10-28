@@ -25,7 +25,7 @@ const ColumnItem = ({ cards }: IProps) => {
           <div className="flex w-full flex-col space-y-[6px]">
             <h3 className="font-medium text-start">{cards.title}</h3>
             <div className="flex w-full flex-col space-y-[6px] md:flex-row md:space-x-[6px] md:space-y-0 xl:flex-col xl:space-x-0 xl:space-y-[6px]">
-              <div className="flex w-full flex-wrap items-center space-x-[6px]">
+              <div className="flex w-full flex-wrap items-center gap-[6px] md:w-64">
                 {cards.tags.map((tag) => (
                   <TagChip key={tag} tag={tag} />
                 ))}

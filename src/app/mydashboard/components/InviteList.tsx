@@ -25,8 +25,10 @@ const InviteList = () => {
         setInvitationList((prev) => {
           const existingId = new Set(prev.map((item) => item.id));
           const filteredNewInviteList = newInviteList.filter((item: IInvitationList) => !existingId.has(item.id));
+          setHasMore(filteredNewInviteList.length === size);
           return [...prev, ...filteredNewInviteList];
         });
+
       }
 
       if (response.data.inviteList.length === 0) {
