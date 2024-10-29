@@ -39,7 +39,7 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
       }
     };
     deleteMember(id);
-    console.log(members.members);
+    // console.log(members.members);
   };
 
   useEffect(() => {
