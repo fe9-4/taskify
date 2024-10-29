@@ -6,16 +6,16 @@ import apiClient from "@/app/api/apiClient";
 interface IParams {
   dashboardId: number;
 }
-// https://sp-taskify-api.vercel.app/9-4/dashboards/12067/invitations?page=1&size=10
+// 대시보드로 초대한 목록 가져오기
 export const GET = async (request: NextRequest, { params }: { params: IParams }) => {
   const { searchParams } = new URL(request.url);
   const page = searchParams.get("page") || 1;
   const size = searchParams.get("size") || 5;
-  const dashboardId = params.dashboardId;
+  const { dashboardId } = params;
   const cookieStore = cookies();
-  const token = cookieStore.get("accessToken")?.value;
+  const accessToken = cookieStore.get("accessToken")?.value;
 
-  if (!token) {
+  if (!accessToken) {
     return new NextResponse("사용자 정보를 찾을 수 없습니다.", { status: 401 });
   }
 
@@ -24,14 +24,15 @@ export const GET = async (request: NextRequest, { params }: { params: IParams })
   }
 
   try {
+    // https://sp-taskify-api.vercel.app/9-4/dashboards/12067/invitations?page=1&size=5
     const response = await apiClient.get(`/dashboards/${dashboardId}/invitations?page=${page}&size=${size}`, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     });
-
+    console.log("초대목록 api요청");
     if (response.status === 200) {
-      const data = response.data.data;
+      const data = response.data;
       return NextResponse.json(data, { status: 200 });
     }
   } catch (error) {

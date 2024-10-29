@@ -9,11 +9,11 @@ import toast from "react-hot-toast";
 const MemberItem = ({ member, onClick }: { member: Member; onClick: (userId: number, nickname: string) => void }) => {
   const { nickname, profileImageUrl, userId, id } = member;
 
-  const onClickDeleteMember = (userId: number, nickname: string) => {
+  const onClickDeleteMember = (id: number, nickname: string) => {
     if (member.isOwner) {
       toast.error("대시보드를 생성한 유저는 삭제할 수 없습니다");
     } else {
-      onClick(userId, nickname);
+      onClick(id, nickname);
     }
   };
   const pastelColors = [
@@ -26,8 +26,7 @@ const MemberItem = ({ member, onClick }: { member: Member; onClick: (userId: num
     "bg-teal-200",
   ];
   return (
-    // border 스타일 추후 수정
-    <div className={cls("flex w-full justify-between border-b border-gray04 px-5 py-3 md:px-7 md:py-4")}>
+    <div className="flex w-full justify-between border-b border-gray04 px-5 py-3 last:border-0 md:px-7 md:py-4">
       <div className="flex items-center gap-2 md:gap-3">
         <div className="size-[38px] overflow-hidden rounded-full">
           {profileImageUrl ? (

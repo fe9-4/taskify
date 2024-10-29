@@ -6,8 +6,8 @@ import ColumnList from "@/app/dashboard/components/ColumnList";
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { AddColumnBtn } from "@/components/button/ButtonComponents";
-import { useAtom } from "jotai";
-import { ColumnTitlesAtom, CreateColumnAtom } from "@/store/modalAtom";
+import { useAtom, useAtomValue } from "jotai";
+import { ColumnTitlesAtom, CreateColumnAtom, RefreshDashboardAtom } from "@/store/modalAtom";
 
 interface IColumnData {
   id: number;
@@ -20,8 +20,9 @@ interface IColumnList {
 
 const DashboardDetail = () => {
   const { dashboardId } = useParams();
-  const [isCreateColumnOpen, setIsCreateColumnOpen] = useAtom(CreateColumnAtom);
+  const [, setIsCreateColumnOpen] = useAtom(CreateColumnAtom);
   const [, setColumnTitles] = useAtom(ColumnTitlesAtom);
+  const updateDashBoard = useAtomValue(RefreshDashboardAtom);
 
   const [columnList, setColumnList] = useState<IColumnList["data"]>([]);
 
@@ -48,9 +49,14 @@ const DashboardDetail = () => {
 
   useEffect(() => {
     getColumn();
-  }, [getColumn, isCreateColumnOpen]);
+  }, [getColumn]);
 
-  return ( 
+  // 모달 창이 닫힐때 마다 대시보드 새로 불러오기
+  useEffect(() => {
+    getColumn();
+  }, [getColumn, updateDashBoard]);
+
+  return (
     <div className="flex flex-col space-y-6 overflow-auto pb-6 xl:flex-row xl:space-x-6 xl:space-y-0 xl:pr-4">
       <div className="flex flex-col space-y-6 xl:flex-row xl:space-y-0">
         {columnList.map((column) => (
