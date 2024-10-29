@@ -60,8 +60,8 @@ const InvitationDashboard = () => {
     customErrorMessage: "멤버 목록을 불러오는데 실패했습니다.",
   });
 
-  // 초대 목록 조회
-  const { invitationList, inviteMember, isInviting } = useInvitation({
+  // 초대 관리 커스텀 훅
+  const { inviteMember, isInviting } = useInvitation({
     dashboardId: currentDashboardId || 0,
   });
 
@@ -74,37 +74,11 @@ const InvitationDashboard = () => {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      // 본인 초대 체크
-      if (data.email === user?.email) {
-        toast.error("본인은 초대할 수 없습니다.");
-        return;
-      }
-
-      // 이미 멤버인지 체크
-      if (memberData.list.some((member) => member.email === data.email)) {
-        toast.error("이미 대시보드의 멤버입니다.");
-        return;
-      }
-
-      // 이미 초대된 사용자인지 확인
-      const existingInvitation = invitationList?.invitations?.find(
-        (invitation: Invitation) => invitation.invitee.email === data.email
-      );
-
-      if (existingInvitation && !existingInvitation.inviteAccepted) {
-        toast.error("이미 초대 요청을 한 계정입니다.");
-        return;
-      } else if (existingInvitation && existingInvitation.inviteAccepted) {
-        toast.error("이미 초대를 수락한 계정입니다.");
-        return;
-      }
-
       await inviteMember(data);
       reset();
       setIsInvitationDashboardOpen(false);
     } catch (error) {
       console.error("초대 실패:", error);
-      toast.error("초대에 실패했습니다.");
     }
   });
 
