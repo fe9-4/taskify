@@ -32,8 +32,6 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
           toast.success(`멤버 ${nickname}가 삭제되었습니다`);
           setMemberList(members.members.filter((member) => member.userId !== id));
           refetch();
-        } else {
-          toast.error("삭제하는 중 오류가 발생했습니다.");
         }
       } catch (err) {
         console.error(`Error deleting member: ${id}`, err);
@@ -41,6 +39,7 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
       }
     };
     deleteMember(id);
+    console.log(members.members);
   };
 
   useEffect(() => {
