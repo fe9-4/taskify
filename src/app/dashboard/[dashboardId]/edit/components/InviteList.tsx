@@ -6,6 +6,7 @@ import { CiSquarePlus } from "react-icons/ci";
 import { useAtom } from "jotai";
 import { InvitationDashboardAtom } from "@/store/modalAtom";
 import InviteItem from "./InviteItem";
+import Image from "next/image";
 interface InvitationItem {
   id: number;
   inviter: {
@@ -120,12 +121,25 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
           </button>
         </div>
       </div>
-      <div className="px-5 md:px-7">
-        {isLoading ? <>초대 내역을 불러오고 있어요</> : <></>}
-        {error ? <>초대 내역을 불러오는데 실패했습니다</> : <></>}
-        {inviteList.length === 0 ? <>아직 초대된 멤버가 없습니다</> : <></>}
-      </div>
 
+      <div className="flex flex-col items-center justify-center px-5 md:px-7">
+        {isLoading ? <div className="pb-5">초대 내역을 불러오고 있어요</div> : <></>}
+        {error ? <div className="pb-5">초대 내역을 불러오는데 실패했습니다</div> : <></>}
+        {inviteList.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-6 py-5">
+            <Image
+              src="/images/myDashboard/invitation.svg"
+              alt="초대"
+              width={60}
+              height={60}
+              className="md:size-[100px]"
+            />
+            <div className="px-5 md:px-7">아직 초대된 멤버가 없습니다</div>
+          </div>
+        ) : (
+          <></>
+        )}
+      </div>
       <ul>
         <li>
           {inviteList.map((item) => (
