@@ -1,47 +1,42 @@
 import { useEffect, useState } from "react";
-import MemberItem from "./MemberItem";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { Member } from "@/zodSchema/memberSchema";
 import { PaginationBtn } from "@/components/button/ButtonComponents";
-/* 초대 res
-{
-  "invitations": [
-    {
-      "id": 13452,
-      "inviter": {
-        "id": 4668,
-        "email": "yelim@fe.fe",
-        "nickname": "yelim"
-      },
-      "teamId": "9-4",
-      "dashboard": {
-        "id": 12067,
-        "title": "수정테스트"
-      },
-      "invitee": {
-        "id": 4701,
-        "email": "cccwon5@naver.com",
-        "nickname": "슈퍼펭귄스"
-      },
-      "inviteAccepted": null,
-      "createdAt": "2024-10-26T08:59:15.950Z",
-      "updatedAt": "2024-10-26T08:59:15.950Z"
-    }
-  ],
-  "totalCount": 1
+import { CiSquarePlus } from "react-icons/ci";
+import { useAtom } from "jotai";
+import { InvitationDashboardAtom } from "@/store/modalAtom";
+import InviteItem from "./InviteItem";
+import Image from "next/image";
+interface InvitationItem {
+  id: number;
+  inviter: {
+    id: number;
+    email: string;
+    nickname: string;
+  };
+  teamId: string;
+  dashboard: {
+    id: number;
+    title: string;
+  };
+  invitee: {
+    id: number;
+    email: string;
+    nickname: string;
+  };
+  inviteAccepted: null | boolean;
+  createdAt: string;
+  updatedAt: string;
 }
-*/
-
 // onClick={() => setIsInvitationDashboardOpen(true)}
 const InviteList = ({ dashboardId }: { dashboardId: number }) => {
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const size = 5;
-  const [inviteList, setInvitateList] = useState<Member[]>([]);
+  const [inviteList, setInviteList] = useState<InvitationItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
-  const [invitationId, setInvitationId] = useState();
+  const [, setIsInvitationDashboardOpen] = useAtom(InvitationDashboardAtom);
 
   const totalPage: number = Math.ceil(totalCount / size);
   const isFirst = page === 1;
@@ -58,14 +53,17 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
       setIsLoading(true);
       const res = await axios.get(`/api/dashboards/${dashboardId}/invitations?page=${page}&size=${size}`);
       const data = res.data;
-      setInvitateList(data.user ? data.user.invitations : []);
-      setTotalCount(data.user.totalCount);
-      setInvitationId(data.invitations.id);
+      
+      setTotalCount(data.totalCount);
+      const uniqueMembers = data.invitations.filter(
+        (invitation: InvitationItem, index: number, self: InvitationItem[]) =>
+          index === self.findIndex((inv) => inv.invitee.id === invitation.invitee.id)
+      );
+      setInviteList(uniqueMembers);
+      setTotalCount(uniqueMembers.length);
     } catch (err) {
       if (axios.isAxiosError(err)) {
         console.error(err.message);
-      } else {
-        console.error("An unexpected error occurred", err);
       }
     } finally {
       setIsLoading(false);
@@ -75,32 +73,32 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
     fetchDashboardInvitationList();
   }, [dashboardId]);
 
-  const onClickDeleteInvitation = (id: number) => {
-    const deleteMember = async (id: number) => {
-      try {
-        const response = await axios.delete(`/api/dashboards/${dashboardId}/invitations/${invitationId}`);
-        if (response.status === 204) {
-          toast.success(`초대를 취소합니다.`);
-          // setInvitateList(members.members.filter((member) => member.userId !== id));
-        } else {
-          toast.error("삭제하는 중 오류가 발생했습니다.");
-        }
-      } catch (err) {
-        console.error(`Error deleting member: ${id}`, err);
-        toast.error("삭제하는 중 오류가 발생했습니다.");
-      }
-    };
-    deleteMember(id);
-  };
-
   useEffect(() => {
-    const uniqueMembers = inviteList.filter(
-      (member, index, self) => index === self.findIndex((m) => m.userId === member.userId)
-    );
-    if (inviteList.length > 0) {
-      setInvitateList(uniqueMembers);
+    if (!isLoading && inviteList.length > 0) {
+      const uniqueMembers = inviteList.filter(
+        (invitation, index, self) => index === self.findIndex((inv) => inv.invitee.id === invitation.invitee.id)
+      );
+      if (uniqueMembers.length !== inviteList.length) {
+        setInviteList(uniqueMembers);
+      }
     }
   }, [isLoading]);
+
+  const onClickCancelInvitation = async (invitationId: number) => {
+    try {
+      const response = await axios.delete(`/api/dashboards/${dashboardId}/invitations/${invitationId}`);
+      if (response.status === 204) {
+        toast.success(`멤버 초대를 취소합니다.`);
+        const newList = inviteList.filter((item) => item.id !== invitationId);
+        setInviteList(newList);
+      } else {
+        toast.error("삭제하는 중 오류가 발생했습니다.");
+      }
+    } catch (err) {
+      console.error(`Error deleting member: ${invitationId}`, err);
+      toast.error("삭제하는 중 오류가 발생했습니다.");
+    }
+  };
 
   return (
     <>
@@ -111,22 +109,43 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
             {totalPage} 중 {page}
           </div>
           <PaginationBtn
-            disabledNext={isFirst && totalPage > size}
-            disabledPrev={isLast && totalPage > size}
+            disabledPrev={isFirst && totalPage === 1}
+            disabledNext={isLast && totalCount < size}
             onClickPrev={onClickPrev}
             onClickNext={onClickNext}
           />
+          <button
+            className="flex items-center gap-[10px] rounded bg-violet01 px-3 py-2 text-xs text-white"
+            type="button"
+            onClick={() => setIsInvitationDashboardOpen(true)}
+          >
+            초대하기 <CiSquarePlus strokeWidth={1} />
+          </button>
         </div>
       </div>
 
-      {isLoading ? <div>초대 내역을 불러오고 있어요</div> : <></>}
-      {error ? <div>초대 내역을 불러오는데 실패했습니다</div> : <></>}
-      {inviteList.length === 0 ? <div>아직 초대된 멤버가 없습니다</div> : <></>}
-
+      <div className="flex flex-col items-center justify-center px-5 md:px-7">
+        {isLoading ? <div className="pb-5">초대 내역을 불러오고 있어요</div> : <></>}
+        {error ? <div className="pb-5">초대 내역을 불러오는데 실패했습니다</div> : <></>}
+        {inviteList.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-6 py-5">
+            <Image
+              src="/images/myDashboard/invitation.svg"
+              alt="초대"
+              width={60}
+              height={60}
+              className="md:size-[100px]"
+            />
+            <div className="px-5 md:px-7">아직 초대된 멤버가 없습니다</div>
+          </div>
+        ) : (
+          <></>
+        )}
+      </div>
       <ul>
         <li>
-          {inviteList.map((member) => (
-            <MemberItem key={member.id} member={member} onClick={onClickDeleteInvitation} />
+          {inviteList.map((item) => (
+            <InviteItem key={item.id} item={item} onClick={onClickCancelInvitation} />
           ))}
         </li>
       </ul>

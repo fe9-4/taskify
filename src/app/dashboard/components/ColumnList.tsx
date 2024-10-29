@@ -6,7 +6,7 @@ import { useAtom } from "jotai";
 import { HiOutlineCog } from "react-icons/hi";
 import { NumChip } from "../../../components/chip/PlusAndNumChip";
 import { AddTodoBtn } from "../../../components/button/ButtonComponents";
-import { ICard, Iitem } from "@/types/dashboardType";
+import { ICard } from "@/types/dashboardType";
 import {
   ColumnAtom,
   CreateCardAtom,
