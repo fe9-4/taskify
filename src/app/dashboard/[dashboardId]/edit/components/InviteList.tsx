@@ -83,17 +83,18 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
     }
   }, [isLoading]);
 
-  const onClickCancelInvitation = async (id: number) => {
+  const onClickCancelInvitation = async (invitationId: number) => {
     try {
-      const response = await axios.delete(`/api/dashboards/${dashboardId}/invitations/${id}`);
+      const response = await axios.delete(`/api/dashboards/${dashboardId}/invitations/${invitationId}`);
       if (response.status === 204) {
         toast.success(`멤버 초대를 취소합니다.`);
-        // setInvitateList(members.members.filter((member) => member.userId !== id));
+        const newList = inviteList.filter((item) => item.id !== invitationId);
+        setInviteList(newList);
       } else {
         toast.error("삭제하는 중 오류가 발생했습니다.");
       }
     } catch (err) {
-      console.error(`Error deleting member: ${id}`, err);
+      console.error(`Error deleting member: ${invitationId}`, err);
       toast.error("삭제하는 중 오류가 발생했습니다.");
     }
   };
