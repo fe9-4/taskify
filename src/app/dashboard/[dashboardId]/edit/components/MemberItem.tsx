@@ -26,8 +26,7 @@ const MemberItem = ({ member, onClick }: { member: Member; onClick: (userId: num
     "bg-teal-200",
   ];
   return (
-    // border 스타일 추후 수정
-    <div className={cls("flex w-full justify-between border-b border-gray04 px-5 py-3 md:px-7 md:py-4")}>
+    <div className="flex w-full justify-between border-b border-gray04 px-5 py-3 last:border-0 md:px-7 md:py-4">
       <div className="flex items-center gap-2 md:gap-3">
         <div className="size-[38px] overflow-hidden rounded-full">
           {profileImageUrl ? (
