@@ -1,9 +1,9 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import { CombiBtn } from "@/components/button/ButtonComponents";
-import { myDashboardUpdateAtom } from "@/store/myDashboardAtom";
+import { currentDashboardIdAtom, myDashboardUpdateAtom } from "@/store/myDashboardAtom";
 import { IInvitation } from "@/types/myDashboardType";
 import { HiOutlineSearch } from "react-icons/hi";
 
@@ -15,18 +15,26 @@ interface IProps {
 const InviteItem = ({ invitationList, setInvitationList }: IProps) => {
   const [search, setSearch] = useState("");
   const [, setMyDashboardUpdated] = useAtom(myDashboardUpdateAtom);
-
+  const currentDashboardId = useAtomValue(currentDashboardIdAtom);
+  
   const handleChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setSearch(value);
   };
-
+  
   const filteredSearch = invitationList.filter((item) =>
     item.dashboard.title.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleAcceptInvitation = async (id: number) => {
+  const handleAcceptInvitation = async (id: number, dashboardId: number) => {
     try {
+      const checkAlreadyDashboard = currentDashboardId.includes(dashboardId);
+
+      if (checkAlreadyDashboard) {
+        toast.error("이미 존재하는 대시보드입니다.");
+        return;
+      }
+
       const response = await axios.put(`/api/invitations/${id}`, {
         id,
         inviteAccepted: true,
@@ -97,7 +105,7 @@ const InviteItem = ({ invitationList, setInvitationList }: IProps) => {
           <div>
             <CombiBtn
               value={["수락", "거절"]}
-              onClickAccept={() => handleAcceptInvitation(item.id)}
+              onClickAccept={() => handleAcceptInvitation(item.id, item.dashboard.id)}
               onClickRefuse={() => handleRefuseInvitation(item.id)}
             />
           </div>
