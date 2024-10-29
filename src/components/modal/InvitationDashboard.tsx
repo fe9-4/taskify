@@ -89,19 +89,7 @@ const InvitationDashboard = () => {
     return null;
   }
 
-  // 초대 권한이 없는 경우 모달을 표시하지 않음
-  if (!isOwner) {
-    setIsInvitationDashboardOpen(false);
-    return null;
-  }
-
   const onSubmit = async (data: FormData) => {
-    // 초대 권한 확인
-    if (!isOwner) {
-      toast.error("초대 권한이 없습니다.");
-      return;
-    }
-
     // 이미 초대된 사용자인지 확인
     const existingInvitation = invitationList?.invitations.find(
       (invitation) => invitation.invitee.email === data.email
