@@ -22,7 +22,6 @@ export const DELETE = async (request: NextRequest, { params }: { params: IParams
   }
 
   try {
-    //https://sp-taskify-api.vercel.app/9-4/dashboards/12067/invitations/13476
     const response = await apiClient.delete(`/dashboards/${dashboardId}/invitations/${invitationId}`, {
       headers: {
         Authorization: `Bearer ${token}`,

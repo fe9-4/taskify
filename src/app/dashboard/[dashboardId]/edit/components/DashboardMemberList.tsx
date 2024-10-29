@@ -28,7 +28,7 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
     const deleteMember = async (id: number) => {
       try {
         const response = await axios.delete(`/api/members/${id}`);
-        if (response.status === 204) {
+        if (response?.status === 204) {
           toast.success(`멤버 ${nickname}가 삭제되었습니다`);
           setMemberList(members.members.filter((member) => member.userId !== id));
           refetch();

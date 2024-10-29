@@ -24,7 +24,6 @@ export const GET = async (request: NextRequest, { params }: { params: IParams })
   }
 
   try {
-    // https://sp-taskify-api.vercel.app/9-4/dashboards/12067/invitations?page=1&size=5
     const response = await apiClient.get(`/dashboards/${dashboardId}/invitations?page=${page}&size=${size}`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,

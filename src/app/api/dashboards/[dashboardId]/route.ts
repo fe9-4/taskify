@@ -22,7 +22,6 @@ export const GET = async (req: Request, { params }: { params: IParams }) => {
   }
 
   try {
-    //https://sp-taskify-api.vercel.app/9-4/dashboards/12067
     const response = await apiClient.get(`/dashboards/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,

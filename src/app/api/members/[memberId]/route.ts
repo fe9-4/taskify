@@ -12,19 +12,23 @@ export async function DELETE(request: NextRequest, { params }: { params: { membe
   }
 
   try {
-    const response = await apiClient.delete(`/members/${memberId}`, {
+    await apiClient.delete(`/members/${memberId}`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
+    console.log("멤버 삭제 성공");
 
-    return NextResponse.json(response, { status: 204 });
+    return new NextResponse(null, { status: 204 });
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.error("멤버 삭제 중 오류 발생: ", error);
 
       if (error.response) {
-        return NextResponse.json({ message: error.response.data.message }, { status: error.status });
+        return NextResponse.json(
+          { message: error.response.data.message || "오류 발생" },
+          { status: error.response.status }
+        );
       }
     }
 
