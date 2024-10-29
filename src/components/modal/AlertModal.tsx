@@ -1,7 +1,6 @@
 import { AlertModalAtom } from "@/store/modalAtom";
 import { ConfirmBtn } from "../button/ButtonComponents";
 import { useAtom } from "jotai";
-import { MouseEventHandler } from "react";
 
 interface AlertModalProps {
   text: string;

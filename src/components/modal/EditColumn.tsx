@@ -2,7 +2,15 @@ import { useForm, useWatch } from "react-hook-form";
 import InputItem from "../input/InputItem";
 import { CancelBtn, ConfirmBtn } from "../button/ButtonComponents";
 import { useAtom, useAtomValue } from "jotai";
-import { ColumnAtom, ColumnTitlesAtom, EditColumnAtom, UpdateDashBoardAtom } from "@/store/modalAtom";
+import {
+  AlertModalAtom,
+  AlertModalConfirmAtom,
+  AlertModalTextAtom,
+  ColumnAtom,
+  ColumnTitlesAtom,
+  EditColumnAtom,
+  UpdateDashBoardAtom,
+} from "@/store/modalAtom";
 import useLoading from "@/hooks/useLoading";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -11,6 +19,9 @@ import { IoIosClose } from "react-icons/io";
 const EditColumn = () => {
   const [, setIsEditColumnOpen] = useAtom(EditColumnAtom);
   const [, setUpdateDashBoard] = useAtom(UpdateDashBoardAtom);
+  const [, setIsAlertOpen] = useAtom(AlertModalAtom);
+  const [, setAlertText] = useAtom(AlertModalTextAtom);
+  const [, setOnConfirm] = useAtom(AlertModalConfirmAtom);
   const { isLoading, withLoading } = useLoading();
   const ColumnTitles = useAtomValue(ColumnTitlesAtom);
   const Column = useAtomValue(ColumnAtom);
@@ -28,13 +39,27 @@ const EditColumn = () => {
     await withLoading(async () => {
       try {
         await axios.put(`/api/columns/${Column.columnId}`, { ...data, columnId: Column.columnId });
-        console.log(Column, ColumnTitles);
         toast.success("컬럼 수정 완료");
         setIsEditColumnOpen(false);
         setUpdateDashBoard(true);
       } catch (error) {
         toast.error("컬럼 수정 실패");
         setIsEditColumnOpen(false);
+      }
+    });
+  };
+
+  const onDelete = async () => {
+    await withLoading(async () => {
+      try {
+        await axios.delete(`/api/columns/${Column.columnId}`);
+        toast.success("컬럼 삭제 완료");
+        setIsAlertOpen(false);
+        setIsEditColumnOpen(false);
+        setUpdateDashBoard(true);
+      } catch (error) {
+        toast.error("컬럼 삭제 실패");
+        setIsAlertOpen(false);
       }
     });
   };
@@ -56,7 +81,16 @@ const EditColumn = () => {
         errors={isDuplicate ? "중복된 컬럼 이름입니다." : ""}
       />
       <div className="mt-6 flex h-[54px] w-full gap-2">
-        <CancelBtn onClick={() => setIsEditColumnOpen(false)}>삭제</CancelBtn>
+        <CancelBtn
+          onClick={() => {
+            console.log(Column.columnId);
+            setOnConfirm(() => onDelete);
+            setAlertText("정말 삭제하시겠습니까?");
+            setIsAlertOpen(true);
+          }}
+        >
+          삭제
+        </CancelBtn>
         <ConfirmBtn disabled={!isValid || isLoading || isDuplicate} onClick={handleSubmit(onSubmit)}>
           수정
         </ConfirmBtn>
