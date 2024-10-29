@@ -9,7 +9,7 @@ import {
   ColumnAtom,
   ColumnTitlesAtom,
   EditColumnAtom,
-  UpdateDashBoardAtom,
+  RefreshDashboardAtom,
 } from "@/store/modalAtom";
 import useLoading from "@/hooks/useLoading";
 import axios from "axios";
@@ -18,7 +18,7 @@ import { IoIosClose } from "react-icons/io";
 
 const EditColumn = () => {
   const [, setIsEditColumnOpen] = useAtom(EditColumnAtom);
-  const [, setUpdateDashBoard] = useAtom(UpdateDashBoardAtom);
+  const [, setRefreshDashboard] = useAtom(RefreshDashboardAtom);
   const [, setIsAlertOpen] = useAtom(AlertModalAtom);
   const [, setAlertText] = useAtom(AlertModalTextAtom);
   const [, setOnConfirm] = useAtom(AlertModalConfirmAtom);
@@ -41,7 +41,7 @@ const EditColumn = () => {
         await axios.put(`/api/columns/${Column.columnId}`, { ...data, columnId: Column.columnId });
         toast.success("컬럼 수정 완료");
         setIsEditColumnOpen(false);
-        setUpdateDashBoard(true);
+        setRefreshDashboard((prev) => !prev);
       } catch (error) {
         toast.error("컬럼 수정 실패");
         setIsEditColumnOpen(false);
@@ -56,7 +56,7 @@ const EditColumn = () => {
         toast.success("컬럼 삭제 완료");
         setIsAlertOpen(false);
         setIsEditColumnOpen(false);
-        setUpdateDashBoard(true);
+        setRefreshDashboard((prev) => !prev);
       } catch (error) {
         toast.error("컬럼 삭제 실패");
         setIsAlertOpen(false);

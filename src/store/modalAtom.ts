@@ -31,4 +31,4 @@ export const AlertModalAtom = atom<boolean>(false);
 export const AlertModalTextAtom = atom<string>("");
 export const AlertModalConfirmAtom = atom<(() => void) | null>(null);
 
-export const UpdateDashBoardAtom = atom<boolean>(false);
+export const RefreshDashboardAtom = atom<boolean>(false);

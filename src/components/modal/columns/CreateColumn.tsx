@@ -2,7 +2,7 @@ import { useForm, useWatch } from "react-hook-form";
 import InputItem from "../../input/InputItem";
 import { CancelBtn, ConfirmBtn } from "../../button/ButtonComponents";
 import { useAtom, useAtomValue } from "jotai";
-import { ColumnTitlesAtom, CreateColumnAtom, UpdateDashBoardAtom } from "@/store/modalAtom";
+import { ColumnTitlesAtom, CreateColumnAtom, RefreshDashboardAtom } from "@/store/modalAtom";
 import { useParams } from "next/navigation";
 import useLoading from "@/hooks/useLoading";
 import axios from "axios";
@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 
 const CreateColumn = () => {
   const [, setIsCreateColumnOpen] = useAtom(CreateColumnAtom);
-  const [, setUpdateDashBoard] = useAtom(UpdateDashBoardAtom);
+  const [, setRefreshDashboard] = useAtom(RefreshDashboardAtom);
   const { dashboardId } = useParams();
   const { isLoading, withLoading } = useLoading();
   const ColumnTitles = useAtomValue(ColumnTitlesAtom);
@@ -30,7 +30,7 @@ const CreateColumn = () => {
         await axios.post("/api/columns", { ...data, dashboardId: Number(dashboardId) });
         toast.success("컬럼 생성 완료");
         setIsCreateColumnOpen(false);
-        setUpdateDashBoard(true);
+        setRefreshDashboard((prev) => !prev);
       } catch (error) {
         toast.error("컬럼 생성 실패");
         setIsCreateColumnOpen(false);

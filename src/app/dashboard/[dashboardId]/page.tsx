@@ -6,8 +6,8 @@ import ColumnList from "@/app/dashboard/components/ColumnList";
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { AddColumnBtn } from "@/components/button/ButtonComponents";
-import { useAtom } from "jotai";
-import { ColumnTitlesAtom, CreateColumnAtom, UpdateDashBoardAtom } from "@/store/modalAtom";
+import { useAtom, useAtomValue } from "jotai";
+import { ColumnTitlesAtom, CreateColumnAtom, RefreshDashboardAtom } from "@/store/modalAtom";
 
 interface IColumnData {
   id: number;
@@ -22,7 +22,7 @@ const DashboardDetail = () => {
   const { dashboardId } = useParams();
   const [, setIsCreateColumnOpen] = useAtom(CreateColumnAtom);
   const [, setColumnTitles] = useAtom(ColumnTitlesAtom);
-  const [updateDashBoard, setUpdateDashBoard] = useAtom(UpdateDashBoardAtom);
+  const updateDashBoard = useAtomValue(RefreshDashboardAtom);
 
   const [columnList, setColumnList] = useState<IColumnList["data"]>([]);
 
@@ -54,8 +54,7 @@ const DashboardDetail = () => {
   // 모달 창이 닫힐때 마다 대시보드 새로 불러오기
   useEffect(() => {
     getColumn();
-    setUpdateDashBoard(false);
-  }, [getColumn, updateDashBoard, setUpdateDashBoard]);
+  }, [getColumn, updateDashBoard]);
 
   return (
     <div className="flex flex-col space-y-6 overflow-auto pb-6 xl:flex-row xl:space-x-6 xl:space-y-0 xl:pr-4">
