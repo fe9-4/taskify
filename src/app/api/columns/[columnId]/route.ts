@@ -4,7 +4,7 @@ import apiClient from "../../apiClient";
 import axios from "axios";
 
 // 컬럼 수정
-export const PUT = async (request: NextRequest) => {
+export const PUT = async (request: NextRequest, { params }: { params: { columnId: string } }) => {
   const cookieStore = cookies();
   const accessToken = cookieStore.get("accessToken")?.value;
 
@@ -15,9 +15,9 @@ export const PUT = async (request: NextRequest) => {
   try {
     const formData = await request.json();
 
-    const columnsId = formData.columnId;
+    const columnId = params.columnId;
     const response = await apiClient.put(
-      `/columns/${columnsId}`,
+      `/columns/${columnId}`,
       { title: formData.title },
       {
         headers: {

@@ -29,10 +29,10 @@ const EditColumn = () => {
         await axios.put(`/api/columns/${Column.columnId}`, { ...data, columnId: Column.columnId });
         console.log(Column, ColumnTitles);
         toast.success("컬럼 수정 완료");
-        // setIsEditColumnOpen(false);
+        setIsEditColumnOpen(false);
       } catch (error) {
         toast.error("컬럼 수정 실패");
-        // setIsEditColumnOpen(false);
+        setIsEditColumnOpen(false);
       }
     });
   };
