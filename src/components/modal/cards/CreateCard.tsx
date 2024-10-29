@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 import useLoading from "@/hooks/useLoading";
 import { useAuth } from "@/hooks/useAuth";
 import { useFileUpload } from "@/hooks/useFileUpload";
-import { useDashboardMember } from "@/hooks/useDashboardMember";
+import { useMember } from "@/hooks/useMember";
 import { formatDateTime } from "@/utils/dateFormat";
 import { CreateCardProps } from "@/types/cardType";
 import { CancelBtn, ConfirmBtn } from "@/components/button/ButtonComponents";
@@ -26,7 +26,7 @@ import { uploadType } from "@/types/uploadType";
 const CreateCard = () => {
   const { user } = useAuth();
   const { dashboardId } = useParams();
-  const { members } = useDashboardMember({ dashboardId: Number(dashboardId) });
+  const { members } = useMember({ dashboardId: Number(dashboardId) });
   const columnId = useAtomValue(CreateCardParamsAtom);
   const [, setIsCreateCardOpen] = useAtom(CreateCardAtom);
   const { isLoading, withLoading } = useLoading();

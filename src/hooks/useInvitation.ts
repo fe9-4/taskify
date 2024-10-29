@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { useDashboardMember } from "@/hooks/useDashboardMember";
+import { useMember } from "@/hooks/useMember";
 
 interface InviteEmailData {
   email: string;
@@ -15,7 +15,7 @@ export const useInvitation = ({ dashboardId }: { dashboardId: number }) => {
   const { user } = useAuth();
 
   // 대시보드 멤버 목록 조회
-  const { memberData } = useDashboardMember({
+  const { memberData } = useMember({
     dashboardId,
     page: 1,
     size: 100,

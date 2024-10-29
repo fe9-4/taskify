@@ -1,5 +1,5 @@
 import React from "react";
-import { useDashboardMember } from "@/hooks/useDashboardMember";
+import { useMember } from "@/hooks/useMember";
 
 interface MemberInitialsProps {
   dashboardId: number;
@@ -17,8 +17,8 @@ const pastelColors = [
 ];
 
 export const MemberInitials = ({ dashboardId }: MemberInitialsProps) => {
-  // useDashboardMember 로 멤버 목록 조회
-  const { memberData, isLoading, error } = useDashboardMember({
+  // useMember 로 멤버 목록 조회
+  const { memberData, isLoading, error } = useMember({
     dashboardId,
     page: 1,
     size: 10,

@@ -9,8 +9,8 @@ interface UseDashboardListProps extends DashboardForm {
   customErrorMessage?: string;
 }
 
-// 대시보드 목록 조회 커스텀 훅
-export const useDashboardList = ({
+// 대시보드 관련 커스텀 훅
+export const useDashboard = ({
   cursorId,
   page,
   size,

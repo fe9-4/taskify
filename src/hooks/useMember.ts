@@ -9,7 +9,7 @@ interface UseDashboardMemberProps extends MemberForm {
 }
 
 // 대시보드 멤버 목록을 조회하는 커스텀 훅
-export const useDashboardMember = ({
+export const useMember = ({
   dashboardId,
   page,
   size,

@@ -7,7 +7,7 @@ import { PaginationBtn } from "../button/ButtonComponents";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useWidth } from "@/hooks/useWidth";
-import { useDashboardList } from "@/hooks/useDashboardList";
+import { useDashboard } from "@/hooks/useDashboard";
 import { Dashboard } from "@/zodSchema/dashboardSchema";
 
 const Sidebar = () => {
@@ -18,7 +18,7 @@ const Sidebar = () => {
   const { user } = useAuth();
   const pathname = usePathname();
   const { isLargeScreen } = useWidth();
-  const { data } = useDashboardList({ cursorId: 1, page, size });
+  const { data } = useDashboard({ cursorId: 1, page, size });
 
   useEffect(() => {
     if (isLargeScreen) {

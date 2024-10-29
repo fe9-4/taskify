@@ -1,8 +1,8 @@
 import React from "react";
 import { SelectedDashboard } from "./SelectedDashboard";
 import { MemberInitials } from "./MemberInitials";
-import { useDashboardList } from "@/hooks/useDashboardList";
-import { useDashboardMember } from "@/hooks/useDashboardMember";
+import { useDashboard } from "@/hooks/useDashboard";
+import { useMember } from "@/hooks/useMember";
 import Image from "next/image";
 import { useRouter, useParams } from "next/navigation";
 import { useSetAtom } from "jotai";
@@ -21,7 +21,7 @@ export const DashboardMemberDisplay = () => {
     getDashboardById,
     isLoading: isDashboardLoading,
     error: dashboardError,
-  } = useDashboardList({
+  } = useDashboard({
     page: 1,
     size: 10,
     showErrorToast: true,
@@ -36,7 +36,7 @@ export const DashboardMemberDisplay = () => {
     memberData,
     isLoading: isMemberLoading,
     error: memberError,
-  } = useDashboardMember({
+  } = useMember({
     dashboardId: currentDashboardId || 0,
     page: 1,
     size: 100,

@@ -1,4 +1,4 @@
-import { useDashboardMember } from "@/hooks/useDashboardMember";
+import { useMember } from "@/hooks/useMember";
 import { useEffect, useState } from "react";
 import MemberItem from "./MemberItem";
 import axios from "axios";
@@ -9,7 +9,7 @@ import { PaginationBtn } from "@/components/button/ButtonComponents";
 const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
   const [page, setPage] = useState(1);
   const size = 4;
-  const { members, isLoading, error, refetch } = useDashboardMember({ dashboardId, page, size });
+  const { members, isLoading, error, refetch } = useMember({ dashboardId, page, size });
 
   const [memberList, setMemberList] = useState<Member[]>([]);
   const [totalCount, setTotalCount] = useState(members?.totalCount);

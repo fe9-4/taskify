@@ -5,12 +5,11 @@ import { useForm } from "react-hook-form";
 import InputItem from "../../input/InputItem";
 import { CancelBtn, ConfirmBtn } from "../../button/ButtonComponents";
 import { InvitationDashboardAtom } from "@/store/modalAtom";
-import toast from "react-hot-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "@/hooks/useAuth";
-import { useDashboardMember } from "@/hooks/useDashboardMember";
+import { useMember } from "@/hooks/useMember";
 import { FormData, FormSchema, Invitation } from "@/zodSchema/invitationSchema";
-import { useDashboardList } from "@/hooks/useDashboardList";
+import { useDashboard } from "@/hooks/useDashboard";
 import { useInvitation } from "@/hooks/useInvitation";
 
 const InvitationDashboard = () => {
@@ -38,7 +37,7 @@ const InvitationDashboard = () => {
     getDashboardById,
     isLoading: isDashboardLoading,
     error: dashboardError,
-  } = useDashboardList({
+  } = useDashboard({
     page: 1,
     size: 10,
     showErrorToast: true,
@@ -52,7 +51,7 @@ const InvitationDashboard = () => {
     memberData,
     isLoading: isMemberLoading,
     error: memberError,
-  } = useDashboardMember({
+  } = useMember({
     dashboardId: currentDashboardId || 0,
     page: 1,
     size: 100,

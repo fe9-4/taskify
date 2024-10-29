@@ -9,7 +9,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useFileUpload } from "@/hooks/useFileUpload";
-import { useDashboardMember } from "@/hooks/useDashboardMember";
+import { useMember } from "@/hooks/useMember";
 import { formatDateTime } from "@/utils/dateFormat";
 import { CancelBtn, ConfirmBtn } from "@/components/button/ButtonComponents";
 import StatusDropdown from "@/components/dropdown/StatusDropdown";
@@ -40,7 +40,7 @@ const UpdateCard = () => {
   const cardId = useAtomValue(UpdateCardParamsAtom);
   const [columnId, setColumnId] = useState<string>("");
 
-  const { members } = useDashboardMember({
+  const { members } = useMember({
     dashboardId: Number(dashboardId),
   });
 
