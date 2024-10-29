@@ -6,8 +6,15 @@ import { useAtom } from "jotai";
 import { HiOutlineCog } from "react-icons/hi";
 import { NumChip } from "../../../components/chip/PlusAndNumChip";
 import { AddTodoBtn } from "../../../components/button/ButtonComponents";
+import {
+  ColumnAtom,
+  CreateCardAtom,
+  CreateCardParamsAtom,
+  DetailCardAtom,
+  DetailCardParamsAtom,
+  EditColumnAtom,
+} from "@/store/modalAtom";
 import { ICard } from "@/types/dashboardType";
-import { CreateCardAtom, CreateCardParamsAtom, DetailCardAtom, DetailCardParamsAtom } from "@/store/modalAtom";
 import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 
 interface IProps {
@@ -20,6 +27,8 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [hasMore, setHasMore] = useState(true);
   const [size, setSize] = useState(3);
   const [, setIsCreateCardOpen] = useAtom(CreateCardAtom);
+  const [, setIsEditColumnOpen] = useAtom(EditColumnAtom);
+  const [, setColumnAtom] = useAtom(ColumnAtom);
   const [, setIsCreateCardParams] = useAtom(CreateCardParamsAtom);
   const [, setIsDetailCardOpen] = useAtom(DetailCardAtom);
   const [, setIsDetailCardParams] = useAtom(DetailCardParamsAtom);
@@ -39,10 +48,10 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
         setCardList((prev) => {
           const existingId = new Set(prev.map((card) => card.id));
           const filteredNewCardList = newCardList.filter((card) => !existingId.has(card.id));
-          
+
           if (filteredNewCardList.length === 0 || filteredNewCardList.length < size) {
             setHasMore(false);
-          } 
+          }
 
           return [...prev, ...filteredNewCardList];
         });
@@ -89,7 +98,8 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   }, [getCardList, dashboardCardUpdate, setDashboardCardUpdate]);
 
   const handleEditModal = () => {
-    // 모달 만들어지면 모달 연결
+    setColumnAtom({ title: columnTitle, columnId });
+    setIsEditColumnOpen(true);
   };
 
   return (
@@ -102,7 +112,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
           </div>
           <NumChip num={cardList.length} />
         </div>
-        <button>
+        <button onClick={handleEditModal}>
           <HiOutlineCog className="size-[22px] text-gray01" />
         </button>
       </div>

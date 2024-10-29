@@ -9,7 +9,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import useLoading from "@/hooks/useLoading";
-import { ActiveBtn, CancelBtn, ConfirmBtn } from "../button/ButtonComponents";
+import { CancelBtn, ConfirmBtn } from "../../button/ButtonComponents";
 
 const CreateDashboard = () => {
   const {

@@ -12,7 +12,7 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
   const { members, isLoading, error, refetch } = useDashboardMember({ dashboardId, page, size });
 
   const [memberList, setMemberList] = useState<Member[]>([]);
-  const totalCount = members.totalCount;
+  const [totalCount, setTotalCount] = useState(members?.totalCount);
   const totalPage: number = Math.ceil(totalCount / size);
   const isFirst = page === 1;
   const isLast = page === totalPage;
@@ -32,8 +32,6 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
           toast.success(`멤버 ${nickname}가 삭제되었습니다`);
           setMemberList(members.members.filter((member) => member.userId !== id));
           refetch();
-        } else {
-          toast.error("삭제하는 중 오류가 발생했습니다.");
         }
       } catch (err) {
         console.error(`Error deleting member: ${id}`, err);
@@ -41,6 +39,7 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
       }
     };
     deleteMember(id);
+    // console.log(members.members);
   };
 
   useEffect(() => {
@@ -49,6 +48,7 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
     );
     if (!isLoading && members && members.members.length > 0) {
       setMemberList(uniqueMembers);
+      setTotalCount(uniqueMembers.length);
     }
   }, [isLoading]);
 
@@ -61,17 +61,17 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
             {totalPage} 중 {page}
           </div>
           <PaginationBtn
-            disabledNext={isFirst && totalPage > size}
-            disabledPrev={isLast && totalPage > size}
+            disabledPrev={isFirst && totalPage === 1}
+            disabledNext={isLast && totalCount < size}
             onClickPrev={onClickPrev}
             onClickNext={onClickNext}
           />
         </div>
       </div>
-
-      {isLoading ? <div>멤버 정보를 불러오고 있어요</div> : <></>}
-      {error ? <div>멤버 정보를 불러오는데 실패했습니다</div> : <></>}
-      {!members ? <div>아직 초대된 멤버가 없습니다</div> : <></>}
+      <div className="flex items-center justify-center gap-6 px-5 md:px-7">
+        {isLoading ? <div className="pb-5">멤버 정보를 불러오고 있어요</div> : <></>}
+        {error ? <div className="pb-5">멤버 정보를 불러오는데 실패했습니다</div> : <></>}
+      </div>
 
       <ul>
         <li>
