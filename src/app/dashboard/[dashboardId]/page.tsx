@@ -50,14 +50,14 @@ const DashboardDetail = () => {
     getColumn();
   }, [getColumn, isCreateColumnOpen]);
 
-  return (
-    <div className="flex flex-col space-y-6 overflow-auto pb-6 xl:flex-row xl:space-x-6 xl:space-y-0">
+  return ( 
+    <div className="flex flex-col space-y-6 overflow-auto pb-6 xl:flex-row xl:space-x-6 xl:space-y-0 xl:pr-4">
       <div className="flex flex-col space-y-6 xl:flex-row xl:space-y-0">
         {columnList.map((column) => (
           <ColumnList key={column.id} columnTitle={column.title} columnId={column.id} />
         ))}
       </div>
-      <div className="flex h-fit justify-center xl:justify-start xl:pt-[66px]">
+      <div className="px-4 xl:px-0 xl:pt-[66px]">
         {columnList.length < 10 && <AddColumnBtn onClick={handleColumnBtn} />}
       </div>
     </div>

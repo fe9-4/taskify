@@ -86,8 +86,8 @@ export default function Home() {
       </div>
       <div className="h-[42px] w-[138px] md:h-12 md:w-[120px]">
         <ConfirmBtn
+          type="submit"
           disabled={false}
-          type="active"
           extra={`"cursor-not-allowed bg-gray02" : "bg-violet01"`}
           onClick={onClick}
         >
@@ -96,8 +96,8 @@ export default function Home() {
       </div>
       <div className="h-[42px] w-[138px] md:h-12 md:w-[120px]">
         <ConfirmBtn
+          type="submit"
           disabled={true}
-          type="disabled"
           extra={`"cursor-not-allowed bg-gray02" : "bg-violet01"`}
           onClick={onClick}
         >

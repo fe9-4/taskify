@@ -9,7 +9,7 @@ import { cls } from "@/lib/utils";
 import { InsertBtn } from "../button/ButtonComponents";
 
 const InputItem = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, id, name, value, type, isTextArea, isButton, errors, readOnly = false, size, ...props }, ref) => {
+  ({ label, id, name, value, type, isTextArea, isButton, errors, readOnly = false, size, required, ...props }, ref) => {
     const [inputType, setInputType] = useState(type);
     const [password, setPassword] = useState(false);
 
@@ -21,8 +21,9 @@ const InputItem = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="relative flex flex-col gap-2">
         {label && (
-          <label htmlFor={id} className="text-lg font-medium text-black03 md:text-xl">
+          <label htmlFor={id} className="flex gap-1 text-lg font-medium text-black03 md:text-xl">
             {label}
+            {required && <span className="text-violet01">*</span>}
           </label>
         )}
 
@@ -36,7 +37,7 @@ const InputItem = forwardRef<HTMLInputElement, InputProps>(
               )}
               id={id}
               name={name}
-              value={value}
+              defaultValue={value}
               readOnly={readOnly}
               {...props}
             />

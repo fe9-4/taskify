@@ -2,8 +2,7 @@ import { Login } from "@/zodSchema/authSchema";
 import { AxiosError } from "axios";
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-
-import { apiClient } from "../../apiClient";
+import apiClient from "@/app/api/apiClient";
 
 export const POST = async (request: NextRequest): Promise<NextResponse> => {
   try {
@@ -15,7 +14,7 @@ export const POST = async (request: NextRequest): Promise<NextResponse> => {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "strict",
-        maxAge: 60 * 60 * 24 * 14,
+        maxAge: 60 * 60 * 24 * 14, // 14일
         path: "/",
       });
 

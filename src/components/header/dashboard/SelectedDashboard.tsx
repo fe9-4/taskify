@@ -1,14 +1,16 @@
 import { Dashboard } from "@/zodSchema/dashboardSchema";
+import { usePathname } from "next/navigation";
 
 interface SelectedDashboardProps {
-  dashboard: Dashboard | null;
+  title: string | null;
 }
 
-export const SelectedDashboard = ({ dashboard }: SelectedDashboardProps) => {
-  // 대시보드가 없는 경우 처리
-  if (!dashboard) {
-    return <div>대시보드가 없습니다.</div>;
+export const SelectedDashboard = ({ title }: SelectedDashboardProps) => {
+  const pathname = usePathname();
+
+  if (pathname === "/mypage" || !title) {
+    return <div className="hidden text-2xl font-bold text-black03 xl:block">계정관리</div>;
   }
 
-  return <div>{dashboard.title}</div>;
+  return <div className="hidden text-2xl font-bold text-black03 xl:block">{title}</div>;
 };
