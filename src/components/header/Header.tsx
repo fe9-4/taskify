@@ -9,24 +9,18 @@ import { useAuth } from "@/hooks/useAuth";
 
 export default function Header() {
   const pathname = usePathname();
-  const { user, refetchUser, isUserFetched, isInitialLoading } = useAuth();
+  const { user, isUserLoading } = useAuth();
   const [isHomePage, setIsHomePage] = useState(pathname === "/");
 
   useEffect(() => {
     setIsHomePage(pathname === "/");
   }, [pathname]);
 
-  useEffect(() => {
-    if (!isUserFetched && pathname !== "/login" && pathname !== "/signup") {
-      refetchUser();
-    }
-  }, [isUserFetched, pathname, refetchUser]);
-
   if (pathname === "/login" || pathname === "/signup") {
     return null;
   }
 
-  const showHeader = isHomePage || (!isInitialLoading && user);
+  const showHeader = isHomePage || (!isUserLoading && user);
 
   if (!showHeader) {
     return null;
@@ -34,7 +28,7 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed left-0 right-0 top-0 z-10 h-[60px] px-[24px] md:h-[70px] md:px-[40px] xl:px-[70px] ${
+      className={`fixed left-0 right-0 top-0 z-10 h-[60px] px-[12px] md:h-[70px] md:px-[40px] xl:px-[70px] ${
         isHomePage ? "bg-black" : "border-b border-gray03 bg-white"
       }`}
     >

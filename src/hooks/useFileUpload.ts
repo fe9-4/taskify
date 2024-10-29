@@ -1,37 +1,43 @@
-import { useState, useCallback } from "react";
+import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import { IUploadType } from "@/types/uploadType";
 
-export const useFileUpload = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+// 파일 업로드 응답 타입
+interface UploadResponse {
+  profileImageUrl?: string; // 프로필 이미지 URL
+  imageUrl?: string; // 카드 이미지 URL
+}
 
-  const createFormData = useCallback(async (file: string | File): Promise<FormData | null> => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
+// 파일 업로드 커스텀 훅
+export const useFileUpload = (uploadUrl: string, uploadType: IUploadType) => {
+  // 파일 업로드 mutation 정의
+  const uploadFileMutation = useMutation<string, Error, File>({
+    mutationFn: async (file: File) => {
+      // FormData 생성 및 이미지 파일 추가
       const formData = new FormData();
+      formData.append("image", file);
 
-      if (file instanceof File) {
-        // 파일 객체인 경우 직접 FormData에 추가
-        formData.append("image", file);
-      } else if (typeof file === "string") {
-        // URL 문자열인 경우 fetch를 사용하여 파일로 변환
-        const response = await fetch(file);
-        if (!response.ok) throw new Error("이미지를 가져오는데 실패했습니다");
-        const blob = await response.blob();
-        formData.append("image", blob, "image.jpg");
+      // 파일 업로드 API 요청
+      const response = await axios.post<UploadResponse>(uploadUrl, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      // 업로드 타입에 따른 URL 반환
+      if (uploadType === "profile" && response.data?.profileImageUrl) {
+        return response.data.profileImageUrl;
+      } else if (uploadType === "card" && response.data?.imageUrl) {
+        return response.data.imageUrl;
       } else {
-        throw new Error("유효하지 않은 파일 형식입니다");
+        throw new Error("이미지 URL을 받지 못했습니다.");
       }
+    },
+  });
 
-      return formData;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다");
-      return null;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  return { createFormData, isLoading, error };
+  return {
+    uploadFile: uploadFileMutation.mutateAsync, // 파일 업로드 실행 함수
+    isPending: uploadFileMutation.isPending, // 업로드 진행 중 상태
+    error: uploadFileMutation.error?.message || null, // 업로드 에러 메시지
+  };
 };
