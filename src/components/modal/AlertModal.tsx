@@ -1,5 +1,5 @@
 import { AlertModalAtom } from "@/store/modalAtom";
-import { ConfirmBtn } from "../button/ButtonComponents";
+import { CancelBtn, ConfirmBtn } from "../button/ButtonComponents";
 import { useAtom } from "jotai";
 
 interface AlertModalProps {
@@ -16,9 +16,10 @@ const AlertModal = ({ text, onConfirm }: AlertModalProps) => {
   };
 
   return (
-    <div className="flex h-[164px] w-[272px] flex-col items-center justify-center gap-8 rounded-2xl bg-white md:h-[192px] md:w-[368px]">
+    <div className="flex h-[160px] w-[300px] flex-col items-center justify-center gap-8 rounded-2xl bg-white p-6 md:h-[174px] md:w-[500px]">
       <p className="text-lg font-medium md:text-2xl">{text}</p>
-      <div className="h-[42px] w-[138px] md:h-12 md:w-[240px]">
+      <div className="flex h-[54px] w-full gap-2">
+        <CancelBtn onClick={() => setIsAlertOpen(false)}>취소</CancelBtn>
         <ConfirmBtn type="active" onClick={handleConfirm}>
           확인
         </ConfirmBtn>

@@ -1,6 +1,6 @@
 import { useForm, useWatch } from "react-hook-form";
-import InputItem from "../input/InputItem";
-import { CancelBtn, ConfirmBtn } from "../button/ButtonComponents";
+import InputItem from "../../input/InputItem";
+import { CancelBtn, ConfirmBtn } from "../../button/ButtonComponents";
 import { useAtom, useAtomValue } from "jotai";
 import {
   AlertModalAtom,
@@ -85,7 +85,7 @@ const EditColumn = () => {
           onClick={() => {
             console.log(Column.columnId);
             setOnConfirm(() => onDelete);
-            setAlertText("정말 삭제하시겠습니까?");
+            setAlertText("컬럼의 모든 카드가 삭제됩니다.");
             setIsAlertOpen(true);
           }}
         >

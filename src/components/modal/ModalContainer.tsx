@@ -15,15 +15,15 @@ import {
   InvitationDashboardAtom,
   AlertModalConfirmAtom,
 } from "@/store/modalAtom";
-import CreateDashboard from "@/components/modal/CreateDashboard";
+import CreateDashboard from "@/components/modal/dashboard/CreateDashboard";
 import ModalContent from "./ModalContent";
 import AlertModal from "./AlertModal";
 import CreateCard from "@/components/modal/cards/CreateCard";
 import DetailCard from "@/components/modal/cards/DetailCard";
 import UpdateCard from "@/components/modal/cards/UpdateCard";
-import CreateColumn from "./CreateColumn";
-import InvitationDashboard from "./InvitationDashboard";
-import EditColumn from "./EditColumn";
+import CreateColumn from "./columns/CreateColumn";
+import InvitationDashboard from "./dashboard/InvitationDashboard";
+import EditColumn from "./columns/EditColumn";
 
 Modal.setAppElement("#modal-root");
 

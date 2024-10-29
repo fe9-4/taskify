@@ -1,6 +1,6 @@
 import { useForm, useWatch } from "react-hook-form";
-import InputItem from "../input/InputItem";
-import { CancelBtn, ConfirmBtn } from "../button/ButtonComponents";
+import InputItem from "../../input/InputItem";
+import { CancelBtn, ConfirmBtn } from "../../button/ButtonComponents";
 import { useAtom, useAtomValue } from "jotai";
 import { ColumnTitlesAtom, CreateColumnAtom, UpdateDashBoardAtom } from "@/store/modalAtom";
 import { useParams } from "next/navigation";
