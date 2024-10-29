@@ -157,9 +157,9 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
         </div>
       </div>
       <div className="px-5 md:px-7">
-        {isLoading ? <div>초대 내역을 불러오고 있어요</div> : <></>}
-        {error ? <div>초대 내역을 불러오는데 실패했습니다</div> : <></>}
-        {inviteList.length === 0 ? <div>아직 초대된 멤버가 없습니다</div> : <></>}
+        {isLoading ? <>초대 내역을 불러오고 있어요</> : <></>}
+        {error ? <>초대 내역을 불러오는데 실패했습니다</> : <></>}
+        {inviteList.length === 0 ? <>아직 초대된 멤버가 없습니다</> : <></>}
       </div>
 
       <ul>
