@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import Image from "next/image";
 import InviteItem from "@/app/mydashboard/components/InviteItem";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { IInvitation, IInvitationList } from "@/types/myDashboardType";
+import { IInvitation } from "@/types/myDashboardType";
 import { cls } from "@/lib/utils";
 
 const InviteList = () => {
@@ -20,19 +20,25 @@ const InviteList = () => {
       const response = await axios.get(`/api/invitations?size=${size}`);
 
       if (response.status === 200) {
-        const newInviteList = response.data;
+        const newInviteList: IInvitation["invitations"] = response.data;
 
         setInvitationList((prev) => {
-          const existingId = new Set(prev.map((item) => item.id));
-          const filteredNewInviteList = newInviteList.filter((item: IInvitationList) => !existingId.has(item.id));
+          const existingId = new Set(prev.map((item) => item.dashboard.id));
+          const filteredNewInviteList = newInviteList.filter((item) => {
+            if (existingId.has(item.dashboard.id)) {
+              return false;
+            }
+
+            existingId.add(item.dashboard.id);
+            return true;
+          });
+
+          if (filteredNewInviteList.length === 0 || filteredNewInviteList.length < size) {
+            setHasMore(false);
+          }
+
           return [...prev, ...filteredNewInviteList];
         });
-      }
-
-      if (response.data.inviteList.length === 0) {
-        setHasMore(false);
-      } else if (response.data.inviteList.length < size) {
-        setHasMore(false);
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -69,7 +75,7 @@ const InviteList = () => {
   return (
     <div
       className={cls(
-        "flex flex-col space-y-[105px] max-h-[770px] overflow-auto bg-white px-5 pb-20 pt-6 xl:w-[1022px]",
+        "flex max-h-[770px] flex-col space-y-[105px] overflow-auto bg-white px-5 pb-20 pt-6 md:max-h-[592px] xl:max-h-[650px] xl:w-[1022px]",
         invitationList.length > 0 ? "space-y-[10px] pb-6" : ""
       )}
     >
@@ -88,7 +94,7 @@ const InviteList = () => {
       ) : (
         <>
           <InviteItem invitationList={invitationList} setInvitationList={setInvitationList} />
-          <div ref={loadingRef} className="h-1" />
+          <div ref={loadingRef} className="h-[1px]" />
         </>
       )}
     </div>

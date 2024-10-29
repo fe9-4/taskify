@@ -9,7 +9,7 @@ import { ReactNode } from "react";
 export const AddColumnBtn = ({ onClick }: any) => {
   return (
     <BaseBtn onClick={onClick}>
-      <Content extra="h-[66px] w-[284px] text-lg md:h-[70px] md:w-[544px] md:text-xl xl:h-[70px] xl:w-[354px] font-bold">
+      <Content extra="h-[66px] w-[329px] text-lg md:h-[70px] md:w-[574px] md:text-xl xl:h-[70px] xl:w-[354px] font-bold">
         새로운 컬럼 추가하기
         <PlusIcon />
       </Content>
@@ -21,7 +21,7 @@ export const AddColumnBtn = ({ onClick }: any) => {
 export const AddDashboardBtn = ({ onClick }: any) => {
   return (
     <BaseBtn onClick={onClick}>
-      <Content extra="font-semibold text-base	h-[58px] w-[260px] md:h-[66px] md:w-[247px] md:text-lg xl:h-[70px] xl:w-[332px] font-bold">
+      <Content extra="font-semibold text-base	h-[58px] md:h-[66px] md:text-lg xl:h-[70px] font-bold">
         새로운 대시보드
         <PlusIcon />
       </Content>
@@ -33,7 +33,7 @@ export const AddDashboardBtn = ({ onClick }: any) => {
 export const AddTodoBtn = ({ onClick }: { onClick: () => void }) => {
   return (
     <BaseBtn onClick={onClick}>
-      <Content extra="h-8 w-[284px] md:h-[40px] md:w-[544px] xl:w-[314px]">
+      <Content extra="h-8 md:h-[40px] md:w-[544px] xl:w-[314px]">
         <PlusIcon />
       </Content>
     </BaseBtn>
@@ -43,7 +43,7 @@ export const AddTodoBtn = ({ onClick }: { onClick: () => void }) => {
 //4) 대시보드 삭제
 export const DeleteDashboardBtn = ({ onClick }: any) => {
   return (
-    <BaseBtn onClick={onClick} extra="bg-gay03">
+    <BaseBtn onClick={onClick} extra="bg-gray03">
       <Content extra="h-[52px] w-[284px] text-lg font-medium md:h-[62px] md:w-80 md:text-xl">대시보드 삭제하기</Content>
     </BaseBtn>
   );

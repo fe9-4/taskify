@@ -3,7 +3,7 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 import InviteList from "@/app/mydashboard/components/InviteList";
-import Pagination from "./components/Pagination";
+import Pagination from "../../components/pagination/Pagination";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAtom } from "jotai";
@@ -61,9 +61,7 @@ const MyDashboard = () => {
     <div className="flex flex-col space-y-10 px-6 pt-6 md:px-8 md:pt-8">
       <div className="flex flex-col space-y-6 xl:w-[1022px]">
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
-          <div className="flex justify-center md:justify-start">
-            <AddDashboardBtn onClick={() => setisCreateDashboardOpen(true)} />
-          </div>
+          <AddDashboardBtn onClick={() => setisCreateDashboardOpen(true)} />
           {dashboardList?.length > 0
             ? dashboardList.map((dashboard) => (
                 <DashboardCard
