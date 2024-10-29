@@ -61,8 +61,8 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
             {totalPage} 중 {page}
           </div>
           <PaginationBtn
-            disabledPrev={isFirst && totalPage < size}
-            disabledNext={isLast && totalPage < size}
+            disabledPrev={isFirst && totalPage === 1}
+            disabledNext={isLast && totalCount < size}
             onClickPrev={onClickPrev}
             onClickNext={onClickNext}
           />
