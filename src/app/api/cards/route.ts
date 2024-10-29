@@ -17,9 +17,6 @@ export const POST = async (request: NextRequest) => {
     const body = await request.json();
     const { assigneeUserId, dashboardId, columnId, title, description, dueDate, tags, imageUrl } = body;
 
-    // 태그를 JSON 문자열에서 배열로 변환
-    const parsedTags = JSON.parse(tags);
-
     // dueDate를 YYYY-MM-DD HH:MM 형식으로 변환
     const formattedDueDate = dueDate ? formatDateTime(new Date(dueDate)) : null;
 
@@ -31,12 +28,12 @@ export const POST = async (request: NextRequest) => {
       title,
       description,
       dueDate: formattedDueDate,
-      tags: parsedTags,
+      tags,
       imageUrl,
     };
 
     // API 클라이언트를 사용하여 서버에 카드 생성 요청
-    const response = await apiClient.post("/cards/", newCard, {
+    const response = await apiClient.post("/cards", newCard, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -64,7 +61,7 @@ export const GET = async (req: Request) => {
   const { searchParams } = new URL(req.url);
   const columnId = searchParams.get("columnId");
   const size = searchParams.get("size");
-  
+
   if (!token) {
     return new NextResponse("사용자 정보를 찾을 수 없습니다.", { status: 401 });
   }
@@ -76,8 +73,8 @@ export const GET = async (req: Request) => {
   try {
     const response = await apiClient.get(`/cards?size=${size}&columnId=${columnId}`, {
       headers: {
-        Authorization: `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (response.status === 200) {
@@ -89,4 +86,4 @@ export const GET = async (req: Request) => {
       return new NextResponse("대시보드 상세페이지 카드정보 조회 실패", { status: error.status });
     }
   }
-}
+};

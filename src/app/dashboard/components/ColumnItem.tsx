@@ -9,7 +9,7 @@ interface IProps {
 
 const ColumnItem = ({ cards }: IProps) => {
   return (
-    <button className="w-full border-b pb-6 md:border-0 md:pb-0">
+    <section className="w-full border-b pb-6 md:border-0 md:pb-0">
       <div className="mt-4 flex flex-col space-y-2 rounded-md border border-gray03 bg-white p-3 md:flex-row md:items-center md:space-x-2 md:space-y-0 md:px-4 xl:flex-col xl:space-x-0 xl:space-y-[6px]">
         {cards.imageUrl ? (
           <Image
@@ -52,7 +52,7 @@ const ColumnItem = ({ cards }: IProps) => {
           </div>
         </div>
       </div>
-    </button>
+    </section>
   );
 };
 
