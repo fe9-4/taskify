@@ -2,8 +2,6 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import ColumnItem from "./ColumnItem";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useAtom } from "jotai";
-import { CreateCardAtom } from "@/store/modalAtom";
 import { HiOutlineCog } from "react-icons/hi";
 import { NumChip } from "../../../components/chip/PlusAndNumChip";
 import { AddTodoBtn } from "../../../components/button/ButtonComponents";
@@ -39,10 +37,10 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
         setCardList((prev) => {
           const existingId = new Set(prev.map((card) => card.id));
           const filteredNewCardList = newCardList.filter((card) => !existingId.has(card.id));
-          
+
           if (filteredNewCardList.length === 0 || filteredNewCardList.length < size) {
             setHasMore(false);
-          } 
+          }
 
           return [...prev, ...filteredNewCardList];
         });
