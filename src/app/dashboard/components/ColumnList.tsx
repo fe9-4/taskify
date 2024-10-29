@@ -3,13 +3,18 @@ import toast from "react-hot-toast";
 import ColumnItem from "./ColumnItem";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAtom } from "jotai";
-import { CreateCardAtom } from "@/store/modalAtom";
 import { HiOutlineCog } from "react-icons/hi";
 import { NumChip } from "../../../components/chip/PlusAndNumChip";
 import { AddTodoBtn } from "../../../components/button/ButtonComponents";
 import { ICard, Iitem } from "@/types/dashboardType";
-import { useAtom } from "jotai";
-import { CreateCardAtom, CreateCardParamsAtom, DetailCardAtom, DetailCardParamsAtom } from "@/store/modalAtom";
+import {
+  ColumnAtom,
+  CreateCardAtom,
+  CreateCardParamsAtom,
+  DetailCardAtom,
+  DetailCardParamsAtom,
+  EditColumnAtom,
+} from "@/store/modalAtom";
 
 interface IProps {
   columnTitle: string;
@@ -21,6 +26,8 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [hasMore, setHasMore] = useState(true);
   const [size, setSize] = useState(3);
   const [, setIsCreateCardOpen] = useAtom(CreateCardAtom);
+  const [, setIsEditColumnOpen] = useAtom(EditColumnAtom);
+  const [, setColumnAtom] = useAtom(ColumnAtom);
   const [, setIsCreateCardParams] = useAtom(CreateCardParamsAtom);
   const [, setIsDetailCardOpen] = useAtom(DetailCardAtom);
   const [, setIsDetailCardParams] = useAtom(DetailCardParamsAtom);
@@ -39,10 +46,10 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
         setCardList((prev) => {
           const existingId = new Set(prev.map((card) => card.id));
           const filteredNewCardList = newCardList.filter((card) => !existingId.has(card.id));
-          
+
           if (filteredNewCardList.length === 0 || filteredNewCardList.length < size) {
             setHasMore(false);
-          } 
+          }
 
           return [...prev, ...filteredNewCardList];
         });
@@ -81,7 +88,8 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   }, [hasMore, size, getCardList]);
 
   const handleEditModal = () => {
-    // 모달 만들어지면 모달 연결
+    setColumnAtom({ title: columnTitle, columnId });
+    setIsEditColumnOpen(true);
   };
 
   return (
@@ -94,7 +102,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
           </div>
           <NumChip num={cardList.length} />
         </div>
-        <button>
+        <button onClick={handleEditModal}>
           <HiOutlineCog className="size-[22px] text-gray01" />
         </button>
       </div>
