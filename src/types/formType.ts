@@ -1,6 +1,5 @@
 import { ChangeEventHandler, KeyboardEventHandler, MouseEventHandler } from "react";
 import { inputFileSize } from "@/components/input/InputFile";
-import { CardProps } from "./cardType";
 
 type Size = keyof typeof inputFileSize.size;
 
