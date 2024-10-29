@@ -35,10 +35,12 @@ export const InvitationSchema = z.object({
   teamId: z.string(),
   dashboard: DashboardInfoSchema,
   invitee: InviteeSchema,
-  inviteAccepted: z.boolean(),
+  inviteAccepted: z.boolean().nullable(),
   createdAt: DateSchema,
   updatedAt: DateSchema,
 });
+
+export type Invitation = z.infer<typeof InvitationSchema>;
 
 // 초대 목록 스키마
 export const InvitationListSchema = z.object({
@@ -46,6 +48,11 @@ export const InvitationListSchema = z.object({
   totalCount: z.number(),
 });
 
-// 타입 추출
-export type Invitation = z.infer<typeof InvitationSchema>;
 export type InvitationList = z.infer<typeof InvitationListSchema>;
+
+// 초대 응답 스키마
+export const InvitationResponseSchema = z.object({
+  user: InvitationSchema,
+});
+
+export type InvitationResponse = z.infer<typeof InvitationResponseSchema>;

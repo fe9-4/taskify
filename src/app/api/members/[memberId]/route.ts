@@ -18,16 +18,23 @@ export async function DELETE(request: NextRequest, { params }: { params: { membe
       },
     });
 
-    return NextResponse.json(response, { status: 204 });
+    if (response.status === 204) {
+      return new NextResponse(null, { status: 204 });
+    }
+
+    return NextResponse.json({ message: "멤버 삭제 실패" }, { status: 400 });
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.error("멤버 삭제 중 오류 발생: ", error);
 
       if (error.response) {
-        return NextResponse.json({ message: error.response.data.message }, { status: error.status });
+        return NextResponse.json(
+          { message: error.response.data.message || "멤버 삭제 실패" },
+          { status: error.response.status }
+        );
       }
     }
 
-    return NextResponse.json({ error: "멤버 삭제 중 오류가 발생했습니다." }, { status: 500 });
+    return NextResponse.json({ message: "멤버 삭제 중 오류가 발생했습니다." }, { status: 500 });
   }
 }
