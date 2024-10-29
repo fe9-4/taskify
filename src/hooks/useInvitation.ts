@@ -31,6 +31,7 @@ export const useInvitation = ({ dashboardId }: { dashboardId: number }) => {
         throw error;
       }
     },
+    staleTime: 1000 * 60 * 5, // 5분
     initialData: {
       invitations: [],
       totalCount: 0,
