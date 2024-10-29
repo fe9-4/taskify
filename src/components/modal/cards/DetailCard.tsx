@@ -142,7 +142,7 @@ const DetailCard = () => {
 
               <div className="flex flex-1 flex-col gap-y-4">
                 <div className="flex flex-wrap items-center gap-3">
-                  <StatusTitleChip title="To DO" />
+                  <StatusTitleChip title="To Do" />
                   <span className="h-[20px] w-[1px] bg-gray03 md:mx-2"></span>
                   {card.tags.map((tag, index) => (
                     <TagChip tag={tag} key={`${tag}-${index + 1}`} />

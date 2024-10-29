@@ -3,13 +3,12 @@ import toast from "react-hot-toast";
 import ColumnItem from "./ColumnItem";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAtom } from "jotai";
-import { CreateCardAtom } from "@/store/modalAtom";
 import { HiOutlineCog } from "react-icons/hi";
 import { NumChip } from "../../../components/chip/PlusAndNumChip";
 import { AddTodoBtn } from "../../../components/button/ButtonComponents";
-import { ICard, Iitem } from "@/types/dashboardType";
-import { useAtom } from "jotai";
+import { ICard } from "@/types/dashboardType";
 import { CreateCardAtom, CreateCardParamsAtom, DetailCardAtom, DetailCardParamsAtom } from "@/store/modalAtom";
+import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 
 interface IProps {
   columnTitle: string;
@@ -24,12 +23,13 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [, setIsCreateCardParams] = useAtom(CreateCardParamsAtom);
   const [, setIsDetailCardOpen] = useAtom(DetailCardAtom);
   const [, setIsDetailCardParams] = useAtom(DetailCardParamsAtom);
+  const [dashboardCardUpdate, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
   const observeRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
-
+  
   const getCardList = useCallback(async () => {
     if (!hasMore) return;
-
+    
     try {
       const response = await axios.get(`/api/cards?size=${size}&columnId=${columnId}`);
 
@@ -79,6 +79,14 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
       }
     };
   }, [hasMore, size, getCardList]);
+
+  useEffect(() => {
+    if (dashboardCardUpdate) {
+      getCardList();
+      setHasMore(true);
+      setDashboardCardUpdate(false);
+    }
+  }, [getCardList, dashboardCardUpdate, setDashboardCardUpdate]);
 
   const handleEditModal = () => {
     // 모달 만들어지면 모달 연결

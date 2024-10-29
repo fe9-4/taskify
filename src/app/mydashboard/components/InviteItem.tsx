@@ -16,7 +16,7 @@ const InviteItem = ({ invitationList, setInvitationList }: IProps) => {
   const [search, setSearch] = useState("");
   const [, setMyDashboardUpdated] = useAtom(myDashboardUpdateAtom);
   const currentDashboardId = useAtomValue(currentDashboardIdAtom);
-  
+
   const handleChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setSearch(value);

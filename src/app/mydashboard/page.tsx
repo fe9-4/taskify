@@ -55,7 +55,7 @@ const MyDashboard = () => {
     if (isUpdatedList) {
       getCurrentDashboards();
       setIsUpdatedList(false);
-    }
+    } 
   }, [isUpdatedList, getCurrentDashboards, setIsUpdatedList]);
 
   useEffect(() => {
