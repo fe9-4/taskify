@@ -27,7 +27,7 @@ const InputFile = ({ label, size, id, name, value, onChange }: InputFileProps) =
       reader.onloadend = () => {
         if (reader.result && typeof reader.result === "string") {
           setPreview(reader.result);
-          onChange(reader.result);
+          onChange(file);
         }
       };
     }
@@ -46,8 +46,8 @@ const InputFile = ({ label, size, id, name, value, onChange }: InputFileProps) =
       {label && (
         <p
           className={cls(
-            "text-lg text-black03",
-            size === "profile" ? "mb-8 text-xl font-bold md:mb-5 md:text-3xl" : "font-medium"
+            "text-black03",
+            size === "profile" ? "mb-8 text-xl font-bold md:mb-5 md:text-3xl" : "text-lg font-medium md:text-xl"
           )}
         >
           {label}

@@ -2,7 +2,7 @@
 
 import { PropsWithChildren, useState } from "react";
 import { usePathname } from "next/navigation";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { HydrationBoundary, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider } from "jotai";
 import { Toaster } from "react-hot-toast";
 
@@ -16,8 +16,11 @@ export default function ClientLayout({ children }: PropsWithChildren) {
   return (
     <QueryClientProvider client={queryClient}>
       <Provider>
-        <div className={marginClass}>{children}</div>
-        <Toaster />
+        {/* HydrationBoundary에서 상태를 전달할 때, 서버 측에서 미리 받아올 데이터 사용을 고려 */}
+        <HydrationBoundary>
+          <div className={marginClass}>{children}</div>
+          <Toaster />
+        </HydrationBoundary>
       </Provider>
     </QueryClientProvider>
   );

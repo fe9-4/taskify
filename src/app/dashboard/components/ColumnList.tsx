@@ -2,12 +2,14 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import ColumnItem from "./ColumnItem";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useAtom } from "jotai";
+import { CreateCardAtom } from "@/store/modalAtom";
 import { HiOutlineCog } from "react-icons/hi";
 import { NumChip } from "../../../components/chip/PlusAndNumChip";
 import { AddTodoBtn } from "../../../components/button/ButtonComponents";
 import { ICard, Iitem } from "@/types/dashboardType";
 import { useAtom } from "jotai";
-import { CreateCardAtom } from "@/store/modalAtom";
+import { CreateCardAtom, CreateCardParamsAtom, DetailCardAtom, DetailCardParamsAtom } from "@/store/modalAtom";
 
 interface IProps {
   columnTitle: string;
@@ -19,6 +21,9 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [hasMore, setHasMore] = useState(true);
   const [size, setSize] = useState(3);
   const [, setIsCreateCardOpen] = useAtom(CreateCardAtom);
+  const [, setIsCreateCardParams] = useAtom(CreateCardParamsAtom);
+  const [, setIsDetailCardOpen] = useAtom(DetailCardAtom);
+  const [, setIsDetailCardParams] = useAtom(DetailCardParamsAtom);
   const observeRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
 
@@ -29,19 +34,18 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
       const response = await axios.get(`/api/cards?size=${size}&columnId=${columnId}`);
 
       if (response.status === 200) {
-        const newCardList = response.data.cards;
+        const newCardList: ICard["cards"] = response.data.cards;
 
         setCardList((prev) => {
           const existingId = new Set(prev.map((card) => card.id));
-          const filteredNewCardList = newCardList.filter((card: Iitem) => !existingId.has(card.id));
+          const filteredNewCardList = newCardList.filter((card) => !existingId.has(card.id));
+          
+          if (filteredNewCardList.length === 0 || filteredNewCardList.length < size) {
+            setHasMore(false);
+          } 
+
           return [...prev, ...filteredNewCardList];
         });
-      }
-
-      if (response.data.cards.length === 0) {
-        setHasMore(false);
-      } else if (response.data.cards.length < size) {
-        setHasMore(false);
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -95,12 +99,25 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
         </button>
       </div>
       <div className="flex flex-col space-y-2">
-        <AddTodoBtn onClick={() => setIsCreateCardOpen(true)} />
+        <AddTodoBtn
+          onClick={() => {
+            setIsCreateCardOpen(true);
+            setIsCreateCardParams(String(columnId));
+          }}
+        />
         {cardList.length > 0 ? (
           cardList.map((item, i) => (
             <div key={item.id}>
-              <ColumnItem cards={item} />
-              {i === cardList.length - 1 && <div ref={loadingRef} className="h-[1px]" />}
+              <button
+                className="size-full"
+                onClick={() => {
+                  setIsDetailCardOpen(true);
+                  setIsDetailCardParams(String(item.id));
+                }}
+              >
+                <ColumnItem cards={item} />
+                {i === cardList.length - 1 && <div ref={loadingRef} className="h-[1px]" />}
+              </button>
             </div>
           ))
         ) : (

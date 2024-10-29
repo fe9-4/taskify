@@ -3,13 +3,18 @@ import axios from "axios";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
+interface IBody {
+  id: number;
+  inviteAccepted: boolean;
+}
+
 export const PUT = async (req: Request) => {
   const body = await req.json();
-  const { id, inviteAccepted } = body;
+  const { id, inviteAccepted }: IBody = body;
   
   const cookieStore = cookies();
   const token = cookieStore.get("accessToken")?.value;
-  
+
   if (!token) {
     return new NextResponse("사용자 정보를 찾을 수 없습니다.", { status: 401 });
   }
