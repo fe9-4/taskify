@@ -15,7 +15,7 @@ const EditDashboard = ({ dashboardId }: { dashboardId: number }) => {
     handleSubmit,
     watch,
     reset,
-    formState: { isValid },
+    formState: { isValid, isDirty },
   } = useForm<FieldValues>({ mode: "onChange" });
 
   const [dashboardInfo, setDashboardInfo] = useState<DashboardInfoType | null>(null);
@@ -69,20 +69,17 @@ const EditDashboard = ({ dashboardId }: { dashboardId: number }) => {
     updateDashboard(formData);
   };
 
+  const isButtonDisabled = !isValid || !isDirty;
+
   return (
     <div className="w-full rounded-2xl bg-white px-4 py-5 md:px-7 md:py-8">
       <h2 className="mb-6 text-2xl font-bold md:text-3xl">{dashboardInfo?.title || "TITLE"}</h2>
-      <InputItem
-        id="title"
-        {...register("title", { required: "대시보드 이름을 입력해주세요" })}
-        label="대시보드 이름"
-        type="text"
-      />
+      <InputItem id="title" {...register("title", { required: true })} label="대시보드 이름" type="text" />
       <div className="mb-8 mt-4 md:mb-10">
         <SelectColorChip register={register} watch={watch} />
       </div>
       <div className="flex h-[54px] w-full gap-2">
-        <ActiveBtn disabled={!isValid && !dashboardInfo?.createdByMe} onClick={handleSubmit(onSubmit)}>
+        <ActiveBtn disabled={isButtonDisabled} onClick={handleSubmit(onSubmit)}>
           변경
         </ActiveBtn>
       </div>
