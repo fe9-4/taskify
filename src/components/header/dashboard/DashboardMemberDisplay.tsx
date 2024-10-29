@@ -58,13 +58,13 @@ export const DashboardMemberDisplay = () => {
   if (isDashboardLoading || isMemberLoading || dashboardError || memberError) return null;
 
   // 대시보드 소유자 여부 확인
-  const isDashboardOwner = currentDashboard?.createdByMe;
+  const isDashboardOwner = currentDashboard?.createdByMe || false;
 
   return (
     <div className="flex h-full w-full items-center justify-between">
       {/* 대시보드 제목 영역 */}
       <div className="w-[100px] pl-1 md:w-[180px]">
-        <SelectedDashboard title={currentDashboard?.title || null} />
+        <SelectedDashboard title={currentDashboard?.title || null} isDashboardOwner={isDashboardOwner} />
       </div>
 
       {/* 대시보드 관리 버튼 영역 */}
