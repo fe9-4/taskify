@@ -27,6 +27,7 @@ export interface IInvitationList {
   invitee: {
     nickname: string;
     email: string;
+    id: number;
   };
   inviteAccepted: boolean;
 }

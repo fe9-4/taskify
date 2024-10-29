@@ -25,7 +25,7 @@ const InviteList = () => {
         setInvitationList((prev) => {
           const existingId = new Set(prev.map((item) => item.dashboard.id));
           const filteredNewInviteList = newInviteList.filter((item) => {
-            if (item.inviteAccepted || existingId.has(item.dashboard.id)) {
+            if (existingId.has(item.dashboard.id)) {
               return false;
             }
 
