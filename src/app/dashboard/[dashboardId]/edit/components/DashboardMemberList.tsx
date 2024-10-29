@@ -12,7 +12,7 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
   const { members, isLoading, error, refetch } = useDashboardMember({ dashboardId, page, size });
 
   const [memberList, setMemberList] = useState<Member[]>([]);
-  const totalCount = members.totalCount;
+  const [totalCount, setTotalCount] = useState(members?.totalCount);
   const totalPage: number = Math.ceil(totalCount / size);
   const isFirst = page === 1;
   const isLast = page === totalPage;
@@ -49,6 +49,7 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
     );
     if (!isLoading && members && members.members.length > 0) {
       setMemberList(uniqueMembers);
+      setTotalCount(uniqueMembers.length);
     }
   }, [isLoading]);
 

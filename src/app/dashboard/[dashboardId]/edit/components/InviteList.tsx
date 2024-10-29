@@ -1,48 +1,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { Member } from "@/zodSchema/memberSchema";
 import { PaginationBtn } from "@/components/button/ButtonComponents";
 import { CiSquarePlus } from "react-icons/ci";
 import { useAtom } from "jotai";
 import { InvitationDashboardAtom } from "@/store/modalAtom";
 import InviteItem from "./InviteItem";
-/* 초대 res
-{
-  "invitations": [
-    {
-      "id": 13452,
-
-      "inviter": {
-        "id": 4668,
-        "email": "yelim@fe.fe",
-        "nickname": "yelim"
-      },
-
-      "teamId": "9-4",
-      
-      "dashboard": {
-        "id": 12067,
-        "title": "수정테스트"
-      },
-
-      "invitee": {
-        "id": 4701,
-        "email": "cccwon5@naver.com",
-        "nickname": "슈퍼펭귄스"
-      },
-
-      "inviteAccepted": null,
-
-      "createdAt": "2024-10-26T08:59:15.950Z",
-
-      "updatedAt": "2024-10-26T08:59:15.950Z"
-      
-    }
-  ],
-  "totalCount": 1
-}
-*/
 interface InvitationItem {
   id: number;
   inviter: {
@@ -95,6 +58,7 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
           index === self.findIndex((inv) => inv.invitee.id === invitation.invitee.id)
       );
       setInviteList(uniqueMembers);
+      setTotalCount(uniqueMembers.length);
     } catch (err) {
       if (axios.isAxiosError(err)) {
         console.error(err.message);
