@@ -76,7 +76,7 @@ const CreateCard = () => {
   const tags = useWatch({ control, name: "tags" });
 
   // 폼의 전체 유효성 체크
-  const isFormValid = isValid && !!dueDate && tags.length > 0 && !!imageUrl;
+  const isFormValid = isValid && !!dueDate && tags.length > 0 && !!imageUrl && !isFileUploading;
 
   const handleAddTag = (tag: string) => {
     if (tagInput.trim() && !tags.includes(tag)) {
@@ -99,9 +99,11 @@ const CreateCard = () => {
 
     try {
       const uploadedUrl = await uploadFile(file);
-      setImageUrl(uploadedUrl);
-      setValue("imageUrl", uploadedUrl);
-      toast.success("카드 이미지 업로드가 완료되었습니다.");
+      if (uploadedUrl) {
+        setImageUrl(uploadedUrl);
+        setValue("imageUrl", uploadedUrl);
+        toast.success("카드 이미지 업로드가 완료되었습니다.");
+      }
     } catch (error) {
       toast.error("카드 이미지 업로드에 실패했습니다.");
       console.error("이미지 업로드 에러:", error);
@@ -111,9 +113,12 @@ const CreateCard = () => {
   };
 
   const onSubmit: SubmitHandler<CreateCardProps> = async (data) => {
+    if (isFileUploading || !imageUrl) {
+      return;
+    }
+
     await withLoading(async () => {
       try {
-        console.log(data);
         const response = await axios.post(`/api/cards`, data);
         if (response.data) {
           toast.success("카드가 생성되었습니다! 🎉");
@@ -138,7 +143,7 @@ const CreateCard = () => {
 
       <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 md:gap-8">
         <Controller
-          name="assignee"
+          name="assigneeUserId"
           control={control}
           render={({ field }) => (
             <SearchDropdown

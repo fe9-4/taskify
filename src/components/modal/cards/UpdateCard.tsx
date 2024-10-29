@@ -1,17 +1,16 @@
 "use client";
 
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState, useCallback, useMemo } from "react";
 import { useForm, SubmitHandler, Controller, useWatch } from "react-hook-form";
 import { useParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CardSchema } from "@/zodSchema/cardSchema";
+import { UpdateCardSchema } from "@/zodSchema/cardSchema";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { useDashboardMember } from "@/hooks/useDashboardMember";
 import { formatDateTime } from "@/utils/dateFormat";
-import { UpdateCardProps } from "@/types/cardType";
 import { CancelBtn, ConfirmBtn } from "@/components/button/ButtonComponents";
 import StatusDropdown from "@/components/dropdown/StatusDropdown";
 import SearchDropdown from "@/components/dropdown/SearchDropdown";
@@ -19,14 +18,28 @@ import InputItem from "@/components/input/InputItem";
 import InputDate from "@/components/input/InputDate";
 import InputTag from "@/components/input/InputTag";
 import InputFile from "@/components/input/InputFile";
-
-import { useAtom } from "jotai";
+import { useAtom, useAtomValue } from "jotai";
 import useLoading from "@/hooks/useLoading";
-import { UpdateCardAtom } from "@/store/modalAtom";
+import { UpdateCardAtom, UpdateCardParamsAtom } from "@/store/modalAtom";
 import { uploadType } from "@/types/uploadType";
+import { UpdateCardProps } from "@/types/cardType";
+
+interface CardDataType extends UpdateCardProps {
+  assignee: {
+    id: number;
+    userId: number;
+    nickname: string;
+    email: string;
+    profileImageUrl: string | null;
+  };
+  status?: string;
+}
 
 const UpdateCard = () => {
-  const { dashboardId, columnId, cardId } = useParams();
+  const { dashboardId } = useParams();
+  const cardId = useAtomValue(UpdateCardParamsAtom);
+  const [columnId, setColumnId] = useState<string>("");
+
   const { members } = useDashboardMember({
     dashboardId: Number(dashboardId),
   });
@@ -42,12 +55,14 @@ const UpdateCard = () => {
     error: fileError,
   } = useFileUpload(`/api/columns/${columnId}/card-image`, uploadType.CARD);
 
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [cardData, setCardData] = useState();
+  const [cardData, setCardData] = useState<CardDataType | null>(null);
   const [tagInput, setTagInput] = useState("");
 
   const [, setIsUpdateCardOpen] = useAtom(UpdateCardAtom);
   const { isLoading, withLoading } = useLoading();
+
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (fileError) {
@@ -62,59 +77,73 @@ const UpdateCard = () => {
     setValue,
     reset,
     watch,
+    trigger,
     control,
-    formState: { errors, isValid },
+    getValues,
+    formState: { errors },
   } = useForm<UpdateCardProps>({
-    // resolver: zodResolver(CardSchema),
-    // mode: "onChange",
+    resolver: zodResolver(UpdateCardSchema),
+    mode: "onChange",
     defaultValues: {
-      assigneeUserId: Number(user && user.id),
-      columnId: 40993,
+      assigneeUserId: Number(user?.id) || 0,
+      columnId: Number(columnId),
       title: "",
       description: "",
       dueDate: "",
       tags: [],
       imageUrl: null,
-      assignee: {
-        id: 0,
-        nickname: "",
-        profileImageUrl: null,
-      },
     },
   });
 
-  // 카드 데이터를 가져오는 함수
+  const fetchCardData = useCallback(async () => {
+    if (!cardId) {
+      console.error("카드 ID가 없습니다.");
+      return;
+    }
+
+    try {
+      const response = await axios.get(`/api/cards/${cardId}`);
+      const data = response.data;
+
+      setColumnId(String(data.columnId));
+      setCurrentValue(data.status || "toDo");
+      setSelectedValue(data.status || "toDo");
+
+      setCardData(data);
+      setPreviewUrl(data.imageUrl);
+
+      reset({
+        ...data,
+        assigneeUserId: data.assignee.id,
+        tags: data.tags || [],
+        imageUrl: data.imageUrl,
+      });
+    } catch (error) {
+      console.error("카드 데이터 불러오기 실패:", error);
+      toast.error("카드 데이터를 불러오는데 실패했습니다.");
+    }
+  }, [cardId, reset]);
+
   useEffect(() => {
-    const fetchCardData = async () => {
-      try {
-        const response = await axios.get(`/api/cards/${cardId}`);
-        const data = response.data;
-
-        setCardData(data); // UI 업데이트용 state
-        reset({
-          ...data, // 데이터의 나머지 필드 포함
-          assignee: data.assignee
-            ? {
-                // assignee가 존재하는지 확인 후 추가
-                id: data.assignee.id,
-                nickname: data.assignee.nickname,
-                profileImageUrl: data.assignee.profileImageUrl,
-              }
-            : null,
-        });
-      } catch (error) {
-        console.error("카드 데이터 불러오기 실패:", error);
-      }
-    };
-
     fetchCardData();
-  }, [cardId]);
+  }, [fetchCardData]);
 
   const dueDate = useWatch({ control, name: "dueDate" });
   const tags = useWatch({ control, name: "tags" });
+  const title = watch("title");
+  const description = watch("description");
 
-  // 폼의 전체 유효성 체크
-  const isFormValid = isValid && !!dueDate && tags.length > 0;
+  const isFormValid = useMemo(
+    () =>
+      title?.trim() !== "" &&
+      description?.trim() !== "" &&
+      !!dueDate &&
+      tags.length > 0 &&
+      (selectedFile !== null || previewUrl !== null) &&
+      (!!selectedValue || !!currentValue) &&
+      Number(watch("assigneeUserId")) > 0,
+    [title, description, dueDate, tags, selectedFile, previewUrl, selectedValue, currentValue, watch]
+  );
 
   const handleAddTag = (tag: string) => {
     if (tagInput.trim() && !tags.includes(tag)) {
@@ -123,10 +152,10 @@ const UpdateCard = () => {
     }
   };
 
-  // 이미지 변경 핸들러 수정
-  const handleImageChange = async (file: string | File | null) => {
+  const handleImageChange = (file: string | File | null) => {
     if (!file) {
-      setImageUrl(null);
+      setSelectedFile(null);
+      setPreviewUrl(null);
       setValue("imageUrl", null);
       return;
     }
@@ -135,27 +164,45 @@ const UpdateCard = () => {
       return;
     }
 
-    try {
-      const uploadedUrl = await uploadFile(file);
-      setImageUrl(uploadedUrl);
-      setValue("imageUrl", uploadedUrl);
-      toast.success("카드 이미지 업로드가 완료되었습니다.");
-    } catch (error) {
-      toast.error("카드 이미지 업로드에 실패했습니다.");
-      console.error("이미지 업로드 에러:", error);
-      setImageUrl(null);
-      setValue("imageUrl", null);
-    }
+    setSelectedFile(file);
+    setPreviewUrl(null);
   };
 
-  const onSubmit: SubmitHandler<UpdateCardProps> = async (data: any) => {
+  useEffect(() => {
+    return () => {
+      if (previewUrl && previewUrl.startsWith("blob:")) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
+  const onSubmit: SubmitHandler<UpdateCardProps> = async (data) => {
     await withLoading(async () => {
       try {
-        console.log(data);
-        const response = await axios.put(`/api/cards/${cardId}`, data);
-        setCardData(response.data);
-        if (response.data) toast.success("카드가 수정되었습니다! 🎉");
-        setIsUpdateCardOpen(false);
+        let uploadedImageUrl = previewUrl;
+
+        if (selectedFile) {
+          uploadedImageUrl = await uploadFile(selectedFile);
+          if (!uploadedImageUrl) {
+            throw new Error("이미지 업로드 실패");
+          }
+        }
+
+        const cardData = {
+          columnId: Number(columnId),
+          assigneeUserId: Number(data.assigneeUserId),
+          title: data.title,
+          description: data.description,
+          dueDate: data.dueDate,
+          tags: data.tags,
+          imageUrl: uploadedImageUrl,
+        };
+
+        const response = await axios.put(`/api/cards/${cardId}`, cardData);
+        if (response.data) {
+          toast.success("카드가 수정되었습니다! 🎉");
+          setIsUpdateCardOpen(false);
+        }
       } catch (error) {
         toast.error("카드 수정에 실패하였습니다.");
       }
@@ -178,41 +225,60 @@ const UpdateCard = () => {
           <StatusDropdown setSelectedValue={setSelectedValue} currentValue={currentValue} />
 
           <Controller
-            name="assignee"
+            name="assigneeUserId"
             control={control}
-            render={({ field }) => (
-              <SearchDropdown
-                inviteMemberList={members.members}
-                currentManager={field.value}
-                setManager={(manager) => field.onChange(manager)}
-                setValue={setValue}
-                // value={updateCard}
-                validation={managerValidation}
-                // {...register("assignee")}
-              />
-            )}
+            defaultValue={cardData?.assignee?.userId}
+            render={({ field }) => {
+              const selectedMember = members.members.find((member) => member.userId === field.value);
+
+              const currentManager = selectedMember || {
+                id: cardData?.assignee?.id || 0,
+                userId: cardData?.assignee?.userId || 0,
+                email: cardData?.assignee?.email || "",
+                nickname: cardData?.assignee?.nickname || "",
+                profileImageUrl: cardData?.assignee?.profileImageUrl || null,
+              };
+
+              return (
+                <SearchDropdown
+                  inviteMemberList={members.members}
+                  currentManager={currentManager}
+                  setManager={(manager) => {
+                    field.onChange(manager.userId);
+                    setValue("assigneeUserId", manager.userId);
+                  }}
+                  setValue={setValue}
+                  validation={managerValidation}
+                />
+              );
+            }}
           />
         </div>
 
-        <div className="flex flex-col gap-2">
-          <label htmlFor="title" className="text-lg font-medium text-black03">
-            제목 <span className="text-violet01">*</span>
-          </label>
-          <InputItem id="title" {...register("title")} errors={errors.title && errors.title.message} />
-        </div>
+        <InputItem
+          label="제목"
+          id="title"
+          {...register("title")}
+          errors={errors.title && errors.title.message}
+          required
+        />
 
-        <div className="flex flex-col gap-2">
-          <label htmlFor="description" className="text-lg font-medium text-black03">
-            설명 <span className="text-violet01">*</span>
-          </label>
-          <InputItem
-            id="description"
-            {...register("description")}
-            // isTextArea
-            size="description"
-            errors={errors.description && errors.description.message}
-          />
-        </div>
+        <InputItem
+          label="설명"
+          id="description"
+          {...register("description", {
+            required: "설명은 필수입니다",
+            onChange: (e) => {
+              setValue("description", e.target.value);
+              trigger("description");
+            },
+          })}
+          isTextArea
+          size="description"
+          required
+          errors={errors.description && errors.description.message}
+          value={watch("description")}
+        />
 
         <Controller
           name="dueDate"
@@ -245,7 +311,7 @@ const UpdateCard = () => {
           onClick={(tag) =>
             setValue(
               "tags",
-              tags.filter((t) => t !== tag)
+              tags.filter((t: string) => t !== tag)
             )
           }
           onChange={(e: ChangeEvent<HTMLInputElement>) => setTagInput(e.target.value)}
@@ -255,7 +321,7 @@ const UpdateCard = () => {
           label="이미지"
           id="imageUrl"
           name="imageUrl"
-          value={imageUrl}
+          value={previewUrl}
           onChange={handleImageChange}
           size="todo"
         />
@@ -264,11 +330,7 @@ const UpdateCard = () => {
           <CancelBtn type="button" onClick={() => setIsUpdateCardOpen(false)}>
             취소
           </CancelBtn>
-          <ConfirmBtn
-            type="submit"
-            disabled={!isValid || isLoading || isFileUploading}
-            onClick={handleSubmit(onSubmit)}
-          >
+          <ConfirmBtn type="submit" disabled={!isFormValid || isLoading || isFileUploading}>
             수정
           </ConfirmBtn>
         </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { ICurrentManager } from "@/types/currentManager";
 import { cls, randomColor } from "@/lib/utils";
 import { CreateCardProps, UpdateCardProps } from "@/types/cardType";
 import { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
@@ -7,13 +8,6 @@ import { FieldErrors, UseFormRegisterReturn, UseFormSetValue } from "react-hook-
 import { FaCaretDown } from "react-icons/fa";
 import { HiCheck } from "react-icons/hi";
 
-interface ICurrentManager {
-  id: number;
-  nickname: string;
-  profileImageUrl: string | null;
-}
-
-// currentManager는 '할 일 수정'에서 이 드롭다운메뉴를 사용하실 때 현재 담당자명입니다.
 interface IProps {
   inviteMemberList: ICurrentManager[];
   currentManager: ICurrentManager;
@@ -40,7 +34,7 @@ const SearchDropdown = ({ validation, setValue, inviteMemberList, setManager, cu
     setIsOpen(value.length > 0);
 
     if (value === res[0]?.nickname) {
-      setValue("assigneeUserId", res[0]?.id);
+      setValue("assigneeUserId", res[0]?.userId);
     }
   };
 

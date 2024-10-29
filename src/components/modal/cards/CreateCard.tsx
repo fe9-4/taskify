@@ -19,7 +19,6 @@ import InputItem from "@/components/input/InputItem";
 import InputDate from "@/components/input/InputDate";
 import InputTag from "@/components/input/InputTag";
 import InputFile from "@/components/input/InputFile";
-
 import { useAtom, useAtomValue } from "jotai";
 import { CreateCardAtom, CreateCardParamsAtom } from "@/store/modalAtom";
 import { uploadType } from "@/types/uploadType";
@@ -41,11 +40,9 @@ const CreateCard = () => {
   useEffect(() => {
     if (fileError) {
       toast.error("이미지 업로드 중 오류가 발생했습니다.");
-      console.error("파일 업로드 에러:", fileError);
     }
   }, [fileError]);
 
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [tagInput, setTagInput] = useState("");
 
   const {
@@ -55,7 +52,7 @@ const CreateCard = () => {
     watch,
     trigger,
     control,
-    formState: { errors, isValid },
+    formState: { errors },
   } = useForm<CreateCardProps>({
     resolver: zodResolver(CardSchema),
     mode: "onChange",
@@ -71,10 +68,17 @@ const CreateCard = () => {
     },
   });
 
+  // 폼 필드 값 실시간 감시
   const dueDate = useWatch({ control, name: "dueDate" });
   const tags = useWatch({ control, name: "tags" });
+  const title = watch("title");
+  const description = watch("description");
 
-  const isFormValid = isValid && !!dueDate && tags.length > 0 && !!imageUrl && !isFileUploading;
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const isFormValid =
+    title?.trim() !== "" && description?.trim() !== "" && !!dueDate && tags.length > 0 && selectedFile !== null;
 
   const handleAddTag = (tag: string) => {
     if (tagInput.trim() && !tags.includes(tag)) {
@@ -83,9 +87,10 @@ const CreateCard = () => {
     }
   };
 
-  const handleImageChange = async (file: string | File | null) => {
+  const handleImageChange = (file: string | File | null) => {
     if (!file) {
-      setImageUrl(null);
+      setSelectedFile(null);
+      setPreviewUrl(null);
       setValue("imageUrl", null);
       return;
     }
@@ -94,24 +99,28 @@ const CreateCard = () => {
       return;
     }
 
-    try {
-      const uploadedUrl = await uploadFile(file);
-      setImageUrl(uploadedUrl);
-      setValue("imageUrl", uploadedUrl);
-      toast.success("카드 이미지 업로드가 완료되었습니다.");
-    } catch (error) {
-      toast.error("카드 이미지 업로드에 실패했습니다.");
-      console.error("이미지 업로드 에러:", error);
-      setImageUrl(null);
-      setValue("imageUrl", null);
-    }
+    setSelectedFile(file);
+    const preview = URL.createObjectURL(file);
+    setPreviewUrl(preview);
   };
 
   const onSubmit: SubmitHandler<CreateCardProps> = async (data) => {
     await withLoading(async () => {
       try {
-        console.log(data);
-        const response = await axios.post(`/api/cards`, data);
+        let uploadedImageUrl = null;
+        if (selectedFile) {
+          uploadedImageUrl = await uploadFile(selectedFile);
+          if (!uploadedImageUrl) {
+            throw new Error("이미지 업로드 실패");
+          }
+        }
+
+        const cardData = {
+          ...data,
+          imageUrl: uploadedImageUrl,
+        };
+
+        const response = await axios.post(`/api/cards`, cardData);
         if (response.data) {
           toast.success("카드가 생성되었습니다! 🎉");
           setIsCreateCardOpen(false);
@@ -135,17 +144,32 @@ const CreateCard = () => {
 
       <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 md:gap-8">
         <Controller
-          name="assignee"
+          name="assigneeUserId"
           control={control}
-          render={({ field }) => (
-            <SearchDropdown
-              inviteMemberList={members.members}
-              currentManager={field.value}
-              setManager={(manager) => field.onChange(manager)}
-              setValue={setValue}
-              validation={managerValidation}
-            />
-          )}
+          render={({ field }) => {
+            const selectedMember = members.members.find((member) => member.userId === field.value);
+
+            const currentManager = selectedMember || {
+              id: 0,
+              userId: 0,
+              email: "",
+              nickname: "",
+              profileImageUrl: null,
+            };
+
+            return (
+              <SearchDropdown
+                inviteMemberList={members.members}
+                currentManager={currentManager}
+                setManager={(manager) => {
+                  field.onChange(manager.userId);
+                  setValue("assigneeUserId", manager.userId);
+                }}
+                setValue={setValue}
+                validation={managerValidation}
+              />
+            );
+          }}
         />
 
         <InputItem
@@ -213,7 +237,7 @@ const CreateCard = () => {
           label="이미지"
           id="imageUrl"
           name="imageUrl"
-          value={imageUrl}
+          value={previewUrl}
           onChange={handleImageChange}
           size="todo"
         />

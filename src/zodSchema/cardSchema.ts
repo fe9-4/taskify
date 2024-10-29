@@ -10,3 +10,17 @@ export const CardSchema = z.object({
   tags: z.array(z.string()).min(1, "태그를 1개 이상 입력해주세요"),
   imageUrl: z.string().nullable(),
 });
+
+export type CardSchemaType = z.infer<typeof CardSchema>;
+
+export const UpdateCardSchema = z.object({
+  columnId: z.number(),
+  assigneeUserId: z.number(),
+  title: z.string(),
+  description: z.string(),
+  dueDate: z.string(),
+  tags: z.array(z.string()),
+  imageUrl: z.string().nullable(),
+});
+
+export type UpdateCardSchemaType = z.infer<typeof UpdateCardSchema>;
