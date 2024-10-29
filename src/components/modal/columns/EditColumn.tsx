@@ -83,7 +83,6 @@ const EditColumn = () => {
       <div className="mt-6 flex h-[54px] w-full gap-2">
         <CancelBtn
           onClick={() => {
-            console.log(Column.columnId);
             setOnConfirm(() => onDelete);
             setAlertText("컬럼의 모든 카드가 삭제됩니다.");
             setIsAlertOpen(true);
