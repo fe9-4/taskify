@@ -2,7 +2,7 @@ import { useForm, useWatch } from "react-hook-form";
 import InputItem from "../input/InputItem";
 import { CancelBtn, ConfirmBtn } from "../button/ButtonComponents";
 import { useAtom, useAtomValue } from "jotai";
-import { ColumnAtom, ColumnTitlesAtom, EditColumnAtom } from "@/store/modalAtom";
+import { ColumnAtom, ColumnTitlesAtom, EditColumnAtom, UpdateDashBoardAtom } from "@/store/modalAtom";
 import useLoading from "@/hooks/useLoading";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -10,6 +10,7 @@ import { IoIosClose } from "react-icons/io";
 
 const EditColumn = () => {
   const [, setIsEditColumnOpen] = useAtom(EditColumnAtom);
+  const [, setUpdateDashBoard] = useAtom(UpdateDashBoardAtom);
   const { isLoading, withLoading } = useLoading();
   const ColumnTitles = useAtomValue(ColumnTitlesAtom);
   const Column = useAtomValue(ColumnAtom);
@@ -30,6 +31,7 @@ const EditColumn = () => {
         console.log(Column, ColumnTitles);
         toast.success("컬럼 수정 완료");
         setIsEditColumnOpen(false);
+        setUpdateDashBoard(true);
       } catch (error) {
         toast.error("컬럼 수정 실패");
         setIsEditColumnOpen(false);
