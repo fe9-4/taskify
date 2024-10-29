@@ -70,7 +70,7 @@ export const GET = async (request: NextRequest, { params }: { params: { cardId: 
       },
     });
 
-    return NextResponse.json(response.data, { status: 201 });
+    return NextResponse.json(response.data, { status: 200 });
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.error("할 일 카드 조회 중 오류 발생: ", error);

@@ -8,19 +8,22 @@ interface CardProps {
   imageUrl: string | File | null;
 }
 
-interface FormValues {
+interface AssigneeType {
   id: number;
+  userId: number;
   nickname: string;
+  email: string;
   profileImageUrl: string | null;
 }
 
 export interface CreateCardProps extends CardProps {
-  assignee: FormValues;
-  dashboardId?: number;
+  dashboardId: number;
+  assignee?: AssigneeType;
 }
 
 export interface UpdateCardProps extends CardProps {
-  assignee: FormValues;
+  dashboardId: number;
+  assignee?: AssigneeType;
 }
 
 export interface CardDataProps {
@@ -29,10 +32,11 @@ export interface CardDataProps {
   description: string;
   tags: string[];
   dueDate: string;
-  assignee: FormValues;
+  assignee: AssigneeType;
   imageUrl: string;
   teamId: string;
   columnId: number;
   createdAt: Date;
   updatedAt: Date;
+  status?: string;
 }
