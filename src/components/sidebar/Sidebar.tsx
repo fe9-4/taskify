@@ -3,12 +3,12 @@ import { usePathname } from "next/navigation";
 import Button from "./Button";
 import DashboardList from "./DashboardList";
 import Logo from "./Logo";
-import { PaginationBtn } from "../button/ButtonComponents";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useWidth } from "@/hooks/useWidth";
 import { useDashboardList } from "@/hooks/useDashboardList";
 import { Dashboard } from "@/zodSchema/dashboardSchema";
+import Pagination from "../pagination/Pagination";
 
 const Sidebar = () => {
   const [page, setPage] = useState(1);
@@ -53,16 +53,7 @@ const Sidebar = () => {
         <Button />
         <DashboardList list={dashboardList} />
         <div className="absolute bottom-0 hidden md:mt-6 md:block xl:mt-8">
-          {totalCount > size ? (
-            <PaginationBtn
-              disabledPrev={isFirst}
-              disabledNext={isLast}
-              onClickPrev={onClickPrev}
-              onClickNext={onClickNext}
-            />
-          ) : (
-            <></>
-          )}
+          {totalCount > size ? <Pagination totalPage={totalPage} setPage={setPage} page={page} /> : <></>}
         </div>
       </div>
     </aside>
