@@ -9,8 +9,8 @@ import { useRouter } from "next/navigation";
 import { useAtom } from "jotai";
 import { AddDashboardBtn, DashboardCard } from "@/components/button/ButtonComponents";
 import { IMyDashboard } from "@/types/myDashboardType";
-import { CreateDashboardAtom } from "@/store/modalAtom";
 import { currentDashboardIdAtom, myDashboardUpdateAtom } from "@/store/myDashboardAtom";
+import { useToggleModal } from "@/hooks/useToggleModal";
 
 const MyDashboard = () => {
   const router = useRouter();
@@ -20,7 +20,8 @@ const MyDashboard = () => {
   const [size, setSize] = useState(5);
   const [dashboardList, setDashboardList] = useState<IMyDashboard["dashboards"]>([]);
   const [totalPage, setTotalPage] = useState(0);
-  const [, setisCreateDashboardOpen] = useAtom(CreateDashboardAtom);
+
+  const toggleModal = useToggleModal();
   const [isUpdatedList, setIsUpdatedList] = useAtom(myDashboardUpdateAtom);
   const [, setDashboardIdList] = useAtom(currentDashboardIdAtom);
 
@@ -55,7 +56,7 @@ const MyDashboard = () => {
     if (isUpdatedList) {
       getCurrentDashboards();
       setIsUpdatedList(false);
-    } 
+    }
   }, [isUpdatedList, getCurrentDashboards, setIsUpdatedList]);
 
   useEffect(() => {
@@ -69,7 +70,7 @@ const MyDashboard = () => {
     <div className="flex flex-col space-y-10 px-6 pt-6 md:px-8 md:pt-8">
       <div className="flex flex-col space-y-6 xl:w-[1022px]">
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
-          <AddDashboardBtn onClick={() => setisCreateDashboardOpen(true)} />
+          <AddDashboardBtn onClick={() => toggleModal("createDashboard", true)} />
           {dashboardList?.length > 0
             ? dashboardList.map((dashboard) => (
                 <DashboardCard

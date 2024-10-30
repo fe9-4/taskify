@@ -7,7 +7,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { AddColumnBtn } from "@/components/button/ButtonComponents";
 import { useAtom, useAtomValue } from "jotai";
-import { ColumnTitlesAtom, CreateColumnAtom, RefreshDashboardAtom } from "@/store/modalAtom";
+import { ColumnTitlesAtom, RefreshDashboardAtom } from "@/store/modalAtom";
+import { useToggleModal } from "@/hooks/useToggleModal";
 
 interface IColumnData {
   id: number;
@@ -20,7 +21,7 @@ interface IColumnList {
 
 const DashboardDetail = () => {
   const { dashboardId } = useParams();
-  const [, setIsCreateColumnOpen] = useAtom(CreateColumnAtom);
+  const toggleModal = useToggleModal();
   const [, setColumnTitles] = useAtom(ColumnTitlesAtom);
   const updateDashBoard = useAtomValue(RefreshDashboardAtom);
 
@@ -44,7 +45,7 @@ const DashboardDetail = () => {
   const handleColumnBtn = () => {
     const columTitles = columnList.map((column) => column.title);
     setColumnTitles(columTitles);
-    setIsCreateColumnOpen(true);
+    toggleModal("createColumn", true);
   };
   
   // 모달 창이 닫힐때 마다 대시보드 새로 불러오기

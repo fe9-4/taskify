@@ -1,19 +1,18 @@
-import { useAtom } from "jotai";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import InputItem from "../../input/InputItem";
 import { CancelBtn, ConfirmBtn } from "../../button/ButtonComponents";
-import { InvitationDashboardAtom } from "@/store/modalAtom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "@/hooks/useAuth";
 import { useMember } from "@/hooks/useMember";
 import { FormData, FormSchema, Invitation } from "@/zodSchema/invitationSchema";
 import { useDashboard } from "@/hooks/useDashboard";
 import { useInvitation } from "@/hooks/useInvitation";
+import { useToggleModal } from "@/hooks/useToggleModal";
 
 const InvitationDashboard = () => {
-  const [, setIsInvitationDashboardOpen] = useAtom(InvitationDashboardAtom);
+  const toggleModal = useToggleModal();
   const params = useParams();
   const router = useRouter();
   const currentDashboardId = params?.dashboardId ? Number(params.dashboardId) : null;
@@ -66,16 +65,16 @@ const InvitationDashboard = () => {
 
   useEffect(() => {
     if (dashboardError || memberError) {
-      setIsInvitationDashboardOpen(false);
+      toggleModal("invitationDashboard", false);
       router.push("/mydashboard");
     }
-  }, [dashboardError, memberError, setIsInvitationDashboardOpen, router]);
+  }, [dashboardError, memberError, toggleModal, router]);
 
   const onSubmit = handleSubmit(async (data) => {
     try {
       await inviteMember(data);
       reset();
-      setIsInvitationDashboardOpen(false);
+      toggleModal("invitationDashboard", false);
     } catch (error) {
       console.error("초대 실패:", error);
     }
@@ -98,7 +97,7 @@ const InvitationDashboard = () => {
           errors={errors.email?.message}
         />
         <div className="mt-6 flex h-[54px] w-full gap-2">
-          <CancelBtn type="button" onClick={() => setIsInvitationDashboardOpen(false)}>
+          <CancelBtn type="button" onClick={() => toggleModal("invitationDashboard", false)}>
             취소
           </CancelBtn>
           <ConfirmBtn type="submit" disabled={!isValid || isDashboardLoading || isMemberLoading || isInviting}>
