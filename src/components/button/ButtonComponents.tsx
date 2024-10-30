@@ -107,11 +107,17 @@ export const DeleteCancelBtn = ({ children, onClick }: { children: string; onCli
   );
 };
 
-//4) 입력  / 피그마 표기 : Component24
-export const InsertBtn = ({ children, onClick }: { children: string; onClick: any }) => {
+//4) 입력 / 피그마 표기 : Component24
+export const InsertBtn = ({ children, disabled, onClick }: { children: string; disabled?: boolean; onClick: any }) => {
   return (
-    <BaseBtn extra="rounded-[4px]" onClick={onClick}>
-      <Content extra="text-violet01 font-medium	text-xs w-[84px] h-7 md:h-8">{children}</Content>
+    <BaseBtn
+      extra={cls("rounded-[4px] size-full", disabled ? "cursor-not-allowed" : "")}
+      onClick={onClick}
+      disabled={disabled}
+    >
+      <Content extra={cls("font-medium text-xs w-[84px] h-7 md:h-8", disabled ? "text-gray02" : "text-violet01")}>
+        {children}
+      </Content>
     </BaseBtn>
   );
 };
@@ -134,6 +140,7 @@ export const CancelBtn = ({
     </BaseBtn>
   );
 };
+
 // 6) 확인 / 피그마 표기 : modal
 export const ConfirmBtn = ({
   children,

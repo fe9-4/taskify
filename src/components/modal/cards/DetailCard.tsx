@@ -18,6 +18,7 @@ import { StatusTitleChip } from "../../chip/StatusChip";
 import TagChip from "@/components/chip/TagChip";
 import EditDeleteDropdown from "@/components/dropdown/EditDeleteDropdown";
 import CreateComment from "../comments/CreateComment";
+import CommentList from "../comments/CommentList";
 
 const DetailCard = () => {
   const cardId = useAtomValue(DetailCardParamsAtom);
@@ -158,8 +159,7 @@ const DetailCard = () => {
           </div>
         ))}
 
-      {/* 임시 댓글 창 */}
-      <CreateComment cardId={cardId} columnId={column.columnId} />
+      <CommentList cardId={cardId} columnId={column.columnId} />
     </section>
   );
 };

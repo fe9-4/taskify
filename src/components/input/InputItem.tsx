@@ -6,13 +6,9 @@ import Image from "next/image";
 import CloseEyes from "../../../public/icons/visibility_off.svg";
 import OpenEyes from "../../../public/icons/visibility_on.svg";
 import { cls } from "@/lib/utils";
-import { InsertBtn } from "../button/ButtonComponents";
 
 const InputItem = forwardRef<HTMLInputElement, InputProps>(
-  (
-    { label, id, name, value, type, isTextArea, isButton, errors, readOnly = false, size, required, onClick, ...props },
-    ref
-  ) => {
+  ({ label, id, name, value, type, isTextArea, isButton, errors, readOnly = false, size, required, ...props }, ref) => {
     const [inputType, setInputType] = useState(type);
     const [password, setPassword] = useState(false);
 
@@ -31,26 +27,19 @@ const InputItem = forwardRef<HTMLInputElement, InputProps>(
         )}
 
         {isTextArea ? (
-          <>
-            <textarea
-              className={cls(
-                "relative w-full resize-none rounded-lg p-4 text-xs text-black03 placeholder-gray02 ring-1 ring-inset ring-gray03 transition-all focus-within:ring-violet01 focus:outline-none focus:ring-inset md:py-4 md:text-base",
-                size === "description" ? "h-[126px]" : "h-[70px] md:h-[110px]",
-                errors ? "ring-red01 transition-all focus-within:ring-red01" : "focus-within:ring-violet01"
-              )}
-              id={id}
-              name={name}
-              defaultValue={value}
-              ref={ref as React.Ref<HTMLTextAreaElement>}
-              readOnly={readOnly}
-              {...props}
-            />
-            {isButton && (
-              <div className="absolute bottom-3 right-3">
-                <InsertBtn onClick={onClick}>입력</InsertBtn>
-              </div>
+          <textarea
+            className={cls(
+              "relative w-full resize-none rounded-lg p-4 text-xs text-black03 placeholder-gray02 ring-1 ring-inset ring-gray03 transition-all focus-within:ring-violet01 focus:outline-none focus:ring-inset md:py-4 md:text-base",
+              size === "description" ? "h-[126px]" : "h-[70px] md:h-[110px]",
+              errors ? "ring-red01 transition-all focus-within:ring-red01" : "focus-within:ring-violet01"
             )}
-          </>
+            id={id}
+            name={name}
+            defaultValue={value}
+            ref={ref as React.Ref<HTMLTextAreaElement>}
+            readOnly={readOnly}
+            {...props}
+          />
         ) : (
           <div className="relative">
             <input
@@ -85,7 +74,5 @@ const InputItem = forwardRef<HTMLInputElement, InputProps>(
     );
   }
 );
-
-InputItem.displayName = "InputItem";
 
 export default InputItem;
