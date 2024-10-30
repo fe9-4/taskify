@@ -4,7 +4,7 @@ import { ChangeEvent, useState, useEffect } from "react";
 import { useForm, SubmitHandler, Controller, useWatch } from "react-hook-form";
 import { useParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CardSchema } from "@/zodSchema/cardSchema";
+import { CreateCardFormSchema } from "@/zodSchema/cardSchema";
 import axios from "axios";
 import toast from "react-hot-toast";
 import useLoading from "@/hooks/useLoading";
@@ -57,7 +57,7 @@ const CreateCard = () => {
     control,
     formState: { errors },
   } = useForm<CreateCardProps>({
-    resolver: zodResolver(CardSchema),
+    resolver: zodResolver(CreateCardFormSchema),
     mode: "onChange",
     defaultValues: {
       assigneeUserId: Number(user && user.id),

@@ -1,26 +1,34 @@
 import { z } from "zod";
+import { CardFormSchema, CardResponseSchema } from "./commonSchema";
 
-export const CardSchema = z.object({
-  assigneeUserId: z.number().min(1, "담당자를 선택해주세요"),
+// 카드 생성 요청 스키마
+export const CreateCardFormSchema = z.object({
+  ...CardFormSchema.shape,
   dashboardId: z.number(),
-  columnId: z.number(),
-  title: z.string().min(1, "제목은 필수입니다"),
-  description: z.string().min(1, "설명은 필수입니다"),
-  dueDate: z.string().min(1, "날짜를 선택해주세요"),
-  tags: z.array(z.string()).min(1, "태그를 1개 이상 입력해주세요"),
-  imageUrl: z.string().nullable(),
 });
 
-export type CardSchemaType = z.infer<typeof CardSchema>;
+export type CreateCardFormSchemaType = z.infer<typeof CreateCardFormSchema>;
 
-export const UpdateCardSchema = z.object({
-  columnId: z.number(),
-  assigneeUserId: z.number(),
-  title: z.string(),
-  description: z.string(),
-  dueDate: z.string(),
-  tags: z.array(z.string()),
-  imageUrl: z.string().nullable(),
+// 카드 수정 요청 스키마
+export const UpdateCardFormSchema = z.object(CardFormSchema.shape);
+
+export type UpdateCardFormSchemaType = z.infer<typeof UpdateCardFormSchema>;
+
+// 카드 수정 응답 스키마
+export const UpdateCardResponseSchema = z.object(CardResponseSchema.shape);
+
+export type UpdateCardResponseSchemaType = z.infer<typeof UpdateCardResponseSchema>;
+
+// 카드 상세 응답 스키마
+export const CardDetailResponseSchema = z.object(CardResponseSchema.shape);
+
+export type CardDetailResponseSchemaType = z.infer<typeof CardDetailResponseSchema>;
+
+// 카드 목록 응답 스키마
+export const CardListResponseSchema = z.object({
+  cursorId: z.number(),
+  totalCount: z.number(),
+  cards: z.array(CardResponseSchema),
 });
 
-export type UpdateCardSchemaType = z.infer<typeof UpdateCardSchema>;
+export type CardListResponseSchemaType = z.infer<typeof CardListResponseSchema>;

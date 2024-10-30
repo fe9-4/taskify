@@ -1,16 +1,14 @@
-import axios from "axios";
-import toast from "react-hot-toast";
-import ColumnItem from "./ColumnItem";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useAtom } from "jotai";
 import { HiOutlineCog } from "react-icons/hi";
 import { NumChip } from "../../../components/chip/PlusAndNumChip";
 import { AddTodoBtn } from "../../../components/button/ButtonComponents";
 import { ColumnAtom, CreateCardParamsAtom, DetailCardParamsAtom } from "@/store/modalAtom";
-import { ICard } from "@/types/dashboardType";
 import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { useToggleModal } from "@/hooks/useToggleModal";
 import { Droppable } from "@hello-pangea/dnd";
+import ColumnItem from "./ColumnItem";
+import { useCard } from "@/hooks/useCard";
 
 interface IProps {
   columnTitle: string;
@@ -18,77 +16,46 @@ interface IProps {
 }
 
 const ColumnList = ({ columnTitle, columnId }: IProps) => {
-  const [cardList, setCardList] = useState<ICard["cards"]>([]);
-  const [hasMore, setHasMore] = useState(true);
-  const [size, setSize] = useState(3);
   const toggleModal = useToggleModal();
   const [, setColumnAtom] = useAtom(ColumnAtom);
   const [, setIsCreateCardParams] = useAtom(CreateCardParamsAtom);
   const [, setIsDetailCardParams] = useAtom(DetailCardParamsAtom);
   const [dashboardCardUpdate, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
-  const observeRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
 
-  const getCardList = useCallback(async () => {
-    if (!hasMore) return;
+  // useCard 훅 사용
+  const { cards, totalCount, fetchNextPage, hasNextPage, isFetchingNextPage } = useCard(columnId, 10);
 
-    try {
-      const response = await axios.get(`/api/cards?size=${size}&columnId=${columnId}`);
-
-      if (response.status === 200) {
-        const newCardList: ICard["cards"] = response.data.cards;
-
-        setCardList((prev) => {
-          const existingId = new Set(prev.map((card) => card.id));
-          const filteredNewCardList = newCardList.filter((card) => !existingId.has(card.id));
-
-          if (filteredNewCardList.length === 0 || filteredNewCardList.length < size) {
-            setHasMore(false);
-          }
-
-          return [...prev, ...filteredNewCardList];
-        });
+  // Intersection Observer 콜백
+  const onIntersect = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      const target = entries[0];
+      if (target.isIntersecting && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
       }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.error("ColumnList getCardList에서 api 오류 발생", error);
-        toast.error(error.response?.data);
-      }
-    }
-  }, [columnId, hasMore, size]);
+    },
+    [hasNextPage, isFetchingNextPage, fetchNextPage]
+  );
 
-  // 카드아이템 무한스크롤
+  // Intersection Observer 설정
   useEffect(() => {
-    getCardList();
-
-    observeRef.current = new IntersectionObserver((entries) => {
-      const lastCardItem = entries[0];
-
-      if (lastCardItem.isIntersecting && hasMore) {
-        getCardList();
-      }
+    const observer = new IntersectionObserver(onIntersect, {
+      threshold: 1.0,
     });
 
-    const currentLoadingRef = loadingRef.current;
-
-    if (currentLoadingRef) {
-      observeRef.current.observe(currentLoadingRef);
+    if (loadingRef.current) {
+      observer.observe(loadingRef.current);
     }
 
-    return () => {
-      if (currentLoadingRef) {
-        observeRef.current?.unobserve(currentLoadingRef);
-      }
-    };
-  }, [hasMore, size, getCardList]);
+    return () => observer.disconnect();
+  }, [onIntersect]);
 
+  // dashboardCardUpdate 상태가 변경될 때 카드 목록 갱신
   useEffect(() => {
     if (dashboardCardUpdate) {
-      getCardList();
-      setHasMore(true);
       setDashboardCardUpdate(false);
     }
-  }, [getCardList, dashboardCardUpdate, setDashboardCardUpdate]);
+  }, [dashboardCardUpdate, setDashboardCardUpdate]);
 
   const handleEditModal = () => {
     setColumnAtom({ title: columnTitle, columnId });
@@ -103,12 +70,18 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
             <span className="size-2 rounded-full bg-violet01" />
             <h2 className="text-lg font-bold text-black">{columnTitle}</h2>
           </div>
-          <NumChip num={cardList.length} />
+          <NumChip num={totalCount} />
         </div>
         <button onClick={handleEditModal}>
           <HiOutlineCog className="size-[22px] text-gray01" />
         </button>
       </div>
+      <AddTodoBtn
+        onClick={() => {
+          setIsCreateCardParams(columnId);
+          toggleModal("createCard", true);
+        }}
+      />
       <Droppable droppableId={columnId.toString()}>
         {(provided, snapshot) => (
           <div
@@ -116,17 +89,13 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
             {...provided.droppableProps}
             className={`flex flex-col space-y-2 ${snapshot.isDraggingOver ? "bg-gray-50" : ""}`}
           >
-            <AddTodoBtn
-              onClick={() => {
-                setIsCreateCardParams(columnId);
-                toggleModal("createCard", true);
-              }}
-            />
-            {cardList.length > 0 ? (
-              cardList.map((item, index) => (
+            {isFetchingNextPage && cards.length === 0 ? (
+              <p className="flex items-center justify-center text-center font-bold">로딩 중...</p>
+            ) : cards.length > 0 ? (
+              cards.map((card, index) => (
                 <ColumnItem
-                  key={item.id}
-                  cards={item}
+                  key={card.id}
+                  card={card}
                   index={index}
                   columnId={columnId}
                   columnTitle={columnTitle}
@@ -139,10 +108,10 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
               <p className="flex items-center justify-center text-center font-bold">등록된 카드가 없습니다.</p>
             )}
             {provided.placeholder}
-            {hasMore && <div ref={loadingRef} className="h-[1px]" />}
           </div>
         )}
       </Droppable>
+      {hasNextPage && !isFetchingNextPage && <div ref={loadingRef} className="h-[1px]" />}
     </div>
   );
 };

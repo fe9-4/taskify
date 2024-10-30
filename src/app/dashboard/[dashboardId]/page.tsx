@@ -12,15 +12,6 @@ import { ColumnSchemaType } from "@/zodSchema/columnSchema";
 import { useCard } from "@/hooks/useCard";
 import { useToggleModal } from "@/hooks/useToggleModal";
 
-interface IColumnData {
-  id: number;
-  title: string;
-  teamId: string;
-}
-interface IColumnList {
-  data: IColumnData[];
-}
-
 const DashboardDetail = () => {
   const { dashboardId } = useParams();
   const toggleModal = useToggleModal();

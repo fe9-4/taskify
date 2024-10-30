@@ -12,7 +12,6 @@ export type CreateColumnSchemaType = z.infer<typeof CreateColumnSchema>;
 // 컬럼 수정 요청 스키마
 export const UpdateColumnSchema = z.object({
   title: z.string().min(1, "제목을 입력해주세요").max(20, "제목은 20자 이하로 입력해주세요"),
-  order: z.number().optional(),
 });
 
 export type UpdateColumnSchemaType = z.infer<typeof UpdateColumnSchema>;

@@ -42,4 +42,41 @@ export const UserSchema = z.object({
   updatedAt: DateSchema,
 });
 
-export type User = z.infer<typeof UserSchema>;
+export type UserSchemaType = z.infer<typeof UserSchema>;
+
+// CardForm 관련 스키마
+export const CardFormSchema = z.object({
+  columnId: z.number(),
+  assigneeUserId: z.number(),
+  title: z.string(),
+  description: z.string(),
+  dueDate: z.string(),
+  tags: z.array(z.string()),
+  imageUrl: z.string(),
+});
+
+export type CardFormSchemaType = z.infer<typeof CardFormSchema>;
+
+export const AssigneeSchema = z.object({
+  profileImageUrl: z.string().nullable(),
+  nickname: z.string(),
+  id: z.number(),
+});
+
+export type AssigneeSchemaType = z.infer<typeof AssigneeSchema>;
+
+export const CardResponseSchema = z.object({
+  id: z.number(),
+  title: z.string(),
+  description: z.string(),
+  tags: z.array(z.string()),
+  dueDate: z.string(),
+  assignee: AssigneeSchema.nullable(),
+  imageUrl: z.string(),
+  teamId: z.string(),
+  columnId: z.number(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
+});
+
+export type CardResponseSchemaType = z.infer<typeof CardResponseSchema>;

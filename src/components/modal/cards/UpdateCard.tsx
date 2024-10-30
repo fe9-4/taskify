@@ -4,7 +4,7 @@ import { ChangeEvent, useEffect, useState, useCallback, useMemo } from "react";
 import { useForm, SubmitHandler, Controller, useWatch } from "react-hook-form";
 import { useParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UpdateCardSchema } from "@/zodSchema/cardSchema";
+import { UpdateCardFormSchema } from "@/zodSchema/cardSchema";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -83,7 +83,7 @@ const UpdateCard = () => {
     getValues,
     formState: { errors },
   } = useForm<UpdateCardProps>({
-    resolver: zodResolver(UpdateCardSchema),
+    resolver: zodResolver(UpdateCardFormSchema),
     mode: "onChange",
     defaultValues: {
       assigneeUserId: Number(user?.id) || 0,

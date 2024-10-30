@@ -1,12 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import toast from "react-hot-toast";
-import {
-  ColumnSchemaType,
-  ColumnListSchemaType,
-  CreateColumnSchemaType,
-  UpdateColumnSchemaType,
-} from "@/zodSchema/columnSchema";
+import { ColumnListSchemaType, CreateColumnSchemaType, UpdateColumnSchemaType } from "@/zodSchema/columnSchema";
 
 const MAX_COLUMNS = 10;
 
@@ -90,21 +85,6 @@ export const useColumn = (dashboardId?: string | number) => {
     },
   });
 
-  // 컬럼 순서 변경 처리
-  const reorderColumn = async (columnId: number, newOrder: number) => {
-    try {
-      await updateMutation.mutateAsync({
-        columnId,
-        data: {
-          title: columns?.find((col) => col.id === columnId)?.title || "",
-          order: newOrder,
-        },
-      });
-    } catch (error) {
-      console.error("컬럼 순서 변경 실패:", error);
-    }
-  };
-
   return {
     columns: columns || [],
     ...queryRest,
@@ -112,7 +92,6 @@ export const useColumn = (dashboardId?: string | number) => {
     updateColumn: updateMutation.mutate,
     deleteColumn: deleteMutation.mutate,
     uploadCardImage: uploadImageMutation.mutate,
-    reorderColumn,
     isCreating: createMutation.isPending,
     isUpdating: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
