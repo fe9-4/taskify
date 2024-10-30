@@ -3,7 +3,6 @@ import { CiSquarePlus } from "react-icons/ci";
 import { cls } from "@/lib/utils";
 
 const Button = ({ isExpanded }: { isExpanded: boolean }) => {
-  const [, setisCreateDashboardOpen] = useAtom(CreateDashboardAtom);
   const toggleModal = useToggleModal();
 
   return (
