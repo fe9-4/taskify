@@ -16,16 +16,18 @@ import TagChip from "@/components/chip/TagChip";
 import EditDeleteDropdown from "@/components/dropdown/EditDeleteDropdown";
 import CreateComment from "../comments/CreateComment";
 import { useToggleModal } from "@/hooks/useToggleModal";
+import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 
 const DetailCard = () => {
   const cardId = useAtomValue(DetailCardParamsAtom);
   const column = useAtomValue(ColumnAtom);
   const [cardData, setCardData] = useState<CardDataProps>();
-  const toggleModal = useToggleModal();
   const [, setIsUpdateCardParams] = useAtom(UpdateCardParamsAtom);
-
   const [, setAlertText] = useAtom(AlertModalTextAtom);
   const [, setOnConfirm] = useAtom(AlertModalConfirmAtom);
+  const [, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
+  
+  const toggleModal = useToggleModal();
 
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -48,8 +50,12 @@ const DetailCard = () => {
   const ondelete = async () => {
     try {
       const response = await axios.delete(`/api/cards/${cardId}`);
-      if (response.status === 201) toast.success("카드가 삭제되었습니다.");
-      toggleModal("detailCard", false);
+      if (response.status === 201) { 
+        toast.success("카드가 삭제되었습니다.");
+        toggleModal("detailCard", false);
+        setDashboardCardUpdate(true);
+      } 
+      
     } catch (error) {
       if (axios.isAxiosError(error)) {
         toast.error("카드 삭제에 실패하였습니다.");

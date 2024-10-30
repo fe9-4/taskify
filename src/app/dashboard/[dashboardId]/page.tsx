@@ -1,89 +1,72 @@
-// dashboard/[dashboardId]/page.tsx
 "use client";
 
-import React, { useRef, WheelEvent } from "react";
+import axios from "axios";
+import toast from "react-hot-toast";
+import ColumnList from "@/app/dashboard/components/ColumnList";
+import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { AddColumnBtn } from "@/components/button/ButtonComponents";
-import { useAtom } from "jotai";
-import { ColumnTitlesAtom } from "@/store/modalAtom";
-import { DragDropContext, DropResult } from "@hello-pangea/dnd";
-import ColumnList from "@/app/dashboard/components/ColumnList";
-import { useColumn } from "@/hooks/useColumn";
-import { ColumnSchemaType } from "@/zodSchema/columnSchema";
-import { useCard } from "@/hooks/useCard";
+import { useAtom, useAtomValue } from "jotai";
+import { ColumnTitlesAtom, RefreshDashboardAtom } from "@/store/modalAtom";
 import { useToggleModal } from "@/hooks/useToggleModal";
+import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
+
+interface IColumnData {
+  id: number;
+  title: string;
+  teamId: string;
+}
+interface IColumnList {
+  data: IColumnData[];
+}
 
 const DashboardDetail = () => {
   const { dashboardId } = useParams();
   const toggleModal = useToggleModal();
   const [, setColumnTitles] = useAtom(ColumnTitlesAtom);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const updateDashBoard = useAtomValue(RefreshDashboardAtom);
+  const isCardUpdate = useAtomValue(dashboardCardUpdateAtom);
 
-  const { columns, canAddColumn } = useColumn(Number(dashboardId));
-  const { moveCard } = useCard();
+  const [columnList, setColumnList] = useState<IColumnList["data"]>([]);
+
+  const getColumn = useCallback(async () => {
+    try {
+      const response = await axios.get(`/api/columns?dashboardId=${dashboardId}`);
+
+      if (response.status === 200) {
+        setColumnList(response.data);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error("대시보드 컬럼 목록 조회 api에서 오류 발생", error);
+        toast.error(error.response?.data);
+      }
+    }
+  }, [dashboardId]);
 
   const handleColumnBtn = () => {
-    const columTitles = columns?.map((column: ColumnSchemaType) => column.title) || [];
+    const columTitles = columnList.map((column) => column.title);
     setColumnTitles(columTitles);
     toggleModal("createColumn", true);
   };
 
-  const handleDragEnd = async (result: DropResult) => {
-    if (!result.destination || !result.draggableId) return;
-
-    const { draggableId, source, destination } = result;
-
-    // 같은 컬럼 내에서의 이동은 무시
-    if (source.droppableId === destination.droppableId) {
-      return;
-    }
-
-    try {
-      // 다른 컬럼으로의 이동
-      const cardId = parseInt(draggableId);
-      const targetColumnId = parseInt(destination.droppableId);
-
-      await moveCard(cardId, targetColumnId, destination.index);
-    } catch (error) {
-      console.error("카드 이동 중 오류 발생:", error);
-    }
-  };
-
-  const handleScroll = (e: WheelEvent): void => {
-    const el = scrollRef.current;
-    const { deltaY } = e;
-    if (el) {
-      if (deltaY === 0) return;
-      e.preventDefault();
-      el.scrollTo({
-        left: el.scrollLeft + deltaY,
-        behavior: "auto",
-      });
-    }
-  };
+  // 모달 창이 닫힐때 마다 대시보드 새로 불러오기
+  useEffect(() => {
+    getColumn();
+  }, [getColumn, updateDashBoard, isCardUpdate]);
 
   return (
-    <DragDropContext onDragEnd={handleDragEnd}>
-      <div
-        className="flex flex-col space-y-6 overflow-auto pb-6 xl:flex-row xl:space-x-6 xl:space-y-0 xl:pr-4"
-        ref={scrollRef}
-        onWheel={handleScroll}
-      >
-        <div className="flex flex-col space-y-6 xl:flex-row xl:space-y-0">
-          {columns &&
-            columns.length > 0 &&
-            columns.map((column: ColumnSchemaType) => (
-              // React.memo 적용된 ColumnList 컴포넌트 사용
-              <MemoizedColumnList key={column.id} columnTitle={column.title} columnId={column.id} />
-            ))}
-        </div>
-        <div className="px-4 xl:px-0 xl:pt-[66px]">{canAddColumn && <AddColumnBtn onClick={handleColumnBtn} />}</div>
+    <div className="flex flex-col space-y-6 overflow-auto pb-6 xl:flex-row xl:space-x-6 xl:space-y-0 xl:pr-4">
+      <div className="flex flex-col space-y-6 xl:flex-row xl:space-y-0">
+        {columnList.map((column) => (
+          <ColumnList key={column.id} columnTitle={column.title} columnId={column.id} />
+        ))}
       </div>
-    </DragDropContext>
+      <div className="px-4 xl:px-0 xl:pt-[66px]">
+        {columnList.length < 10 && <AddColumnBtn onClick={handleColumnBtn} />}
+      </div>
+    </div>
   );
 };
-
-// React.memo로 감싸서 불필요한 리랜더링 방지
-const MemoizedColumnList = React.memo(ColumnList);
 
 export default DashboardDetail;

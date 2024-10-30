@@ -2,10 +2,7 @@ import { z } from "zod";
 import { CardFormSchema, CardResponseSchema } from "./commonSchema";
 
 // 카드 생성 요청 스키마
-export const CreateCardFormSchema = z.object({
-  ...CardFormSchema.shape,
-  dashboardId: z.number(),
-});
+export const CreateCardFormSchema = z.object(CardFormSchema.shape);
 
 export type CreateCardFormSchemaType = z.infer<typeof CreateCardFormSchema>;
 
