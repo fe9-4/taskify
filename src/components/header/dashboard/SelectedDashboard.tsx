@@ -9,8 +9,16 @@ interface SelectedDashboardProps {
 export const SelectedDashboard = ({ title, isDashboardOwner }: SelectedDashboardProps) => {
   const pathname = usePathname();
 
-  if (pathname === "/mypage" || !title) {
+  if (pathname === "/mypage") {
     return <div className="hidden text-2xl font-bold text-black03 xl:block">계정관리</div>;
+  }
+
+  if (pathname === "/mydashboard") {
+    return <div className="hidden text-2xl font-bold text-black03 xl:block">내 대시보드</div>;
+  }
+
+  if (!title) {
+    return null;
   }
 
   return (
