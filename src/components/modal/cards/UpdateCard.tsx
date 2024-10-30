@@ -44,8 +44,7 @@ const UpdateCard = () => {
     dashboardId: Number(dashboardId),
   });
 
-  const [selectedValue, setSelectedValue] = useState("");
-  const [currentValue, setCurrentValue] = useState<string[]>([]);
+  const [selectedValue, setSelectedValue] = useState(0);
 
   const { user } = useAuth();
 
@@ -107,7 +106,6 @@ const UpdateCard = () => {
       const data = response.data;
 
       setColumnId(String(data.columnId));
-      // setCurrentValue(data.status || "toDo");
       setSelectedValue(data.status || "toDo");
 
       setCardData(data);
@@ -141,9 +139,9 @@ const UpdateCard = () => {
       !!dueDate &&
       tags.length > 0 &&
       (selectedFile !== null || previewUrl !== null) &&
-      (!!selectedValue || !!currentValue) &&
+      (!!selectedValue) &&
       Number(watch("assigneeUserId")) > 0,
-    [title, description, dueDate, tags, selectedFile, previewUrl, selectedValue, currentValue, watch]
+    [title, description, dueDate, tags, selectedFile, previewUrl, selectedValue, watch]
   );
 
   const handleAddTag = (tag: string) => {
@@ -223,7 +221,7 @@ const UpdateCard = () => {
 
       <form onSubmit={handleSubmit(onSubmit)} className="grid gap-8">
         <div className="grid gap-8 md:flex md:gap-7">
-          <StatusDropdown setSelectedValue={setSelectedValue} currentValue={currentValue} />
+          <StatusDropdown setSelectedValueId={setSelectedValue} />
 
           <Controller
             name="assigneeUserId"

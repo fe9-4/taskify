@@ -23,7 +23,7 @@ const DetailCard = () => {
   const cardId = useAtomValue(DetailCardParamsAtom);
   const column = useAtomValue(ColumnAtom);
   const [cardData, setCardData] = useState<CardDataProps>();
-
+  
   const [, setIsDetailCardOpen] = useAtom(DetailCardAtom);
   const [, setIsUpdateCardOpen] = useAtom(UpdateCardAtom);
   const [, setIsUpdateCardParams] = useAtom(UpdateCardParamsAtom);

@@ -6,30 +6,30 @@ import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { cls } from "@/lib/utils";
 import { StatusTitleChip } from "../chip/StatusChip";
 import { useAtomValue } from "jotai";
-import { currentColumnTitleAtom } from "@/store/dashboardAtom";
+import { currentColumnListAtom } from "@/store/dashboardAtom";
+import { ColumnAtom } from "@/store/modalAtom";
 
 interface IProps {
-  setSelectedValue: Dispatch<SetStateAction<string>>;
-  currentValue: string[];
+  setSelectedValueId: Dispatch<SetStateAction<number>>;
 }
 
 // 상태값 변경함수를 보내서 드롭다운에서 값을 받아 쓰세요.
-// currentValue는 '할 일 수정' 모달에서 불러온 현재 값입니다.
-const StatusDropdown = ({ setSelectedValue, currentValue }: IProps) => {
-  const currentColumnTitleList = useAtomValue(currentColumnTitleAtom);
+const StatusDropdown = ({ setSelectedValueId }: IProps) => {
+  const currentColumnList = useAtomValue(currentColumnListAtom);
+  const column = useAtomValue(ColumnAtom);
   const [isOpen, setIsOpen] = useState(false);
-  const [value, setValue] = useState(currentColumnTitleList[0] || "toDo");
+  const [value, setValue] = useState(column.title || "toDo");
   const dropdownRef = useRef<HTMLDivElement>(null);
-  
+  console.log(currentColumnList)
   const handleClickOutside = (e: MouseEvent) => {
     if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
       setIsOpen(false);
     }
   };
 
-  const handleSelectValue = (name: string) => {
-    setValue(name);
-    setSelectedValue(name);
+  const handleSelectValue = (title: string, id: number) => {
+    setValue(title);
+    setSelectedValueId(id);
     setIsOpen(false);
   };
 
@@ -44,11 +44,6 @@ const StatusDropdown = ({ setSelectedValue, currentValue }: IProps) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
-  // const btnArr = currentValue.map((item) => ({
-  //   value: item,
-  //   title: item.toUpperCase() + item.slice(1)
-  // }));
 
   return (
     <section className="flex flex-col gap-2">
@@ -66,15 +61,15 @@ const StatusDropdown = ({ setSelectedValue, currentValue }: IProps) => {
         </button>
         {isOpen && (
           <div className="absolute left-0 right-0 top-[50px] z-10 flex flex-col overflow-hidden rounded-bl-md rounded-br-md rounded-tl-md rounded-tr-md border border-gray03 bg-white">
-            {currentColumnTitleList.map((item) => (
+            {currentColumnList.map((item) => (
               <button
                 type="button"
-                key={item}
-                onClick={() => handleSelectValue(item)}
-                className={cls("status-dropdown-custom-btn", value !== item ? "px-0 pl-[46px] pr-4" : "")}
+                key={item.id}
+                onClick={() => handleSelectValue(item.title, item.id)}
+                className={cls("status-dropdown-custom-btn", value !== item.title ? "px-0 pl-[46px] pr-4" : "")}
               >
-                {value === item && <HiCheck />}
-                <StatusTitleChip title={item} />
+                {value === item.title && <HiCheck />}
+                <StatusTitleChip title={item.title} />
               </button>
             ))}
           </div>

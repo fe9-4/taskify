@@ -15,7 +15,7 @@ import {
   EditColumnAtom,
 } from "@/store/modalAtom";
 import { ICard } from "@/types/dashboardType";
-import { currentColumnTitleAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
+import { currentColumnListAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 
 interface IProps {
   columnTitle: string;
@@ -32,7 +32,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [, setIsCreateCardParams] = useAtom(CreateCardParamsAtom);
   const [, setIsDetailCardOpen] = useAtom(DetailCardAtom);
   const [, setIsDetailCardParams] = useAtom(DetailCardParamsAtom);
-  const [, setCurrentColumnTitle] = useAtom(currentColumnTitleAtom);
+  const [, setCurrentColumnList] = useAtom(currentColumnListAtom);
   const [dashboardCardUpdate, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
   const observeRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
@@ -99,13 +99,13 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   }, [getCardList, dashboardCardUpdate, setDashboardCardUpdate]);
 
   useEffect(() => {
-    if (columnTitle) {
-      setCurrentColumnTitle((prev) => {
-        const titleList = Array.from(new Set([...prev, columnTitle]));
-        return titleList;
+    if (columnTitle && columnId) {
+      setCurrentColumnList((prev) => {
+        const newColumn = { id: columnId, title: columnTitle };
+        return [...prev, newColumn];
       })
     }
-  }, [columnTitle, setCurrentColumnTitle]);
+  }, [columnTitle, columnId, setCurrentColumnList]);
 
   const handleEditModal = () => {
     setColumnAtom({ title: columnTitle, columnId });
@@ -126,7 +126,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
           <HiOutlineCog className="size-[22px] text-gray01" />
         </button>
       </div>
-      <div className="flex flex-col space-y-2">
+      <div className="flex flex-col space-y-2 min-w-[314px]">
         <AddTodoBtn
           onClick={() => {
             setIsCreateCardOpen(true);

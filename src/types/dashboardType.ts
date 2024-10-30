@@ -52,3 +52,8 @@ export interface CreateDashboard {
   title: string;
   color: string;
 }
+
+export interface ICurrentColumn {
+  id: number;
+  title: string;
+}
