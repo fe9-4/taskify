@@ -15,7 +15,7 @@ import {
   EditColumnAtom,
 } from "@/store/modalAtom";
 import { ICard } from "@/types/dashboardType";
-import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
+import { currentColumnTitleAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 
 interface IProps {
   columnTitle: string;
@@ -32,10 +32,11 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [, setIsCreateCardParams] = useAtom(CreateCardParamsAtom);
   const [, setIsDetailCardOpen] = useAtom(DetailCardAtom);
   const [, setIsDetailCardParams] = useAtom(DetailCardParamsAtom);
+  const [, setCurrentColumnTitle] = useAtom(currentColumnTitleAtom);
   const [dashboardCardUpdate, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
   const observeRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
-  
+
   const getCardList = useCallback(async () => {
     if (!hasMore) return;
     
@@ -96,6 +97,15 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
       setDashboardCardUpdate(false);
     }
   }, [getCardList, dashboardCardUpdate, setDashboardCardUpdate]);
+
+  useEffect(() => {
+    if (columnTitle) {
+      setCurrentColumnTitle((prev) => {
+        const titleList = Array.from(new Set([...prev, columnTitle]));
+        return titleList;
+      })
+    }
+  }, [columnTitle, setCurrentColumnTitle]);
 
   const handleEditModal = () => {
     setColumnAtom({ title: columnTitle, columnId });

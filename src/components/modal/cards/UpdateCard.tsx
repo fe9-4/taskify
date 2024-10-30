@@ -45,7 +45,7 @@ const UpdateCard = () => {
   });
 
   const [selectedValue, setSelectedValue] = useState("");
-  const [currentValue, setCurrentValue] = useState("");
+  const [currentValue, setCurrentValue] = useState<string[]>([]);
 
   const { user } = useAuth();
 
@@ -59,6 +59,7 @@ const UpdateCard = () => {
   const [tagInput, setTagInput] = useState("");
 
   const [, setIsUpdateCardOpen] = useAtom(UpdateCardAtom);
+
   const { isLoading, withLoading } = useLoading();
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -106,7 +107,7 @@ const UpdateCard = () => {
       const data = response.data;
 
       setColumnId(String(data.columnId));
-      setCurrentValue(data.status || "toDo");
+      // setCurrentValue(data.status || "toDo");
       setSelectedValue(data.status || "toDo");
 
       setCardData(data);
