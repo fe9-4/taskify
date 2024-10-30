@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { FaCircle, FaCrown } from "react-icons/fa6";
 
 // 현재 보고있는 대시보드 아이디와 같으면 가장 바깥쪽 div에 보라색 배경
-const DashboardItem = ({ item, isExpanded }: { item: any; isExpanded: boolean }) => {
+const DashboardItem = ({ item, isExpanded }: { item: ItemType; isExpanded: boolean }) => {
   const { color, title, createdByMe, id } = item;
 
   const pathname = usePathname();

@@ -14,10 +14,12 @@ const Sidebar = () => {
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(10);
   const [isExpanded, setIsExpanded] = useState(false);
+
   const pathname = usePathname();
   const { isLargeScreen } = useWidth();
   const { user } = useAuth();
   const { dashboards } = useDashboard({ cursorId: 1, page, size });
+
   const totalPage: number = Math.ceil(dashboards.total / size);
 
   const sidebarRef = useRef<HTMLDivElement | null>(null);
