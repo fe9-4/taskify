@@ -14,8 +14,8 @@ const CommentList = ({ cardId, columnId }: CommentListProps) => {
   const [, setOnConfirm] = useAtom(AlertModalConfirmAtom);
 
   const [comments, setComments] = useState<CommentProps[]>([]);
-  const [offset, setOffset] = useState(0);
-  const size = 10;
+  const size = 5;
+  const [cursorId, setCursorId] = useState(0);
 
   const observeRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
@@ -25,8 +25,12 @@ const CommentList = ({ cardId, columnId }: CommentListProps) => {
     if (!hasMore) return;
 
     try {
-      const response = await axios.get(`/api/comments?size=${size}&cardId=${cardId}`);
+      const response = await axios.get(
+        `/api/comments?size=${size}${cursorId ? `&cursorId=${cursorId}` : ""}&cardId=${cardId}`
+      );
       const newCommentList = response.data.comments;
+
+      console.log("커서", response.data.cursorId);
 
       setComments((prev) => {
         // const uniqueComments = newCommentList.filter(
@@ -51,7 +55,8 @@ const CommentList = ({ cardId, columnId }: CommentListProps) => {
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data);
+        const errorMessage = error.response?.data?.message || "오류가 발생했습니다.";
+        toast.error(errorMessage);
       }
     }
   }, [cardId, hasMore, size]);
@@ -60,23 +65,26 @@ const CommentList = ({ cardId, columnId }: CommentListProps) => {
   useEffect(() => {
     getComments();
 
-    const observer = new IntersectionObserver((entries) => {
+    observeRef.current = new IntersectionObserver((entries) => {
       const lastCommentItem = entries[0];
+
       if (lastCommentItem.isIntersecting && hasMore) {
-        setOffset((prevOffset) => prevOffset + size);
+        getComments();
       }
     });
 
     const currentLoadingRef = loadingRef.current;
-    if (currentLoadingRef) observer.observe(currentLoadingRef);
+
+    if (currentLoadingRef) observeRef.current.observe(currentLoadingRef);
 
     return () => {
-      if (currentLoadingRef) observer.unobserve(currentLoadingRef);
+      if (currentLoadingRef) observeRef.current?.unobserve(currentLoadingRef);
     };
-  }, [hasMore]);
+  }, [hasMore, size, getComments]);
 
   useEffect(() => {
     getComments();
+    setHasMore(true);
   }, [getComments]);
 
   // const handleDelete = (commentId: number) => {
@@ -93,9 +101,10 @@ const CommentList = ({ cardId, columnId }: CommentListProps) => {
       <CreateComment cardId={cardId} columnId={columnId} setComments={setComments} />
       <div className="mt-4 h-[100vh] overflow-y-scroll">
         {comments.length > 0 ? (
-          comments.map((comment) => (
+          comments.map((comment, i) => (
             <div key={comment.id}>
               <CommentItem comment={comment} setComments={setComments} />
+              {i === comments.length - 1 && <div ref={loadingRef} className="h-[1px]" />}
             </div>
           ))
         ) : (
@@ -104,11 +113,11 @@ const CommentList = ({ cardId, columnId }: CommentListProps) => {
           </p>
         )}
       </div>
-      {hasMore && (
+      {/* {hasMore && (
         <div ref={loadingRef} className="h-10">
           로딩 중...
         </div>
-      )}
+      )} */}
     </>
   );
 };
