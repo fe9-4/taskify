@@ -10,7 +10,7 @@ import { useAtom } from "jotai";
 import { AddDashboardBtn, DashboardCard } from "@/components/button/ButtonComponents";
 import { IMyDashboard } from "@/types/myDashboardType";
 import { CreateDashboardAtom } from "@/store/modalAtom";
-import { myDashboardUpdateAtom } from "@/store/myDashboardAtom";
+import { currentDashboardIdAtom, myDashboardUpdateAtom } from "@/store/myDashboardAtom";
 
 const MyDashboard = () => {
   const router = useRouter();
@@ -22,6 +22,7 @@ const MyDashboard = () => {
   const [totalPage, setTotalPage] = useState(0);
   const [, setisCreateDashboardOpen] = useAtom(CreateDashboardAtom);
   const [isUpdatedList, setIsUpdatedList] = useAtom(myDashboardUpdateAtom);
+  const [, setDashboardIdList] = useAtom(currentDashboardIdAtom);
 
   const getCurrentDashboards = useCallback(async () => {
     try {
@@ -54,8 +55,15 @@ const MyDashboard = () => {
     if (isUpdatedList) {
       getCurrentDashboards();
       setIsUpdatedList(false);
-    }
+    } 
   }, [isUpdatedList, getCurrentDashboards, setIsUpdatedList]);
+
+  useEffect(() => {
+    const currentDashboardIdList = dashboardList.map((item) => item.id);
+    if (JSON.stringify(currentDashboardIdList) !== JSON.stringify(dashboardList)) {
+      setDashboardIdList(currentDashboardIdList);
+    }
+  }, [dashboardList, setDashboardIdList]);
 
   return (
     <div className="flex flex-col space-y-10 px-6 pt-6 md:px-8 md:pt-8">

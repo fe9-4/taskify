@@ -47,10 +47,6 @@ const DashboardDetail = () => {
     setIsCreateColumnOpen(true);
   };
 
-  useEffect(() => {
-    getColumn();
-  }, [getColumn]);
-
   // 모달 창이 닫힐때 마다 대시보드 새로 불러오기
   useEffect(() => {
     getColumn();
