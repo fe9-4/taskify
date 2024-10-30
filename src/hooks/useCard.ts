@@ -1,3 +1,4 @@
+// useCard.tsx
 import { useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -58,7 +59,7 @@ export const useCard = (columnId?: number, size: number = 10) => {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cardData", columnId, size] });
+      queryClient.invalidateQueries({ queryKey: ["cardData"] });
     },
     onError: () => {
       toast.error("카드 수정에 실패했습니다");
@@ -73,58 +74,73 @@ export const useCard = (columnId?: number, size: number = 10) => {
     },
     onSuccess: () => {
       toast.success("카드가 삭제되었습니다");
-      queryClient.invalidateQueries({ queryKey: ["cardData", columnId, size] });
+      queryClient.invalidateQueries({ queryKey: ["cardData"] });
     },
     onError: () => {
       toast.error("카드 삭제에 실패했습니다");
     },
   });
 
-  // 카드 드래그 앤 드롭 처리
-  const moveCard = async (cardId: number, targetColumnId: number) => {
-    try {
-      // 카드 목록이 로딩 중이거나 카드 데이터가 없는 경우 처리
-      if (isLoading || !cardData?.pages?.length) {
-        throw new Error("카드 데이터를 찾을 수 없습니다");
-      }
+  // 카드 이동 (낙관적 업데이트 적용)
+  const moveCardMutation = useMutation({
+    mutationFn: async ({ cardId, targetColumnId }: { cardId: number; targetColumnId: number }) => {
+      const response = await axios.put(`/api/cards/${cardId}`, { columnId: targetColumnId });
+      return response.data;
+    },
+    onMutate: async ({ cardId, targetColumnId }) => {
+      await queryClient.cancelQueries({ queryKey: ["cardData"] });
 
-      // 기존 카드 정보 가져오기
-      const existingCard = cardData.pages
-        .flatMap((page) => page.cards || [])
-        .find((card: CardResponseSchemaType) => card.id === cardId);
+      const previousData = queryClient.getQueryData(["cardData"]);
 
-      if (!existingCard) {
-        throw new Error("카드를 찾을 수 없습니다");
-      }
+      // 낙관적 업데이트
+      queryClient.setQueryData(["cardData"], (oldData: any) => {
+        if (!oldData) return oldData;
 
-      // 필요한 필드를 추출하여 업데이트 데이터 생성
-      const updatedCardData: UpdateCardFormSchemaType = {
-        title: existingCard.title,
-        description: existingCard.description,
-        tags: existingCard.tags,
-        dueDate: existingCard.dueDate,
-        imageUrl: existingCard.imageUrl,
-        columnId: targetColumnId,
-        assigneeUserId: existingCard.assignee?.id || 0,
-      };
+        const newData = {
+          ...oldData,
+          pages: oldData.pages.map((page: any) => {
+            const updatedCards = page.cards.filter((card: CardResponseSchemaType) => card.id !== cardId);
+            return { ...page, cards: updatedCards };
+          }),
+        };
 
-      // API 호출
-      await updateMutation.mutateAsync({
-        cardId,
-        ...updatedCardData,
+        // 이동한 카드 정보
+        const movedCard = oldData.pages.flatMap((page: any) => page.cards).find((card: any) => card.id === cardId);
+
+        if (movedCard) {
+          movedCard.columnId = targetColumnId;
+
+          // 대상 컬럼에 카드 추가
+          const targetPageIndex = newData.pages.findIndex((page: any) => page.columnId === targetColumnId);
+          if (targetPageIndex !== -1) {
+            newData.pages[targetPageIndex].cards.push(movedCard);
+          } else {
+            // 대상 컬럼이 로드되지 않은 경우
+            newData.pages.push({
+              columnId: targetColumnId,
+              cards: [movedCard],
+            });
+          }
+        }
+
+        return newData;
       });
 
-      // 성공 시 관련된 컬럼들의 카드 목록 갱신
-      queryClient.invalidateQueries({ queryKey: ["cardData", existingCard.columnId, size] });
-      queryClient.invalidateQueries({ queryKey: ["cardData", targetColumnId, size] });
-
-      toast.success("카드가 이동되었습니다");
-    } catch (error) {
+      return { previousData };
+    },
+    onError: (err, variables, context) => {
+      // 이전 데이터로 롤백
+      queryClient.setQueryData(["cardData"], context?.previousData);
       toast.error("카드 이동에 실패했습니다");
+    },
+    onSettled: () => {
+      // 데이터 재검증
+      queryClient.invalidateQueries({ queryKey: ["cardData"] });
+    },
+  });
 
-      // 실패 시 전체 카드 목록 갱신
-      queryClient.invalidateQueries({ queryKey: ["cardData", columnId, size] });
-    }
+  const moveCard = (cardId: number, targetColumnId: number) => {
+    moveCardMutation.mutate({ cardId, targetColumnId });
   };
 
   return {

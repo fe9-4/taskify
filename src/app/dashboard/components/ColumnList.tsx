@@ -1,3 +1,4 @@
+// ColumnList.tsx
 import { useCallback, useEffect, useRef } from "react";
 import { useAtom } from "jotai";
 import { HiOutlineCog } from "react-icons/hi";
@@ -89,9 +90,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
             {...provided.droppableProps}
             className={`flex flex-col space-y-2 ${snapshot.isDraggingOver ? "bg-gray-50" : ""}`}
           >
-            {isFetchingNextPage && cards.length === 0 ? (
-              <p className="flex items-center justify-center text-center font-bold">로딩 중...</p>
-            ) : cards.length > 0 ? (
+            {cards.length > 0 ? (
               cards.map((card, index) => (
                 <ColumnItem
                   key={card.id}
@@ -108,10 +107,14 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
               <p className="flex items-center justify-center text-center font-bold">등록된 카드가 없습니다.</p>
             )}
             {provided.placeholder}
+            {hasNextPage && (
+              <div ref={loadingRef} className="flex h-10 items-center justify-center">
+                {isFetchingNextPage ? "로딩 중..." : ""}
+              </div>
+            )}
           </div>
         )}
       </Droppable>
-      {hasNextPage && !isFetchingNextPage && <div ref={loadingRef} className="h-[1px]" />}
     </div>
   );
 };
