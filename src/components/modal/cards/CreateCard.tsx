@@ -26,7 +26,7 @@ import { uploadType } from "@/types/uploadType";
 const CreateCard = () => {
   const { user } = useAuth();
   const { dashboardId } = useParams();
-  const { members } = useMember({ dashboardId: Number(dashboardId) });
+  const { memberData } = useMember({ dashboardId: Number(dashboardId) });
   const columnId = useAtomValue(CreateCardParamsAtom);
   const [, setIsCreateCardOpen] = useAtom(CreateCardAtom);
   const { isLoading, withLoading } = useLoading();
@@ -147,7 +147,7 @@ const CreateCard = () => {
           name="assigneeUserId"
           control={control}
           render={({ field }) => {
-            const selectedMember = members.members.find((member) => member.userId === field.value);
+            const selectedMember = memberData.members.find((member) => member.userId === field.value);
 
             const currentManager = selectedMember || {
               id: 0,
@@ -159,7 +159,7 @@ const CreateCard = () => {
 
             return (
               <SearchDropdown
-                inviteMemberList={members.members}
+                inviteMemberList={memberData.members}
                 currentManager={currentManager}
                 setManager={(manager) => {
                   field.onChange(manager.userId);

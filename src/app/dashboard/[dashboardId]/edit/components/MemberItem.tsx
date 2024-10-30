@@ -1,7 +1,6 @@
 "use client";
 
 import { DeleteCancelBtn } from "@/components/button/ButtonComponents";
-import { cls } from "@/lib/utils";
 import { Member } from "@/zodSchema/memberSchema";
 import Image from "next/image";
 import toast from "react-hot-toast";

@@ -1,56 +1,25 @@
 import { useMember } from "@/hooks/useMember";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import MemberItem from "./MemberItem";
-import axios from "axios";
-import toast from "react-hot-toast";
-import { Member } from "@/zodSchema/memberSchema";
 import { PaginationBtn } from "@/components/button/ButtonComponents";
 
 const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
   const [page, setPage] = useState(1);
   const size = 4;
-  const { members, isLoading, error, refetch } = useMember({ dashboardId, page, size });
 
-  const [memberList, setMemberList] = useState<Member[]>([]);
-  const [totalCount, setTotalCount] = useState(members?.totalCount);
-  const totalPage: number = Math.ceil(totalCount / size);
-  const isFirst = page === 1;
-  const isLast = page === totalPage;
+  const { memberData, isLoading, error, deleteMember, pagination } = useMember({
+    dashboardId,
+    page,
+    size,
+  });
+
   const onClickPrev = () => {
-    if (!isFirst) setPage(page - 1);
+    if (!pagination.isFirstPage) setPage(page - 1);
   };
+
   const onClickNext = () => {
-    if (!isLast) setPage(page + 1);
+    if (!pagination.isLastPage) setPage(page + 1);
   };
-
-  // 삭제 요청 시 서버에서 삭제는 되는데 브라우저에서는 500 에러 반환하는 문제 해결해야함
-  const onClickDeleteMember = (id: number, nickname: string) => {
-    const deleteMember = async (id: number) => {
-      try {
-        const response = await axios.delete(`/api/members/${id}`);
-        if (response.status === 204) {
-          toast.success(`멤버 ${nickname}가 삭제되었습니다`);
-          setMemberList(members.members.filter((member) => member.userId !== id));
-          refetch();
-        }
-      } catch (err) {
-        console.error(`Error deleting member: ${id}`, err);
-        toast.error("삭제하는 중 오류가 발생했습니다.");
-      }
-    };
-    deleteMember(id);
-    // console.log(members.members);
-  };
-
-  useEffect(() => {
-    const uniqueMembers = members.members.filter(
-      (member, index, self) => index === self.findIndex((m) => m.userId === member.userId)
-    );
-    if (!isLoading && members && members.members.length > 0) {
-      setMemberList(uniqueMembers);
-      setTotalCount(uniqueMembers.length);
-    }
-  }, [isLoading]);
 
   return (
     <>
@@ -58,29 +27,30 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
         <h2 className="col-start-1 text-2xl font-bold md:text-3xl">구성원</h2>
         <div className="flex items-center gap-3 md:gap-4">
           <div>
-            {totalPage} 중 {page}
+            {pagination.totalPages} 중 {pagination.currentPage}
           </div>
           <PaginationBtn
-            disabledPrev={isFirst && totalPage === 1}
-            disabledNext={isLast && totalCount < size}
+            disabledPrev={pagination.isFirstPage}
+            disabledNext={pagination.isLastPage}
             onClickPrev={onClickPrev}
             onClickNext={onClickNext}
           />
         </div>
       </div>
       <div className="flex items-center justify-center gap-6 px-5 md:px-7">
-        {isLoading ? <div className="pb-5">멤버 정보를 불러오고 있어요</div> : <></>}
-        {error ? <div className="pb-5">멤버 정보를 불러오는데 실패했습니다</div> : <></>}
+        {isLoading && <div className="pb-5">멤버 정보를 불러오고 있어요</div>}
+        {error && <div className="pb-5">멤버 정보를 불러오는데 실패했습니다</div>}
       </div>
 
       <ul>
         <li>
-          {memberList.map((member) => (
-            <MemberItem key={member.id} member={member} onClick={onClickDeleteMember} />
+          {memberData.members.map((member) => (
+            <MemberItem key={member.id} member={member} onClick={() => deleteMember(member.userId)} />
           ))}
         </li>
       </ul>
     </>
   );
 };
+
 export default DashboardMemberList;

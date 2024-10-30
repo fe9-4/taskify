@@ -102,7 +102,7 @@ export const DashboardMemberDisplay = () => {
           </>
         )}
         {/* 멤버 이니셜 표시 */}
-        {currentDashboardId && memberData.total > 0 && <MemberInitials dashboardId={currentDashboardId} />}
+        {currentDashboardId && memberData.totalCount > 0 && <MemberInitials dashboardId={currentDashboardId} />}
         {/* 구분선 */}
         <div className="mx-4 h-8 w-px bg-gray-300"></div>
       </div>

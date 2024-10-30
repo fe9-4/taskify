@@ -18,7 +18,7 @@ const Sidebar = () => {
   const { user } = useAuth();
   const pathname = usePathname();
   const { isLargeScreen } = useWidth();
-  const { data } = useDashboard({ cursorId: 1, page, size });
+  const { dashboards } = useDashboard({ cursorId: 1, page, size });
 
   useEffect(() => {
     if (isLargeScreen) {
@@ -29,11 +29,11 @@ const Sidebar = () => {
   }, [isLargeScreen]);
 
   useEffect(() => {
-    if (data) {
-      setDashboardList(data.dashboards);
-      setTotalCount(data.totalCount);
+    if (dashboards) {
+      setDashboardList(dashboards.all);
+      setTotalCount(dashboards.total);
     }
-  }, [user, page, size]);
+  }, [user, dashboards, page, size]);
 
   const totalPage: number = Math.ceil(totalCount / size);
   const isFirst = page === 1;

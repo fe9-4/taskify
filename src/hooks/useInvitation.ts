@@ -50,7 +50,7 @@ export const useInvitation = ({ dashboardId }: { dashboardId: number }) => {
     }
 
     // 이미 멤버인지 체크
-    if (memberData.list.some((member) => member.email === email)) {
+    if (memberData.members.some((member) => member.email === email)) {
       throw new Error("이미 대시보드의 멤버입니다.");
     }
 
