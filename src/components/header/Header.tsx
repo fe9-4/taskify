@@ -9,7 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 export default function Header() {
   const pathname = usePathname();
-  const { user, isUserLoading } = useAuth();
+  const { user, isLoading } = useAuth();
   const [isHomePage, setIsHomePage] = useState(pathname === "/");
 
   useEffect(() => {
@@ -20,7 +20,7 @@ export default function Header() {
     return null;
   }
 
-  const showHeader = isHomePage || (!isUserLoading && user);
+  const showHeader = isHomePage || (!isLoading && user);
 
   if (!showHeader) {
     return null;
