@@ -35,14 +35,14 @@ const EditPage = () => {
   };
 
   return (
-    <div className="flex w-[284px] flex-col p-5 md:w-[544px] xl:w-[620px]">
-      <div className="flex items-center gap-[6px] md:gap-2">
+    <div className="m-5 mt-0 flex w-[284px] flex-col md:w-[544px] xl:w-[620px]">
+      <div className="flex items-center gap-[6px] pb-[10px] pt-4 md:gap-2 md:py-5 xl:pb-[34px]">
         <IoIosArrowBack className="size-[18px]" />
         <Link href={`/dashboard/${dashboardId}`} className="text-base md:text-lg">
           돌아가기
         </Link>
       </div>
-      <div className="flex w-[620px] flex-col gap-4">
+      <div className="flex w-full flex-col gap-4">
         <EditDashboard dashboardId={id} />
         <Section>
           <DashboardMemberList dashboardId={id} />
