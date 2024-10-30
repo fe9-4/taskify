@@ -1,13 +1,21 @@
+import { cls } from "@/lib/utils";
 import { CreateDashboardAtom } from "@/store/modalAtom";
 import { useAtom } from "jotai";
 import { CiSquarePlus } from "react-icons/ci";
 
-const Button = () => {
+const Button = ({ isExpanded }: { isExpanded: boolean }) => {
   const [, setisCreateDashboardOpen] = useAtom(CreateDashboardAtom);
 
   return (
-    <div className="flex justify-center md:justify-between">
-      <div className="hidden w-full font-semibold text-gray01 md:block md:text-xs md:leading-5">Dash Boards</div>
+    <div className={cls("flex md:justify-between", isExpanded ? "" : "justify-center")}>
+      <div
+        className={cls(
+          "w-full font-semibold text-gray01 md:block md:text-xs md:leading-5",
+          isExpanded ? "block" : "hidden"
+        )}
+      >
+        Dash Boards
+      </div>
       <button
         type="button"
         onClick={() => setisCreateDashboardOpen(true)}

@@ -35,10 +35,10 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [dashboardCardUpdate, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
   const observeRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
-  
+
   const getCardList = useCallback(async () => {
     if (!hasMore) return;
-    
+
     try {
       const response = await axios.get(`/api/cards?size=${size}&columnId=${columnId}`);
 
