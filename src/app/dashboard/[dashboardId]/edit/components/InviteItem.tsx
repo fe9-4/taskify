@@ -1,19 +1,27 @@
 "use client";
 
 import { DeleteCancelBtn } from "@/components/button/ButtonComponents";
-import { cls } from "@/lib/utils";
-const InviteItem = ({ item, onClick }: { item: any; onClick: (id: number) => void }) => {
-  const onClickCancel = (id: number) => {
-    onClick(id);
+import { Invitation } from "@/zodSchema/invitationSchema";
+
+interface InviteItemProps {
+  item: Invitation;
+  onClick: (id: number) => void;
+  disabled?: boolean;
+}
+
+const InviteItem = ({ item, onClick }: InviteItemProps) => {
+  const onClickCancel = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onClick(item.id);
   };
-  const { id, invitee } = item;
-  const { email } = invitee;
+
   return (
     <div className="flex w-full justify-between border-b border-gray04 px-5 py-3 last:border-0 md:px-7 md:py-4">
       <div className="flex items-center gap-2 md:gap-3">
-        <div className="text-base font-normal md:text-lg">{email}</div>
+        <div>{item.invitee.email}</div>
       </div>
-      <DeleteCancelBtn onClick={() => onClickCancel(id)}>취소</DeleteCancelBtn>
+      <DeleteCancelBtn onClick={onClickCancel}>취소</DeleteCancelBtn>
     </div>
   );
 };

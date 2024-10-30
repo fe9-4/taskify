@@ -1,5 +1,5 @@
 import React from "react";
-import { useDashboardMember } from "@/hooks/useDashboardMember";
+import { useMember } from "@/hooks/useMember";
 
 interface MemberInitialsProps {
   dashboardId: number;
@@ -17,8 +17,8 @@ const pastelColors = [
 ];
 
 export const MemberInitials = ({ dashboardId }: MemberInitialsProps) => {
-  // useDashboardMember 로 멤버 목록 조회
-  const { memberData, isLoading, error } = useDashboardMember({
+  // useMember 로 멤버 목록 조회
+  const { memberData, isLoading, error } = useMember({
     dashboardId,
     page: 1,
     size: 10,
@@ -28,9 +28,9 @@ export const MemberInitials = ({ dashboardId }: MemberInitialsProps) => {
 
   if (isLoading) return <div>로딩중...</div>;
   if (error) return <div>에러 발생: {error.message}</div>;
-  if (!memberData.total) return null;
+  if (!memberData.totalCount) return null;
 
-  const totalMembers = memberData.total;
+  const totalMembers = memberData.totalCount;
 
   // 화면 크기별 표시할 멤버 수 설정
   const getVisibleMembersCount = () => {
@@ -48,7 +48,7 @@ export const MemberInitials = ({ dashboardId }: MemberInitialsProps) => {
     <ul className="flex list-none flex-row p-0">
       {/* 모바일 뷰 (sm, md) */}
       <div className="flex xl:hidden">
-        {memberData.list.slice(0, mobileVisibleCount).map((member, index) => (
+        {memberData.members.slice(0, mobileVisibleCount).map((member, index) => (
           <li
             key={member.id}
             className={`relative z-${30 - index} -mr-2 flex h-8 w-8 items-center justify-center rounded-full ${
@@ -67,7 +67,7 @@ export const MemberInitials = ({ dashboardId }: MemberInitialsProps) => {
 
       {/* 데스크톱 뷰 (xl 이상) */}
       <div className="hidden xl:flex">
-        {memberData.list.slice(0, desktopVisibleCount).map((member, index, array) => (
+        {memberData.members.slice(0, desktopVisibleCount).map((member, index, array) => (
           <li
             key={member.id}
             className={`relative z-${30 - index} -mr-2 flex h-8 w-8 items-center justify-center rounded-full ${

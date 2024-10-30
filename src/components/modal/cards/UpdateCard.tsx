@@ -9,7 +9,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useFileUpload } from "@/hooks/useFileUpload";
-import { useDashboardMember } from "@/hooks/useDashboardMember";
+import { useMember } from "@/hooks/useMember";
 import { formatDateTime } from "@/utils/dateFormat";
 import { CancelBtn, ConfirmBtn } from "@/components/button/ButtonComponents";
 import StatusDropdown from "@/components/dropdown/StatusDropdown";
@@ -40,7 +40,7 @@ const UpdateCard = () => {
   const cardId = useAtomValue(UpdateCardParamsAtom);
   const [columnId, setColumnId] = useState<string>("");
 
-  const { members } = useDashboardMember({
+  const { memberData } = useMember({
     dashboardId: Number(dashboardId),
   });
 
@@ -229,7 +229,7 @@ const UpdateCard = () => {
             control={control}
             defaultValue={cardData?.assignee?.userId}
             render={({ field }) => {
-              const selectedMember = members.members.find((member) => member.userId === field.value);
+              const selectedMember = memberData.members.find((member) => member.userId === field.value);
 
               const currentManager = selectedMember || {
                 id: cardData?.assignee?.id || 0,
@@ -241,7 +241,7 @@ const UpdateCard = () => {
 
               return (
                 <SearchDropdown
-                  inviteMemberList={members.members}
+                  inviteMemberList={memberData.members}
                   currentManager={currentManager}
                   setManager={(manager) => {
                     field.onChange(manager.userId);

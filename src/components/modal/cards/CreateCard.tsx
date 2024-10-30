@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 import useLoading from "@/hooks/useLoading";
 import { useAuth } from "@/hooks/useAuth";
 import { useFileUpload } from "@/hooks/useFileUpload";
-import { useDashboardMember } from "@/hooks/useDashboardMember";
+import { useMember } from "@/hooks/useMember";
 import { formatDateTime } from "@/utils/dateFormat";
 import { CreateCardProps } from "@/types/cardType";
 import { CancelBtn, ConfirmBtn } from "@/components/button/ButtonComponents";
@@ -22,14 +22,16 @@ import InputFile from "@/components/input/InputFile";
 import { useAtom, useAtomValue } from "jotai";
 import { CreateCardAtom, CreateCardParamsAtom } from "@/store/modalAtom";
 import { uploadType } from "@/types/uploadType";
+import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 
 const CreateCard = () => {
   const { user } = useAuth();
   const { dashboardId } = useParams();
-  const { members } = useDashboardMember({ dashboardId: Number(dashboardId) });
+  const { memberData } = useMember({ dashboardId: Number(dashboardId) });
   const columnId = useAtomValue(CreateCardParamsAtom);
   const [, setIsCreateCardOpen] = useAtom(CreateCardAtom);
   const { isLoading, withLoading } = useLoading();
+  const [, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
 
   const {
     uploadFile,
@@ -124,6 +126,7 @@ const CreateCard = () => {
         if (response.data) {
           toast.success("카드가 생성되었습니다! 🎉");
           setIsCreateCardOpen(false);
+          setDashboardCardUpdate(true);
         }
       } catch (error) {
         toast.error("카드 생성에 실패하였습니다.");
@@ -147,7 +150,7 @@ const CreateCard = () => {
           name="assigneeUserId"
           control={control}
           render={({ field }) => {
-            const selectedMember = members.members.find((member) => member.userId === field.value);
+            const selectedMember = memberData.members.find((member) => member.userId === field.value);
 
             const currentManager = selectedMember || {
               id: 0,
@@ -159,7 +162,7 @@ const CreateCard = () => {
 
             return (
               <SearchDropdown
-                inviteMemberList={members.members}
+                inviteMemberList={memberData.members}
                 currentManager={currentManager}
                 setManager={(manager) => {
                   field.onChange(manager.userId);
