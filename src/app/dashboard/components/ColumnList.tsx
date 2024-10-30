@@ -1,4 +1,4 @@
-// ColumnList.tsx
+// dashboard/components/ColumnList.tsx
 import { useCallback, useEffect, useRef } from "react";
 import { useAtom } from "jotai";
 import { HiOutlineCog } from "react-icons/hi";

@@ -81,66 +81,41 @@ export const useCard = (columnId?: number, size: number = 10) => {
     },
   });
 
-  // 카드 이동 (낙관적 업데이트 적용)
+  // 카드 이동
   const moveCardMutation = useMutation({
-    mutationFn: async ({ cardId, targetColumnId }: { cardId: number; targetColumnId: number }) => {
-      const response = await axios.put(`/api/cards/${cardId}`, { columnId: targetColumnId });
+    mutationFn: async ({
+      cardId,
+      targetColumnId,
+      newIndex,
+    }: {
+      cardId: number;
+      targetColumnId: number;
+      newIndex: number;
+    }) => {
+      const response = await axios.put(`/api/cards/${cardId}`, { columnId: targetColumnId, newIndex });
       return response.data;
     },
     onMutate: async ({ cardId, targetColumnId }) => {
       await queryClient.cancelQueries({ queryKey: ["cardData"] });
-
       const previousData = queryClient.getQueryData(["cardData"]);
-
-      // 낙관적 업데이트
-      queryClient.setQueryData(["cardData"], (oldData: any) => {
-        if (!oldData) return oldData;
-
-        const newData = {
-          ...oldData,
-          pages: oldData.pages.map((page: any) => {
-            const updatedCards = page.cards.filter((card: CardResponseSchemaType) => card.id !== cardId);
-            return { ...page, cards: updatedCards };
-          }),
-        };
-
-        // 이동한 카드 정보
-        const movedCard = oldData.pages.flatMap((page: any) => page.cards).find((card: any) => card.id === cardId);
-
-        if (movedCard) {
-          movedCard.columnId = targetColumnId;
-
-          // 대상 컬럼에 카드 추가
-          const targetPageIndex = newData.pages.findIndex((page: any) => page.columnId === targetColumnId);
-          if (targetPageIndex !== -1) {
-            newData.pages[targetPageIndex].cards.push(movedCard);
-          } else {
-            // 대상 컬럼이 로드되지 않은 경우
-            newData.pages.push({
-              columnId: targetColumnId,
-              cards: [movedCard],
-            });
-          }
-        }
-
-        return newData;
-      });
-
       return { previousData };
     },
     onError: (err, variables, context) => {
-      // 이전 데이터로 롤백
-      queryClient.setQueryData(["cardData"], context?.previousData);
+      if (context?.previousData) {
+        queryClient.setQueryData(["cardData"], context.previousData);
+      }
       toast.error("카드 이동에 실패했습니다");
     },
+    onSuccess: () => {
+      toast.success("카드가 이동되었습니다");
+    },
     onSettled: () => {
-      // 데이터 재검증
       queryClient.invalidateQueries({ queryKey: ["cardData"] });
     },
   });
 
-  const moveCard = (cardId: number, targetColumnId: number) => {
-    moveCardMutation.mutate({ cardId, targetColumnId });
+  const moveCard = async (cardId: number, targetColumnId: number, newIndex: number) => {
+    return await moveCardMutation.mutateAsync({ cardId, targetColumnId, newIndex });
   };
 
   return {

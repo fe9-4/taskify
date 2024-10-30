@@ -1,6 +1,7 @@
+// dashboard/[dashboardId]/page.tsx
 "use client";
 
-import { useRef, WheelEvent } from "react";
+import React, { useRef, WheelEvent } from "react";
 import { useParams } from "next/navigation";
 import { AddColumnBtn } from "@/components/button/ButtonComponents";
 import { useAtom } from "jotai";
@@ -37,11 +38,15 @@ const DashboardDetail = () => {
       return;
     }
 
-    // 다른 컬럼으로의 이동
-    const cardId = parseInt(draggableId);
-    const targetColumnId = parseInt(destination.droppableId);
+    try {
+      // 다른 컬럼으로의 이동
+      const cardId = parseInt(draggableId);
+      const targetColumnId = parseInt(destination.droppableId);
 
-    await moveCard(cardId, targetColumnId);
+      await moveCard(cardId, targetColumnId, destination.index);
+    } catch (error) {
+      console.error("카드 이동 중 오류 발생:", error);
+    }
   };
 
   const handleScroll = (e: WheelEvent): void => {
@@ -68,7 +73,8 @@ const DashboardDetail = () => {
           {columns &&
             columns.length > 0 &&
             columns.map((column: ColumnSchemaType) => (
-              <ColumnList key={column.id} columnTitle={column.title} columnId={column.id} />
+              // React.memo 적용된 ColumnList 컴포넌트 사용
+              <MemoizedColumnList key={column.id} columnTitle={column.title} columnId={column.id} />
             ))}
         </div>
         <div className="px-4 xl:px-0 xl:pt-[66px]">{canAddColumn && <AddColumnBtn onClick={handleColumnBtn} />}</div>
@@ -76,5 +82,8 @@ const DashboardDetail = () => {
     </DragDropContext>
   );
 };
+
+// React.memo로 감싸서 불필요한 리랜더링 방지
+const MemoizedColumnList = React.memo(ColumnList);
 
 export default DashboardDetail;
