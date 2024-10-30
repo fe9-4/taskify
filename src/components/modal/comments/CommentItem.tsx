@@ -86,9 +86,13 @@ const CommentItem = ({ comment, setComments }: CommentItemProps) => {
             )}
           </div>
         </div>
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-2">
           {isEditing && <InputItem value={editContent} onChange={handleEditChange} isTextArea />}
-          {!isEditing && <p className="break-all text-base text-black03 md:text-lg">{comment.content}</p>}
+          {!isEditing && (
+            <p className="break-all text-sm leading-snug text-black03 md:text-base md:leading-normal">
+              {comment.content}
+            </p>
+          )}
           <span className="text-xs font-medium text-gray02 md:text-sm">{formatDateTime(comment.createdAt)}</span>
         </div>
       </div>

@@ -1,8 +1,8 @@
 import { MutableRefObject, useEffect, useRef, useState } from "react";
 
 const useIntersectionObserver = (callback: () => void) => {
-  const [observeTarget, setObserveTarget] = useState<HTMLDivElement | null>(null);
-  const observer = useRef<MutableRefObject<Element> | any>(null);
+  const [observeTarget, setObserveTarget] = useState<HTMLElement | null>(null);
+  const observer = useRef<MutableRefObject<HTMLElement> | any>(null);
 
   useEffect(() => {
     const currentTarget = observeTarget;
