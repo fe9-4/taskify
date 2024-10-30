@@ -30,7 +30,12 @@ const EditDashboard = ({ dashboardId }: { dashboardId: number }) => {
 
   const onSubmit = () => {
     const formData = watch() as ValueType;
-    updateDashboard(formData);
+    updateDashboard(formData, {
+      onSuccess: () => {
+        // 변경 후 폼 상태 초기화
+        reset(formData, { keepValues: true });
+      },
+    });
   };
 
   const isButtonDisabled = !isValid || !isDirty || isUpdating;

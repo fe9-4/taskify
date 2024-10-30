@@ -62,8 +62,13 @@ export const useDashboard = ({
     },
     onSuccess: (data) => {
       toast.success("대시보드 정보가 수정되었습니다");
-      // 대시보드 정보 쿼리 무효화
-      queryClient.invalidateQueries({ queryKey: ["dashboard", dashboardId] });
+      // 즉시 캐시 업데이트
+      queryClient.setQueryData(["dashboardInfo", dashboardId], (oldData: any) => ({
+        ...oldData,
+        ...data,
+      }));
+      // 대시보드 목록도 업데이트
+      queryClient.invalidateQueries({ queryKey: ["dashboards"] });
     },
     onError: (error) => {
       console.error("Error updating dashboard:", error);
