@@ -5,15 +5,15 @@ export const CreateDashboardAtom = atom<boolean>(false);
 
 // 할 일 카드 생성 모달
 export const CreateCardAtom = atom<boolean>(false);
-export const CreateCardParamsAtom = atom<string>("");
+export const CreateCardParamsAtom = atom<number>(0);
 
 //할 일 카드 상세 모달
 export const DetailCardAtom = atom<boolean>(false);
-export const DetailCardParamsAtom = atom<string>("");
+export const DetailCardParamsAtom = atom<number>(0);
 
 // 할 일 카드 수정 모달
 export const UpdateCardAtom = atom<boolean>(false);
-export const UpdateCardParamsAtom = atom<string>("");
+export const UpdateCardParamsAtom = atom<number>(0);
 
 // 컬럼 생성 모달
 export const CreateColumnAtom = atom<boolean>(false);

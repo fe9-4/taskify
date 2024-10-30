@@ -22,6 +22,7 @@ import InputFile from "@/components/input/InputFile";
 import { useAtom, useAtomValue } from "jotai";
 import { CreateCardAtom, CreateCardParamsAtom } from "@/store/modalAtom";
 import { uploadType } from "@/types/uploadType";
+import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 
 const CreateCard = () => {
   const { user } = useAuth();
@@ -30,6 +31,7 @@ const CreateCard = () => {
   const columnId = useAtomValue(CreateCardParamsAtom);
   const [, setIsCreateCardOpen] = useAtom(CreateCardAtom);
   const { isLoading, withLoading } = useLoading();
+  const [, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
 
   const {
     uploadFile,
@@ -124,6 +126,7 @@ const CreateCard = () => {
         if (response.data) {
           toast.success("카드가 생성되었습니다! 🎉");
           setIsCreateCardOpen(false);
+          setDashboardCardUpdate(true);
         }
       } catch (error) {
         toast.error("카드 생성에 실패하였습니다.");

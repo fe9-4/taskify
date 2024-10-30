@@ -19,6 +19,16 @@ export const metadata: Metadata = {
   },
   description: "새로운 일정관리 | Taskify",
   icons: { icon: "/icons/favicon.ico", shortcut: "/icons/favicon.ico" },
+  metadataBase: new URL("http://localhost:3000/"),
+  openGraph: {
+    title: {
+      template: "%s | Taskify",
+      default: "새로운 일정관리 | Taskify"
+    },
+    description: "새로운 일정관리 | Taskify",
+    images: "/icons/favicon.ico",
+    url: "http://localhost:3000/"
+  }
 };
 
 export default function RootLayout({

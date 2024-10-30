@@ -13,8 +13,10 @@ const Pagination = ({ totalPage, setPage, page }: IProps) => {
   const [isDisabledPrev, setIsDisabledPrev] = useState(false);
 
   useEffect(() => {
-    setIsDisabledPrev(page === 1);
-    setIsDisabledNext(page === totalPage);
+    if (totalPage > 0) {
+      setIsDisabledPrev(page === 1);
+      setIsDisabledNext(page === totalPage);
+    }
   }, [page, totalPage]);
 
   const handlePageNext = () => {
@@ -26,9 +28,9 @@ const Pagination = ({ totalPage, setPage, page }: IProps) => {
     } else {
       setPage(nextPage);
       setIsDisabledNext(false);
-    } 
-  }
-  
+    }
+  };
+
   const handlePagePrev = () => {
     const prevPage = page - 1;
 
@@ -42,7 +44,14 @@ const Pagination = ({ totalPage, setPage, page }: IProps) => {
     }
   };
 
-  return <PaginationBtn onClickNext={handlePageNext} onClickPrev={handlePagePrev} disabledNext={isDisabledNext} disabledPrev={isDisabledPrev}   />
+  return (
+    <PaginationBtn
+      onClickNext={handlePageNext}
+      onClickPrev={handlePagePrev}
+      disabledNext={isDisabledNext}
+      disabledPrev={isDisabledPrev}
+    />
+  );
 };
 
 export default Pagination;

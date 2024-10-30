@@ -3,9 +3,9 @@ import { usePathname } from "next/navigation";
 import Button from "./Button";
 import DashboardList from "./DashboardList";
 import Logo from "./Logo";
-import { PaginationBtn } from "../button/ButtonComponents";
 import { useEffect, useState } from "react";
 import { useWidth } from "@/hooks/useWidth";
+import Pagination from "../pagination/Pagination";
 import { useDashboard } from "@/hooks/useDashboard";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -26,16 +26,6 @@ const Sidebar = () => {
   }, [isLargeScreen]);
 
   const totalPage: number = Math.ceil(dashboards.total / size);
-  const isFirst = page === 1;
-  const isLast = page === totalPage;
-
-  const onClickPrev = () => {
-    if (!isFirst) setPage(page - 1);
-  };
-
-  const onClickNext = () => {
-    if (!isLast) setPage(page + 1);
-  };
 
   if (!user || pathname === "/" || pathname === "/login" || pathname === "/signup") return null;
 
@@ -46,14 +36,7 @@ const Sidebar = () => {
         <Button />
         <DashboardList list={dashboards.all} />
         <div className="absolute bottom-0 hidden md:mt-6 md:block xl:mt-8">
-          {dashboards.total > size && (
-            <PaginationBtn
-              disabledPrev={isFirst}
-              disabledNext={isLast}
-              onClickPrev={onClickPrev}
-              onClickNext={onClickNext}
-            />
-          )}
+          {dashboards.total > size ? <Pagination totalPage={totalPage} setPage={setPage} page={page} /> : <></>}
         </div>
       </div>
     </aside>

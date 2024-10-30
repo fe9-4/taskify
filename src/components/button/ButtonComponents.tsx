@@ -3,6 +3,7 @@ import { BaseBtn, Content, ContentLeftAlign, PlusIcon } from "@/components/butto
 import { FaCrown, FaCircle } from "react-icons/fa";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { ReactNode } from "react";
+import { boolean } from "zod";
 
 // 1. 버튼 텍스트가 정해져있는 경우
 // 1) 컬럼 추가
@@ -41,9 +42,9 @@ export const AddTodoBtn = ({ onClick }: { onClick: () => void }) => {
 };
 
 //4) 대시보드 삭제
-export const DeleteDashboardBtn = ({ onClick }: any) => {
+export const DeleteDashboardBtn = ({ onClick, disabled }: { onClick: () => void; disabled?: boolean }) => {
   return (
-    <BaseBtn onClick={onClick} extra="bg-gray03">
+    <BaseBtn onClick={onClick} disabled={disabled} extra="bg-gray03">
       <Content extra="h-[52px] w-[284px] text-lg font-medium md:h-[62px] md:w-80 md:text-xl">대시보드 삭제하기</Content>
     </BaseBtn>
   );
