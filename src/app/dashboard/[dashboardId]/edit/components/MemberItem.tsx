@@ -28,22 +28,24 @@ const MemberItem = ({ member, onClick }: { member: Member; onClick: (userId: num
   return (
     <div className="flex w-full justify-between border-b border-gray04 px-5 py-3 last:border-0 md:px-7 md:py-4">
       <div className="flex items-center gap-2 md:gap-3">
-        <div className="size-[38px] overflow-hidden rounded-full">
+        <div className="size-[34px] overflow-hidden rounded-full md:size-[38px]">
           {profileImageUrl ? (
             <Image
               src={profileImageUrl}
-              width={50}
-              height={50}
+              width={40}
+              height={40}
               alt="프로필"
               className="size-[38px] rounded-full object-center"
             />
           ) : (
-            <div className={`flex size-full items-center justify-center ${pastelColors[userId % pastelColors.length]}`}>
+            <div
+              className={`flex size-full items-center justify-center text-[14px] font-semibold leading-[17px] text-white md:text-[17px] md:leading-5 ${pastelColors[userId % pastelColors.length]}`}
+            >
               {nickname.slice(0, 1)}
             </div>
           )}
         </div>
-        <div>{nickname}</div>
+        <div className="text-base font-normal md:text-lg">{nickname}</div>
       </div>
       <DeleteCancelBtn onClick={() => onClickDeleteMember(id, nickname)}>삭제</DeleteCancelBtn>
     </div>

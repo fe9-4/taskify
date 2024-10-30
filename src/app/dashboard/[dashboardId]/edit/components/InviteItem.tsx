@@ -11,7 +11,7 @@ const InviteItem = ({ item, onClick }: { item: any; onClick: (id: number) => voi
   return (
     <div className="flex w-full justify-between border-b border-gray04 px-5 py-3 last:border-0 md:px-7 md:py-4">
       <div className="flex items-center gap-2 md:gap-3">
-        <div>{email}</div>
+        <div className="text-base font-normal md:text-lg">{email}</div>
       </div>
       <DeleteCancelBtn onClick={() => onClickCancel(id)}>취소</DeleteCancelBtn>
     </div>

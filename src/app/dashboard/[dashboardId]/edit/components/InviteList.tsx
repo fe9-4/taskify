@@ -104,7 +104,7 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
       <div className="flex items-center justify-between px-5 py-6 md:px-7 md:py-[26px]">
         <h2 className="col-start-1 text-2xl font-bold md:text-3xl">초대 내역</h2>
         <div className="flex items-center gap-3 md:gap-4">
-          <div>
+          <div className="text-xs font-normal md:text-base">
             {totalPage} 중 {page}
           </div>
           <PaginationBtn
