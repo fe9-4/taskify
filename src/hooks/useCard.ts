@@ -3,8 +3,12 @@ import { useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-q
 import axios from "axios";
 import toast from "react-hot-toast";
 import { formatDateTime } from "@/utils/dateFormat";
-import { CardListResponseSchemaType, CreateCardFormSchemaType, UpdateCardFormSchemaType } from "@/zodSchema/cardSchema";
-import { CardResponseSchemaType } from "@/zodSchema/commonSchema";
+import {
+  CardListResponseSchemaType,
+  CreateCardSchemaType,
+  UpdateCardSchemaType,
+  CardResponseSchemaType,
+} from "@/zodSchema/cardSchema";
 
 export const useCard = (columnId?: number, size: number = 10) => {
   const queryClient = useQueryClient();
@@ -31,7 +35,7 @@ export const useCard = (columnId?: number, size: number = 10) => {
 
   // 카드 생성
   const createMutation = useMutation({
-    mutationFn: async (data: CreateCardFormSchemaType) => {
+    mutationFn: async (data: CreateCardSchemaType) => {
       const formattedData = {
         ...data,
         dueDate: data.dueDate ? formatDateTime(new Date(data.dueDate)) : null,
@@ -50,7 +54,7 @@ export const useCard = (columnId?: number, size: number = 10) => {
 
   // 카드 수정
   const updateMutation = useMutation({
-    mutationFn: async ({ cardId, ...data }: { cardId: number } & UpdateCardFormSchemaType) => {
+    mutationFn: async ({ cardId, ...data }: { cardId: number } & UpdateCardSchemaType) => {
       const formattedData = {
         ...data,
         dueDate: data.dueDate ? formatDateTime(new Date(data.dueDate)) : null,

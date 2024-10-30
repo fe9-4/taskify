@@ -1,10 +1,10 @@
 "use client";
 
 import { ChangeEvent, useState, useEffect } from "react";
-import { useForm, SubmitHandler, Controller, useWatch } from "react-hook-form";
+import { useForm, SubmitHandler, Controller, useWatch, UseFormSetValue } from "react-hook-form";
 import { useParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CreateCardFormSchema } from "@/zodSchema/cardSchema";
+import { CreateCardSchema, CreateCardSchemaType } from "@/zodSchema/cardSchema";
 import axios from "axios";
 import toast from "react-hot-toast";
 import useLoading from "@/hooks/useLoading";
@@ -12,7 +12,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { useMember } from "@/hooks/useMember";
 import { formatDateTime } from "@/utils/dateFormat";
-import { CreateCardProps } from "@/types/cardType";
 import { CancelBtn, ConfirmBtn } from "@/components/button/ButtonComponents";
 import SearchDropdown from "@/components/dropdown/SearchDropdown";
 import InputItem from "@/components/input/InputItem";
@@ -24,6 +23,7 @@ import { CreateCardParamsAtom } from "@/store/modalAtom";
 import { uploadType } from "@/types/uploadType";
 import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { useToggleModal } from "@/hooks/useToggleModal";
+import { CreateCardProps } from "@/types/cardType";
 
 const CreateCard = () => {
   const { user } = useAuth();
@@ -56,8 +56,8 @@ const CreateCard = () => {
     trigger,
     control,
     formState: { errors },
-  } = useForm<CreateCardProps>({
-    resolver: zodResolver(CreateCardFormSchema),
+  } = useForm<CreateCardSchemaType>({
+    resolver: zodResolver(CreateCardSchema),
     mode: "onChange",
     defaultValues: {
       assigneeUserId: Number(user && user.id),
@@ -67,7 +67,7 @@ const CreateCard = () => {
       description: "",
       dueDate: "",
       tags: [],
-      imageUrl: null,
+      imageUrl: "",
     },
   });
 
@@ -94,7 +94,7 @@ const CreateCard = () => {
     if (!file) {
       setSelectedFile(null);
       setPreviewUrl(null);
-      setValue("imageUrl", null);
+      setValue("imageUrl", "");
       return;
     }
 
@@ -107,7 +107,7 @@ const CreateCard = () => {
     setPreviewUrl(preview);
   };
 
-  const onSubmit: SubmitHandler<CreateCardProps> = async (data) => {
+  const onSubmit: SubmitHandler<CreateCardSchemaType> = async (data) => {
     await withLoading(async () => {
       try {
         let uploadedImageUrl = null;
@@ -169,7 +169,7 @@ const CreateCard = () => {
                   field.onChange(manager.userId);
                   setValue("assigneeUserId", manager.userId);
                 }}
-                setValue={setValue}
+                setValue={setValue as UseFormSetValue<CreateCardProps>}
                 validation={managerValidation}
               />
             );
