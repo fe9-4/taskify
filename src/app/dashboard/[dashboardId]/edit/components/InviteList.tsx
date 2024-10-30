@@ -141,13 +141,18 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
           <></>
         )}
       </div>
-      <ul>
-        <li>
-          {inviteList.map((item) => (
-            <InviteItem key={item.id} item={item} onClick={onClickCancelInvitation} />
-          ))}
-        </li>
-      </ul>
+      {!error && !isLoading && inviteList.length > 0 && (
+        <>
+          <div className="px-5 text-base font-normal text-gray02 md:px-7 md:text-lg">이메일</div>
+          <ul>
+            <li>
+              {inviteList.map((item) => (
+                <InviteItem key={item.id} item={item} onClick={onClickCancelInvitation} />
+              ))}
+            </li>
+          </ul>
+        </>
+      )}
     </>
   );
 };
