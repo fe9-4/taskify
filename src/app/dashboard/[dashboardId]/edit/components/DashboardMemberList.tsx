@@ -1,9 +1,6 @@
 import { useMember } from "@/hooks/useMember";
 import { useState } from "react";
 import MemberItem from "./MemberItem";
-import axios from "axios";
-import toast from "react-hot-toast";
-import { Member } from "@/zodSchema/memberSchema";
 import Pagination from "@/components/pagination/Pagination";
 
 const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
