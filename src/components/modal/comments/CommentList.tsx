@@ -1,4 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useAtom } from "jotai";
+import { useToggleModal } from "@/hooks/useToggleModal";
+import { AlertModalConfirmAtom, AlertModalTextAtom } from "@/store/modalAtom";
 import { CommentListProps, CommentProps } from "@/types/commentType";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -6,6 +9,10 @@ import CommentItem from "./CommentItem";
 import CreateComment from "./CreateComment";
 
 const CommentList = ({ cardId, columnId }: CommentListProps) => {
+  const toggleModal = useToggleModal();
+  const [, setAlertText] = useAtom(AlertModalTextAtom);
+  const [, setOnConfirm] = useAtom(AlertModalConfirmAtom);
+
   const [comments, setComments] = useState<CommentProps[]>([]);
   const [offset, setOffset] = useState(0);
   const size = 10;
@@ -71,6 +78,15 @@ const CommentList = ({ cardId, columnId }: CommentListProps) => {
   useEffect(() => {
     getComments();
   }, [getComments]);
+
+  // const handleDelete = (commentId: number) => {
+  //   toggleModal("deleteModal", true);
+  //   setAlertText("정말 삭제하시겠습니까?");
+  //   setOnConfirm(() => {
+  //     ondelete(commentId);
+  //     toggleModal("deleteModal", false);
+  //   });
+  // };
 
   return (
     <>

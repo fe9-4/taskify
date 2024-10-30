@@ -1,6 +1,6 @@
 import toast from "react-hot-toast";
 import { PaginationBtn } from "@/components/button/ButtonComponents";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, MouseEvent, SetStateAction, useEffect, useState } from "react";
 
 interface IProps {
   totalPage: number;
@@ -13,11 +13,14 @@ const Pagination = ({ totalPage, setPage, page }: IProps) => {
   const [isDisabledPrev, setIsDisabledPrev] = useState(false);
 
   useEffect(() => {
-    setIsDisabledPrev(page === 1);
-    setIsDisabledNext(page === totalPage);
+    if (totalPage > 0) {
+      setIsDisabledPrev(page === 1);
+      setIsDisabledNext(page === totalPage);
+    }
   }, [page, totalPage]);
 
-  const handlePageNext = () => {
+  const handlePageNext = (e: MouseEvent) => {
+    e.stopPropagation();
     const nextPage = page + 1;
 
     if (nextPage > totalPage) {
@@ -26,10 +29,11 @@ const Pagination = ({ totalPage, setPage, page }: IProps) => {
     } else {
       setPage(nextPage);
       setIsDisabledNext(false);
-    } 
-  }
-  
-  const handlePagePrev = () => {
+    }
+  };
+
+  const handlePagePrev = (e: MouseEvent) => {
+    e.stopPropagation();
     const prevPage = page - 1;
 
     if (prevPage < 1) {
@@ -42,7 +46,14 @@ const Pagination = ({ totalPage, setPage, page }: IProps) => {
     }
   };
 
-  return <PaginationBtn onClickNext={handlePageNext} onClickPrev={handlePagePrev} disabledNext={isDisabledNext} disabledPrev={isDisabledPrev}   />
+  return (
+    <PaginationBtn
+      onClickNext={handlePageNext}
+      onClickPrev={handlePagePrev}
+      disabledNext={isDisabledNext}
+      disabledPrev={isDisabledPrev}
+    />
+  );
 };
 
 export default Pagination;

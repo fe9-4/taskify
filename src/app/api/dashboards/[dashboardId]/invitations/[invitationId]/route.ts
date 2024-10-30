@@ -22,21 +22,23 @@ export const DELETE = async (request: NextRequest, { params }: { params: IParams
   }
 
   try {
-    //https://sp-taskify-api.vercel.app/9-4/dashboards/12067/invitations/13476
     const response = await apiClient.delete(`/dashboards/${dashboardId}/invitations/${invitationId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
 
-    if (response.status === 200) {
-      const data = response.data;
-      return NextResponse.json(data, { status: 200 });
+    if (response.status === 204) {
+      return new NextResponse(null, { status: 204 });
     }
+    // 204가 아닌 경우의 응답 추가
+    return NextResponse.json({ message: "초대 삭제 실패" }, { status: 400 });
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.error("대시보드 초대 내역 DELETE 요청 오류 발생", error);
-      return new NextResponse("대시보드 초대 DELETE 실패", { status: error.status });
+      return NextResponse.json({ error: "초대 삭제 실패" }, { status: error.status || 500 });
     }
+    // 일반 에러의 경우 응답 추가
+    return NextResponse.json({ error: "알 수 없는 오류가 발생했습니다" }, { status: 500 });
   }
 };

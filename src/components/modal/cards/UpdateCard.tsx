@@ -9,7 +9,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useFileUpload } from "@/hooks/useFileUpload";
-import { useDashboardMember } from "@/hooks/useDashboardMember";
+import { useMember } from "@/hooks/useMember";
 import { formatDateTime } from "@/utils/dateFormat";
 import { CancelBtn, ConfirmBtn } from "@/components/button/ButtonComponents";
 import StatusDropdown from "@/components/dropdown/StatusDropdown";
@@ -20,9 +20,10 @@ import InputTag from "@/components/input/InputTag";
 import InputFile from "@/components/input/InputFile";
 import { useAtom, useAtomValue } from "jotai";
 import useLoading from "@/hooks/useLoading";
-import { UpdateCardAtom, UpdateCardParamsAtom } from "@/store/modalAtom";
+import { UpdateCardParamsAtom } from "@/store/modalAtom";
 import { uploadType } from "@/types/uploadType";
 import { UpdateCardProps } from "@/types/cardType";
+import { useToggleModal } from "@/hooks/useToggleModal";
 
 interface CardDataType extends UpdateCardProps {
   assignee: {
@@ -40,7 +41,7 @@ const UpdateCard = () => {
   const cardId = useAtomValue(UpdateCardParamsAtom);
   const [columnId, setColumnId] = useState<string>("");
 
-  const { members } = useDashboardMember({
+  const { memberData } = useMember({
     dashboardId: Number(dashboardId),
   });
 
@@ -58,7 +59,7 @@ const UpdateCard = () => {
   const [cardData, setCardData] = useState<CardDataType | null>(null);
   const [tagInput, setTagInput] = useState("");
 
-  const [, setIsUpdateCardOpen] = useAtom(UpdateCardAtom);
+  const toggleModal = useToggleModal();
   const { isLoading, withLoading } = useLoading();
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -201,7 +202,7 @@ const UpdateCard = () => {
         const response = await axios.put(`/api/cards/${cardId}`, cardData);
         if (response.data) {
           toast.success("카드가 수정되었습니다! 🎉");
-          setIsUpdateCardOpen(false);
+          toggleModal("updateCard", false);
         }
       } catch (error) {
         toast.error("카드 수정에 실패하였습니다.");
@@ -229,7 +230,7 @@ const UpdateCard = () => {
             control={control}
             defaultValue={cardData?.assignee?.userId}
             render={({ field }) => {
-              const selectedMember = members.members.find((member) => member.userId === field.value);
+              const selectedMember = memberData.members.find((member) => member.userId === field.value);
 
               const currentManager = selectedMember || {
                 id: cardData?.assignee?.id || 0,
@@ -241,7 +242,7 @@ const UpdateCard = () => {
 
               return (
                 <SearchDropdown
-                  inviteMemberList={members.members}
+                  inviteMemberList={memberData.members}
                   currentManager={currentManager}
                   setManager={(manager) => {
                     field.onChange(manager.userId);
@@ -327,7 +328,7 @@ const UpdateCard = () => {
         />
 
         <div className="flex h-[42px] gap-3 md:h-[54px] md:gap-2">
-          <CancelBtn type="button" onClick={() => setIsUpdateCardOpen(false)}>
+          <CancelBtn type="button" onClick={() => toggleModal("updateCard", false)}>
             취소
           </CancelBtn>
           <ConfirmBtn type="submit" disabled={!isFormValid || isLoading || isFileUploading}>

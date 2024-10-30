@@ -3,39 +3,23 @@
 import React from "react";
 import Modal from "react-modal";
 import { useAtom, useAtomValue } from "jotai";
-import {
-  AlertModalAtom,
-  AlertModalTextAtom,
-  CreateCardAtom,
-  CreateDashboardAtom,
-  EditColumnAtom,
-  DetailCardAtom,
-  UpdateCardAtom,
-  CreateColumnAtom,
-  InvitationDashboardAtom,
-  AlertModalConfirmAtom,
-} from "@/store/modalAtom";
+import { AlertModalTextAtom, AlertModalConfirmAtom, ModalStateAtom } from "@/store/modalAtom";
 import CreateDashboard from "@/components/modal/dashboard/CreateDashboard";
 import ModalContent from "./ModalContent";
-import AlertModal from "./AlertModal";
+import DeleteModal from "./DeleteModal";
 import CreateCard from "@/components/modal/cards/CreateCard";
 import DetailCard from "@/components/modal/cards/DetailCard";
 import UpdateCard from "@/components/modal/cards/UpdateCard";
 import CreateColumn from "./columns/CreateColumn";
 import InvitationDashboard from "./dashboard/InvitationDashboard";
 import EditColumn from "./columns/EditColumn";
+import { useToggleModal } from "@/hooks/useToggleModal";
 
 Modal.setAppElement("#modal-root");
 
 const ModalContainer = () => {
-  const [isCreateDashboardOpen, setIsCreateDashboardOpen] = useAtom(CreateDashboardAtom);
-  const [isInvitationDashboardOpen, setIsInvitationDashboardOpen] = useAtom(InvitationDashboardAtom);
-  const [isCreateCardOpen, setIsCreateCardOpen] = useAtom(CreateCardAtom);
-  const [isDetailCardOpen, setIsDetailCardOpen] = useAtom(DetailCardAtom);
-  const [isUpdateCardOpen, setIsUpdateCardOpen] = useAtom(UpdateCardAtom);
-  const [isCreateColumnOpen, setIsCreateColumnOpen] = useAtom(CreateColumnAtom);
-  const [isEditColumnOpen, setIsEditColumnOpen] = useAtom(EditColumnAtom);
-  const [isAlertOpen, setIsAlertOpen] = useAtom(AlertModalAtom);
+  const modalState = useAtomValue(ModalStateAtom);
+  const toggleModal = useToggleModal();
 
   const alertText = useAtomValue(AlertModalTextAtom);
   const [onConfirm] = useAtom(AlertModalConfirmAtom);
@@ -43,43 +27,46 @@ const ModalContainer = () => {
   return (
     <>
       {/* 대시보드 생성 모달 */}
-      <ModalContent isOpen={isCreateDashboardOpen} onRequestClose={() => setIsCreateDashboardOpen(false)}>
+      <ModalContent isOpen={modalState.createDashboard} onRequestClose={() => toggleModal("createDashboard", false)}>
         <CreateDashboard />
       </ModalContent>
 
       {/* 할 일 카드 생성 모달 */}
-      <ModalContent isOpen={isCreateCardOpen} onRequestClose={() => setIsCreateCardOpen(false)}>
+      <ModalContent isOpen={modalState.createCard} onRequestClose={() => toggleModal("createCard", false)}>
         <CreateCard />
       </ModalContent>
 
       {/* 할 일 카드 상세 모달 */}
-      <ModalContent isOpen={isDetailCardOpen} onRequestClose={() => setIsDetailCardOpen(false)}>
+      <ModalContent isOpen={modalState.detailCard} onRequestClose={() => toggleModal("detailCard", false)}>
         <DetailCard />
       </ModalContent>
 
       {/* 할 일 수정 모달 */}
-      <ModalContent isOpen={isUpdateCardOpen} onRequestClose={() => setIsUpdateCardOpen(false)}>
+      <ModalContent isOpen={modalState.updateCard} onRequestClose={() => toggleModal("updateCard", false)}>
         <UpdateCard />
       </ModalContent>
 
       {/* 대시 보드 초대 모달 */}
-      <ModalContent isOpen={isInvitationDashboardOpen} onRequestClose={() => setIsInvitationDashboardOpen(false)}>
+      <ModalContent
+        isOpen={modalState.invitationDashboard}
+        onRequestClose={() => toggleModal("invitationDashboard", false)}
+      >
         <InvitationDashboard />
       </ModalContent>
 
       {/* 컬럼 생성 모달 */}
-      <ModalContent isOpen={isCreateColumnOpen} onRequestClose={() => setIsCreateColumnOpen(false)}>
+      <ModalContent isOpen={modalState.createColumn} onRequestClose={() => toggleModal("createColumn", false)}>
         <CreateColumn />
       </ModalContent>
 
       {/* 컬럼 수정 모달 */}
-      <ModalContent isOpen={isEditColumnOpen} onRequestClose={() => setIsEditColumnOpen(false)}>
+      <ModalContent isOpen={modalState.editColumn} onRequestClose={() => toggleModal("editColumn", false)}>
         <EditColumn />
       </ModalContent>
 
-      {/* 알람 모달 */}
-      <ModalContent isOpen={isAlertOpen} onRequestClose={() => setIsAlertOpen(false)}>
-        {onConfirm && <AlertModal text={alertText} onConfirm={onConfirm} />}
+      {/* 삭제 모달 */}
+      <ModalContent isOpen={modalState.deleteModal} onRequestClose={() => toggleModal("deleteModal", false)}>
+        {onConfirm && <DeleteModal text={alertText} onConfirm={onConfirm} />}
       </ModalContent>
     </>
   );

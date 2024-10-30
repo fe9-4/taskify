@@ -25,7 +25,7 @@ const ModalContent = ({ children, isOpen, onRequestClose }: Props) => {
     <Modal
       isOpen={isOpen}
       onRequestClose={onRequestClose}
-      className="flex items-center justify-center"
+      className="max-h-[95%] items-center justify-center overflow-scroll rounded-2xl [&::-webkit-scrollbar]:hidden"
       overlayClassName="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50"
     >
       {children}

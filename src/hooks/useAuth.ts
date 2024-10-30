@@ -14,58 +14,52 @@ export const useAuth = () => {
   const [user, setUser] = useAtom(userAtom);
 
   const {
-    isLoading: isUserLoading,
-    isFetched: isUserFetched,
+    data: userData,
+    isLoading,
+    isFetching,
+    isError,
     error: userError,
   } = useQuery({
     queryKey: ["user"],
     queryFn: async () => {
       try {
-        // 쿠키의 존재 여부를 확인
         const cookieResponse = await axios.get("/api/auth/checkCookie");
 
-        // 쿠키가 존재하면 사용자 정보를 가져옴
         if (cookieResponse.status === 200 && cookieResponse.data.success) {
           const userResponse = await axios.get("/api/users/me");
           return userResponse.data.user;
-        } else {
-          // 쿠키가 없으면 null을 반환
-          return null;
         }
+        return null;
       } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status === 401) {
           console.error("Cookie에 accessToken이 없습니다.");
+          return null;
         }
         throw error;
       }
     },
-    retry: 0,
+    retry: false,
     staleTime: 1000 * 60 * 5,
     refetchOnWindowFocus: false,
   });
 
   useEffect(() => {
-    if (userError) {
-      // 사용자 상태를 null로 설정
+    if (!isLoading && !isError) {
+      setUser(userData);
+    }
+  }, [userData, isLoading, isError, setUser]);
+
+  useEffect(() => {
+    if (isError) {
       setUser(null);
-      // 인증 정보가 필요없는 경로
       const publicPaths = ["/", "/login", "/signup"];
-      // 로그인 상태가 아니고 현재 경로가 인증 정보가 필요한 경로면 홈으로 이동
       if (!publicPaths.includes(pathname)) {
         router.push("/");
       }
     }
-  }, [userError, setUser, router, pathname]);
-
-  useEffect(() => {
-    if (!isUserLoading && !userError) {
-      const userData = queryClient.getQueryData<User>(["user"]);
-      setUser(userData || null);
-    }
-  }, [isUserLoading, userError, queryClient, setUser]);
+  }, [isError, setUser, router, pathname]);
 
   const loginMutation = useMutation({
-    // 실제 로그인 요청을 수행하는 함수
     mutationFn: async (credentials: Login) => {
       const response = await axios.post("/api/auth/login", credentials);
       return response.data.user;
@@ -73,7 +67,6 @@ export const useAuth = () => {
     onSuccess: (data) => {
       setUser(data);
       queryClient.setQueryData(["user"], data);
-      // 로그인 성공 후 마이대시보드로 이동
       router.push("/mydashboard");
     },
     onError: (error) => {
@@ -97,7 +90,6 @@ export const useAuth = () => {
   );
 
   const logoutMutation = useMutation({
-    // 실제 로그아웃 요청을 수행하는 함수
     mutationFn: async () => {
       await axios.post("/api/auth/logout", {});
     },
@@ -105,7 +97,6 @@ export const useAuth = () => {
       setUser(null);
       queryClient.setQueryData(["user"], null);
       queryClient.clear();
-      // 로그아웃 성공 후 홈으로 이동
       router.push("/");
     },
     onError: (error) => {
@@ -132,8 +123,9 @@ export const useAuth = () => {
     login,
     logout,
     updateUser,
-    isUserLoading,
-    isUserFetched,
-    isInitialLoading: isUserLoading && !isUserFetched,
+    isLoading,
+    isFetching,
+    isError,
+    isInitialLoading: isLoading && !user,
   };
 };

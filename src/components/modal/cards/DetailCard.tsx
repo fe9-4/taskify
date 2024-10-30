@@ -1,15 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import {
-  AlertModalAtom,
   AlertModalConfirmAtom,
   AlertModalTextAtom,
   ColumnAtom,
-  DetailCardAtom,
   DetailCardParamsAtom,
-  UpdateCardAtom,
   UpdateCardParamsAtom,
 } from "@/store/modalAtom";
+import { useToggleModal } from "@/hooks/useToggleModal";
 import axios from "axios";
 import toast from "react-hot-toast";
 import Image from "next/image";
@@ -17,19 +15,15 @@ import { CardDataProps } from "@/types/cardType";
 import { StatusTitleChip } from "../../chip/StatusChip";
 import TagChip from "@/components/chip/TagChip";
 import EditDeleteDropdown from "@/components/dropdown/EditDeleteDropdown";
-import CreateComment from "../comments/CreateComment";
 import CommentList from "../comments/CommentList";
 
 const DetailCard = () => {
   const cardId = useAtomValue(DetailCardParamsAtom);
   const column = useAtomValue(ColumnAtom);
   const [cardData, setCardData] = useState<CardDataProps>();
-
-  const [, setIsDetailCardOpen] = useAtom(DetailCardAtom);
-  const [, setIsUpdateCardOpen] = useAtom(UpdateCardAtom);
   const [, setIsUpdateCardParams] = useAtom(UpdateCardParamsAtom);
 
-  const [, setIsAlertOpen] = useAtom(AlertModalAtom);
+  const toggleModal = useToggleModal();
   const [, setAlertText] = useAtom(AlertModalTextAtom);
   const [, setOnConfirm] = useAtom(AlertModalConfirmAtom);
 
@@ -55,7 +49,7 @@ const DetailCard = () => {
     try {
       const response = await axios.delete(`/api/cards/${cardId}`);
       if (response.status === 201) toast.success("카드가 삭제되었습니다.");
-      setIsDetailCardOpen(false);
+      toggleModal("detailCard", false);
     } catch (error) {
       if (axios.isAxiosError(error)) {
         toast.error("카드 삭제에 실패하였습니다.");
@@ -66,11 +60,11 @@ const DetailCard = () => {
   const handleDelete = () => {
     setAlertText("정말 삭제하시겠습니까?");
     setOnConfirm(() => ondelete);
-    setIsAlertOpen(true);
+    toggleModal("deleteModal", true);
   };
 
   const toggleDropdown = useCallback(() => setIsOpen((prev) => !prev), []);
-  const closeModal = useCallback(() => setIsDetailCardOpen(false), [setIsDetailCardOpen]);
+  const closeModal = () => toggleModal("detailCard", false);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -86,9 +80,9 @@ const DetailCard = () => {
 
   const handleEdit = () => {
     if (cardData) {
-      setIsUpdateCardOpen(true);
+      toggleModal("updateCard", true);
       setIsUpdateCardParams(cardData.id);
-      setIsDetailCardOpen(false);
+      toggleModal("detailCard", false);
     }
   };
 
