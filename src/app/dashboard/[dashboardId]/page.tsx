@@ -4,16 +4,26 @@ import { useRef, WheelEvent } from "react";
 import { useParams } from "next/navigation";
 import { AddColumnBtn } from "@/components/button/ButtonComponents";
 import { useAtom } from "jotai";
-import { ColumnTitlesAtom, CreateColumnAtom } from "@/store/modalAtom";
+import { ColumnTitlesAtom } from "@/store/modalAtom";
 import { DragDropContext, DropResult } from "@hello-pangea/dnd";
 import ColumnList from "@/app/dashboard/components/ColumnList";
 import { useColumn } from "@/hooks/useColumn";
 import { ColumnSchemaType } from "@/zodSchema/columnSchema";
 import { useCard } from "@/hooks/useCard";
+import { useToggleModal } from "@/hooks/useToggleModal";
+
+interface IColumnData {
+  id: number;
+  title: string;
+  teamId: string;
+}
+interface IColumnList {
+  data: IColumnData[];
+}
 
 const DashboardDetail = () => {
   const { dashboardId } = useParams();
-  const [, setIsCreateColumnOpen] = useAtom(CreateColumnAtom);
+  const toggleModal = useToggleModal();
   const [, setColumnTitles] = useAtom(ColumnTitlesAtom);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -23,7 +33,7 @@ const DashboardDetail = () => {
   const handleColumnBtn = () => {
     const columTitles = columns?.map((column: ColumnSchemaType) => column.title) || [];
     setColumnTitles(columTitles);
-    setIsCreateColumnOpen(true);
+    toggleModal("createColumn", true);
   };
 
   const handleDragEnd = async (result: DropResult) => {

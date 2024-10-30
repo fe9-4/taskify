@@ -6,16 +6,10 @@ import { useAtom } from "jotai";
 import { HiOutlineCog } from "react-icons/hi";
 import { NumChip } from "../../../components/chip/PlusAndNumChip";
 import { AddTodoBtn } from "../../../components/button/ButtonComponents";
-import {
-  ColumnAtom,
-  CreateCardAtom,
-  CreateCardParamsAtom,
-  DetailCardAtom,
-  DetailCardParamsAtom,
-  EditColumnAtom,
-} from "@/store/modalAtom";
+import { ColumnAtom, CreateCardParamsAtom, DetailCardParamsAtom } from "@/store/modalAtom";
 import { ICard } from "@/types/dashboardType";
 import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
+import { useToggleModal } from "@/hooks/useToggleModal";
 import { Droppable } from "@hello-pangea/dnd";
 
 interface IProps {
@@ -27,11 +21,9 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [cardList, setCardList] = useState<ICard["cards"]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [size, setSize] = useState(3);
-  const [, setIsCreateCardOpen] = useAtom(CreateCardAtom);
-  const [, setIsEditColumnOpen] = useAtom(EditColumnAtom);
+  const toggleModal = useToggleModal();
   const [, setColumnAtom] = useAtom(ColumnAtom);
   const [, setIsCreateCardParams] = useAtom(CreateCardParamsAtom);
-  const [, setIsDetailCardOpen] = useAtom(DetailCardAtom);
   const [, setIsDetailCardParams] = useAtom(DetailCardParamsAtom);
   const [dashboardCardUpdate, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
   const observeRef = useRef<IntersectionObserver | null>(null);
@@ -100,7 +92,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
 
   const handleEditModal = () => {
     setColumnAtom({ title: columnTitle, columnId });
-    setIsEditColumnOpen(true);
+    toggleModal("editColumn", true);
   };
 
   return (
@@ -117,17 +109,17 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
           <HiOutlineCog className="size-[22px] text-gray01" />
         </button>
       </div>
-      <Droppable droppableId={columnId.toString()} type="CARD">
+      <Droppable droppableId={columnId.toString()}>
         {(provided, snapshot) => (
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
-            className={`flex min-h-[100px] flex-col space-y-2 ${snapshot.isDraggingOver ? "bg-gray-50" : ""}`}
+            className={`flex flex-col space-y-2 ${snapshot.isDraggingOver ? "bg-gray-50" : ""}`}
           >
             <AddTodoBtn
               onClick={() => {
-                setIsCreateCardOpen(true);
                 setIsCreateCardParams(columnId);
+                toggleModal("createCard", true);
               }}
             />
             {cardList.length > 0 ? (
@@ -138,7 +130,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
                   index={index}
                   columnId={columnId}
                   columnTitle={columnTitle}
-                  setIsDetailCardOpen={setIsDetailCardOpen}
+                  toggleModal={toggleModal}
                   setIsDetailCardParams={setIsDetailCardParams}
                   setColumnAtom={setColumnAtom}
                 />
@@ -147,6 +139,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
               <p className="flex items-center justify-center text-center font-bold">등록된 카드가 없습니다.</p>
             )}
             {provided.placeholder}
+            {hasMore && <div ref={loadingRef} className="h-[1px]" />}
           </div>
         )}
       </Droppable>

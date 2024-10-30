@@ -3,13 +3,14 @@ import Image from "next/image";
 import TagChip from "@/components/chip/TagChip";
 import { Iitem } from "@/types/dashboardType";
 import { Draggable } from "@hello-pangea/dnd";
+import { initiModalState } from "@/store/modalAtom";
 
 interface IProps {
   cards: Iitem;
   index: number;
   columnId: number;
   columnTitle: string;
-  setIsDetailCardOpen: (value: boolean) => void;
+  toggleModal: (modalName: keyof typeof initiModalState, isOpen: boolean) => void;
   setIsDetailCardParams: (value: number) => void;
   setColumnAtom: (value: { title: string; columnId: number }) => void;
 }
@@ -19,10 +20,16 @@ const ColumnItem = ({
   index,
   columnId,
   columnTitle,
-  setIsDetailCardOpen,
+  toggleModal,
   setIsDetailCardParams,
   setColumnAtom,
 }: IProps) => {
+  const handleCardClick = () => {
+    toggleModal("detailCard", true);
+    setIsDetailCardParams(cards.id);
+    setColumnAtom({ title: columnTitle, columnId });
+  };
+
   return (
     <Draggable draggableId={cards.id.toString()} index={index}>
       {(provided, snapshot) => (
@@ -32,14 +39,7 @@ const ColumnItem = ({
           {...provided.dragHandleProps}
           className={`${snapshot.isDragging ? "opacity-50" : ""}`}
         >
-          <button
-            className="w-full"
-            onClick={() => {
-              setIsDetailCardOpen(true);
-              setIsDetailCardParams(cards.id);
-              setColumnAtom({ title: columnTitle, columnId });
-            }}
-          >
+          <button className="w-full" onClick={handleCardClick}>
             <section className="w-full border-b pb-6 md:border-0 md:pb-0">
               <div className="mt-4 flex flex-col space-y-2 rounded-md border border-gray03 bg-white p-3 md:flex-row md:items-center md:space-x-2 md:space-y-0 md:px-4 xl:flex-col xl:space-x-0 xl:space-y-[6px]">
                 {cards.imageUrl ? (
