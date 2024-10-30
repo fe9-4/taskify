@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { PaginationBtn } from "@/components/button/ButtonComponents";
 import { CiSquarePlus } from "react-icons/ci";
 import { useAtom } from "jotai";
 import { InvitationDashboardAtom } from "@/store/modalAtom";
 import InviteItem from "./InviteItem";
 import Image from "next/image";
+import Pagination from "@/components/pagination/Pagination";
 interface InvitationItem {
   id: number;
   inviter: {
@@ -39,21 +39,13 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
   const [, setIsInvitationDashboardOpen] = useAtom(InvitationDashboardAtom);
 
   const totalPage: number = Math.ceil(totalCount / size);
-  const isFirst = page === 1;
-  const isLast = page === totalPage;
-  const onClickPrev = () => {
-    if (!isFirst) setPage(page - 1);
-  };
-  const onClickNext = () => {
-    if (!isLast) setPage(page + 1);
-  };
 
   const fetchDashboardInvitationList = async () => {
     try {
       setIsLoading(true);
       const res = await axios.get(`/api/dashboards/${dashboardId}/invitations?page=${page}&size=${size}`);
       const data = res.data;
-      
+
       setTotalCount(data.totalCount);
       const uniqueMembers = data.invitations.filter(
         (invitation: InvitationItem, index: number, self: InvitationItem[]) =>
@@ -108,12 +100,7 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
           <div className="text-xs font-normal md:text-base">
             {totalPage} 중 {page}
           </div>
-          <PaginationBtn
-            disabledPrev={isFirst && totalPage === 1}
-            disabledNext={isLast && totalCount < size}
-            onClickPrev={onClickPrev}
-            onClickNext={onClickNext}
-          />
+          <Pagination totalPage={totalPage} setPage={setPage} page={page} />
           <button
             className="absolute bottom-[-26px] right-[20px] flex h-[26px] items-center gap-[10px] rounded bg-violet01 px-3 py-1 text-xs text-white md:relative md:bottom-auto md:right-auto md:h-8 md:py-2"
             type="button"

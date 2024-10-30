@@ -4,7 +4,7 @@ import MemberItem from "./MemberItem";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { Member } from "@/zodSchema/memberSchema";
-import { PaginationBtn } from "@/components/button/ButtonComponents";
+import Pagination from "@/components/pagination/Pagination";
 
 const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
   const [page, setPage] = useState(1);
@@ -14,14 +14,6 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
   const [memberList, setMemberList] = useState<Member[]>([]);
   const [totalCount, setTotalCount] = useState(members?.totalCount);
   const totalPage: number = Math.ceil(totalCount / size);
-  const isFirst = page === 1;
-  const isLast = page === totalPage;
-  const onClickPrev = () => {
-    if (!isFirst) setPage(page - 1);
-  };
-  const onClickNext = () => {
-    if (!isLast) setPage(page + 1);
-  };
 
   // 삭제 요청 시 서버에서 삭제는 되는데 브라우저에서는 500 에러 반환하는 문제 해결해야함
   const onClickDeleteMember = (id: number, nickname: string) => {
@@ -61,12 +53,7 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
           <div className="text-xs font-normal md:text-base">
             {totalPage} 중 {page}
           </div>
-          <PaginationBtn
-            disabledPrev={isFirst && totalPage === 1}
-            disabledNext={isLast && totalCount < size}
-            onClickPrev={onClickPrev}
-            onClickNext={onClickNext}
-          />
+          <Pagination totalPage={totalPage} setPage={setPage} page={page} />
         </div>
       </div>
       <div className="flex items-center justify-center gap-6 px-5 md:px-7">
