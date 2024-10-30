@@ -91,7 +91,7 @@ const CommentList = ({ cardId }: CommentListProps) => {
         comments.map((comment) => (
           <div key={comment.id}>
             <div className="mb-5 flex items-start gap-2 border-b-[1px] border-b-gray03 pb-2">
-              {comment.author && comment.author?.profileImageUrl ? (
+              {comment.author && comment.author.profileImageUrl ? (
                 <div className="relative size-6 overflow-hidden rounded-full md:size-8">
                   <Image src={comment.author.profileImageUrl} fill alt={comment.author.nickname} />
                 </div>
