@@ -9,15 +9,16 @@ import toast from "react-hot-toast";
 
 interface CommentListProps {
   cardId: number;
-  comments: CommentProps[];
-  setComments: Dispatch<SetStateAction<CommentProps[]>>;
+  // comments: CommentProps[];
+  // setComments: Dispatch<SetStateAction<CommentProps[]>>;
 }
 
-const CommentList = ({ cardId, comments, setComments }: CommentListProps) => {
+const CommentList = ({ cardId }: CommentListProps) => {
   const [, setIsAlertOpen] = useAtom(AlertModalAtom);
   const [, setAlertText] = useAtom(AlertModalTextAtom);
   const [, setOnConfirm] = useAtom(AlertModalConfirmAtom);
 
+  const [comments, setComments] = useState<CommentProps[]>([]);
   const [editCommentId, setEditCommentId] = useState<number | null>(null);
   const [editContent, setEditContent] = useState<string>("");
   const [size, setSize] = useState(10);
@@ -26,7 +27,8 @@ const CommentList = ({ cardId, comments, setComments }: CommentListProps) => {
     const getComments = async () => {
       try {
         const response = await axios.get(`/api/comments?size=${size}&cardId=${cardId}`);
-        setComments(response.data.comments);
+        const newCommentList = response.data.comments;
+        setComments(newCommentList);
       } catch (error) {
         if (axios.isAxiosError(error)) {
           console.error("CommentList에서 api 오류 발생", error);
@@ -89,7 +91,7 @@ const CommentList = ({ cardId, comments, setComments }: CommentListProps) => {
         comments.map((comment) => (
           <div key={comment.id}>
             <div className="mb-5 flex items-start gap-2 border-b-[1px] border-b-gray03 pb-2">
-              {comment.author && comment.author.profileImageUrl ? (
+              {comment.author && comment.author?.profileImageUrl ? (
                 <div className="relative size-6 overflow-hidden rounded-full md:size-8">
                   <Image src={comment.author.profileImageUrl} fill alt={comment.author.nickname} />
                 </div>

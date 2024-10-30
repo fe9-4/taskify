@@ -4,9 +4,11 @@ export interface CommentProps {
   createdAt: Date;
   updatedAt: Date;
   cardId: number;
-  author: {
-    id: number;
-    nickname: string;
-    profileImageUrl: string;
-  };
+  author: authorProps;
+}
+
+export interface authorProps {
+  id: number;
+  nickname: string;
+  profileImageUrl: string;
 }
