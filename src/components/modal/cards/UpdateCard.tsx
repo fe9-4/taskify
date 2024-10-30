@@ -20,9 +20,10 @@ import InputTag from "@/components/input/InputTag";
 import InputFile from "@/components/input/InputFile";
 import { useAtom, useAtomValue } from "jotai";
 import useLoading from "@/hooks/useLoading";
-import { UpdateCardAtom, UpdateCardParamsAtom } from "@/store/modalAtom";
+import { UpdateCardParamsAtom } from "@/store/modalAtom";
 import { uploadType } from "@/types/uploadType";
 import { UpdateCardProps } from "@/types/cardType";
+import { useToggleModal } from "@/hooks/useToggleModal";
 
 interface CardDataType extends UpdateCardProps {
   assignee: {
@@ -58,7 +59,7 @@ const UpdateCard = () => {
   const [cardData, setCardData] = useState<CardDataType | null>(null);
   const [tagInput, setTagInput] = useState("");
 
-  const [, setIsUpdateCardOpen] = useAtom(UpdateCardAtom);
+  const toggleModal = useToggleModal();
   const { isLoading, withLoading } = useLoading();
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -201,7 +202,7 @@ const UpdateCard = () => {
         const response = await axios.put(`/api/cards/${cardId}`, cardData);
         if (response.data) {
           toast.success("카드가 수정되었습니다! 🎉");
-          setIsUpdateCardOpen(false);
+          toggleModal("updateCard", false);
         }
       } catch (error) {
         toast.error("카드 수정에 실패하였습니다.");
@@ -327,7 +328,7 @@ const UpdateCard = () => {
         />
 
         <div className="flex h-[42px] gap-3 md:h-[54px] md:gap-2">
-          <CancelBtn type="button" onClick={() => setIsUpdateCardOpen(false)}>
+          <CancelBtn type="button" onClick={() => toggleModal("updateCard", false)}>
             취소
           </CancelBtn>
           <ConfirmBtn type="submit" disabled={!isFormValid || isLoading || isFileUploading}>

@@ -2,15 +2,16 @@ import { useForm, useWatch } from "react-hook-form";
 import InputItem from "../../input/InputItem";
 import { CancelBtn, ConfirmBtn } from "../../button/ButtonComponents";
 import { useAtom, useAtomValue } from "jotai";
-import { ColumnTitlesAtom, CreateColumnAtom, RefreshDashboardAtom } from "@/store/modalAtom";
+import { ColumnTitlesAtom, RefreshDashboardAtom } from "@/store/modalAtom";
 import { useParams } from "next/navigation";
 import useLoading from "@/hooks/useLoading";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useToggleModal } from "@/hooks/useToggleModal";
 
 const CreateColumn = () => {
-  const [, setIsCreateColumnOpen] = useAtom(CreateColumnAtom);
   const [, setRefreshDashboard] = useAtom(RefreshDashboardAtom);
+  const toggleModal = useToggleModal();
   const { dashboardId } = useParams();
   const { isLoading, withLoading } = useLoading();
   const ColumnTitles = useAtomValue(ColumnTitlesAtom);
@@ -29,11 +30,11 @@ const CreateColumn = () => {
       try {
         await axios.post("/api/columns", { ...data, dashboardId: Number(dashboardId) });
         toast.success("컬럼 생성 완료");
-        setIsCreateColumnOpen(false);
+        toggleModal("createColumn", false);
         setRefreshDashboard((prev) => !prev);
       } catch (error) {
         toast.error("컬럼 생성 실패");
-        setIsCreateColumnOpen(false);
+        toggleModal("createColumn", false);
       }
     });
   };
@@ -50,7 +51,7 @@ const CreateColumn = () => {
         errors={isDuplicate ? "중복된 컬럼 이름입니다." : ""}
       />
       <div className="mt-6 flex h-[54px] w-full gap-2">
-        <CancelBtn onClick={() => setIsCreateColumnOpen(false)}>취소</CancelBtn>
+        <CancelBtn onClick={() => toggleModal("createColumn", false)}>취소</CancelBtn>
         <ConfirmBtn disabled={!isValid || isLoading || isDuplicate} onClick={handleSubmit(onSubmit)}>
           생성
         </ConfirmBtn>

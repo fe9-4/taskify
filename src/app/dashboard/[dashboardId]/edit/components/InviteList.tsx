@@ -1,18 +1,17 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { CiSquarePlus } from "react-icons/ci";
-import { useAtom } from "jotai";
-import { InvitationDashboardAtom } from "@/store/modalAtom";
 import InviteItem from "./InviteItem";
 import Image from "next/image";
 import Pagination from "@/components/pagination/Pagination";
 import { useInvitation } from "@/hooks/useInvitation";
 import { Invitation } from "@/zodSchema/invitationSchema";
+import { useToggleModal } from "@/hooks/useToggleModal";
 
 const InviteList = ({ dashboardId }: { dashboardId: number }) => {
   const [page, setPage] = useState(1);
   const size = 5;
-  const [, setIsInvitationDashboardOpen] = useAtom(InvitationDashboardAtom);
+  const toggleModal = useToggleModal();
 
   // useInvitation 훅 사용
   const { invitationList, cancelInvitation, isCanceling } = useInvitation({
@@ -43,7 +42,7 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
           <button
             className="absolute bottom-[-26px] right-[20px] flex h-[26px] items-center gap-[10px] rounded bg-violet01 px-3 py-1 text-xs text-white md:relative md:bottom-auto md:right-auto md:h-8 md:py-2"
             type="button"
-            onClick={() => setIsInvitationDashboardOpen(true)}
+            onClick={() => toggleModal("invitationDashboard", true)}
           >
             초대하기 <CiSquarePlus strokeWidth={1} />
           </button>
