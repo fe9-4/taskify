@@ -57,7 +57,7 @@ export const useMember = ({
     },
     onSuccess: (_, memberId) => {
       const member = queryResult.data?.members.find((m) => m.userId === memberId);
-      toast.success(`멤버 ${member?.nickname}가 삭제되었습니다`);
+      toast.success(`멤버가 삭제되었습니다`);
       queryClient.invalidateQueries({ queryKey: ["members", dashboardId] });
     },
     onError: (error) => {
@@ -68,8 +68,6 @@ export const useMember = ({
 
   // 페이지네이션 관련 계산
   const totalPage = Math.ceil(totalCount / size);
-  const isFirstPage = page === 1;
-  const isLastPage = page === totalPage;
 
   return {
     ...queryResult,
@@ -78,8 +76,6 @@ export const useMember = ({
     pagination: {
       currentPage: page,
       totalPages: totalPage,
-      isFirstPage,
-      isLastPage,
       totalCount,
     },
   };

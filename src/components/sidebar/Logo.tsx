@@ -1,13 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useWidth } from "@/hooks/useWidth";
+import { cls } from "@/lib/utils";
 
-const Logo = () => {
+const Logo = ({ isExpanded }: { isExpanded: boolean }) => {
   const { isLargeScreen } = useWidth();
 
   return (
-    <Link href="/" className="flex w-full items-center justify-center xl:justify-start">
-      {isLargeScreen ? (
+    <Link
+      href="/"
+      className={cls("flex w-full items-center xl:justify-start", isExpanded ? "justify-start" : "justify-center")}
+    >
+      {isLargeScreen || isExpanded ? (
         <Image
           src="/images/header/logo_md.svg"
           alt="로고"

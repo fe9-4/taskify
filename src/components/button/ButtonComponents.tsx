@@ -34,7 +34,7 @@ export const AddDashboardBtn = ({ onClick }: any) => {
 export const AddTodoBtn = ({ onClick }: { onClick: () => void }) => {
   return (
     <BaseBtn onClick={onClick}>
-      <Content extra="h-8 md:h-[40px] md:w-[544px] xl:w-[314px]">
+      <Content extra="h-8 md:h-[40px] w-full">
         <PlusIcon />
       </Content>
     </BaseBtn>

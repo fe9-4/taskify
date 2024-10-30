@@ -1,12 +1,21 @@
 import { useToggleModal } from "@/hooks/useToggleModal";
 import { CiSquarePlus } from "react-icons/ci";
+import { cls } from "@/lib/utils";
 
-const Button = () => {
+const Button = ({ isExpanded }: { isExpanded: boolean }) => {
+  const [, setisCreateDashboardOpen] = useAtom(CreateDashboardAtom);
   const toggleModal = useToggleModal();
 
   return (
-    <div className="flex justify-center md:justify-between">
-      <div className="hidden w-full font-semibold text-gray01 md:block md:text-xs md:leading-5">Dash Boards</div>
+    <div className={cls("flex md:justify-between", isExpanded ? "" : "justify-center")}>
+      <div
+        className={cls(
+          "w-full font-semibold text-gray01 md:block md:text-xs md:leading-5",
+          isExpanded ? "block" : "hidden"
+        )}
+      >
+        Dash Boards
+      </div>
       <button
         type="button"
         onClick={() => toggleModal("createDashboard", true)}
@@ -17,4 +26,5 @@ const Button = () => {
     </div>
   );
 };
+
 export default Button;
