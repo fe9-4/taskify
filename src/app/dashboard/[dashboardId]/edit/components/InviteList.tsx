@@ -53,6 +53,7 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
       setIsLoading(true);
       const res = await axios.get(`/api/dashboards/${dashboardId}/invitations?page=${page}&size=${size}`);
       const data = res.data;
+      
       setTotalCount(data.totalCount);
       const uniqueMembers = data.invitations.filter(
         (invitation: InvitationItem, index: number, self: InvitationItem[]) =>
