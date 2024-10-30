@@ -60,7 +60,7 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
               height={60}
               className="md:size-[100px]"
             />
-            <div className="px-5 md:px-7">아직 초대된 멤버가 없습니다</div>
+            <div className="px-5 text-gray02 md:px-7">아직 초대된 멤버가 없습니다</div>
           </div>
         )}
       </div>

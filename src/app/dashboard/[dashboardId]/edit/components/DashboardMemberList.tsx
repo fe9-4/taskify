@@ -2,11 +2,19 @@ import { useMember } from "@/hooks/useMember";
 import { useState } from "react";
 import MemberItem from "./MemberItem";
 import Pagination from "@/components/pagination/Pagination";
+import { useAuth } from "@/hooks/useAuth";
+import Image from "next/image";
+import { Montserrat } from "next/font/google";
 
+const montserrat = Montserrat({
+  weight: "600",
+  subsets: ["latin"],
+  variable: "--font-montserrat",
+});
 const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
   const [page, setPage] = useState(1);
   const size = 4;
-
+  const { user } = useAuth();
   const { memberData, isLoading, error, deleteMember, pagination } = useMember({
     dashboardId,
     page,
@@ -25,9 +33,9 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
           <Pagination totalPage={totalPages} setPage={setPage} page={page} />
         </div>
       </div>
-      <div className="flex items-center justify-center gap-6 px-5 md:px-7">
-        {isLoading && <div className="pb-5">멤버 정보를 불러오고 있어요</div>}
-        {error && <div className="pb-5">멤버 정보를 불러오는데 실패했습니다</div>}
+      <div className="flex flex-col items-center justify-center gap-6 px-5 md:px-7">
+        {isLoading && <div className="pb-5 text-gray02">멤버 정보를 불러오고 있어요</div>}
+        {error && <div className="pb-5 text-gray02">멤버 정보를 불러오는데 실패했습니다</div>}
       </div>
       {!isLoading && !error && (
         <>
@@ -35,7 +43,7 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
           <ul>
             <li>
               {memberData.members.map((member) => (
-                <MemberItem key={member.id} member={member} onClick={() => deleteMember(member.userId)} />
+                <MemberItem key={member.id} member={member} onClick={() => deleteMember(member.id)} />
               ))}
             </li>
           </ul>
