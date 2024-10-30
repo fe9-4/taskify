@@ -4,6 +4,7 @@ import { DashboardForm, DashboardList, DashboardListSchema } from "@/zodSchema/d
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { DashboardInfoType, ValueType } from "@/types/dashboardType";
+import { useAuth } from "@/hooks/useAuth";
 
 interface UseDashboardListProps extends DashboardForm {
   options?: Omit<UseQueryOptions<DashboardList, Error>, "queryKey" | "queryFn">;
@@ -27,6 +28,7 @@ export const useDashboard = ({
 }: UseDashboardListProps & { dashboardId?: number }) => {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   // 대시보드 상세 정보 조회 쿼리
   const dashboardInfoQuery = useQuery<DashboardInfoType>({
@@ -98,6 +100,7 @@ export const useDashboard = ({
         throw error;
       }
     },
+    enabled: !!user,
     staleTime: 1000 * 60 * 5,
     ...options,
   });
