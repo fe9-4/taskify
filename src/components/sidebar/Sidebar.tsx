@@ -3,7 +3,7 @@ import { usePathname } from "next/navigation";
 import Button from "./Button";
 import DashboardList from "./DashboardList";
 import Logo from "./Logo";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useWidth } from "@/hooks/useWidth";
 import Pagination from "../pagination/Pagination";
 import { useDashboard } from "@/hooks/useDashboard";
