@@ -64,7 +64,9 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
           </div>
         )}
       </div>
-      <div className="px-5 py-[1px] text-base font-normal text-gray02 md:px-7 md:text-lg">이메일</div>
+      {invitationList.invitations.length > 0 && (
+        <div className="px-5 py-[1px] text-base font-normal text-gray02 md:px-7 md:text-lg">이메일</div>
+      )}
       <ul>
         <li>
           {invitationList.invitations.map((item: Invitation) => (
