@@ -60,11 +60,13 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
               height={60}
               className="md:size-[100px]"
             />
-            <div className="px-5 md:px-7">아직 초대된 멤버가 없습니다</div>
+            <div className="px-5 text-gray02 md:px-7">아직 초대된 멤버가 없습니다</div>
           </div>
         )}
       </div>
-      <div className="px-5 py-[1px] text-base font-normal text-gray02 md:px-7 md:text-lg">이메일</div>
+      {invitationList.invitations.length > 0 && (
+        <div className="px-5 py-[1px] text-base font-normal text-gray02 md:px-7 md:text-lg">이메일</div>
+      )}
       <ul>
         <li>
           {invitationList.invitations.map((item: Invitation) => (
