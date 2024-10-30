@@ -7,7 +7,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { UpdateCardSchema, UpdateCardSchemaType, CardResponseSchemaType } from "@/zodSchema/cardSchema";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useAuth } from "@/hooks/useAuth";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { useMember } from "@/hooks/useMember";
 import { formatDateTime } from "@/utils/dateFormat";
@@ -26,6 +25,9 @@ import { UpdateCardProps } from "@/types/cardType";
 import { useToggleModal } from "@/hooks/useToggleModal";
 import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { ICurrentManager } from "@/types/currentManager";
+import { useCard } from "@/hooks/useCard";
+import { currentColumnListAtom } from "@/store/dashboardAtom";
+import { useColumn } from "@/hooks/useColumn";
 
 const UpdateCard = () => {
   const { dashboardId } = useParams();
@@ -38,8 +40,6 @@ const UpdateCard = () => {
   });
 
   const [selectedValue, setSelectedValue] = useState(0);
-
-  const { user } = useAuth();
 
   const {
     uploadFile,
@@ -55,6 +55,17 @@ const UpdateCard = () => {
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const { updateCard } = useCard(Number(columnId));
+
+  const { columns } = useColumn(Number(dashboardId));
+  const [, setCurrentColumnList] = useAtom(currentColumnListAtom);
+
+  useEffect(() => {
+    if (columns) {
+      setCurrentColumnList(columns);
+    }
+  }, [columns, setCurrentColumnList]);
 
   useEffect(() => {
     if (fileError) {
@@ -97,14 +108,14 @@ const UpdateCard = () => {
       const data: CardResponseSchemaType = response.data;
 
       setColumnId(String(data.columnId));
-      setSelectedValue(data.columnId); // 추가된 부분
-
+      setSelectedValue(data.columnId);
       setCardData(data);
       setPreviewUrl(data.imageUrl);
 
       reset({
         ...data,
         assigneeUserId: data.assignee?.id || 0,
+        columnId: data.columnId,
         dueDate: data.dueDate ? formatDateTime(new Date(data.dueDate)) : "",
         tags: data.tags || [],
         imageUrl: data.imageUrl || "",
@@ -119,6 +130,12 @@ const UpdateCard = () => {
     fetchCardData();
   }, [fetchCardData]);
 
+  useEffect(() => {
+    if (selectedValue) {
+      setValue("columnId", selectedValue);
+    }
+  }, [selectedValue, setValue]);
+
   const title = watch("title");
   const description = watch("description");
   const dueDate = useWatch({ control, name: "dueDate" });
@@ -130,7 +147,7 @@ const UpdateCard = () => {
     const hasDescription = description?.trim() !== "";
     const hasDueDate = !!dueDate;
     const hasTags = tags && tags.length > 0;
-    const hasAssignee = assigneeUserId && assigneeUserId > 0; // 수정된 부분
+    const hasAssignee = assigneeUserId && assigneeUserId > 0;
     const hasImage = !!selectedFile || !!previewUrl;
     const hasColumnId = selectedValue > 0;
 
@@ -157,7 +174,7 @@ const UpdateCard = () => {
     }
 
     setSelectedFile(file);
-    setPreviewUrl(URL.createObjectURL(file)); // 미리보기 URL 생성
+    setPreviewUrl(URL.createObjectURL(file));
   };
 
   useEffect(() => {
@@ -185,23 +202,23 @@ const UpdateCard = () => {
           }
         }
 
-        const cardData = {
+        const updateData = {
+          cardId: Number(cardId),
           columnId: selectedValue,
           assigneeUserId: Number(data.assigneeUserId),
           title: data.title.trim(),
           description: data.description.trim(),
           dueDate: data.dueDate,
           tags: data.tags,
-          imageUrl: uploadedImageUrl,
+          imageUrl: uploadedImageUrl || "",
         };
 
-        const response = await axios.put(`/api/cards/${cardId}`, cardData);
-        if (response.status === 200) {
-          toast.success("카드가 수정되었습니다! 🎉");
-          toggleModal("updateCard", false);
-          setDashboardCardUpdate(true);
-        }
+        console.log("카드 수정 데이터:", updateData);
+        await updateCard(updateData);
+        toggleModal("updateCard", false);
+        setDashboardCardUpdate(true);
       } catch (error) {
+        console.error("카드 수정 오류:", error);
         toast.error("카드 수정에 실패하였습니다.");
       }
     });

@@ -3,12 +3,7 @@ import { useMutation, useQueryClient, useInfiniteQuery } from "@tanstack/react-q
 import axios from "axios";
 import toast from "react-hot-toast";
 import { formatDateTime } from "@/utils/dateFormat";
-import {
-  CardListResponseSchemaType,
-  CreateCardSchemaType,
-  UpdateCardSchemaType,
-  CardResponseSchemaType,
-} from "@/zodSchema/cardSchema";
+import { CardListResponseSchemaType, CreateCardSchemaType, UpdateCardSchemaType } from "@/zodSchema/cardSchema";
 
 export const useCard = (columnId?: number, size: number = 10) => {
   const queryClient = useQueryClient();
@@ -54,18 +49,17 @@ export const useCard = (columnId?: number, size: number = 10) => {
 
   // 카드 수정
   const updateMutation = useMutation({
-    mutationFn: async ({ cardId, ...data }: { cardId: number } & UpdateCardSchemaType) => {
-      const formattedData = {
-        ...data,
-        dueDate: data.dueDate ? formatDateTime(new Date(data.dueDate)) : null,
-      };
-      const response = await axios.put(`/api/cards/${cardId}`, formattedData);
+    mutationFn: async (data: { cardId: number } & UpdateCardSchemaType) => {
+      const { cardId, ...updateData } = data;
+      const response = await axios.put(`/api/cards/${cardId}`, updateData);
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cardData"] });
+      toast.success("카드가 수정되었습니다");
+      queryClient.invalidateQueries({ queryKey: ["cardData", columnId] });
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("카드 수정 실패:", error);
       toast.error("카드 수정에 실패했습니다");
     },
   });
@@ -96,7 +90,22 @@ export const useCard = (columnId?: number, size: number = 10) => {
       targetColumnId: number;
       newIndex: number;
     }) => {
-      const response = await axios.put(`/api/cards/${cardId}`, { columnId: targetColumnId, newIndex });
+      // 기존 카드 데이터 조회
+      const cardResponse = await axios.get(`/api/cards/${cardId}`);
+      const existingCard = cardResponse.data;
+
+      // 기존 데이터를 유지하면서 columnId만 업데이트
+      const updateData = {
+        columnId: targetColumnId,
+        assigneeUserId: existingCard.assignee.id,
+        title: existingCard.title,
+        description: existingCard.description,
+        dueDate: existingCard.dueDate,
+        tags: existingCard.tags,
+        imageUrl: existingCard.imageUrl,
+      };
+
+      const response = await axios.put(`/api/cards/${cardId}`, updateData);
       return response.data;
     },
     onMutate: async ({ cardId, targetColumnId }) => {
@@ -132,7 +141,7 @@ export const useCard = (columnId?: number, size: number = 10) => {
     isLoading,
     ...queryRest,
     createCard: createMutation.mutate,
-    updateCard: updateMutation.mutate,
+    updateCard: (data: { cardId: number } & UpdateCardSchemaType) => updateMutation.mutateAsync(data),
     deleteCard: deleteMutation.mutate,
     moveCard,
     isCreating: createMutation.isPending,
