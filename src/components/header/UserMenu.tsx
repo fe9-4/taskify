@@ -54,7 +54,12 @@ export const UserMenu = ({ isHomePage }: UserMenuProps) => {
   };
 
   if (isInitialLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center space-x-2">
+        <div className="h-8 w-8 animate-pulse rounded-full bg-gray-200" />
+        <div className="hidden h-5 w-20 animate-pulse rounded bg-gray-200 md:block" />
+      </div>
+    );
   }
 
   // 로그인하지 않은 사용자를 위한 메뉴 아이템
