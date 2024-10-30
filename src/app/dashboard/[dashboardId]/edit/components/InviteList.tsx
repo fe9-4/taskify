@@ -101,7 +101,7 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
 
   return (
     <>
-      <div className="flex items-center justify-between px-5 pb-[18px] pt-[22px] md:px-7 md:py-[26px]">
+      <div className="relative flex items-center justify-between px-5 pb-[18px] pt-[22px] md:px-7 md:py-[26px]">
         <h2 className="col-start-1 text-2xl font-bold md:text-3xl">초대 내역</h2>
         <div className="flex items-center gap-3 md:gap-4">
           <div className="text-xs font-normal md:text-base">
@@ -114,7 +114,7 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
             onClickNext={onClickNext}
           />
           <button
-            className="flex items-center gap-[10px] rounded bg-violet01 px-3 py-2 text-xs text-white"
+            className="absolute bottom-[-26px] right-[20px] flex h-[26px] items-center gap-[10px] rounded bg-violet01 px-3 py-1 text-xs text-white md:relative md:bottom-auto md:right-auto md:h-8 md:py-2"
             type="button"
             onClick={() => setIsInvitationDashboardOpen(true)}
           >
@@ -127,7 +127,7 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
         {isLoading ? <div className="pb-5">초대 내역을 불러오고 있어요</div> : <></>}
         {error ? <div className="pb-5">초대 내역을 불러오는데 실패했습니다</div> : <></>}
         {!error && !isLoading && inviteList.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-6 py-5">
+          <div className="flex flex-col items-center justify-center gap-6 pb-5 pt-10">
             <Image
               src="/images/myDashboard/invitation.svg"
               alt="초대"
@@ -143,7 +143,7 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
       </div>
       {!error && !isLoading && inviteList.length > 0 && (
         <>
-          <div className="px-5 text-base font-normal text-gray02 md:px-7 md:text-lg">이메일</div>
+          <div className="px-5 py-[1px] text-base font-normal text-gray02 md:px-7 md:text-lg">이메일</div>
           <ul>
             <li>
               {inviteList.map((item) => (
