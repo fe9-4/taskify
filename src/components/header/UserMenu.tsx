@@ -57,7 +57,7 @@ export const UserMenu = ({ isHomePage }: UserMenuProps) => {
     return (
       <div className="flex items-center space-x-2">
         <div className="h-8 w-8 animate-pulse rounded-full bg-gray-200" />
-        <div className="hidden h-4 w-10 animate-pulse rounded bg-gray-200 md:block" />
+        <div className="hidden h-5 w-20 animate-pulse rounded bg-gray-200 md:block" />
       </div>
     );
   }
