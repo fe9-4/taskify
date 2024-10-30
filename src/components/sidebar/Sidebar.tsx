@@ -44,7 +44,7 @@ const Sidebar = () => {
         isExpanded ? "w-[160px]" : "w-[67px]"
       )}
     >
-      <Logo />
+      <Logo isExpanded={isExpanded} />
       <div className="relative flex h-[700px] w-full shrink-0 flex-col">
         <Button isExpanded={isExpanded} />
         <DashboardList list={dashboards.all} isExpanded={isExpanded} />
