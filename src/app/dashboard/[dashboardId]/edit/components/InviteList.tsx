@@ -31,7 +31,7 @@ interface InvitationItem {
 // onClick={() => setIsInvitationDashboardOpen(true)}
 const InviteList = ({ dashboardId }: { dashboardId: number }) => {
   const [page, setPage] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
+  const [totalCount, setTotalCount] = useState(1);
   const size = 5;
   const [inviteList, setInviteList] = useState<InvitationItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
