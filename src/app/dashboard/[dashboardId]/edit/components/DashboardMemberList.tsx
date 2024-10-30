@@ -2,19 +2,10 @@ import { useMember } from "@/hooks/useMember";
 import { useState } from "react";
 import MemberItem from "./MemberItem";
 import Pagination from "@/components/pagination/Pagination";
-import { useAuth } from "@/hooks/useAuth";
-import Image from "next/image";
-import { Montserrat } from "next/font/google";
 
-const montserrat = Montserrat({
-  weight: "600",
-  subsets: ["latin"],
-  variable: "--font-montserrat",
-});
 const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
   const [page, setPage] = useState(1);
   const size = 4;
-  const { user } = useAuth();
   const { memberData, isLoading, error, deleteMember, pagination } = useMember({
     dashboardId,
     page,
