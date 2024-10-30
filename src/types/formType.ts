@@ -16,9 +16,11 @@ export interface InputProps extends textAreaProps {
   className?: string;
   tag?: string;
   size?: string;
+  readOnly?: boolean;
+  disabled?: boolean;
   onChange?: ChangeEventHandler;
   onKeyDown?: KeyboardEventHandler;
-  readOnly?: boolean;
+  onClick?: MouseEventHandler;
 }
 
 export interface textAreaProps {

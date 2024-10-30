@@ -9,7 +9,25 @@ import { cls } from "@/lib/utils";
 import { InsertBtn } from "../button/ButtonComponents";
 
 const InputItem = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, id, name, value, type, isTextArea, isButton, errors, readOnly = false, size, required, ...props }, ref) => {
+  (
+    {
+      label,
+      id,
+      name,
+      value,
+      type,
+      isTextArea,
+      isButton,
+      errors,
+      readOnly = false,
+      size,
+      required,
+      disabled,
+      onClick,
+      ...props
+    },
+    ref
+  ) => {
     const [inputType, setInputType] = useState(type);
     const [password, setPassword] = useState(false);
 
@@ -38,12 +56,14 @@ const InputItem = forwardRef<HTMLInputElement, InputProps>(
               id={id}
               name={name}
               defaultValue={value}
+              ref={ref as React.Ref<HTMLTextAreaElement>}
               readOnly={readOnly}
+              disabled={disabled}
               {...props}
             />
             {isButton && (
               <div className="absolute bottom-3 right-3">
-                <InsertBtn onClick={() => ""}>입력</InsertBtn>
+                <InsertBtn onClick={onClick}>입력</InsertBtn>
               </div>
             )}
           </>
