@@ -10,22 +10,7 @@ import { InsertBtn } from "../button/ButtonComponents";
 
 const InputItem = forwardRef<HTMLInputElement, InputProps>(
   (
-    {
-      label,
-      id,
-      name,
-      value,
-      type,
-      isTextArea,
-      isButton,
-      errors,
-      readOnly = false,
-      size,
-      required,
-      disabled,
-      onClick,
-      ...props
-    },
+    { label, id, name, value, type, isTextArea, isButton, errors, readOnly = false, size, required, onClick, ...props },
     ref
   ) => {
     const [inputType, setInputType] = useState(type);
@@ -58,7 +43,6 @@ const InputItem = forwardRef<HTMLInputElement, InputProps>(
               defaultValue={value}
               ref={ref as React.Ref<HTMLTextAreaElement>}
               readOnly={readOnly}
-              disabled={disabled}
               {...props}
             />
             {isButton && (
