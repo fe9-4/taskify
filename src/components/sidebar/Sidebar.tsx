@@ -20,9 +20,9 @@ const Sidebar = () => {
   const pathname = usePathname();
   const { isLargeScreen } = useWidth();
   const { user } = useAuth();
-  const { dashboards } = useDashboard({ cursorId: 1, page, size });
+  const { dashboardData } = useDashboard();
 
-  const totalPage: number = Math.ceil(dashboards.total / size);
+  const totalPage: number = Math.ceil(dashboardData?.totalCount || 0 / size);
 
   const onClickSidebar = () => {
     if (!isLargeScreen) {
@@ -46,7 +46,7 @@ const Sidebar = () => {
       <Logo isExpanded={isExpanded} />
       <div className="relative flex h-[700px] w-full shrink-0 flex-col">
         <Button isExpanded={isExpanded} />
-        <DashboardList list={dashboards.all} isExpanded={isExpanded} />
+        <DashboardList list={dashboardData?.dashboards || []} isExpanded={isExpanded} />
         <button
           type="button"
           onClick={onClickSidebar}
@@ -60,7 +60,11 @@ const Sidebar = () => {
           <HiChevronDoubleLeft className={cls("size-5 text-gray01", isExpanded ? "" : "hidden")} />
         </button>
         <div className={cls("absolute bottom-0 md:mt-6 md:block xl:mt-8", isExpanded ? "" : "hidden")}>
-          {dashboards.total > size ? <Pagination totalPage={totalPage} setPage={setPage} page={page} /> : <></>}
+          {dashboardData?.totalCount && dashboardData.totalCount > size ? (
+            <Pagination totalPage={totalPage} setPage={setPage} page={page} />
+          ) : (
+            <></>
+          )}
         </div>
       </div>
     </aside>

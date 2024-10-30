@@ -15,21 +15,10 @@ export const DashboardMemberDisplay = () => {
   const toggleModal = useToggleModal();
 
   // 대시보드 목록 조회
-  const {
-    dashboardInfo,
-    getDashboardById,
-    isLoading: isDashboardLoading,
-    error: dashboardError,
-  } = useDashboard({
-    page: 1,
-    size: 10,
-    showErrorToast: true,
-    customErrorMessage: "대시보드를 찾을 수 없습니다.",
-    dashboardId: currentDashboardId || undefined,
-  });
+  const { dashboardInfo, isLoading: isDashboardLoading, error: dashboardError } = useDashboard(currentDashboardId || 0);
 
   // 실제 표시할 대시보드 정보
-  const displayDashboard = dashboardInfo || getDashboardById(currentDashboardId || 0);
+  const displayDashboard = dashboardInfo;
 
   // 멤버 목록 조회
   const {

@@ -9,8 +9,8 @@ export const useColumn = (dashboardId?: string | number) => {
   const queryClient = useQueryClient();
 
   // 컬럼 목록 조회 쿼리
-  const { data: columns, ...queryRest } = useQuery<ColumnListSchemaType>({
-    queryKey: ["columns", dashboardId],
+  const { data: columnData, ...queryRest } = useQuery<ColumnListSchemaType>({
+    queryKey: ["columnData", dashboardId],
     queryFn: async () => {
       const response = await axios.get(`/api/columns?dashboardId=${dashboardId}`);
       return response.data;
@@ -22,7 +22,7 @@ export const useColumn = (dashboardId?: string | number) => {
   const createMutation = useMutation({
     mutationFn: async (data: CreateColumnSchemaType) => {
       // 컬럼 개수 체크
-      if ((columns?.length || 0) >= MAX_COLUMNS) {
+      if ((columnData?.data.length || 0) >= MAX_COLUMNS) {
         throw new Error("컬럼은 최대 10개까지만 생성할 수 있습니다");
       }
       const response = await axios.post("/api/columns", data);
@@ -30,7 +30,7 @@ export const useColumn = (dashboardId?: string | number) => {
     },
     onSuccess: () => {
       toast.success("컬럼이 생성되었습니다");
-      queryClient.invalidateQueries({ queryKey: ["columns", dashboardId] });
+      queryClient.invalidateQueries({ queryKey: ["columnData", dashboardId] });
     },
     onError: (error) => {
       if (error instanceof Error) {
@@ -49,7 +49,7 @@ export const useColumn = (dashboardId?: string | number) => {
     },
     onSuccess: () => {
       toast.success("컬럼이 수정되었습니다");
-      queryClient.invalidateQueries({ queryKey: ["columns", dashboardId] });
+      queryClient.invalidateQueries({ queryKey: ["columnData", dashboardId] });
     },
     onError: () => {
       toast.error("컬럼 수정에 실패했습니다");
@@ -64,7 +64,7 @@ export const useColumn = (dashboardId?: string | number) => {
     },
     onSuccess: () => {
       toast.success("컬럼이 삭제되었습니다");
-      queryClient.invalidateQueries({ queryKey: ["columns", dashboardId] });
+      queryClient.invalidateQueries({ queryKey: ["columnData", dashboardId] });
     },
     onError: () => {
       toast.error("컬럼 삭제에 실패했습니다");
@@ -86,7 +86,7 @@ export const useColumn = (dashboardId?: string | number) => {
   });
 
   return {
-    columns: columns || [],
+    columns: columnData?.data || [],
     ...queryRest,
     createColumn: createMutation.mutate,
     updateColumn: updateMutation.mutate,
@@ -96,7 +96,7 @@ export const useColumn = (dashboardId?: string | number) => {
     isUpdating: updateMutation.isPending,
     isDeleting: deleteMutation.isPending,
     isUploading: uploadImageMutation.isPending,
-    totalColumns: columns?.length || 0,
-    canAddColumn: (columns?.length || 0) < MAX_COLUMNS,
+    totalColumns: columnData?.data.length || 0,
+    canAddColumn: (columnData?.data.length || 0) < MAX_COLUMNS,
   };
 };

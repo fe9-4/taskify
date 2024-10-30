@@ -29,6 +29,9 @@ export const ColumnSchema = z.object({
 export type ColumnSchemaType = z.infer<typeof ColumnSchema>;
 
 // 컬럼 목록 응답 스키마 (배열 형태로 수정)
-export const ColumnListSchema = z.array(ColumnSchema);
+export const ColumnListSchema = z.object({
+  result: z.string(),
+  data: z.array(ColumnSchema),
+});
 
 export type ColumnListSchemaType = z.infer<typeof ColumnListSchema>;

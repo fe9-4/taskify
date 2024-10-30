@@ -1,6 +1,14 @@
 import { z } from "zod";
 import { DateSchema } from "./commonSchema";
 
+// 대시보드 수정 요청 스키마
+export const UpdateDashboardSchema = z.object({
+  title: z.string(),
+  color: z.string(),
+});
+
+export type UpdateDashboard = z.infer<typeof UpdateDashboardSchema>;
+
 // 대시보드 목록 요청 스키마
 export const DashboardFormSchema = z.object({
   cursorId: z.number().optional(),

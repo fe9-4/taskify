@@ -28,13 +28,13 @@ const DashboardDetail = () => {
     const targetColumnId = parseInt(destination.droppableId);
 
     if (source.droppableId !== destination.droppableId) {
-      await moveCard(cardId, targetColumnId, destination.index);
+      await moveCard(cardId, targetColumnId, Number(dashboardId));
     }
   };
 
   const handleColumnBtn = () => {
-    const columTitles = columns?.map((column) => column.title) || [];
-    setColumnTitles(columTitles);
+    const columnTitles = columns?.map((column) => column.title) || [];
+    setColumnTitles(columnTitles);
     toggleModal("createColumn", true);
   };
 
