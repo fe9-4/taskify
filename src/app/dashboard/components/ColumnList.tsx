@@ -16,6 +16,7 @@ import {
 } from "@/store/modalAtom";
 import { ICard } from "@/types/dashboardType";
 import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
+import { Droppable } from "@hello-pangea/dnd";
 
 interface IProps {
   columnTitle: string;
@@ -35,10 +36,10 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [dashboardCardUpdate, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
   const observeRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
-  
+
   const getCardList = useCallback(async () => {
     if (!hasMore) return;
-    
+
     try {
       const response = await axios.get(`/api/cards?size=${size}&columnId=${columnId}`);
 
@@ -116,33 +117,39 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
           <HiOutlineCog className="size-[22px] text-gray01" />
         </button>
       </div>
-      <div className="flex flex-col space-y-2">
-        <AddTodoBtn
-          onClick={() => {
-            setIsCreateCardOpen(true);
-            setIsCreateCardParams(columnId);
-          }}
-        />
-        {cardList.length > 0 ? (
-          cardList.map((item, i) => (
-            <div key={item.id}>
-              <button
-                className="size-full"
-                onClick={() => {
-                  setIsDetailCardOpen(true);
-                  setIsDetailCardParams(item.id);
-                  setColumnAtom({ title: columnTitle, columnId });
-                }}
-              >
-                <ColumnItem cards={item} />
-                {i === cardList.length - 1 && <div ref={loadingRef} className="h-[1px]" />}
-              </button>
-            </div>
-          ))
-        ) : (
-          <p className="flex items-center justify-center text-center font-bold">등록된 카드가 없습니다.</p>
+      <Droppable droppableId={columnId.toString()} type="CARD">
+        {(provided, snapshot) => (
+          <div
+            ref={provided.innerRef}
+            {...provided.droppableProps}
+            className={`flex min-h-[100px] flex-col space-y-2 ${snapshot.isDraggingOver ? "bg-gray-50" : ""}`}
+          >
+            <AddTodoBtn
+              onClick={() => {
+                setIsCreateCardOpen(true);
+                setIsCreateCardParams(columnId);
+              }}
+            />
+            {cardList.length > 0 ? (
+              cardList.map((item, index) => (
+                <ColumnItem
+                  key={item.id}
+                  cards={item}
+                  index={index}
+                  columnId={columnId}
+                  columnTitle={columnTitle}
+                  setIsDetailCardOpen={setIsDetailCardOpen}
+                  setIsDetailCardParams={setIsDetailCardParams}
+                  setColumnAtom={setColumnAtom}
+                />
+              ))
+            ) : (
+              <p className="flex items-center justify-center text-center font-bold">등록된 카드가 없습니다.</p>
+            )}
+            {provided.placeholder}
+          </div>
         )}
-      </div>
+      </Droppable>
     </div>
   );
 };
