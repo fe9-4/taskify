@@ -6,16 +6,10 @@ import { useAtom } from "jotai";
 import { HiOutlineCog } from "react-icons/hi";
 import { NumChip } from "../../../components/chip/PlusAndNumChip";
 import { AddTodoBtn } from "../../../components/button/ButtonComponents";
-import {
-  ColumnAtom,
-  CreateCardAtom,
-  CreateCardParamsAtom,
-  DetailCardAtom,
-  DetailCardParamsAtom,
-  EditColumnAtom,
-} from "@/store/modalAtom";
+import { ColumnAtom, CreateCardParamsAtom, DetailCardParamsAtom } from "@/store/modalAtom";
 import { ICard } from "@/types/dashboardType";
 import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
+import { useToggleModal } from "@/hooks/useToggleModal";
 
 interface IProps {
   columnTitle: string;
@@ -26,11 +20,9 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [cardList, setCardList] = useState<ICard["cards"]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [size, setSize] = useState(3);
-  const [, setIsCreateCardOpen] = useAtom(CreateCardAtom);
-  const [, setIsEditColumnOpen] = useAtom(EditColumnAtom);
+  const toggleModal = useToggleModal();
   const [, setColumnAtom] = useAtom(ColumnAtom);
   const [, setIsCreateCardParams] = useAtom(CreateCardParamsAtom);
-  const [, setIsDetailCardOpen] = useAtom(DetailCardAtom);
   const [, setIsDetailCardParams] = useAtom(DetailCardParamsAtom);
   const [dashboardCardUpdate, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
   const observeRef = useRef<IntersectionObserver | null>(null);
@@ -99,7 +91,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
 
   const handleEditModal = () => {
     setColumnAtom({ title: columnTitle, columnId });
-    setIsEditColumnOpen(true);
+    toggleModal("editColumn", true);
   };
 
   return (
@@ -119,8 +111,8 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
       <div className="flex flex-col space-y-2">
         <AddTodoBtn
           onClick={() => {
-            setIsCreateCardOpen(true);
             setIsCreateCardParams(columnId);
+            toggleModal("createCard", true);
           }}
         />
         {cardList.length > 0 ? (
@@ -129,7 +121,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
               <button
                 className="size-full"
                 onClick={() => {
-                  setIsDetailCardOpen(true);
+                  toggleModal("detailCard", true);
                   setIsDetailCardParams(item.id);
                   setColumnAtom({ title: columnTitle, columnId });
                 }}

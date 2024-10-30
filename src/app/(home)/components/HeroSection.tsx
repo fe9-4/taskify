@@ -26,7 +26,7 @@ const HeroSection = () => {
         href={user ? "/mydashboard" : "/login"}
         className="mb-[76px] flex h-[46px] w-[235px] items-center justify-center rounded-lg bg-violet01 text-white md:mb-[180px] md:h-[54px] md:w-[280px]"
       >
-        로그인하기
+        {user ? "내 대시보드로 이동하기" : "로그인하기"}
       </Link>
     </div>
   );

@@ -5,16 +5,14 @@ import { useDashboard } from "@/hooks/useDashboard";
 import { useMember } from "@/hooks/useMember";
 import Image from "next/image";
 import { useRouter, useParams } from "next/navigation";
-import { useSetAtom } from "jotai";
-import { InvitationDashboardAtom } from "@/store/modalAtom";
+import { useToggleModal } from "@/hooks/useToggleModal";
 
 export const DashboardMemberDisplay = () => {
   const router = useRouter();
   const params = useParams();
   const currentDashboardId = params?.dashboardId ? Number(params.dashboardId) : null;
 
-  // 초대하기 모달 상태 관리
-  const setIsInvitationDashboardOpen = useSetAtom(InvitationDashboardAtom);
+  const toggleModal = useToggleModal();
 
   // 대시보드 목록 조회
   const {
@@ -48,7 +46,7 @@ export const DashboardMemberDisplay = () => {
 
   // 초대하기 버튼 클릭 핸들러
   const handleInviteClick = () => {
-    setIsInvitationDashboardOpen(true);
+    toggleModal("invitationDashboard", true);
   };
 
   // 관리 버튼 클릭 핸들러

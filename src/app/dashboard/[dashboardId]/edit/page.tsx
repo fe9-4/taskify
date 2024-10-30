@@ -11,13 +11,14 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import useLoading from "@/hooks/useLoading";
 import { useAtom } from "jotai";
-import { AlertModalAtom, AlertModalConfirmAtom, AlertModalTextAtom } from "@/store/modalAtom";
+import { AlertModalConfirmAtom, AlertModalTextAtom } from "@/store/modalAtom";
+import { useToggleModal } from "@/hooks/useToggleModal";
 
 const EditPage = () => {
   const { dashboardId } = useParams();
   const router = useRouter();
   const { isLoading, withLoading } = useLoading();
-  const [, setIsAlertOpen] = useAtom(AlertModalAtom);
+  const toggleModal = useToggleModal();
   const [, setAlertText] = useAtom(AlertModalTextAtom);
   const [, setOnConfirm] = useAtom(AlertModalConfirmAtom);
   const id = Number(dashboardId);
@@ -56,7 +57,7 @@ const EditPage = () => {
           onClick={() => {
             setOnConfirm(() => onDelete);
             setAlertText("대시보드를 삭제하시겠습니까?");
-            setIsAlertOpen(true);
+            toggleModal("deleteModal", true);
           }}
           disabled={isLoading}
         />
