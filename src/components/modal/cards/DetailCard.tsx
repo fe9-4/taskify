@@ -4,6 +4,7 @@ import {
   AlertModalAtom,
   AlertModalConfirmAtom,
   AlertModalTextAtom,
+  ColumnAtom,
   DetailCardAtom,
   DetailCardParamsAtom,
   UpdateCardAtom,
@@ -15,13 +16,12 @@ import Image from "next/image";
 import { CardDataProps } from "@/types/cardType";
 import { StatusTitleChip } from "../../chip/StatusChip";
 import TagChip from "@/components/chip/TagChip";
-import InputItem from "@/components/input/InputItem";
-
-const buttonBaseClasses =
-  "block w-full px-4 py-1 text-center text-base font-medium text-black03 hover:rounded-md hover:bg-violet-100 hover:text-violet01";
+import EditDeleteDropdown from "@/components/dropdown/EditDeleteDropdown";
+import CreateComment from "../comments/CreateComment";
 
 const DetailCard = () => {
   const cardId = useAtomValue(DetailCardParamsAtom);
+  const column = useAtomValue(ColumnAtom);
   const [cardData, setCardData] = useState<CardDataProps>();
 
   const [, setIsDetailCardOpen] = useAtom(DetailCardAtom);
@@ -83,10 +83,10 @@ const DetailCard = () => {
     };
   }, []);
 
-  const handleUpdate = () => {
+  const handleEdit = () => {
     if (cardData) {
       setIsUpdateCardOpen(true);
-      setIsUpdateCardParams(String(cardData.id));
+      setIsUpdateCardParams(cardData.id);
       setIsDetailCardOpen(false);
     }
   };
@@ -101,16 +101,7 @@ const DetailCard = () => {
                 <button onClick={toggleDropdown} className="relative size-5 md:size-7">
                   <Image src="/icons/kebab_icon.svg" fill alt="모달 수정, 삭제하기" />
                 </button>
-                {isOpen && (
-                  <div className="absolute right-6 top-7 w-[100px] rounded-md bg-white p-2 ring-1 ring-inset ring-gray03 transition-all focus:outline-none focus:ring-1 focus:ring-inset md:right-10 md:top-8">
-                    <button className={buttonBaseClasses} onClick={handleUpdate}>
-                      수정하기
-                    </button>
-                    <button className={buttonBaseClasses} onClick={handleDelete}>
-                      삭제하기
-                    </button>
-                  </div>
-                )}
+                {isOpen && <EditDeleteDropdown handleEdit={handleEdit} handleDelete={handleDelete} />}
                 <button onClick={closeModal} className="relative size-3 md:size-4">
                   <Image src="/icons/cancel_icon.svg" fill alt="모달 취소" />
                 </button>
@@ -142,7 +133,7 @@ const DetailCard = () => {
 
               <div className="flex flex-1 flex-col gap-y-4">
                 <div className="flex flex-wrap items-center gap-3">
-                  <StatusTitleChip title="To Do" />
+                  <StatusTitleChip title={column.title} />
                   <span className="h-[20px] w-[1px] bg-gray03 md:mx-2"></span>
                   {card.tags.map((tag, index) => (
                     <TagChip tag={tag} key={`${tag}-${index + 1}`} />
@@ -168,26 +159,7 @@ const DetailCard = () => {
         ))}
 
       {/* 임시 댓글 창 */}
-      <h3 className="mb-2 text-base font-medium md:text-lg">댓글</h3>
-      <InputItem isTextArea isButton placeholder="댓글 작성하기" />
-
-      <div className="mt-4">
-        <div className="mb-2 flex items-start gap-2">
-          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-yellow-500 text-white">
-            C
-          </div>
-          <div>
-            <p className="text-sm font-semibold">
-              장한철 <span className="text-gray-400">2022.12.27 14:00</span>
-            </p>
-            <p>오늘안에 CCC 까지 만들 수 있을까요?</p>
-            <div className="mt-1 flex space-x-2 text-sm text-gray-500">
-              <button>수정</button>
-              <button>삭제</button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <CreateComment cardId={cardId} columnId={column.columnId} />
     </section>
   );
 };

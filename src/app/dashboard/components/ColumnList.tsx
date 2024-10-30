@@ -120,7 +120,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
         <AddTodoBtn
           onClick={() => {
             setIsCreateCardOpen(true);
-            setIsCreateCardParams(String(columnId));
+            setIsCreateCardParams(columnId);
           }}
         />
         {cardList.length > 0 ? (
@@ -130,7 +130,8 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
                 className="size-full"
                 onClick={() => {
                   setIsDetailCardOpen(true);
-                  setIsDetailCardParams(String(item.id));
+                  setIsDetailCardParams(item.id);
+                  setColumnAtom({ title: columnTitle, columnId });
                 }}
               >
                 <ColumnItem cards={item} />
