@@ -24,7 +24,15 @@ const CommentList = ({ cardId, columnId }: CommentListProps) => {
       const nextCursorId = response.data.cursorId;
 
       if (newCommentList.length > 0) {
-        setComments((prev) => [...prev, ...newCommentList]);
+        setComments((prevComments) => {
+          const uniqueComments = [
+            ...prevComments,
+            ...newCommentList.filter(
+              (newComment: CommentProps) => !prevComments.some((prevComment) => prevComment.id === newComment.id)
+            ),
+          ];
+          return uniqueComments.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        });
         setCursorId(nextCursorId);
       } else {
         setCursorId(null);
@@ -37,7 +45,7 @@ const CommentList = ({ cardId, columnId }: CommentListProps) => {
     } finally {
       setIsLoading(false);
     }
-  }, [cardId, isLoading, size, cursorId]);
+  }, [cardId, isLoading, size, comments]);
 
   useEffect(() => {
     getComments();
@@ -60,8 +68,8 @@ const CommentList = ({ cardId, columnId }: CommentListProps) => {
             등록된 댓글이 없습니다.
           </p>
         )}
+        <div ref={setObserveTarget} style={{ height: "1px" }} />
       </div>
-      <div ref={setObserveTarget} style={{ height: "1px" }} />
       {isLoading && <p className="text-gray02">Loading...</p>}
     </>
   );

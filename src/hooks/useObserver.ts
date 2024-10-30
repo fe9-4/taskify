@@ -6,8 +6,9 @@ const useIntersectionObserver = (callback: () => void) => {
   const observer = useRef(
     new IntersectionObserver(
       ([entry]) => {
-        if (!entry.isIntersecting) return;
-        callback();
+        if (entry.isIntersecting) {
+          callback();
+        }
       },
       { threshold: 1 }
     )
