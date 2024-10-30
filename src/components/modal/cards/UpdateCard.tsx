@@ -24,6 +24,7 @@ import { UpdateCardParamsAtom } from "@/store/modalAtom";
 import { uploadType } from "@/types/uploadType";
 import { UpdateCardProps } from "@/types/cardType";
 import { useToggleModal } from "@/hooks/useToggleModal";
+import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 
 interface CardDataType extends UpdateCardProps {
   assignee: {
@@ -33,12 +34,12 @@ interface CardDataType extends UpdateCardProps {
     email: string;
     profileImageUrl: string | null;
   };
-  status?: string;
 }
 
 const UpdateCard = () => {
   const { dashboardId } = useParams();
   const cardId = useAtomValue(UpdateCardParamsAtom);
+  const [, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
   const [columnId, setColumnId] = useState<string>("");
 
   const { memberData } = useMember({
@@ -46,7 +47,7 @@ const UpdateCard = () => {
   });
 
   const [selectedValue, setSelectedValue] = useState(0);
-
+  
   const { user } = useAuth();
 
   const {
@@ -106,7 +107,6 @@ const UpdateCard = () => {
       const data = response.data;
 
       setColumnId(String(data.columnId));
-      setSelectedValue(data.status || "toDo");
 
       setCardData(data);
       setPreviewUrl(data.imageUrl);
@@ -188,7 +188,7 @@ const UpdateCard = () => {
         }
 
         const cardData = {
-          columnId: Number(columnId),
+          columnId: selectedValue,
           assigneeUserId: Number(data.assigneeUserId),
           title: data.title,
           description: data.description,
@@ -198,13 +198,14 @@ const UpdateCard = () => {
         };
 
         const response = await axios.put(`/api/cards/${cardId}`, cardData);
-        if (response.data) {
+        if (response.status === 200) {
           toast.success("카드가 수정되었습니다! 🎉");
           toggleModal("updateCard", false);
+          setDashboardCardUpdate(true);
         }
       } catch (error) {
         toast.error("카드 수정에 실패하였습니다.");
-      }
+      } 
     });
   };
 

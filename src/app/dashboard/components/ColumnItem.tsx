@@ -1,46 +1,24 @@
-import { HiOutlineCalendar } from "react-icons/hi";
 import Image from "next/image";
 import TagChip from "@/components/chip/TagChip";
 import { Iitem } from "@/types/dashboardType";
-import { useAtom } from "jotai";
-import { currentColumnIdAtom } from "@/store/dashboardAtom";
-import { useEffect } from "react";
+import { HiOutlineCalendar } from "react-icons/hi";
 
 interface IProps {
   cards: Iitem;
 }
 
 const ColumnItem = ({ cards }: IProps) => {
-  const [, setCurrentColumnId] = useAtom(currentColumnIdAtom);
-
-  useEffect(() => {
-    if (cards) {
-      setCurrentColumnId(cards.columnId);
-    }
-  }, [cards, setCurrentColumnId]);
-
   return (
     <section className="w-full border-b pb-6 md:border-0 md:pb-0">
       <div className="mt-4 flex flex-col space-y-2 rounded-md border border-gray03 bg-white p-3 md:flex-row md:items-center md:space-x-2 md:space-y-0 md:px-4 xl:flex-col xl:space-x-0 xl:space-y-[6px]">
-        {cards.imageUrl ? (
-          <Image
-            src={cards.imageUrl}
-            alt="카드 이미지1"
-            width={260}
-            height={150}
-            className="w-full max-h-[150px] object-cover md:h-[53px] md:w-[90px] xl:h-40 xl:w-full rounded-md"
-            priority={true}
-          />
-        ) : (
-          <Image
-          src="/images/cardImg1.png"
+        <Image
+          src={cards.imageUrl}
           alt="카드 이미지1"
           width={260}
           height={150}
-          className="w-full object-cover md:h-[53px] md:w-[90px] xl:h-40 xl:w-full rounded-md"
+          className="max-h-[150px] w-full rounded-md object-cover md:h-[53px] md:w-[90px] xl:h-40 xl:w-full"
           priority={true}
         />
-        )}
         <div className="flex flex-col space-y-[6px] md:w-full md:flex-row md:space-x-[6px] xl:flex-col">
           <div className="flex w-full flex-col space-y-[6px]">
             <h3 className="text-start font-medium">{cards.title}</h3>

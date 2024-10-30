@@ -13,14 +13,16 @@ interface IProps {
   setSelectedValueId: Dispatch<SetStateAction<number>>;
 }
 
-// 상태값 변경함수를 보내서 드롭다운에서 값을 받아 쓰세요.
+// 현재 열린 모달의 컬럼정보는 받아오고 있습니다. 
+// 드롭다운에서 값을 선택하면 해당 컬럼의 title은 화면에 표시되는 용도로 쓰이고, id는 updateCard로 전달됩니다.
 const StatusDropdown = ({ setSelectedValueId }: IProps) => {
   const currentColumnList = useAtomValue(currentColumnListAtom);
   const column = useAtomValue(ColumnAtom);
+
   const [isOpen, setIsOpen] = useState(false);
-  const [value, setValue] = useState(column.title || "toDo");
+  const [value, setValue] = useState(column.title);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  console.log(currentColumnList)
+  
   const handleClickOutside = (e: MouseEvent) => {
     if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
       setIsOpen(false);

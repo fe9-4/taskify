@@ -8,7 +8,7 @@ import { NumChip } from "../../../components/chip/PlusAndNumChip";
 import { AddTodoBtn } from "../../../components/button/ButtonComponents";
 import { ColumnAtom, CreateCardParamsAtom, DetailCardParamsAtom } from "@/store/modalAtom";
 import { ICard } from "@/types/dashboardType";
-import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
+import { currentColumnListAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { useToggleModal } from "@/hooks/useToggleModal";
 
 interface IProps {
@@ -28,7 +28,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [dashboardCardUpdate, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
   const observeRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
-
+  
   const getCardList = useCallback(async () => {
     if (!hasMore) return;
 
@@ -82,20 +82,32 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
     };
   }, [hasMore, size, getCardList]);
 
+  // 카드 실시간 업데이트
   useEffect(() => {
     if (dashboardCardUpdate) {
       getCardList();
+
+      setCardList((prev) => prev.filter((card) => card.columnId !== columnId));
+
       setHasMore(true);
       setDashboardCardUpdate(false);
     }
-  }, [getCardList, dashboardCardUpdate, setDashboardCardUpdate]);
+  }, [getCardList, dashboardCardUpdate, columnId]);
 
+  // 카드 수정시 드롭다운에 보내는 데이터
   useEffect(() => {
     if (columnTitle && columnId) {
       setCurrentColumnList((prev) => {
         const newColumn = { id: columnId, title: columnTitle };
-        return [...prev, newColumn];
-      })
+
+        const checkList = prev.some((column) => column.id === columnId);
+
+        if (!checkList) {
+          return [...prev, newColumn];
+        }
+
+        return prev;
+      });
     }
   }, [columnTitle, columnId, setCurrentColumnList]);
 
@@ -118,7 +130,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
           <HiOutlineCog className="size-[22px] text-gray01" />
         </button>
       </div>
-      <div className="flex flex-col space-y-2 min-w-[314px]">
+      <div className="flex min-w-[314px] flex-col space-y-2">
         <AddTodoBtn
           onClick={() => {
             setIsCreateCardParams(columnId);

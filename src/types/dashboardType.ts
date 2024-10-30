@@ -35,7 +35,7 @@ export interface Iitem {
   tags: string[];
   dueDate: string;
   assignee: IAssignee;
-  imageUrl: string | null;
+  imageUrl: string;
   teamId: string;
   columnId: number;
   createdAt: string;
@@ -53,6 +53,7 @@ export interface CreateDashboard {
   color: string;
 }
 
+// 현재 대시보드 내 컬럼들의 id, title 타입
 export interface ICurrentColumn {
   id: number;
   title: string;
