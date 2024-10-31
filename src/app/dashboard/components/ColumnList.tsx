@@ -1,17 +1,14 @@
-import Image from "next/image";
-import toast from "react-hot-toast";
+import { useEffect, memo } from "react";
 import ColumnItem from "./ColumnItem";
-import { useEffect } from "react";
 import { useAtom } from "jotai";
 import { HiOutlineCog } from "react-icons/hi";
 import { NumChip } from "../../../components/chip/PlusAndNumChip";
 import { AddTodoBtn } from "../../../components/button/ButtonComponents";
 import { ColumnAtom, CreateCardParamsAtom, DetailCardParamsAtom } from "@/store/modalAtom";
 import { currentColumnListAtom } from "@/store/dashboardAtom";
-import { useToggleModal } from "@/hooks/useToggleModal";
+import { useToggleModal } from "@/hooks/useModal";
 import { Droppable, Draggable } from "@hello-pangea/dnd";
 import { CardDataProps } from "@/types/cardType";
-import React from "react";
 
 interface IProps {
   columnTitle: string;
@@ -99,4 +96,4 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards }: IProps) =
   );
 };
 
-export default React.memo(ColumnList);
+export default memo(ColumnList);

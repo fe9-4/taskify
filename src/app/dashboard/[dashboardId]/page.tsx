@@ -8,7 +8,7 @@ import { useParams } from "next/navigation";
 import { AddColumnBtn } from "@/components/button/ButtonComponents";
 import { useAtom, useAtomValue } from "jotai";
 import { ColumnTitlesAtom, RefreshDashboardAtom } from "@/store/modalAtom";
-import { useToggleModal } from "@/hooks/useToggleModal";
+import { useToggleModal } from "@/hooks/useModal";
 import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
 import { CardDataProps } from "@/types/cardType";

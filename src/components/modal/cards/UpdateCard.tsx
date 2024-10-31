@@ -1,12 +1,13 @@
 "use client";
 
 import { ChangeEvent, useEffect, useState, useCallback, useMemo } from "react";
-import { useForm, SubmitHandler, Controller, useWatch, UseFormSetValue } from "react-hook-form";
+import { useForm, SubmitHandler, Controller, useWatch } from "react-hook-form";
 import { useParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UpdateCardSchemaType, UpdateCardSchema } from "@/zodSchema/cardSchema";
+import { UpdateCardSchema } from "@/zodSchema/cardSchema";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { useMember } from "@/hooks/useMember";
 import { formatDateTime } from "@/utils/dateFormat";
@@ -21,14 +22,19 @@ import { useAtom, useAtomValue } from "jotai";
 import useLoading from "@/hooks/useLoading";
 import { UpdateCardParamsAtom } from "@/store/modalAtom";
 import { uploadType } from "@/types/uploadType";
-import { CardDataProps, UpdateCardProps } from "@/types/cardType";
-import { useToggleModal } from "@/hooks/useToggleModal";
+import { UpdateCardProps } from "@/types/cardType";
+import { useToggleModal } from "@/hooks/useModal";
 import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
-import { ICurrentManager } from "@/types/currentManager";
-import { useCard } from "@/hooks/useCard";
-import { currentColumnListAtom } from "@/store/dashboardAtom";
-import { useColumn } from "@/hooks/useColumn";
-import { ICurrentColumn } from "@/types/dashboardType";
+
+interface CardDataType extends UpdateCardProps {
+  assignee: {
+    id: number;
+    userId: number;
+    nickname: string;
+    email: string;
+    profileImageUrl: string | null;
+  };
+}
 
 const UpdateCard = () => {
   const { dashboardId } = useParams();
@@ -36,13 +42,13 @@ const UpdateCard = () => {
   const [, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
   const [columnId, setColumnId] = useState<string>("");
 
-  if (!dashboardId) throw new Error("Dashboard ID is required");
-
   const { memberData } = useMember({
     dashboardId: Number(dashboardId),
   });
 
   const [selectedValue, setSelectedValue] = useState(0);
+
+  const { user } = useAuth();
 
   const {
     uploadFile,
@@ -50,7 +56,7 @@ const UpdateCard = () => {
     error: fileError,
   } = useFileUpload(`/api/columns/${columnId}/card-image`, uploadType.CARD);
 
-  const [cardData, setCardData] = useState<CardDataProps | null>(null);
+  const [cardData, setCardData] = useState<CardDataType | null>(null);
   const [tagInput, setTagInput] = useState("");
 
   const toggleModal = useToggleModal();
@@ -58,17 +64,6 @@ const UpdateCard = () => {
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
-  const { updateCard } = useCard(Number(columnId));
-
-  const { columnList } = useColumn({ dashboardId: Number(dashboardId) });
-  const [, setCurrentColumnList] = useAtom(currentColumnListAtom);
-
-  useEffect(() => {
-    if (columnList) {
-      setCurrentColumnList(columnList as unknown as ICurrentColumn[]);
-    }
-  }, [columnList, setCurrentColumnList]);
 
   useEffect(() => {
     if (fileError) {
@@ -81,22 +76,22 @@ const UpdateCard = () => {
     register,
     handleSubmit,
     setValue,
-    control,
+    reset,
     watch,
     trigger,
+    control,
     formState: { errors },
-    reset,
-  } = useForm<UpdateCardSchemaType>({
+  } = useForm<UpdateCardProps>({
     resolver: zodResolver(UpdateCardSchema),
     mode: "onChange",
     defaultValues: {
-      assigneeUserId: 0,
+      assigneeUserId: Number(user?.id) || 0,
       columnId: Number(columnId),
       title: "",
       description: "",
       dueDate: "",
       tags: [],
-      imageUrl: "",
+      imageUrl: null,
     },
   });
 
@@ -108,20 +103,18 @@ const UpdateCard = () => {
 
     try {
       const response = await axios.get(`/api/cards/${cardId}`);
-      const data: CardDataProps = response.data;
+      const data = response.data;
 
       setColumnId(String(data.columnId));
-      setSelectedValue(data.columnId);
+
       setCardData(data);
       setPreviewUrl(data.imageUrl);
 
       reset({
         ...data,
-        assigneeUserId: data.assignee?.id || 0,
-        columnId: data.columnId,
-        dueDate: data.dueDate ? formatDateTime(new Date(data.dueDate)) : "",
+        assigneeUserId: data.assignee.id,
         tags: data.tags || [],
-        imageUrl: data.imageUrl || "",
+        imageUrl: data.imageUrl,
       });
     } catch (error) {
       console.error("카드 데이터 불러오기 실패:", error);
@@ -133,29 +126,22 @@ const UpdateCard = () => {
     fetchCardData();
   }, [fetchCardData]);
 
-  useEffect(() => {
-    if (selectedValue) {
-      setValue("columnId", selectedValue);
-    }
-  }, [selectedValue, setValue]);
-
-  const title = watch("title");
-  const description = watch("description");
   const dueDate = useWatch({ control, name: "dueDate" });
   const tags = useWatch({ control, name: "tags" });
-  const assigneeUserId = watch("assigneeUserId");
+  const title = watch("title");
+  const description = watch("description");
 
-  const isFormValid = useMemo(() => {
-    const hasTitle = title?.trim() !== "";
-    const hasDescription = description?.trim() !== "";
-    const hasDueDate = !!dueDate;
-    const hasTags = tags && tags.length > 0;
-    const hasAssignee = assigneeUserId && assigneeUserId > 0;
-    const hasImage = !!selectedFile || !!previewUrl;
-    const hasColumnId = selectedValue > 0;
-
-    return hasTitle && hasDescription && hasDueDate && hasTags && hasAssignee && hasImage && hasColumnId;
-  }, [title, description, dueDate, tags, assigneeUserId, selectedFile, previewUrl, selectedValue]);
+  const isFormValid = useMemo(
+    () =>
+      title?.trim() !== "" &&
+      description?.trim() !== "" &&
+      !!dueDate &&
+      tags.length > 0 &&
+      (selectedFile !== null || previewUrl !== null) &&
+      !!selectedValue &&
+      Number(watch("assigneeUserId")) > 0,
+    [title, description, dueDate, tags, selectedFile, previewUrl, selectedValue, watch]
+  );
 
   const handleAddTag = (tag: string) => {
     if (tagInput.trim() && !tags.includes(tag)) {
@@ -168,7 +154,7 @@ const UpdateCard = () => {
     if (!file) {
       setSelectedFile(null);
       setPreviewUrl(null);
-      setValue("imageUrl", "");
+      setValue("imageUrl", null);
       return;
     }
 
@@ -177,7 +163,7 @@ const UpdateCard = () => {
     }
 
     setSelectedFile(file);
-    setPreviewUrl(URL.createObjectURL(file));
+    setPreviewUrl(null);
   };
 
   useEffect(() => {
@@ -188,12 +174,7 @@ const UpdateCard = () => {
     };
   }, [previewUrl]);
 
-  const onSubmit: SubmitHandler<UpdateCardSchemaType> = async (data) => {
-    if (!selectedFile && !previewUrl) {
-      toast.error("이미지를 선택해주세요");
-      return;
-    }
-
+  const onSubmit: SubmitHandler<UpdateCardProps> = async (data) => {
     await withLoading(async () => {
       try {
         let uploadedImageUrl = previewUrl;
@@ -205,23 +186,23 @@ const UpdateCard = () => {
           }
         }
 
-        const updateData = {
-          cardId: Number(cardId),
+        const cardData = {
           columnId: selectedValue,
           assigneeUserId: Number(data.assigneeUserId),
-          title: data.title.trim(),
-          description: data.description.trim(),
+          title: data.title,
+          description: data.description,
           dueDate: data.dueDate,
           tags: data.tags,
-          imageUrl: uploadedImageUrl || "",
+          imageUrl: uploadedImageUrl,
         };
 
-        await updateCard(updateData);
-        toggleModal("updateCard", false);
-        setDashboardCardUpdate(true);
-        setTimeout(() => setDashboardCardUpdate(false), 100);
+        const response = await axios.put(`/api/cards/${cardId}`, cardData);
+        if (response.status === 200) {
+          toast.success("카드가 수정되었습니다! 🎉");
+          toggleModal("updateCard", false);
+          setDashboardCardUpdate(true);
+        }
       } catch (error) {
-        console.error("카드 수정 오류:", error);
         toast.error("카드 수정에 실패하였습니다.");
       }
     });
@@ -241,15 +222,18 @@ const UpdateCard = () => {
       <form onSubmit={handleSubmit(onSubmit)} className="grid gap-8">
         <div className="grid gap-8 md:flex md:gap-7">
           <StatusDropdown setSelectedValueId={setSelectedValue} />
+
           <Controller
             name="assigneeUserId"
             control={control}
-            defaultValue={cardData?.assignee?.id || 0}
+            defaultValue={cardData?.assignee?.userId}
             render={({ field }) => {
               const selectedMember = memberData.members.find((member) => member.userId === field.value);
 
               const currentManager = selectedMember || {
                 id: cardData?.assignee?.id || 0,
+                userId: cardData?.assignee?.userId || 0,
+                email: cardData?.assignee?.email || "",
                 nickname: cardData?.assignee?.nickname || "",
                 profileImageUrl: cardData?.assignee?.profileImageUrl || null,
               };
@@ -257,12 +241,12 @@ const UpdateCard = () => {
               return (
                 <SearchDropdown
                   inviteMemberList={memberData.members}
-                  currentManager={currentManager as ICurrentManager}
+                  currentManager={currentManager}
                   setManager={(manager) => {
                     field.onChange(manager.userId);
                     setValue("assigneeUserId", manager.userId);
                   }}
-                  setValue={setValue as unknown as UseFormSetValue<UpdateCardProps>}
+                  setValue={setValue}
                   validation={managerValidation}
                 />
               );
@@ -292,6 +276,7 @@ const UpdateCard = () => {
           size="description"
           required
           errors={errors.description && errors.description.message}
+          value={watch("description")}
         />
 
         <Controller
