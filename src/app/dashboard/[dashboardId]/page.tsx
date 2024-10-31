@@ -95,6 +95,7 @@ const DashboardDetail = () => {
         const newColumns = prevColumns.map((column) => {
           if (column.id === sourceColumnId) {
             const newCards = Array.from(column.cards);
+            const [movedCard] = newCards.splice(source.index, 1);
             return { ...column, cards: newCards };
           }
           if (column.id === destinationColumnId) {
