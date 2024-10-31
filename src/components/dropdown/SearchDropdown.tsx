@@ -10,7 +10,7 @@ import { HiCheck } from "react-icons/hi";
 
 interface IProps {
   inviteMemberList: ICurrentManager[];
-  currentManager: ICurrentManager;
+  currentManager: ICurrentManager | undefined;
   setManager: (manager: ICurrentManager) => void;
   setValue: UseFormSetValue<CreateCardProps | UpdateCardProps>;
 }

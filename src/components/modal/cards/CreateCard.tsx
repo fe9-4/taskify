@@ -30,8 +30,12 @@ const CreateCard = () => {
   const { dashboardId } = useParams();
   const columnId = useAtomValue(CreateCardParamsAtom);
   const { memberData } = useMember({ dashboardId: Number(dashboardId) });
+
   const [tagInput, setTagInput] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const { isLoading, withLoading } = useLoading();
+
   const toggleModal = useToggleModal();
   const [, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
 
@@ -59,7 +63,7 @@ const CreateCard = () => {
     resolver: zodResolver(CardSchema),
     mode: "onChange",
     defaultValues: {
-      assigneeUserId: Number(user && user.id),
+      assigneeUserId: Number(user?.id || 0),
       dashboardId: Number(dashboardId),
       columnId: Number(columnId),
       title: "",
@@ -75,11 +79,7 @@ const CreateCard = () => {
   const title = watch("title");
   const description = watch("description");
 
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
-  const isFormValid =
-    title?.trim() !== "" && description?.trim() !== "" && !!dueDate && tags.length > 0 && selectedFile !== null;
+  const isFormValid = title.trim() && description.trim() && dueDate && tags.length > 0 && selectedFile !== null;
 
   const handleAddTag = (tag: string) => {
     if (tagInput.trim() && !tags.includes(tag)) {
@@ -90,38 +90,36 @@ const CreateCard = () => {
 
   const handleImageChange = (file: string | File | null) => {
     if (!file) {
-      setSelectedFile(null);
-      setPreviewUrl(null);
-      setValue("imageUrl", null);
+      resetImage();
       return;
     }
 
-    if (!(file instanceof File)) {
-      return;
+    if (file instanceof File) {
+      setSelectedFile(file);
+      const preview = URL.createObjectURL(file);
+      setPreviewUrl(preview);
     }
+  };
 
-    setSelectedFile(file);
-    const preview = URL.createObjectURL(file);
-    setPreviewUrl(preview);
+  const resetImage = () => {
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    setValue("imageUrl", null);
   };
 
   const onSubmit: SubmitHandler<CreateCardProps> = async (data) => {
     await withLoading(async () => {
+      console.log(data);
       try {
         let uploadedImageUrl = null;
         if (selectedFile) {
           uploadedImageUrl = await uploadFile(selectedFile);
-          if (!uploadedImageUrl) {
-            throw new Error("이미지 업로드 실패");
-          }
+          if (!uploadedImageUrl) throw new Error("이미지 업로드 실패");
         }
 
-        const cardData = {
-          ...data,
-          imageUrl: uploadedImageUrl,
-        };
-
+        const cardData = { ...data, imageUrl: uploadedImageUrl };
         const response = await axios.post(`/api/cards`, cardData);
+
         if (response.data) {
           toast.success("카드가 생성되었습니다! 🎉");
           toggleModal("createCard", false);
@@ -142,9 +140,7 @@ const CreateCard = () => {
           name="assigneeUserId"
           control={control}
           render={({ field }) => {
-            const selectedMember = memberData.members.find((member) => member.userId === field.value);
-
-            const currentManager = selectedMember || {
+            const selectedMember = memberData.members.find((member) => member.userId === field.value) || {
               id: 0,
               userId: 0,
               email: "",
@@ -155,7 +151,7 @@ const CreateCard = () => {
             return (
               <SearchDropdown
                 inviteMemberList={memberData.members}
-                currentManager={currentManager}
+                currentManager={selectedMember}
                 setManager={(manager) => {
                   field.onChange(manager.userId);
                   setValue("assigneeUserId", manager.userId);
@@ -171,7 +167,7 @@ const CreateCard = () => {
           id="title"
           {...register("title")}
           placeholder="제목을 입력해 주세요"
-          errors={errors.title && errors.title.message}
+          errors={errors.title?.message}
         />
 
         <InputItem
@@ -186,26 +182,15 @@ const CreateCard = () => {
           isTextArea
           size="description"
           placeholder="설명을 입력해 주세요"
-          errors={errors.description && errors.description.message}
+          errors={errors.description?.message}
         />
 
-        <Controller
-          name="dueDate"
-          control={control}
-          render={({ field }) => (
-            <InputDate
-              label="마감일"
-              id="dueDate"
-              name="dueDate"
-              value={field.value}
-              onChange={(date) => {
-                const formattedDate = date ? formatDateTime(date) : "";
-                field.onChange(formattedDate);
-                setValue("dueDate", formattedDate);
-              }}
-              placeholder="날짜를 입력해 주세요"
-            />
-          )}
+        <InputDate
+          label="마감일"
+          id="dueDate"
+          placeholder="날짜를 입력해 주세요"
+          value={watch("dueDate")}
+          onChange={(formattedDate) => setValue("dueDate", formattedDate)}
         />
 
         <InputTag

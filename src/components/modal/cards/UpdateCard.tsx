@@ -39,31 +39,29 @@ interface CardDataType extends UpdateCardProps {
 const UpdateCard = () => {
   const { user } = useAuth();
   const { dashboardId } = useParams();
-
   const cardId = useAtomValue(UpdateCardParamsAtom);
   const column = useAtomValue(ColumnAtom);
-
-  const [columnId, setColumnId] = useState<number>(column.columnId);
   const { memberData } = useMember({ dashboardId: Number(dashboardId) });
-  const { isLoading, withLoading } = useLoading();
-  const [selectedValue, setSelectedValue] = useState(column.columnId);
-  const [cardData, setCardData] = useState<CardDataType | null>(null);
+
   const [tagInput, setTagInput] = useState("");
-  const toggleModal = useToggleModal();
-  const [, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
+  const [cardData, setCardData] = useState<CardDataType | null>(null);
+  const [selectedValue, setSelectedValue] = useState(column.columnId);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const { isLoading, withLoading } = useLoading();
+
+  const toggleModal = useToggleModal();
+  const [, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
 
   const {
     uploadFile,
     isPending: isFileUploading,
     error: fileError,
-  } = useFileUpload(`/api/columns/${columnId}/card-image`, uploadType.CARD);
+  } = useFileUpload(`/api/columns/${selectedValue}/card-image`, uploadType.CARD);
 
   useEffect(() => {
     if (fileError) {
       toast.error("이미지 업로드 중 오류가 발생했습니다.");
-      console.error("파일 업로드 에러:", fileError);
     }
   }, [fileError]);
 
@@ -81,7 +79,7 @@ const UpdateCard = () => {
     mode: "onChange",
     defaultValues: {
       assigneeUserId: Number(user?.id) || 0,
-      columnId: Number(columnId),
+      columnId: column.columnId,
       title: "",
       description: "",
       dueDate: "",
@@ -91,16 +89,12 @@ const UpdateCard = () => {
   });
 
   const fetchCardData = useCallback(async () => {
-    if (!cardId) {
-      console.error("카드 ID가 없습니다.");
-      return;
-    }
+    if (!cardId) return;
 
     try {
       const response = await axios.get(`/api/cards/${cardId}`);
       const data = response.data;
 
-      setColumnId(data.columnId);
       setCardData(data);
       setPreviewUrl(data.imageUrl);
 
@@ -108,9 +102,8 @@ const UpdateCard = () => {
         ...data,
         assigneeUserId: data.assignee.id,
         tags: data.tags || [],
-        imageUrl: data.imageUrl,
       });
-    } catch (error) {
+    } catch {
       toast.error("카드 데이터를 불러오는데 실패했습니다.");
     }
   }, [cardId, reset]);
@@ -126,12 +119,12 @@ const UpdateCard = () => {
 
   const isFormValid = useMemo(
     () =>
-      title?.trim() !== "" &&
-      description?.trim() !== "" &&
+      title.trim() !== "" &&
+      description.trim() !== "" &&
       !!dueDate &&
       tags.length > 0 &&
       (selectedFile !== null || previewUrl !== null) &&
-      !!selectedValue &&
+      selectedValue > 0 &&
       Number(watch("assigneeUserId")) > 0,
     [title, description, dueDate, tags, selectedFile, previewUrl, selectedValue, watch]
   );
@@ -151,17 +144,15 @@ const UpdateCard = () => {
       return;
     }
 
-    if (!(file instanceof File)) {
-      return;
+    if (file instanceof File) {
+      setSelectedFile(file);
+      setPreviewUrl(null);
     }
-
-    setSelectedFile(file);
-    setPreviewUrl(null);
   };
 
   useEffect(() => {
     return () => {
-      if (previewUrl && previewUrl.startsWith("blob:")) {
+      if (previewUrl?.startsWith("blob:")) {
         URL.revokeObjectURL(previewUrl);
       }
     };
@@ -174,9 +165,7 @@ const UpdateCard = () => {
 
         if (selectedFile) {
           uploadedImageUrl = await uploadFile(selectedFile);
-          if (!uploadedImageUrl) {
-            throw new Error("이미지 업로드 실패");
-          }
+          if (!uploadedImageUrl) throw new Error("이미지 업로드 실패");
         }
 
         const cardData = {
@@ -195,7 +184,7 @@ const UpdateCard = () => {
           toggleModal("updateCard", false);
           setDashboardCardUpdate(true);
         }
-      } catch (error) {
+      } catch {
         toast.error("카드 수정에 실패하였습니다.");
       }
     });
@@ -208,34 +197,23 @@ const UpdateCard = () => {
       <form onSubmit={handleSubmit(onSubmit)} className="grid gap-8">
         <div className="grid gap-8 md:flex md:gap-7">
           <StatusDropdown setSelectedValueId={setSelectedValue} />
-
           <Controller
             name="assigneeUserId"
             control={control}
             defaultValue={cardData?.assignee?.userId}
-            render={({ field }) => {
-              const selectedMember = memberData.members.find((member) => member.userId === field.value);
-
-              const currentManager = selectedMember || {
-                id: cardData?.assignee?.id || 0,
-                userId: cardData?.assignee?.userId || 0,
-                email: cardData?.assignee?.email || "",
-                nickname: cardData?.assignee?.nickname || "",
-                profileImageUrl: cardData?.assignee?.profileImageUrl || null,
-              };
-
-              return (
-                <SearchDropdown
-                  inviteMemberList={memberData.members}
-                  currentManager={currentManager}
-                  setManager={(manager) => {
-                    field.onChange(manager.userId);
-                    setValue("assigneeUserId", manager.userId);
-                  }}
-                  setValue={setValue}
-                />
-              );
-            }}
+            render={({ field }) => (
+              <SearchDropdown
+                inviteMemberList={memberData.members}
+                currentManager={
+                  field.value ? memberData.members.find((member) => member.userId === field.value) : cardData?.assignee
+                }
+                setManager={(manager) => {
+                  field.onChange(manager.userId);
+                  setValue("assigneeUserId", manager.userId);
+                }}
+                setValue={setValue}
+              />
+            )}
           />
         </div>
 
@@ -244,7 +222,7 @@ const UpdateCard = () => {
           id="title"
           {...register("title")}
           placeholder="제목을 입력해 주세요"
-          errors={errors.title && errors.title.message}
+          errors={errors.title?.message}
         />
 
         <InputItem
@@ -259,7 +237,7 @@ const UpdateCard = () => {
           isTextArea
           size="description"
           placeholder="설명을 입력해 주세요"
-          errors={errors.description && errors.description.message}
+          errors={errors.description?.message}
           value={watch("description")}
         />
 
@@ -270,13 +248,8 @@ const UpdateCard = () => {
             <InputDate
               label="마감일"
               id="dueDate"
-              name="dueDate"
               value={field.value}
-              onChange={(date) => {
-                const formattedDate = date ? formatDateTime(date) : "";
-                field.onChange(formattedDate);
-                setValue("dueDate", formattedDate);
-              }}
+              onChange={field.onChange}
               placeholder="날짜를 입력해 주세요"
             />
           )}
@@ -294,7 +267,7 @@ const UpdateCard = () => {
           onClick={(tag) =>
             setValue(
               "tags",
-              tags.filter((t: string) => t !== tag)
+              tags.filter((t) => t !== tag)
             )
           }
           onChange={(e: ChangeEvent<HTMLInputElement>) => setTagInput(e.target.value)}

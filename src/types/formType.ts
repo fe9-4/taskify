@@ -36,11 +36,10 @@ export interface InputFileProps {
 
 export interface InputDateProps {
   id: string;
-  name: string;
   label: string;
   value: string | any;
   placeholder: string;
-  onChange: (date: Date | null) => void;
+  onChange: (date: string) => void;
 }
 
 export interface InputTagProps {
