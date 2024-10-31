@@ -11,6 +11,7 @@ export const GET = async (request: Request) => {
   const { searchParams } = new URL(request.url);
   const cardId = searchParams.get("cardId");
   const size = searchParams.get("size");
+  const cursorId = searchParams.get("cursorId");
 
   if (!accessToken) {
     return NextResponse.json({ error: "인증되지 않은 사용자" }, { status: 401 });
@@ -21,11 +22,14 @@ export const GET = async (request: Request) => {
   }
 
   try {
-    const response = await apiClient.get(`/comments?size=${size}&cardId=${cardId}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+    const response = await apiClient.get(
+      `/comments?size=${size}${cursorId ? `&cursorId=${cursorId}` : ""}&cardId=${cardId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
 
     return NextResponse.json(response.data, { status: 200 });
   } catch (error) {

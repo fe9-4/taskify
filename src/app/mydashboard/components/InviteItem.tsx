@@ -55,6 +55,7 @@ const InviteItem = ({ invitationList, setInvitationList }: IProps) => {
       if (response.status === 200) {
         toast.success("초대를 거절하였습니다.");
         setInvitationList((prev) => prev.filter((item) => item.id !== id));
+        setMyDashboardUpdated(true);
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {

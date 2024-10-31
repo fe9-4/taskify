@@ -18,7 +18,7 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
     dashboardId,
   });
 
-  const totalPage: number = Math.ceil(invitationList.totalCount / size);
+  const totalPage: number = Math.ceil(invitationList.totalCount / size) || 1;
 
   const onClickCancelInvitation = async (invitationId: number) => {
     try {
