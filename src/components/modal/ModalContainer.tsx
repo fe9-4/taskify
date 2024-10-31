@@ -13,7 +13,7 @@ import UpdateCard from "@/components/modal/cards/UpdateCard";
 import CreateColumn from "./columns/CreateColumn";
 import InvitationDashboard from "./dashboard/InvitationDashboard";
 import EditColumn from "./columns/EditColumn";
-import { useToggleModal } from "@/hooks/useToggleModal";
+import { useToggleModal } from "@/hooks/useModal";
 
 Modal.setAppElement("#modal-root");
 

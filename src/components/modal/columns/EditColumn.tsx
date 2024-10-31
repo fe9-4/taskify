@@ -7,7 +7,7 @@ import useLoading from "@/hooks/useLoading";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { IoIosClose } from "react-icons/io";
-import { useDeleteModal, useToggleModal } from "@/hooks/useToggleModal";
+import { useDeleteModal, useToggleModal } from "@/hooks/useModal";
 
 const EditColumn = () => {
   const toggleModal = useToggleModal();

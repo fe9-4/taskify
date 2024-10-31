@@ -1,4 +1,4 @@
-import { useToggleModal } from "@/hooks/useToggleModal";
+import { useToggleModal } from "@/hooks/useModal";
 import { CiSquarePlus } from "react-icons/ci";
 import { cls } from "@/lib/utils";
 

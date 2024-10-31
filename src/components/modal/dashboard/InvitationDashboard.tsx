@@ -9,7 +9,7 @@ import { useMember } from "@/hooks/useMember";
 import { FormData, FormSchema, Invitation } from "@/zodSchema/invitationSchema";
 import { useDashboard } from "@/hooks/useDashboard";
 import { useInvitation } from "@/hooks/useInvitation";
-import { useToggleModal } from "@/hooks/useToggleModal";
+import { useToggleModal } from "@/hooks/useModal";
 
 const InvitationDashboard = () => {
   const toggleModal = useToggleModal();

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import { ColumnAtom, DetailCardParamsAtom, UpdateCardParamsAtom } from "@/store/modalAtom";
-import { useDeleteModal, useToggleModal } from "@/hooks/useToggleModal";
+import { useDeleteModal, useToggleModal } from "@/hooks/useModal";
 import axios from "axios";
 import toast from "react-hot-toast";
 import Image from "next/image";

@@ -10,7 +10,7 @@ import Section from "./components/Section";
 import toast from "react-hot-toast";
 import axios from "axios";
 import useLoading from "@/hooks/useLoading";
-import { useDeleteModal } from "@/hooks/useToggleModal";
+import { useDeleteModal } from "@/hooks/useModal";
 
 const EditPage = () => {
   const { dashboardId } = useParams();

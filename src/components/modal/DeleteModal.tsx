@@ -1,4 +1,4 @@
-import { useToggleModal } from "@/hooks/useToggleModal";
+import { useToggleModal } from "@/hooks/useModal";
 import { CancelBtn, ConfirmBtn } from "../button/ButtonComponents";
 import { useAtomValue } from "jotai";
 import { DeleteModalStateAtom } from "@/store/modalAtom";
