@@ -48,6 +48,12 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards }: IProps) =
     toggleModal("editColumn", true);
   };
 
+  const handleCardClick = (cardId: number) => {
+    setIsDetailCardParams(cardId);
+    setColumnAtom({ title: columnTitle, columnId });
+    toggleModal("detailCard", true);
+  };
+
   return (
     <div className="space-y-6 px-4 pt-4 md:border-b md:border-gray04 md:pb-6 xl:flex xl:min-h-screen xl:flex-col xl:border-b-0 xl:border-r">
       <div className="flex items-center justify-between" {...dragHandleProps}>
@@ -78,6 +84,7 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards }: IProps) =
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     className={`${snapshot.isDragging ? "opacity-50" : ""}`}
+                    onClick={() => handleCardClick(item.id)}
                   >
                     <ColumnItem card={item} dragHandleProps={provided.dragHandleProps} />
                   </div>
