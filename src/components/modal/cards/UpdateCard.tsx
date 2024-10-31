@@ -20,7 +20,7 @@ import InputTag from "@/components/input/InputTag";
 import InputFile from "@/components/input/InputFile";
 import { useAtom, useAtomValue } from "jotai";
 import useLoading from "@/hooks/useLoading";
-import { UpdateCardParamsAtom } from "@/store/modalAtom";
+import { ColumnAtom, UpdateCardParamsAtom } from "@/store/modalAtom";
 import { uploadType } from "@/types/uploadType";
 import { UpdateCardProps } from "@/types/cardType";
 import { useToggleModal } from "@/hooks/useModal";
@@ -37,33 +37,28 @@ interface CardDataType extends UpdateCardProps {
 }
 
 const UpdateCard = () => {
-  const { dashboardId } = useParams();
-  const cardId = useAtomValue(UpdateCardParamsAtom);
-  const [, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
-  const [columnId, setColumnId] = useState<string>("");
-
-  const { memberData } = useMember({
-    dashboardId: Number(dashboardId),
-  });
-
-  const [selectedValue, setSelectedValue] = useState(0);
-
   const { user } = useAuth();
+  const { dashboardId } = useParams();
+
+  const cardId = useAtomValue(UpdateCardParamsAtom);
+  const column = useAtomValue(ColumnAtom);
+
+  const [columnId, setColumnId] = useState<number>(column.columnId);
+  const { memberData } = useMember({ dashboardId: Number(dashboardId) });
+  const { isLoading, withLoading } = useLoading();
+  const [selectedValue, setSelectedValue] = useState(column.columnId);
+  const [cardData, setCardData] = useState<CardDataType | null>(null);
+  const [tagInput, setTagInput] = useState("");
+  const toggleModal = useToggleModal();
+  const [, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const {
     uploadFile,
     isPending: isFileUploading,
     error: fileError,
   } = useFileUpload(`/api/columns/${columnId}/card-image`, uploadType.CARD);
-
-  const [cardData, setCardData] = useState<CardDataType | null>(null);
-  const [tagInput, setTagInput] = useState("");
-
-  const toggleModal = useToggleModal();
-  const { isLoading, withLoading } = useLoading();
-
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (fileError) {
@@ -105,8 +100,7 @@ const UpdateCard = () => {
       const response = await axios.get(`/api/cards/${cardId}`);
       const data = response.data;
 
-      setColumnId(String(data.columnId));
-
+      setColumnId(data.columnId);
       setCardData(data);
       setPreviewUrl(data.imageUrl);
 
