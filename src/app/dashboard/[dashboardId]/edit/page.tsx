@@ -36,7 +36,7 @@ const EditPage = () => {
   };
 
   return (
-    <div className="m-5 mt-0 flex w-[284px] flex-col md:w-[544px] xl:w-[620px]">
+    <div className="mx-5 flex w-[284px] flex-col md:w-[544px] xl:w-[620px]">
       <div className="flex items-center gap-[6px] pb-[10px] pt-4 md:gap-2 md:py-5 xl:pb-[34px]">
         <IoIosArrowBack className="size-[18px]" />
         <Link href={`/dashboard/${dashboardId}`} className="text-base md:text-lg">
@@ -52,7 +52,7 @@ const EditPage = () => {
           <InviteList dashboardId={id} />
         </Section>
       </div>
-      <div className="mt-6">
+      <div className="my-6">
         <DeleteDashboardBtn
           onClick={() => {
             setOnConfirm(() => onDelete);

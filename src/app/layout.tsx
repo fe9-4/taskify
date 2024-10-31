@@ -23,12 +23,12 @@ export const metadata: Metadata = {
   openGraph: {
     title: {
       template: "%s | Taskify",
-      default: "새로운 일정관리 | Taskify"
+      default: "새로운 일정관리 | Taskify",
     },
     description: "새로운 일정관리 | Taskify",
     images: "/icons/favicon.ico",
-    url: "http://localhost:3000/"
-  }
+    url: "http://localhost:3000/",
+  },
 };
 
 export default function RootLayout({

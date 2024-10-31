@@ -26,7 +26,7 @@ const DetailCard = () => {
   const [, setAlertText] = useAtom(AlertModalTextAtom);
   const [, setOnConfirm] = useAtom(AlertModalConfirmAtom);
   const [, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
-  
+
   const toggleModal = useToggleModal();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -50,12 +50,11 @@ const DetailCard = () => {
   const ondelete = async () => {
     try {
       const response = await axios.delete(`/api/cards/${cardId}`);
-      if (response.status === 201) { 
+      if (response.status === 201) {
         toast.success("카드가 삭제되었습니다.");
         toggleModal("detailCard", false);
         setDashboardCardUpdate(true);
-      } 
-      
+      }
     } catch (error) {
       if (axios.isAxiosError(error)) {
         toast.error("카드 삭제에 실패하였습니다.");
