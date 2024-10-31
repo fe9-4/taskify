@@ -10,17 +10,13 @@ import Section from "./components/Section";
 import toast from "react-hot-toast";
 import axios from "axios";
 import useLoading from "@/hooks/useLoading";
-import { useAtom } from "jotai";
-import { AlertModalConfirmAtom, AlertModalTextAtom } from "@/store/modalAtom";
-import { useToggleModal } from "@/hooks/useToggleModal";
+import { useDeleteModal } from "@/hooks/useModal";
 
 const EditPage = () => {
   const { dashboardId } = useParams();
   const router = useRouter();
   const { isLoading, withLoading } = useLoading();
-  const toggleModal = useToggleModal();
-  const [, setAlertText] = useAtom(AlertModalTextAtom);
-  const [, setOnConfirm] = useAtom(AlertModalConfirmAtom);
+  const setDeleteModal = useDeleteModal();
   const id = Number(dashboardId);
 
   const onDelete = async () => {
@@ -55,9 +51,7 @@ const EditPage = () => {
       <div className="my-6">
         <DeleteDashboardBtn
           onClick={() => {
-            setOnConfirm(() => onDelete);
-            setAlertText("대시보드를 삭제하시겠습니까?");
-            toggleModal("deleteModal", true);
+            setDeleteModal(onDelete, "대시보드를 삭제하시겠습니까?");
           }}
           disabled={isLoading}
         />

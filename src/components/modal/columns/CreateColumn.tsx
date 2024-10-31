@@ -7,7 +7,7 @@ import { useParams } from "next/navigation";
 import useLoading from "@/hooks/useLoading";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useToggleModal } from "@/hooks/useToggleModal";
+import { useToggleModal } from "@/hooks/useModal";
 
 const CreateColumn = () => {
   const [, setRefreshDashboard] = useAtom(RefreshDashboardAtom);

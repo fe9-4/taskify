@@ -23,7 +23,7 @@ import { useAtom, useAtomValue } from "jotai";
 import { CreateCardParamsAtom } from "@/store/modalAtom";
 import { uploadType } from "@/types/uploadType";
 import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
-import { useToggleModal } from "@/hooks/useToggleModal";
+import { useToggleModal } from "@/hooks/useModal";
 
 const CreateCard = () => {
   const { user } = useAuth();
