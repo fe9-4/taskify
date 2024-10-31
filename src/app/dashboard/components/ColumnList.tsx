@@ -9,7 +9,7 @@ import { AddTodoBtn } from "../../../components/button/ButtonComponents";
 import { ColumnAtom, CreateCardParamsAtom, DetailCardParamsAtom } from "@/store/modalAtom";
 import { ICard } from "@/types/dashboardType";
 import { currentColumnListAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
-import { useToggleModal } from "@/hooks/useToggleModal";
+import { useToggleModal } from "@/hooks/useModal";
 
 interface IProps {
   columnTitle: string;
@@ -28,7 +28,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [dashboardCardUpdate, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
   const observeRef = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement | null>(null);
-  
+
   const getCardList = useCallback(async () => {
     if (!hasMore) return;
 

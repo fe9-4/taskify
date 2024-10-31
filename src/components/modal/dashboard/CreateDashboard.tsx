@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import useLoading from "@/hooks/useLoading";
 import { CancelBtn, ConfirmBtn } from "../../button/ButtonComponents";
-import { useToggleModal } from "@/hooks/useToggleModal";
+import { useToggleModal } from "@/hooks/useModal";
 
 const CreateDashboard = () => {
   const {

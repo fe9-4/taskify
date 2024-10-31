@@ -2,24 +2,17 @@ import { useForm, useWatch } from "react-hook-form";
 import InputItem from "../../input/InputItem";
 import { CancelBtn, ConfirmBtn } from "../../button/ButtonComponents";
 import { useAtom, useAtomValue } from "jotai";
-import {
-  AlertModalConfirmAtom,
-  AlertModalTextAtom,
-  ColumnAtom,
-  ColumnTitlesAtom,
-  RefreshDashboardAtom,
-} from "@/store/modalAtom";
+import { ColumnAtom, ColumnTitlesAtom, RefreshDashboardAtom } from "@/store/modalAtom";
 import useLoading from "@/hooks/useLoading";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { IoIosClose } from "react-icons/io";
-import { useToggleModal } from "@/hooks/useToggleModal";
+import { useDeleteModal, useToggleModal } from "@/hooks/useModal";
 
 const EditColumn = () => {
   const toggleModal = useToggleModal();
+  const setDeleteModal = useDeleteModal();
   const [, setRefreshDashboard] = useAtom(RefreshDashboardAtom);
-  const [, setAlertText] = useAtom(AlertModalTextAtom);
-  const [, setOnConfirm] = useAtom(AlertModalConfirmAtom);
   const { isLoading, withLoading } = useLoading();
   const ColumnTitles = useAtomValue(ColumnTitlesAtom);
   const Column = useAtomValue(ColumnAtom);
@@ -81,9 +74,7 @@ const EditColumn = () => {
       <div className="mt-6 flex h-[54px] w-full gap-2">
         <CancelBtn
           onClick={() => {
-            setOnConfirm(() => onDelete);
-            setAlertText("컬럼의 모든 카드가 삭제됩니다.");
-            toggleModal("deleteModal", true);
+            setDeleteModal(onDelete, "컬럼의 모든 카드가 삭제됩니다.");
           }}
         >
           삭제
