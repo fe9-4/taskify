@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const CardSchema = z.object({
-  assigneeUserId: z.number().min(1, "담당자를 선택해주세요"),
+  assigneeUserId: z.number(),
   dashboardId: z.number(),
   columnId: z.number(),
   title: z.string().min(1, "제목은 필수입니다"),

@@ -8,7 +8,7 @@ import OpenEyes from "../../../public/icons/visibility_on.svg";
 import { cls } from "@/lib/utils";
 
 const InputItem = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, id, name, value, type, isTextArea, isButton, errors, readOnly = false, size, required, ...props }, ref) => {
+  ({ label, id, name, value, type, isTextArea, isButton, errors, readOnly = false, size, ...props }, ref) => {
     const [inputType, setInputType] = useState(type);
     const [password, setPassword] = useState(false);
 
@@ -22,14 +22,13 @@ const InputItem = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label htmlFor={id} className="flex gap-1 text-lg font-medium text-black03 md:text-xl">
             {label}
-            {required && <span className="text-violet01">*</span>}
           </label>
         )}
 
         {isTextArea ? (
           <textarea
             className={cls(
-              "relative w-full resize-none rounded-lg p-4 text-xs text-black03 placeholder-gray02 ring-1 ring-inset ring-gray03 transition-all focus-within:ring-violet01 focus:outline-none focus:ring-inset md:py-4 md:text-base",
+              "relative w-full resize-none rounded-lg p-4 text-base text-black03 placeholder-gray02 ring-1 ring-inset ring-gray03 transition-all focus-within:ring-violet01 focus:outline-none focus:ring-inset md:py-4 md:text-lg",
               size === "description" ? "h-[126px]" : "h-[70px] md:h-[110px]",
               errors ? "ring-red01 transition-all focus-within:ring-red01" : "focus-within:ring-violet01"
             )}
@@ -44,7 +43,7 @@ const InputItem = forwardRef<HTMLInputElement, InputProps>(
           <div className="relative">
             <input
               className={cls(
-                "h-[50px] w-full rounded-lg px-4 text-lg text-black03 placeholder-gray02 ring-1 ring-inset ring-gray03 transition-all focus:outline-none focus:ring-1 focus:ring-inset",
+                "h-[50px] w-full rounded-lg px-4 text-base text-black03 placeholder-gray02 ring-1 ring-inset ring-gray03 transition-all focus:outline-none focus:ring-1 focus:ring-inset md:text-lg",
                 errors ? "ring-red01 transition-all focus-within:ring-red01" : "focus-within:ring-violet01",
                 readOnly ? "bg-gray03" : "",
                 type === "password" ? "pr-10" : ""
@@ -69,10 +68,12 @@ const InputItem = forwardRef<HTMLInputElement, InputProps>(
           </div>
         )}
 
-        {errors && <span className="pl-1 text-base font-normal text-red01">{errors}</span>}
+        {errors && <span className="pl-1 text-sm font-normal text-red01 md:text-base">{errors}</span>}
       </div>
     );
   }
 );
+
+InputItem.displayName = "InputItem";
 
 export default InputItem;

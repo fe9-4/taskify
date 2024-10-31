@@ -28,11 +28,12 @@ import { useToggleModal } from "@/hooks/useToggleModal";
 const CreateCard = () => {
   const { user } = useAuth();
   const { dashboardId } = useParams();
-  const { memberData } = useMember({ dashboardId: Number(dashboardId) });
   const columnId = useAtomValue(CreateCardParamsAtom);
+  const { memberData } = useMember({ dashboardId: Number(dashboardId) });
+  const [tagInput, setTagInput] = useState("");
   const { isLoading, withLoading } = useLoading();
-  const [, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
   const toggleModal = useToggleModal();
+  const [, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
 
   const {
     uploadFile,
@@ -45,8 +46,6 @@ const CreateCard = () => {
       toast.error("이미지 업로드 중 오류가 발생했습니다.");
     }
   }, [fileError]);
-
-  const [tagInput, setTagInput] = useState("");
 
   const {
     register,
@@ -71,7 +70,6 @@ const CreateCard = () => {
     },
   });
 
-  // 폼 필드 값 실시간 감시
   const dueDate = useWatch({ control, name: "dueDate" });
   const tags = useWatch({ control, name: "tags" });
   const title = watch("title");
@@ -135,13 +133,6 @@ const CreateCard = () => {
     });
   };
 
-  const managerValidation = register("assigneeUserId", {
-    required: {
-      value: true,
-      message: "담당자를 선택해 주세요",
-    },
-  });
-
   return (
     <section className="w-[327px] rounded-2xl bg-white px-4 pb-5 pt-8 md:w-[584px] md:p-8 md:pt-10">
       <h3 className="mb-5 text-2xl font-bold text-black03 md:mb-6 md:text-3xl">할 일 생성</h3>
@@ -170,7 +161,6 @@ const CreateCard = () => {
                   setValue("assigneeUserId", manager.userId);
                 }}
                 setValue={setValue}
-                validation={managerValidation}
               />
             );
           }}
@@ -179,19 +169,15 @@ const CreateCard = () => {
         <InputItem
           label="제목"
           id="title"
-          {...register("title", {
-            required: "제목은 필수입니다",
-          })}
-          errors={errors.title && errors.title.message}
+          {...register("title")}
           placeholder="제목을 입력해 주세요"
-          required
+          errors={errors.title && errors.title.message}
         />
 
         <InputItem
           label="설명"
           id="description"
           {...register("description", {
-            required: "설명은 필수입니다",
             onChange: (e) => {
               setValue("description", e.target.value);
               trigger("description");
@@ -199,7 +185,6 @@ const CreateCard = () => {
           })}
           isTextArea
           size="description"
-          required
           placeholder="설명을 입력해 주세요"
           errors={errors.description && errors.description.message}
         />

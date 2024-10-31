@@ -7,10 +7,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { UpdateCardSchema } from "@/zodSchema/cardSchema";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useAtomValue } from "jotai";
 import { useAuth } from "@/hooks/useAuth";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { useMember } from "@/hooks/useMember";
+import { useToggleModal } from "@/hooks/useToggleModal";
 import { formatDateTime } from "@/utils/dateFormat";
+import useLoading from "@/hooks/useLoading";
+import { UpdateCardParamsAtom } from "@/store/modalAtom";
+import { uploadType } from "@/types/uploadType";
+import { UpdateCardProps } from "@/types/cardType";
 import { CancelBtn, ConfirmBtn } from "@/components/button/ButtonComponents";
 import StatusDropdown from "@/components/dropdown/StatusDropdown";
 import SearchDropdown from "@/components/dropdown/SearchDropdown";
@@ -18,12 +24,6 @@ import InputItem from "@/components/input/InputItem";
 import InputDate from "@/components/input/InputDate";
 import InputTag from "@/components/input/InputTag";
 import InputFile from "@/components/input/InputFile";
-import { useAtom, useAtomValue } from "jotai";
-import useLoading from "@/hooks/useLoading";
-import { UpdateCardParamsAtom } from "@/store/modalAtom";
-import { uploadType } from "@/types/uploadType";
-import { UpdateCardProps } from "@/types/cardType";
-import { useToggleModal } from "@/hooks/useToggleModal";
 
 interface CardDataType extends UpdateCardProps {
   assignee: {
@@ -37,33 +37,25 @@ interface CardDataType extends UpdateCardProps {
 }
 
 const UpdateCard = () => {
+  const { user } = useAuth();
   const { dashboardId } = useParams();
   const cardId = useAtomValue(UpdateCardParamsAtom);
   const [columnId, setColumnId] = useState<string>("");
-
-  const { memberData } = useMember({
-    dashboardId: Number(dashboardId),
-  });
-
+  const { memberData } = useMember({ dashboardId: Number(dashboardId) });
+  const [tagInput, setTagInput] = useState("");
   const [selectedValue, setSelectedValue] = useState("");
   const [currentValue, setCurrentValue] = useState("");
-
-  const { user } = useAuth();
+  const [cardData, setCardData] = useState<CardDataType | null>(null);
+  const toggleModal = useToggleModal();
+  const { isLoading, withLoading } = useLoading();
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const {
     uploadFile,
     isPending: isFileUploading,
     error: fileError,
   } = useFileUpload(`/api/columns/${columnId}/card-image`, uploadType.CARD);
-
-  const [cardData, setCardData] = useState<CardDataType | null>(null);
-  const [tagInput, setTagInput] = useState("");
-
-  const toggleModal = useToggleModal();
-  const { isLoading, withLoading } = useLoading();
-
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (fileError) {
@@ -80,7 +72,6 @@ const UpdateCard = () => {
     watch,
     trigger,
     control,
-    getValues,
     formState: { errors },
   } = useForm<UpdateCardProps>({
     resolver: zodResolver(UpdateCardSchema),
@@ -120,7 +111,6 @@ const UpdateCard = () => {
         imageUrl: data.imageUrl,
       });
     } catch (error) {
-      console.error("카드 데이터 불러오기 실패:", error);
       toast.error("카드 데이터를 불러오는데 실패했습니다.");
     }
   }, [cardId, reset]);
@@ -210,13 +200,6 @@ const UpdateCard = () => {
     });
   };
 
-  const managerValidation = register("assigneeUserId", {
-    required: {
-      value: true,
-      message: "담당자를 선택해 주세요",
-    },
-  });
-
   return (
     <section className="w-[327px] rounded-2xl bg-white p-8 md:w-[584px]">
       <h3 className="mb-5 text-2xl font-bold text-black03 md:mb-6 md:text-3xl">할 일 수정</h3>
@@ -249,7 +232,6 @@ const UpdateCard = () => {
                     setValue("assigneeUserId", manager.userId);
                   }}
                   setValue={setValue}
-                  validation={managerValidation}
                 />
               );
             }}
@@ -260,15 +242,14 @@ const UpdateCard = () => {
           label="제목"
           id="title"
           {...register("title")}
+          placeholder="제목을 입력해 주세요"
           errors={errors.title && errors.title.message}
-          required
         />
 
         <InputItem
           label="설명"
           id="description"
           {...register("description", {
-            required: "설명은 필수입니다",
             onChange: (e) => {
               setValue("description", e.target.value);
               trigger("description");
@@ -276,7 +257,7 @@ const UpdateCard = () => {
           })}
           isTextArea
           size="description"
-          required
+          placeholder="설명을 입력해 주세요"
           errors={errors.description && errors.description.message}
           value={watch("description")}
         />
