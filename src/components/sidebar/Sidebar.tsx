@@ -11,6 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { cls } from "@/lib/utils";
 import { HiChevronDoubleRight } from "react-icons/hi";
 import { HiChevronDoubleLeft } from "react-icons/hi";
+import { useRouter } from "next/navigation";
 
 const Sidebar = () => {
   const [page, setPage] = useState(1);
@@ -18,10 +19,19 @@ const Sidebar = () => {
   const [isExpanded, setIsExpanded] = useState(false);
   const params = useParams();
   const currentDashboardId = params?.dashboardId ? Number(params.dashboardId) : null;
-
-  const pathname = usePathname();
   const { isLargeScreen } = useWidth();
+  const pathname = usePathname();
+  const router = useRouter();
   const { user } = useAuth();
+
+  useEffect(() => {
+    if (!user && pathname === "/") {
+      router.push("/");
+    } else {
+      router.push("/login");
+    }
+  }, [user, router, pathname]);
+
   const { dashboardData } = useDashboard({ dashboardId: currentDashboardId || 0, page, size });
 
   const totalPage: number = Math.ceil(dashboardData?.totalCount / size);

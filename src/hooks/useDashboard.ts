@@ -9,6 +9,7 @@ import {
   DashboardListSchema,
   DashboardSchema,
 } from "@/zodSchema/dashboardSchema";
+import { useAuth } from "@/hooks/useAuth";
 
 interface CreateDashboardData {
   title: string;
@@ -30,8 +31,9 @@ export const useDashboard = ({
   showErrorToast?: boolean;
   customErrorMessage?: string;
 }) => {
-  const queryClient = useQueryClient();
   const router = useRouter();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   const dashboardIdString = String(dashboardId);
 
   // 대시보드 목록 조회
@@ -51,6 +53,7 @@ export const useDashboard = ({
         throw error;
       }
     },
+    enabled: !!user,
     initialData: {
       dashboards: [],
       totalCount: 0,

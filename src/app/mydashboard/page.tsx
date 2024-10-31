@@ -5,16 +5,15 @@ import toast from "react-hot-toast";
 import InviteList from "@/app/mydashboard/components/InviteList";
 import Pagination from "../../components/pagination/Pagination";
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAtom } from "jotai";
 import { AddDashboardBtn, DashboardCard } from "@/components/button/ButtonComponents";
 import { IMyDashboard } from "@/types/myDashboardType";
 import { currentDashboardIdAtom, myDashboardUpdateAtom } from "@/store/myDashboardAtom";
 import { useToggleModal } from "@/hooks/useModal";
+import { useAuth } from "@/hooks/useAuth";
 
 const MyDashboard = () => {
-  const router = useRouter();
-
   const [page, setPage] = useState(1);
   const [cursorId, setCursorId] = useState<number | null>(1);
   const [size, setSize] = useState(5);
@@ -24,6 +23,17 @@ const MyDashboard = () => {
   const toggleModal = useToggleModal();
   const [isUpdatedList, setIsUpdatedList] = useAtom(myDashboardUpdateAtom);
   const [, setDashboardIdList] = useAtom(currentDashboardIdAtom);
+  const pathname = usePathname();
+  const router = useRouter();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (!user && pathname === "/") {
+      router.push("/");
+    } else {
+      router.push("/login");
+    }
+  }, [user, router, pathname]);
 
   const getCurrentDashboards = useCallback(async () => {
     try {

@@ -1,4 +1,4 @@
-import { useParams, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import InputItem from "../../input/InputItem";
@@ -14,9 +14,18 @@ import { useToggleModal } from "@/hooks/useModal";
 const InvitationDashboard = () => {
   const toggleModal = useToggleModal();
   const params = useParams();
-  const router = useRouter();
   const currentDashboardId = params?.dashboardId ? Number(params.dashboardId) : null;
+  const pathname = usePathname();
+  const router = useRouter();
   const { user } = useAuth();
+
+  useEffect(() => {
+    if (!user && pathname === "/") {
+      router.push("/");
+    } else {
+      router.push("/login");
+    }
+  }, [user, router, pathname]);
 
   const {
     register,
