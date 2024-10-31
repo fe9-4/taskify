@@ -1,96 +1,31 @@
-import axios from "axios";
+import Image from "next/image";
 import toast from "react-hot-toast";
 import ColumnItem from "./ColumnItem";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { useAtom } from "jotai";
 import { HiOutlineCog } from "react-icons/hi";
 import { NumChip } from "../../../components/chip/PlusAndNumChip";
 import { AddTodoBtn } from "../../../components/button/ButtonComponents";
 import { ColumnAtom, CreateCardParamsAtom, DetailCardParamsAtom } from "@/store/modalAtom";
-import { ICard } from "@/types/dashboardType";
-import { currentColumnListAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
+import { currentColumnListAtom } from "@/store/dashboardAtom";
 import { useToggleModal } from "@/hooks/useToggleModal";
-import { Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
+import { Droppable, Draggable } from "@hello-pangea/dnd";
+import { CardDataProps } from "@/types/cardType";
+import React from "react";
 
 interface IProps {
   columnTitle: string;
   columnId: number;
   dragHandleProps?: any;
+  cards: CardDataProps[];
 }
 
-const ColumnList = ({ columnTitle, columnId, dragHandleProps }: IProps) => {
-  const [cardList, setCardList] = useState<ICard["cards"]>([]);
-  const [hasMore, setHasMore] = useState(true);
-  const [size, setSize] = useState(3);
+const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards }: IProps) => {
   const toggleModal = useToggleModal();
   const [, setColumnAtom] = useAtom(ColumnAtom);
   const [, setIsCreateCardParams] = useAtom(CreateCardParamsAtom);
   const [, setIsDetailCardParams] = useAtom(DetailCardParamsAtom);
   const [, setCurrentColumnList] = useAtom(currentColumnListAtom);
-  const [dashboardCardUpdate, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
-  const observeRef = useRef<IntersectionObserver | null>(null);
-  const loadingRef = useRef<HTMLDivElement | null>(null);
-
-  const getCardList = useCallback(async () => {
-    if (!hasMore) return;
-
-    try {
-      const response = await axios.get(`/api/cards?size=${size}&columnId=${columnId}`);
-
-      if (response.status === 200) {
-        const newCardList: ICard["cards"] = response.data.cards;
-
-        setCardList((prev) => {
-          const existingId = new Set(prev.map((card) => card.id));
-          const filteredNewCardList = newCardList.filter((card) => !existingId.has(card.id));
-
-          if (filteredNewCardList.length === 0 || filteredNewCardList.length < size) {
-            setHasMore(false);
-          }
-
-          return [...prev, ...filteredNewCardList];
-        });
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.error("ColumnList getCardList에서 api 오류 발생", error);
-        toast.error(error.response?.data);
-      }
-    }
-  }, [columnId, hasMore, size]);
-
-  useEffect(() => {
-    getCardList();
-
-    observeRef.current = new IntersectionObserver((entries) => {
-      const lastCardItem = entries[0];
-
-      if (lastCardItem.isIntersecting && hasMore) {
-        getCardList();
-      }
-    });
-
-    const currentLoadingRef = loadingRef.current;
-
-    if (currentLoadingRef) {
-      observeRef.current.observe(currentLoadingRef);
-    }
-
-    return () => {
-      if (currentLoadingRef) {
-        observeRef.current?.unobserve(currentLoadingRef);
-      }
-    };
-  }, [hasMore, size, getCardList]);
-
-  useEffect(() => {
-    if (dashboardCardUpdate) {
-      setCardList([]);
-      setHasMore(true);
-      getCardList();
-      setDashboardCardUpdate(false);
-    }
-  }, [dashboardCardUpdate, getCardList]);
 
   useEffect(() => {
     if (columnTitle && columnId) {
@@ -121,7 +56,7 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps }: IProps) => {
             <span className="size-2 rounded-full bg-violet01" />
             <h2 className="text-lg font-bold text-black">{columnTitle}</h2>
           </div>
-          <NumChip num={cardList.length} />
+          <NumChip num={cards.length} />
         </div>
         <button onClick={handleEditModal}>
           <HiOutlineCog className="size-[22px] text-gray01" />
@@ -136,7 +71,7 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps }: IProps) => {
                 toggleModal("createCard", true);
               }}
             />
-            {cardList.map((item, index) => (
+            {cards.map((item, index) => (
               <Draggable key={item.id} draggableId={`card-${item.id}`} index={index}>
                 {(provided, snapshot) => (
                   <div
@@ -145,7 +80,6 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps }: IProps) => {
                     className={`${snapshot.isDragging ? "opacity-50" : ""}`}
                   >
                     <ColumnItem card={item} dragHandleProps={provided.dragHandleProps} />
-                    {index === cardList.length - 1 && <div ref={loadingRef} className="h-[1px]" />}
                   </div>
                 )}
               </Draggable>
@@ -158,4 +92,4 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps }: IProps) => {
   );
 };
 
-export default ColumnList;
+export default React.memo(ColumnList);

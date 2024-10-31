@@ -1,10 +1,11 @@
+import React from "react";
 import Image from "next/image";
 import TagChip from "@/components/chip/TagChip";
-import { Iitem } from "@/types/dashboardType";
 import { HiOutlineCalendar } from "react-icons/hi";
+import { CardDataProps } from "@/types/cardType";
 
 interface IProps {
-  card: Iitem;
+  card: CardDataProps;
   dragHandleProps?: any;
 }
 
@@ -19,11 +20,11 @@ const ColumnItem = ({ card, dragHandleProps }: IProps) => {
       >
         <Image
           src={card.imageUrl}
-          alt="카드 이미지1"
+          alt="카드 이미지"
           width={260}
           height={150}
           className="max-h-[150px] w-full rounded-md object-cover md:h-[53px] md:w-[90px] xl:h-40 xl:w-full"
-          priority={true}
+          unoptimized
         />
         <div className="flex flex-col space-y-[6px] md:w-full md:flex-row md:space-x-[6px] xl:flex-col">
           <div className="flex w-full flex-col space-y-[6px]">
@@ -51,4 +52,4 @@ const ColumnItem = ({ card, dragHandleProps }: IProps) => {
   );
 };
 
-export default ColumnItem;
+export default React.memo(ColumnItem);
