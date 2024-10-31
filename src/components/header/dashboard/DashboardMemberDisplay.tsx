@@ -5,7 +5,7 @@ import { useDashboard } from "@/hooks/useDashboard";
 import { useMember } from "@/hooks/useMember";
 import Image from "next/image";
 import { useRouter, useParams } from "next/navigation";
-import { useToggleModal } from "@/hooks/useToggleModal";
+import { useToggleModal } from "@/hooks/useModal";
 
 export const DashboardMemberDisplay = () => {
   const router = useRouter();

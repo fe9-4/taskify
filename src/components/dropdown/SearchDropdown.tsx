@@ -57,7 +57,7 @@ const SearchDropdown = ({ setValue, inviteMemberList, setManager, currentManager
       <label htmlFor="assignee" className="text-lg font-medium text-black03 md:text-xl">
         담당자
       </label>
-      <div className="flex w-full flex-col space-y-[2px] bg-white" ref={dropdownRef}>
+      <div className="relative flex w-full flex-col space-y-[2px] bg-white" ref={dropdownRef}>
         <div className="flex h-[50px] w-full items-center justify-between overflow-hidden rounded-lg px-4 ring-1 ring-inset ring-gray03 transition-all focus-within:ring-violet01 focus:outline-none focus:ring-1 focus:ring-inset">
           <div className="flex w-full items-center space-x-2 text-base md:text-lg">
             {selectedName && (
@@ -76,7 +76,7 @@ const SearchDropdown = ({ setValue, inviteMemberList, setManager, currentManager
           <FaCaretDown />
         </div>
         {isOpen && filteredNames.length > 0 && (
-          <div className="flex flex-col overflow-hidden rounded-bl-md rounded-br-md rounded-tl-md rounded-tr-md border border-gray03">
+          <div className="absolute left-0 right-0 top-[50px] z-10 flex flex-col overflow-hidden rounded-bl-md rounded-br-md rounded-tl-md rounded-tr-md border border-gray03 bg-white">
             {filteredNames.map((item) => (
               <button
                 key={item.id}

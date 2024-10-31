@@ -10,17 +10,13 @@ import Section from "./components/Section";
 import toast from "react-hot-toast";
 import axios from "axios";
 import useLoading from "@/hooks/useLoading";
-import { useAtom } from "jotai";
-import { AlertModalConfirmAtom, AlertModalTextAtom } from "@/store/modalAtom";
-import { useToggleModal } from "@/hooks/useToggleModal";
+import { useDeleteModal } from "@/hooks/useModal";
 
 const EditPage = () => {
   const { dashboardId } = useParams();
   const router = useRouter();
   const { isLoading, withLoading } = useLoading();
-  const toggleModal = useToggleModal();
-  const [, setAlertText] = useAtom(AlertModalTextAtom);
-  const [, setOnConfirm] = useAtom(AlertModalConfirmAtom);
+  const setDeleteModal = useDeleteModal();
   const id = Number(dashboardId);
 
   const onDelete = async () => {
@@ -36,7 +32,7 @@ const EditPage = () => {
   };
 
   return (
-    <div className="m-5 mt-0 flex w-[284px] flex-col md:w-[544px] xl:w-[620px]">
+    <div className="mx-5 flex w-[284px] flex-col md:w-[544px] xl:w-[620px]">
       <div className="flex items-center gap-[6px] pb-[10px] pt-4 md:gap-2 md:py-5 xl:pb-[34px]">
         <IoIosArrowBack className="size-[18px]" />
         <Link href={`/dashboard/${dashboardId}`} className="text-base md:text-lg">
@@ -52,12 +48,10 @@ const EditPage = () => {
           <InviteList dashboardId={id} />
         </Section>
       </div>
-      <div className="mt-6">
+      <div className="my-6">
         <DeleteDashboardBtn
           onClick={() => {
-            setOnConfirm(() => onDelete);
-            setAlertText("대시보드를 삭제하시겠습니까?");
-            toggleModal("deleteModal", true);
+            setDeleteModal(onDelete, "대시보드를 삭제하시겠습니까?");
           }}
           disabled={isLoading}
         />

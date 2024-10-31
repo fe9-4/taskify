@@ -8,7 +8,8 @@ import { useParams } from "next/navigation";
 import { AddColumnBtn } from "@/components/button/ButtonComponents";
 import { useAtom, useAtomValue } from "jotai";
 import { ColumnTitlesAtom, RefreshDashboardAtom } from "@/store/modalAtom";
-import { useToggleModal } from "@/hooks/useToggleModal";
+import { useToggleModal } from "@/hooks/useModal";
+import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 
 interface IColumnData {
   id: number;
@@ -24,6 +25,7 @@ const DashboardDetail = () => {
   const toggleModal = useToggleModal();
   const [, setColumnTitles] = useAtom(ColumnTitlesAtom);
   const updateDashBoard = useAtomValue(RefreshDashboardAtom);
+  const isCardUpdate = useAtomValue(dashboardCardUpdateAtom);
 
   const [columnList, setColumnList] = useState<IColumnList["data"]>([]);
 
@@ -51,7 +53,7 @@ const DashboardDetail = () => {
   // 모달 창이 닫힐때 마다 대시보드 새로 불러오기
   useEffect(() => {
     getColumn();
-  }, [getColumn, updateDashBoard]);
+  }, [getColumn, updateDashBoard, isCardUpdate]);
 
   return (
     <div className="flex flex-col space-y-6 overflow-auto pb-6 xl:flex-row xl:space-x-6 xl:space-y-0 xl:pr-4">

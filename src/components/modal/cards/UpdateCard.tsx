@@ -7,16 +7,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { UpdateCardSchema } from "@/zodSchema/cardSchema";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useAtomValue } from "jotai";
 import { useAuth } from "@/hooks/useAuth";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { useMember } from "@/hooks/useMember";
-import { useToggleModal } from "@/hooks/useToggleModal";
 import { formatDateTime } from "@/utils/dateFormat";
-import useLoading from "@/hooks/useLoading";
-import { UpdateCardParamsAtom } from "@/store/modalAtom";
-import { uploadType } from "@/types/uploadType";
-import { UpdateCardProps } from "@/types/cardType";
 import { CancelBtn, ConfirmBtn } from "@/components/button/ButtonComponents";
 import StatusDropdown from "@/components/dropdown/StatusDropdown";
 import SearchDropdown from "@/components/dropdown/SearchDropdown";
@@ -24,6 +18,13 @@ import InputItem from "@/components/input/InputItem";
 import InputDate from "@/components/input/InputDate";
 import InputTag from "@/components/input/InputTag";
 import InputFile from "@/components/input/InputFile";
+import { useAtom, useAtomValue } from "jotai";
+import useLoading from "@/hooks/useLoading";
+import { UpdateCardParamsAtom } from "@/store/modalAtom";
+import { uploadType } from "@/types/uploadType";
+import { UpdateCardProps } from "@/types/cardType";
+import { useToggleModal } from "@/hooks/useModal";
+import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 
 interface CardDataType extends UpdateCardProps {
   assignee: {
@@ -33,29 +34,36 @@ interface CardDataType extends UpdateCardProps {
     email: string;
     profileImageUrl: string | null;
   };
-  status?: string;
 }
 
 const UpdateCard = () => {
-  const { user } = useAuth();
   const { dashboardId } = useParams();
   const cardId = useAtomValue(UpdateCardParamsAtom);
+  const [, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
   const [columnId, setColumnId] = useState<string>("");
-  const { memberData } = useMember({ dashboardId: Number(dashboardId) });
-  const [tagInput, setTagInput] = useState("");
-  const [selectedValue, setSelectedValue] = useState("");
-  const [currentValue, setCurrentValue] = useState("");
-  const [cardData, setCardData] = useState<CardDataType | null>(null);
-  const toggleModal = useToggleModal();
-  const { isLoading, withLoading } = useLoading();
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const { memberData } = useMember({
+    dashboardId: Number(dashboardId),
+  });
+
+  const [selectedValue, setSelectedValue] = useState(0);
+
+  const { user } = useAuth();
 
   const {
     uploadFile,
     isPending: isFileUploading,
     error: fileError,
   } = useFileUpload(`/api/columns/${columnId}/card-image`, uploadType.CARD);
+
+  const [cardData, setCardData] = useState<CardDataType | null>(null);
+  const [tagInput, setTagInput] = useState("");
+
+  const toggleModal = useToggleModal();
+  const { isLoading, withLoading } = useLoading();
+
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (fileError) {
@@ -98,8 +106,6 @@ const UpdateCard = () => {
       const data = response.data;
 
       setColumnId(String(data.columnId));
-      setCurrentValue(data.status || "toDo");
-      setSelectedValue(data.status || "toDo");
 
       setCardData(data);
       setPreviewUrl(data.imageUrl);
@@ -131,9 +137,9 @@ const UpdateCard = () => {
       !!dueDate &&
       tags.length > 0 &&
       (selectedFile !== null || previewUrl !== null) &&
-      (!!selectedValue || !!currentValue) &&
+      !!selectedValue &&
       Number(watch("assigneeUserId")) > 0,
-    [title, description, dueDate, tags, selectedFile, previewUrl, selectedValue, currentValue, watch]
+    [title, description, dueDate, tags, selectedFile, previewUrl, selectedValue, watch]
   );
 
   const handleAddTag = (tag: string) => {
@@ -180,7 +186,7 @@ const UpdateCard = () => {
         }
 
         const cardData = {
-          columnId: Number(columnId),
+          columnId: selectedValue,
           assigneeUserId: Number(data.assigneeUserId),
           title: data.title,
           description: data.description,
@@ -190,9 +196,10 @@ const UpdateCard = () => {
         };
 
         const response = await axios.put(`/api/cards/${cardId}`, cardData);
-        if (response.data) {
+        if (response.status === 200) {
           toast.success("카드가 수정되었습니다! 🎉");
           toggleModal("updateCard", false);
+          setDashboardCardUpdate(true);
         }
       } catch (error) {
         toast.error("카드 수정에 실패하였습니다.");
@@ -206,7 +213,7 @@ const UpdateCard = () => {
 
       <form onSubmit={handleSubmit(onSubmit)} className="grid gap-8">
         <div className="grid gap-8 md:flex md:gap-7">
-          <StatusDropdown setSelectedValue={setSelectedValue} currentValue={currentValue} />
+          <StatusDropdown setSelectedValueId={setSelectedValue} />
 
           <Controller
             name="assigneeUserId"

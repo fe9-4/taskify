@@ -56,9 +56,9 @@ export const useMember = ({
       return response.data;
     },
     onSuccess: (_, memberId) => {
-      const member = queryResult.data?.members.find((m) => m.userId === memberId);
+      const member = queryResult.data?.members.find((m) => m.id === memberId);
       toast.success(`멤버가 삭제되었습니다`);
-      queryClient.invalidateQueries({ queryKey: ["members", dashboardId] });
+      queryClient.invalidateQueries({ queryKey: ["memberData", dashboardId, page, size] });
     },
     onError: (error) => {
       console.error("Error deleting member:", error);

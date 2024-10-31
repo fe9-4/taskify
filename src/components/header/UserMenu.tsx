@@ -70,8 +70,8 @@ export const UserMenu = ({ isHomePage }: UserMenuProps) => {
 
   // 로그인한 사용자를 위한 드롭다운 메뉴 아이템
   const dropdownMenuItems: MenuItem[] = [
-    { href: "/mypage", label: "마이페이지" },
     { href: "/mydashboard", label: "내 대시보드" },
+    { href: "/mypage", label: "마이페이지" },
     { href: "#", label: "로그아웃", onClick: handleLogout },
   ];
 
