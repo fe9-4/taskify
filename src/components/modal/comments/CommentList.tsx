@@ -11,7 +11,7 @@ const CommentList = ({ cardId, columnId }: CommentListProps) => {
   const [cursorId, setCursorId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const size = 10;
+  const size = 3;
 
   const getComments = useCallback(async () => {
     if (isLoading || !hasMore) return;
@@ -37,26 +37,23 @@ const CommentList = ({ cardId, columnId }: CommentListProps) => {
 
         setCursorId(nextCursorId || null);
         setHasMore(Boolean(nextCursorId));
+      } else {
+        setHasMore(false);
       }
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        toast.error("댓글 조회에 실패하였습니다.");
-      }
+      if (axios.isAxiosError(error)) toast.error("댓글 조회에 실패하였습니다.");
+      setHasMore(false);
     } finally {
       setIsLoading(false);
     }
   }, [cardId, cursorId, size, isLoading, hasMore]);
 
   const targetRef = useIntersectionObserver(() => {
-    if (!isLoading && hasMore) {
-      getComments();
-    }
+    if (!isLoading && hasMore) getComments();
   });
 
   useEffect(() => {
-    if (comments.length === 0 && hasMore) {
-      getComments();
-    }
+    if (comments.length === 0 && hasMore) getComments();
   }, [comments.length, hasMore, getComments]);
 
   return (
