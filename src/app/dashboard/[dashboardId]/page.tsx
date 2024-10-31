@@ -8,7 +8,7 @@ import { useParams } from "next/navigation";
 import { AddColumnBtn } from "@/components/button/ButtonComponents";
 import { useAtom, useAtomValue } from "jotai";
 import { ColumnTitlesAtom, RefreshDashboardAtom } from "@/store/modalAtom";
-import { useToggleModal } from "@/hooks/useToggleModal";
+import { useToggleModal } from "@/hooks/useModal";
 import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 
 interface IColumnData {
@@ -28,7 +28,7 @@ const DashboardDetail = () => {
   const isCardUpdate = useAtomValue(dashboardCardUpdateAtom);
 
   const [columnList, setColumnList] = useState<IColumnList["data"]>([]);
-  
+
   const getColumn = useCallback(async () => {
     try {
       const response = await axios.get(`/api/columns?dashboardId=${dashboardId}`);
@@ -49,7 +49,7 @@ const DashboardDetail = () => {
     setColumnTitles(columTitles);
     toggleModal("createColumn", true);
   };
-  
+
   // 모달 창이 닫힐때 마다 대시보드 새로 불러오기
   useEffect(() => {
     getColumn();

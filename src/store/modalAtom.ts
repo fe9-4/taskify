@@ -15,22 +15,19 @@ export const initiModalState = {
 // 모달 상태 atom
 export const ModalStateAtom = atom(initiModalState);
 
+// 삭제 모달 state
+type DeleteModalState = { title: string; confirm: () => void };
+
+export const DeleteModalStateAtom = atom<DeleteModalState>({
+  title: " ",
+  confirm: () => null,
+});
+
 export const CreateCardParamsAtom = atom<number>(0);
 export const DetailCardParamsAtom = atom<number>(0);
 export const UpdateCardParamsAtom = atom<number>(0);
 
 export const ColumnTitlesAtom = atom<string[]>([]);
 export const ColumnAtom = atom<{ columnId: number; title: string }>({ columnId: 0, title: "" });
-
-export const AlertModalTextAtom = atom<string>("");
-export const AlertModalConfirmAtom = atom<(() => void) | null>(null);
-
-// // 삭제 모달 state
-// type DeleteModalState = { title: string; confirm: (() => void) | null };
-
-// export const DeleteModalStateAtom = atom<DeleteModalState>({
-//   title: " ",
-//   confirm: null,
-// });
 
 export const RefreshDashboardAtom = atom<boolean>(false);

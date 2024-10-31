@@ -23,7 +23,7 @@ import useLoading from "@/hooks/useLoading";
 import { UpdateCardParamsAtom } from "@/store/modalAtom";
 import { uploadType } from "@/types/uploadType";
 import { UpdateCardProps } from "@/types/cardType";
-import { useToggleModal } from "@/hooks/useToggleModal";
+import { useToggleModal } from "@/hooks/useModal";
 import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 
 interface CardDataType extends UpdateCardProps {
@@ -47,7 +47,7 @@ const UpdateCard = () => {
   });
 
   const [selectedValue, setSelectedValue] = useState(0);
-  
+
   const { user } = useAuth();
 
   const {
@@ -204,7 +204,7 @@ const UpdateCard = () => {
         }
       } catch (error) {
         toast.error("카드 수정에 실패하였습니다.");
-      } 
+      }
     });
   };
 

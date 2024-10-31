@@ -9,7 +9,7 @@ import { AddTodoBtn } from "../../../components/button/ButtonComponents";
 import { ColumnAtom, CreateCardParamsAtom, DetailCardParamsAtom } from "@/store/modalAtom";
 import { ICard } from "@/types/dashboardType";
 import { cardLocationChangeAtom, currentColumnListAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
-import { useToggleModal } from "@/hooks/useToggleModal";
+import { useToggleModal } from "@/hooks/useModal";
 
 interface IProps {
   columnTitle: string;

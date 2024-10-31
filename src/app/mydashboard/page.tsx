@@ -10,7 +10,7 @@ import { useAtom } from "jotai";
 import { AddDashboardBtn, DashboardCard } from "@/components/button/ButtonComponents";
 import { IMyDashboard } from "@/types/myDashboardType";
 import { currentDashboardIdAtom, myDashboardUpdateAtom } from "@/store/myDashboardAtom";
-import { useToggleModal } from "@/hooks/useToggleModal";
+import { useToggleModal } from "@/hooks/useModal";
 
 const MyDashboard = () => {
   const router = useRouter();

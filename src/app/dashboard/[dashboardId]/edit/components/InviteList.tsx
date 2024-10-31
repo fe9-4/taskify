@@ -6,7 +6,7 @@ import Image from "next/image";
 import Pagination from "@/components/pagination/Pagination";
 import { useInvitation } from "@/hooks/useInvitation";
 import { Invitation } from "@/zodSchema/invitationSchema";
-import { useToggleModal } from "@/hooks/useToggleModal";
+import { useToggleModal } from "@/hooks/useModal";
 
 const InviteList = ({ dashboardId }: { dashboardId: number }) => {
   const [page, setPage] = useState(1);

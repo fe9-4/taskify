@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: {
       template: "%s | Taskify",
-      default: "새로운 일정관리 | Taskify"
+      default: "새로운 일정관리 | Taskify",
     },
     description: "새로운 일정관리 | Taskify",
     images: "/icons/favicon.ico",

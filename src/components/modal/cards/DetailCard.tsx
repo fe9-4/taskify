@@ -1,13 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAtom, useAtomValue } from "jotai";
-import {
-  AlertModalConfirmAtom,
-  AlertModalTextAtom,
-  ColumnAtom,
-  DetailCardParamsAtom,
-  UpdateCardParamsAtom,
-} from "@/store/modalAtom";
-import { useToggleModal } from "@/hooks/useToggleModal";
+import { ColumnAtom, DetailCardParamsAtom, UpdateCardParamsAtom } from "@/store/modalAtom";
+import { useDeleteModal, useToggleModal } from "@/hooks/useModal";
 import axios from "axios";
 import toast from "react-hot-toast";
 import Image from "next/image";
@@ -23,11 +17,10 @@ const DetailCard = () => {
   const column = useAtomValue(ColumnAtom);
   const [cardData, setCardData] = useState<CardDataProps>();
   const [, setIsUpdateCardParams] = useAtom(UpdateCardParamsAtom);
-  const [, setAlertText] = useAtom(AlertModalTextAtom);
-  const [, setOnConfirm] = useAtom(AlertModalConfirmAtom);
   const [, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
-  
+
   const toggleModal = useToggleModal();
+  const setDeleteModal = useDeleteModal();
 
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -47,15 +40,14 @@ const DetailCard = () => {
     getCardData();
   }, [cardId]);
 
-  const ondelete = async () => {
+  const onDelete = async () => {
     try {
       const response = await axios.delete(`/api/cards/${cardId}`);
-      if (response.status === 201) { 
+      if (response.status === 201) {
         toast.success("카드가 삭제되었습니다.");
         toggleModal("detailCard", false);
         setDashboardCardUpdate(true);
-      } 
-      
+      }
     } catch (error) {
       if (axios.isAxiosError(error)) {
         toast.error("카드 삭제에 실패하였습니다.");
@@ -64,9 +56,7 @@ const DetailCard = () => {
   };
 
   const handleDelete = () => {
-    setAlertText("정말 삭제하시겠습니까?");
-    setOnConfirm(() => ondelete);
-    toggleModal("deleteModal", true);
+    setDeleteModal(onDelete, "정말 삭제하시겠습니까?");
   };
 
   const toggleDropdown = useCallback(() => setIsOpen((prev) => !prev), []);
