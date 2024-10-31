@@ -14,7 +14,7 @@ const InputTag = ({ tags, tagInput, onKeyDown, onClick, onChange }: InputTagProp
           <div className="flex gap-2">
             {tags.map((tag, index) => (
               <div onClick={() => onClick(tag)} key={`${tag}-${index + 1}`}>
-                <TagChip tag={tag} />
+                <TagChip tag={tag} tagDelete />
               </div>
             ))}
           </div>
