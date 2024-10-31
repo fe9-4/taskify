@@ -30,6 +30,8 @@ const DashboardDetail = () => {
   const [columnList, setColumnList] = useState<IColumnList["data"]>([]);
 
   const getColumn = useCallback(async () => {
+    setColumnList([]);
+
     try {
       const response = await axios.get(`/api/columns?dashboardId=${dashboardId}`);
 
@@ -53,13 +55,13 @@ const DashboardDetail = () => {
   // 모달 창이 닫힐때 마다 대시보드 새로 불러오기
   useEffect(() => {
     getColumn();
-  }, [getColumn, updateDashBoard, isCardUpdate]);
+  }, [getColumn, updateDashBoard, isCardUpdate , dashboardId]);
 
   return (
     <div className="flex flex-col space-y-6 overflow-auto pb-6 xl:flex-row xl:space-x-6 xl:space-y-0 xl:pr-4">
       <div className="flex flex-col space-y-6 xl:flex-row xl:space-y-0">
         {columnList.map((column) => (
-          <ColumnList key={column.id} columnTitle={column.title} columnId={column.id} />
+          <ColumnList key={column.id} columnTitle={column.title} columnId={column.id} dashboardId={dashboardId} />
         ))}
       </div>
       <div className="px-4 xl:px-0 xl:pt-[66px]">

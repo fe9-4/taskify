@@ -8,15 +8,16 @@ import { NumChip } from "../../../components/chip/PlusAndNumChip";
 import { AddTodoBtn } from "../../../components/button/ButtonComponents";
 import { ColumnAtom, CreateCardParamsAtom, DetailCardParamsAtom } from "@/store/modalAtom";
 import { ICard } from "@/types/dashboardType";
-import { cardLocationChangeAtom, currentColumnListAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
+import { currentColumnListAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { useToggleModal } from "@/hooks/useModal";
 
 interface IProps {
   columnTitle: string;
   columnId: number;
+  dashboardId: string | string[];
 }
 
-const ColumnList = ({ columnTitle, columnId }: IProps) => {
+const ColumnList = ({ columnTitle, columnId, dashboardId }: IProps) => {
   const [cardList, setCardList] = useState<ICard["cards"]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [size] = useState(3);
@@ -27,10 +28,9 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [, setIsDetailCardParams] = useAtom(DetailCardParamsAtom);
   const [, setCurrentColumnList] = useAtom(currentColumnListAtom);
   const [dashboardCardUpdate, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
-  const [cardLocationChange, setCardLocationChange] = useAtom(cardLocationChangeAtom);
   const toggleModal = useToggleModal();
   const observeRef = useRef<HTMLDivElement | null>(null);
-
+  
   const getCardList = useCallback(async () => {
     if (!hasMore) return;
 
@@ -91,25 +91,17 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   useEffect(() => {
     if (dashboardCardUpdate) {
       getCardList();
-
       setHasMore(true);
       setDashboardCardUpdate(false);
     }
-  }, [dashboardCardUpdate, getCardList]);
-
-  useEffect(() => {
-    if (cardLocationChange) {
-      setCardList((prev) => prev.filter((card) => card.columnId !== columnId));
-      setCardLocationChange(false);
-    }
-  }, [cardLocationChange, columnId]);
+  }, [dashboardCardUpdate, getCardList, setDashboardCardUpdate]);
 
   // 카드 수정시 드롭다운에 보내는 데이터
   useEffect(() => {
     if (columnTitle && columnId) {
       setCurrentColumnList((prev) => {
         const newColumn = { id: columnId, title: columnTitle };
-
+        
         const checkList = prev.some((column) => column.id === columnId);
 
         if (!checkList) {
