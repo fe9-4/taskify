@@ -11,11 +11,12 @@ const CommentList = ({ cardId, columnId }: CommentListProps) => {
   const [comments, setComments] = useState<CommentProps[]>([]);
   const [cursorId, setCursorId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [observe, setObserve] = useState(false);
-  const size = 10;
+  // const [observe, setObserve] = useState(false);
+  const [hasMore, setHasMore] = useState(true); // 더 불러올 데이터가 있는지 확인
+  const size = 3;
 
   const getComments = useCallback(async () => {
-    if (isLoading) return;
+    if (isLoading || !hasMore) return;
     setIsLoading(true);
 
     try {
@@ -35,9 +36,9 @@ const CommentList = ({ cardId, columnId }: CommentListProps) => {
           ];
           return uniqueComments.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         });
-        setCursorId(nextCursorId);
-      } else {
-        setCursorId(null);
+
+        setCursorId(nextCursorId || null);
+        setHasMore(Boolean(nextCursorId)); // 다음 페이지가 없을 경우 false로 설정
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -47,15 +48,18 @@ const CommentList = ({ cardId, columnId }: CommentListProps) => {
     } finally {
       setIsLoading(false);
     }
-  }, [cardId, cursorId, size, isLoading]);
+  }, [cardId, cursorId, size, isLoading, hasMore]);
 
+  // 컴포넌트 첫 마운트 시 한 번만 호출
   useEffect(() => {
     getComments();
-    setObserve(false);
-  }, [observe, getComments]);
+  }, []); // 빈 배열로 설정하여 컴포넌트 마운트 시 한 번만 호출
 
+  // 무한 스크롤에 필요한 관찰 대상 설정
   const setObserveTarget: Dispatch<SetStateAction<any>> = useIntersectionObserver(() => {
-    setObserve(true);
+    if (!isLoading && hasMore) {
+      getComments();
+    }
   });
 
   return (
