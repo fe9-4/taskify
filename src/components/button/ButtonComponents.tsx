@@ -223,7 +223,7 @@ export const PaginationBtn = ({
   onClickNext: any;
 }) => {
   return (
-    <div className="flex h-10 w-20 items-center justify-center overflow-hidden rounded-[4px] border border-gray03 md:h-[36px] md:w-[72px]">
+    <div className="flex h-[36px] w-[72px] items-center justify-center overflow-hidden rounded-[4px] border border-gray03 md:h-10 md:w-20">
       <button
         onClick={onClickPrev}
         type="button"
