@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   },
   description: "새로운 일정관리 | Taskify",
   icons: { icon: "/icons/favicon.ico", shortcut: "/icons/favicon.ico" },
-  metadataBase: new URL("http://localhost:3000/"),
+  metadataBase: new URL("https://taskify-test-9-4.netlify.app/"),
   openGraph: {
     title: {
       template: "%s | Taskify",
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     },
     description: "새로운 일정관리 | Taskify",
     images: "/icons/favicon.ico",
-    url: "http://localhost:3000/"
+    url: "https://taskify-test-9-4.netlify.app/"
   }
 };
 
