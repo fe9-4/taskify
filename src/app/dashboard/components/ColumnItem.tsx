@@ -52,4 +52,4 @@ const ColumnItem = ({ card, dragHandleProps }: IProps) => {
   );
 };
 
-export default React.memo(ColumnItem);
+export default ColumnItem;

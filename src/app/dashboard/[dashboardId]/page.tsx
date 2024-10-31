@@ -79,50 +79,49 @@ const DashboardDetail = () => {
 
     if (!destination) return;
 
-    if (type === "COLUMN") {
-      if (source.index === destination.index) return;
-
-      const reorderedColumns = Array.from(columnList);
-      const [removed] = reorderedColumns.splice(source.index, 1);
-      reorderedColumns.splice(destination.index, 0, removed);
-
-      setColumnList(reorderedColumns);
-
-      try {
-        await axios.put("/api/columns/reorder", {
-          reorderedColumns: reorderedColumns.map((column, index) => ({ id: column.id, position: index })),
-        });
-      } catch (error) {
-        console.error("컬럼 순서 업데이트 오류", error);
-        toast.error("컬럼 순서 업데이트 중 오류가 발생했습니다.");
-      }
-    }
-
     if (type === "CARD") {
       const cardId = parseInt(result.draggableId.split("-")[1]);
       const sourceColumnId = parseInt(source.droppableId.split("-")[1]);
       const destinationColumnId = parseInt(destination.droppableId.split("-")[1]);
 
-      if (sourceColumnId === destinationColumnId && source.index === destination.index) {
+      if (sourceColumnId === destinationColumnId) {
+        toast.success("컬럼 내에서의 카드 이동은 지원되지 않습니다.");
+        setIsCardUpdate(true);
         return;
       }
 
-      const newColumnList = Array.from(columnList);
-      const sourceColumn = newColumnList.find((column) => column.id === sourceColumnId);
-      const destinationColumn = newColumnList.find((column) => column.id === destinationColumnId);
-
-      if (!sourceColumn || !destinationColumn) return;
-
-      const cardToMove = sourceColumn.cards[source.index];
-      sourceColumn.cards.splice(source.index, 1);
-      destinationColumn.cards.splice(destination.index, 0, cardToMove);
-
-      setColumnList(newColumnList);
+      // 불변성을 유지하며 상태 업데이트
+      setColumnList((prevColumns) => {
+        const newColumns = prevColumns.map((column) => {
+          if (column.id === sourceColumnId) {
+            const newCards = Array.from(column.cards);
+            return { ...column, cards: newCards };
+          }
+          if (column.id === destinationColumnId) {
+            const newCards = Array.from(column.cards);
+            newCards.splice(
+              destination.index,
+              0,
+              prevColumns.find((col) => col.id === sourceColumnId)?.cards[source.index] as CardDataProps
+            );
+            return { ...column, cards: newCards };
+          }
+          return column;
+        });
+        return newColumns;
+      });
 
       try {
+        // 필요한 필드가 모두 있는지 확인하고, 없으면 기본값 설정
+        const cardToMove = columnList.find((column) => column.id === sourceColumnId)?.cards[source.index];
+
+        if (!cardToMove) throw new Error("이동할 카드를 찾을 수 없습니다.");
+        if (!cardToMove.assignee) throw new Error("담당자 정보가 없습니다.");
+        if (cardToMove.tags.length === 0) throw new Error("태그 정보가 없습니다.");
+
         await axios.put(`/api/cards/${cardId}`, {
           columnId: destinationColumnId,
-          assigneeUserId: cardToMove.assignee.id,
+          assigneeUserId: cardToMove.assignee?.id,
           title: cardToMove.title,
           description: cardToMove.description,
           dueDate: cardToMove.dueDate,
@@ -133,12 +132,8 @@ const DashboardDetail = () => {
         console.error("카드 이동 업데이트 오류", error);
         toast.error("카드 이동 중 오류가 발생했습니다.");
 
-        setColumnList((prev) => {
-          const rollbackColumnList = Array.from(prev);
-          destinationColumn.cards.splice(destination.index, 1);
-          sourceColumn.cards.splice(source.index, 0, cardToMove);
-          return rollbackColumnList;
-        });
+        // 오류 발생 시 상태 롤백 (필요한 경우 구현)
+        getColumn(); // 상태를 다시 불러오는 함수 호출
       }
     }
   };
