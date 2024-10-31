@@ -98,7 +98,7 @@ export const useInvitation = ({ dashboardId }: { dashboardId: number }) => {
       queryClient.invalidateQueries({ queryKey: ["invitations", dashboardIdString] });
     },
     onError: () => {
-      toast.error("초대 취소에 실패했습니다");
+      toast.error("오류가 발생하여 초대가 취소되지 않았습니다.");
     },
   });
 
