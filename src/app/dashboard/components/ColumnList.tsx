@@ -1,7 +1,7 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 import ColumnItem from "./ColumnItem";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useAtom } from "jotai";
 import { HiOutlineCog } from "react-icons/hi";
 import { NumChip } from "../../../components/chip/PlusAndNumChip";
@@ -92,7 +92,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
       setHasMore(true);
       setDashboardCardUpdate(false);
     }
-  }, [getCardList, dashboardCardUpdate, columnId]);
+  }, [getCardList, dashboardCardUpdate, columnId, setDashboardCardUpdate]);
 
   // 카드 수정시 드롭다운에 보내는 데이터
   useEffect(() => {
@@ -161,4 +161,4 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   );
 };
 
-export default ColumnList;
+export default memo(ColumnList);
