@@ -4,7 +4,7 @@ import { ChangeEvent, useEffect, useState, useCallback, useMemo } from "react";
 import { useForm, SubmitHandler, Controller, useWatch, UseFormSetValue } from "react-hook-form";
 import { useParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UpdateCardSchema, UpdateCardSchemaType, CardResponseSchemaType } from "@/zodSchema/cardSchema";
+import { UpdateCardSchemaType, UpdateCardSchema } from "@/zodSchema/cardSchema";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useFileUpload } from "@/hooks/useFileUpload";
@@ -21,7 +21,7 @@ import { useAtom, useAtomValue } from "jotai";
 import useLoading from "@/hooks/useLoading";
 import { UpdateCardParamsAtom } from "@/store/modalAtom";
 import { uploadType } from "@/types/uploadType";
-import { UpdateCardProps } from "@/types/cardType";
+import { CardDataProps, UpdateCardProps } from "@/types/cardType";
 import { useToggleModal } from "@/hooks/useToggleModal";
 import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { ICurrentManager } from "@/types/currentManager";
@@ -50,7 +50,7 @@ const UpdateCard = () => {
     error: fileError,
   } = useFileUpload(`/api/columns/${columnId}/card-image`, uploadType.CARD);
 
-  const [cardData, setCardData] = useState<CardResponseSchemaType | null>(null);
+  const [cardData, setCardData] = useState<CardDataProps | null>(null);
   const [tagInput, setTagInput] = useState("");
 
   const toggleModal = useToggleModal();
@@ -108,7 +108,7 @@ const UpdateCard = () => {
 
     try {
       const response = await axios.get(`/api/cards/${cardId}`);
-      const data: CardResponseSchemaType = response.data;
+      const data: CardDataProps = response.data;
 
       setColumnId(String(data.columnId));
       setSelectedValue(data.columnId);

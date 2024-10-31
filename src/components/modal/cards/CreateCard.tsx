@@ -4,7 +4,7 @@ import { ChangeEvent, useState, useEffect } from "react";
 import { useForm, SubmitHandler, Controller, useWatch, UseFormSetValue } from "react-hook-form";
 import { useParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CreateCardSchema, CreateCardSchemaType } from "@/zodSchema/cardSchema";
+import { CardSchema, CardSchemaType } from "@/zodSchema/cardSchema";
 import axios from "axios";
 import toast from "react-hot-toast";
 import useLoading from "@/hooks/useLoading";
@@ -56,11 +56,10 @@ const CreateCard = () => {
     trigger,
     control,
     formState: { errors },
-  } = useForm<CreateCardSchemaType>({
-    resolver: zodResolver(CreateCardSchema),
+  } = useForm<CardSchemaType>({
+    resolver: zodResolver(CardSchema),
     mode: "onChange",
     defaultValues: {
-      assigneeUserId: Number(user && user.id),
       dashboardId: Number(dashboardId),
       columnId: Number(columnId),
       title: "",
@@ -107,7 +106,7 @@ const CreateCard = () => {
     setPreviewUrl(preview);
   };
 
-  const onSubmit: SubmitHandler<CreateCardSchemaType> = async (data) => {
+  const onSubmit: SubmitHandler<CardSchemaType> = async (data) => {
     await withLoading(async () => {
       try {
         let uploadedImageUrl = null;
