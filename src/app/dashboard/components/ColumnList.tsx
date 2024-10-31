@@ -10,13 +10,15 @@ import { ColumnAtom, CreateCardParamsAtom, DetailCardParamsAtom } from "@/store/
 import { ICard } from "@/types/dashboardType";
 import { currentColumnListAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { useToggleModal } from "@/hooks/useToggleModal";
+import { Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
 
 interface IProps {
   columnTitle: string;
   columnId: number;
+  dragHandleProps?: any;
 }
 
-const ColumnList = ({ columnTitle, columnId }: IProps) => {
+const ColumnList = ({ columnTitle, columnId, dragHandleProps }: IProps) => {
   const [cardList, setCardList] = useState<ICard["cards"]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [size, setSize] = useState(3);
@@ -57,7 +59,6 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
     }
   }, [columnId, hasMore, size]);
 
-  // 카드아이템 무한스크롤
   useEffect(() => {
     getCardList();
 
@@ -82,19 +83,15 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
     };
   }, [hasMore, size, getCardList]);
 
-  // 카드 실시간 업데이트
   useEffect(() => {
     if (dashboardCardUpdate) {
-      getCardList();
-
-      setCardList((prev) => prev.filter((card) => card.columnId !== columnId));
-
+      setCardList([]);
       setHasMore(true);
+      getCardList();
       setDashboardCardUpdate(false);
     }
-  }, [getCardList, dashboardCardUpdate, columnId]);
+  }, [dashboardCardUpdate, getCardList]);
 
-  // 카드 수정시 드롭다운에 보내는 데이터
   useEffect(() => {
     if (columnTitle && columnId) {
       setCurrentColumnList((prev) => {
@@ -118,7 +115,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
 
   return (
     <div className="space-y-6 px-4 pt-4 md:border-b md:border-gray04 md:pb-6 xl:flex xl:min-h-screen xl:flex-col xl:border-b-0 xl:border-r">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between" {...dragHandleProps}>
         <div className="flex items-center space-x-3">
           <div className="flex items-center space-x-2">
             <span className="size-2 rounded-full bg-violet01" />
@@ -130,33 +127,33 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
           <HiOutlineCog className="size-[22px] text-gray01" />
         </button>
       </div>
-      <div className="flex min-w-[314px] flex-col space-y-2">
-        <AddTodoBtn
-          onClick={() => {
-            setIsCreateCardParams(columnId);
-            toggleModal("createCard", true);
-          }}
-        />
-        {cardList.length > 0 ? (
-          cardList.map((item, i) => (
-            <div key={item.id}>
-              <button
-                className="size-full"
-                onClick={() => {
-                  toggleModal("detailCard", true);
-                  setIsDetailCardParams(item.id);
-                  setColumnAtom({ title: columnTitle, columnId });
-                }}
-              >
-                <ColumnItem cards={item} />
-                {i === cardList.length - 1 && <div ref={loadingRef} className="h-[1px]" />}
-              </button>
-            </div>
-          ))
-        ) : (
-          <p className="flex items-center justify-center text-center font-bold">등록된 카드가 없습니다.</p>
+      <Droppable droppableId={`column-${columnId}`} type="CARD">
+        {(provided) => (
+          <div className="flex min-w-[314px] flex-col space-y-2" ref={provided.innerRef} {...provided.droppableProps}>
+            <AddTodoBtn
+              onClick={() => {
+                setIsCreateCardParams(columnId);
+                toggleModal("createCard", true);
+              }}
+            />
+            {cardList.map((item, index) => (
+              <Draggable key={item.id} draggableId={`card-${item.id}`} index={index}>
+                {(provided, snapshot) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    className={`${snapshot.isDragging ? "opacity-50" : ""}`}
+                  >
+                    <ColumnItem card={item} dragHandleProps={provided.dragHandleProps} />
+                    {index === cardList.length - 1 && <div ref={loadingRef} className="h-[1px]" />}
+                  </div>
+                )}
+              </Draggable>
+            ))}
+            {provided.placeholder}
+          </div>
         )}
-      </div>
+      </Droppable>
     </div>
   );
 };
