@@ -1,3 +1,6 @@
+import { SetStateAction } from "jotai";
+import { ChangeEventHandler } from "react";
+
 export interface CommentProps {
   id: number;
   content: string;
@@ -11,4 +14,9 @@ export interface authorProps {
   id: number;
   nickname: string;
   profileImageUrl: string;
+}
+
+export interface CommentListProps {
+  cardId: number;
+  columnId: number;
 }

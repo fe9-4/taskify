@@ -7,6 +7,7 @@ import {
   DetailCardParamsAtom,
   UpdateCardParamsAtom,
 } from "@/store/modalAtom";
+import { useToggleModal } from "@/hooks/useToggleModal";
 import axios from "axios";
 import toast from "react-hot-toast";
 import Image from "next/image";
@@ -14,16 +15,15 @@ import { CardDataProps } from "@/types/cardType";
 import { StatusTitleChip } from "../../chip/StatusChip";
 import TagChip from "@/components/chip/TagChip";
 import EditDeleteDropdown from "@/components/dropdown/EditDeleteDropdown";
-import CreateComment from "../comments/CreateComment";
-import { useToggleModal } from "@/hooks/useToggleModal";
+import CommentList from "../comments/CommentList";
 
 const DetailCard = () => {
   const cardId = useAtomValue(DetailCardParamsAtom);
   const column = useAtomValue(ColumnAtom);
   const [cardData, setCardData] = useState<CardDataProps>();
-  const toggleModal = useToggleModal();
   const [, setIsUpdateCardParams] = useAtom(UpdateCardParamsAtom);
 
+  const toggleModal = useToggleModal();
   const [, setAlertText] = useAtom(AlertModalTextAtom);
   const [, setOnConfirm] = useAtom(AlertModalConfirmAtom);
 
@@ -153,8 +153,7 @@ const DetailCard = () => {
           </div>
         ))}
 
-      {/* 임시 댓글 창 */}
-      <CreateComment cardId={cardId} columnId={column.columnId} />
+      <CommentList cardId={cardId} columnId={column.columnId} />
     </section>
   );
 };
