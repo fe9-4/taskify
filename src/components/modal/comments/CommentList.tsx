@@ -57,7 +57,7 @@ const CommentList = ({ cardId, columnId }: CommentListProps) => {
     if (comments.length === 0 && hasMore) {
       getComments();
     }
-  }, []);
+  }, [comments.length, hasMore, getComments]);
 
   return (
     <>
