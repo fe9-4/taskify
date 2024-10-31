@@ -11,7 +11,7 @@ const CommentList = ({ cardId, columnId }: CommentListProps) => {
   const [cursorId, setCursorId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const size = 3;
+  const size = 10;
 
   const getComments = useCallback(async () => {
     if (isLoading || !hasMore) return;
