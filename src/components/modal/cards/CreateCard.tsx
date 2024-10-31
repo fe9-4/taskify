@@ -1,10 +1,9 @@
 "use client";
 
 import { ChangeEvent, useState, useEffect } from "react";
-import { useForm, SubmitHandler, Controller, useWatch, UseFormSetValue } from "react-hook-form";
+import { useForm, SubmitHandler, Controller, useWatch } from "react-hook-form";
 import { useParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CreateCardSchema, CreateCardSchemaType } from "@/zodSchema/cardSchema";
 import axios from "axios";
 import toast from "react-hot-toast";
 import useLoading from "@/hooks/useLoading";
@@ -12,6 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { useMember } from "@/hooks/useMember";
 import { formatDateTime } from "@/utils/dateFormat";
+import { CreateCardProps } from "@/types/cardType";
 import { CancelBtn, ConfirmBtn } from "@/components/button/ButtonComponents";
 import SearchDropdown from "@/components/dropdown/SearchDropdown";
 import InputItem from "@/components/input/InputItem";
@@ -23,7 +23,7 @@ import { CreateCardParamsAtom } from "@/store/modalAtom";
 import { uploadType } from "@/types/uploadType";
 import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { useToggleModal } from "@/hooks/useToggleModal";
-import { CreateCardProps } from "@/types/cardType";
+import { CreateCardSchema } from "@/zodSchema/cardSchema";
 
 const CreateCard = () => {
   const { user } = useAuth();
@@ -56,7 +56,7 @@ const CreateCard = () => {
     trigger,
     control,
     formState: { errors },
-  } = useForm<CreateCardSchemaType>({
+  } = useForm<CreateCardProps>({
     resolver: zodResolver(CreateCardSchema),
     mode: "onChange",
     defaultValues: {
@@ -67,7 +67,7 @@ const CreateCard = () => {
       description: "",
       dueDate: "",
       tags: [],
-      imageUrl: "",
+      imageUrl: null,
     },
   });
 
@@ -94,7 +94,7 @@ const CreateCard = () => {
     if (!file) {
       setSelectedFile(null);
       setPreviewUrl(null);
-      setValue("imageUrl", "");
+      setValue("imageUrl", null);
       return;
     }
 
@@ -107,7 +107,7 @@ const CreateCard = () => {
     setPreviewUrl(preview);
   };
 
-  const onSubmit: SubmitHandler<CreateCardSchemaType> = async (data) => {
+  const onSubmit: SubmitHandler<CreateCardProps> = async (data) => {
     await withLoading(async () => {
       try {
         let uploadedImageUrl = null;
@@ -128,7 +128,6 @@ const CreateCard = () => {
           toast.success("카드가 생성되었습니다! 🎉");
           toggleModal("createCard", false);
           setDashboardCardUpdate(true);
-          setTimeout(() => setDashboardCardUpdate(false), 100);
         }
       } catch (error) {
         toast.error("카드 생성에 실패하였습니다.");
@@ -170,7 +169,7 @@ const CreateCard = () => {
                   field.onChange(manager.userId);
                   setValue("assigneeUserId", manager.userId);
                 }}
-                setValue={setValue as UseFormSetValue<CreateCardProps>}
+                setValue={setValue}
                 validation={managerValidation}
               />
             );
@@ -180,8 +179,11 @@ const CreateCard = () => {
         <InputItem
           label="제목"
           id="title"
-          {...register("title")}
+          {...register("title", {
+            required: "제목은 필수입니다",
+          })}
           errors={errors.title && errors.title.message}
+          placeholder="제목을 입력해 주세요"
           required
         />
 
@@ -198,6 +200,7 @@ const CreateCard = () => {
           isTextArea
           size="description"
           required
+          placeholder="설명을 입력해 주세요"
           errors={errors.description && errors.description.message}
         />
 
