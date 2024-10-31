@@ -2,8 +2,8 @@
 
 import React from "react";
 import Modal from "react-modal";
-import { useAtom, useAtomValue } from "jotai";
-import { AlertModalTextAtom, AlertModalConfirmAtom, ModalStateAtom } from "@/store/modalAtom";
+import { useAtomValue } from "jotai";
+import { ModalStateAtom } from "@/store/modalAtom";
 import CreateDashboard from "@/components/modal/dashboard/CreateDashboard";
 import ModalContent from "./ModalContent";
 import DeleteModal from "./DeleteModal";
@@ -20,9 +20,6 @@ Modal.setAppElement("#modal-root");
 const ModalContainer = () => {
   const modalState = useAtomValue(ModalStateAtom);
   const toggleModal = useToggleModal();
-
-  const alertText = useAtomValue(AlertModalTextAtom);
-  const [onConfirm] = useAtom(AlertModalConfirmAtom);
 
   return (
     <>
@@ -66,7 +63,7 @@ const ModalContainer = () => {
 
       {/* 삭제 모달 */}
       <ModalContent isOpen={modalState.deleteModal} onRequestClose={() => toggleModal("deleteModal", false)}>
-        {onConfirm && <DeleteModal text={alertText} onConfirm={onConfirm} />}
+        <DeleteModal />
       </ModalContent>
     </>
   );
