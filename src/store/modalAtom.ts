@@ -1,34 +1,36 @@
 import { atom } from "jotai";
 
-//대시보드 생성 모달
-export const CreateDashboardAtom = atom<boolean>(false);
+// 모달 상태 초기값
+export const initiModalState = {
+  createDashboard: false, // 대시보드 생성 모달
+  createCard: false, // 할 일 카드 생성 모달
+  detailCard: false, //할 일 카드 상세 모달
+  updateCard: false, // 할 일 카드 수정 모달
+  createColumn: false, // 컬럼 생성 모달
+  editColumn: false, // 컬럼 수정 모달
+  invitationDashboard: false, // 대시 보드 초대 모달
+  deleteModal: false, // 알람 모달
+};
 
-// 할 일 카드 생성 모달
-export const CreateCardAtom = atom<boolean>(false);
+// 모달 상태 atom
+export const ModalStateAtom = atom(initiModalState);
+
 export const CreateCardParamsAtom = atom<number>(0);
-
-//할 일 카드 상세 모달
-export const DetailCardAtom = atom<boolean>(false);
 export const DetailCardParamsAtom = atom<number>(0);
-
-// 할 일 카드 수정 모달
-export const UpdateCardAtom = atom<boolean>(false);
 export const UpdateCardParamsAtom = atom<number>(0);
 
-// 컬럼 생성 모달
-export const CreateColumnAtom = atom<boolean>(false);
 export const ColumnTitlesAtom = atom<string[]>([]);
-
-// 컬럼 수정 모달
-export const EditColumnAtom = atom<boolean>(false);
 export const ColumnAtom = atom<{ columnId: number; title: string }>({ columnId: 0, title: "" });
 
-// 대시 보드 초대 모달
-export const InvitationDashboardAtom = atom<boolean>(false);
-
-// 알람 모달
-export const AlertModalAtom = atom<boolean>(false);
 export const AlertModalTextAtom = atom<string>("");
 export const AlertModalConfirmAtom = atom<(() => void) | null>(null);
+
+// // 삭제 모달 state
+// type DeleteModalState = { title: string; confirm: (() => void) | null };
+
+// export const DeleteModalStateAtom = atom<DeleteModalState>({
+//   title: " ",
+//   confirm: null,
+// });
 
 export const RefreshDashboardAtom = atom<boolean>(false);

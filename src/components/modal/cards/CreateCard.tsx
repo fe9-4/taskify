@@ -20,18 +20,19 @@ import InputDate from "@/components/input/InputDate";
 import InputTag from "@/components/input/InputTag";
 import InputFile from "@/components/input/InputFile";
 import { useAtom, useAtomValue } from "jotai";
-import { CreateCardAtom, CreateCardParamsAtom } from "@/store/modalAtom";
+import { CreateCardParamsAtom } from "@/store/modalAtom";
 import { uploadType } from "@/types/uploadType";
 import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
+import { useToggleModal } from "@/hooks/useToggleModal";
 
 const CreateCard = () => {
   const { user } = useAuth();
   const { dashboardId } = useParams();
   const { memberData } = useMember({ dashboardId: Number(dashboardId) });
   const columnId = useAtomValue(CreateCardParamsAtom);
-  const [, setIsCreateCardOpen] = useAtom(CreateCardAtom);
   const { isLoading, withLoading } = useLoading();
   const [, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
+  const toggleModal = useToggleModal();
 
   const {
     uploadFile,
@@ -125,7 +126,7 @@ const CreateCard = () => {
         const response = await axios.post(`/api/cards`, cardData);
         if (response.data) {
           toast.success("카드가 생성되었습니다! 🎉");
-          setIsCreateCardOpen(false);
+          toggleModal("createCard", false);
           setDashboardCardUpdate(true);
         }
       } catch (error) {
@@ -246,7 +247,7 @@ const CreateCard = () => {
         />
 
         <div className="flex h-[42px] gap-3 md:h-[54px] md:gap-2">
-          <CancelBtn type="button" onClick={() => setIsCreateCardOpen(false)}>
+          <CancelBtn type="button" onClick={() => toggleModal("createCard", false)}>
             취소
           </CancelBtn>
           <ConfirmBtn type="submit" disabled={!isFormValid || isLoading || isFileUploading}>

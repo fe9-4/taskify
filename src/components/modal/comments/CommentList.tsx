@@ -1,11 +1,12 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
-import { AlertModalAtom, AlertModalConfirmAtom, AlertModalTextAtom } from "@/store/modalAtom";
+import { AlertModalConfirmAtom, AlertModalTextAtom } from "@/store/modalAtom";
 import { formatDateTime } from "@/utils/dateFormat";
 import { CommentProps } from "@/types/commentType";
 import axios from "axios";
 import Image from "next/image";
 import toast from "react-hot-toast";
+import { useToggleModal } from "@/hooks/useToggleModal";
 
 interface CommentListProps {
   cardId: number;
@@ -14,7 +15,7 @@ interface CommentListProps {
 }
 
 const CommentList = ({ cardId }: CommentListProps) => {
-  const [, setIsAlertOpen] = useAtom(AlertModalAtom);
+  const toggleModal = useToggleModal();
   const [, setAlertText] = useAtom(AlertModalTextAtom);
   const [, setOnConfirm] = useAtom(AlertModalConfirmAtom);
 
@@ -77,11 +78,11 @@ const CommentList = ({ cardId }: CommentListProps) => {
   };
 
   const handleDelete = (commentId: number) => {
-    setIsAlertOpen(true);
+    toggleModal("deleteModal", true);
     setAlertText("정말 삭제하시겠습니까?");
     setOnConfirm(() => {
       ondelete(commentId);
-      setIsAlertOpen(false);
+      toggleModal("deleteModal", false);
     });
   };
 
