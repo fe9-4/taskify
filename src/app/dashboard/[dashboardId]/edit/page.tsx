@@ -52,7 +52,7 @@ const EditPage = () => {
           <InviteList dashboardId={id} />
         </Section>
       </div>
-      <div className="mb-10 mt-6">
+      <div className="my-6">
         <DeleteDashboardBtn
           onClick={() => {
             setOnConfirm(() => onDelete);
