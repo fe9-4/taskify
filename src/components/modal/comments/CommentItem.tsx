@@ -100,4 +100,6 @@ const CommentItem = forwardRef<HTMLDivElement, CommentItemProps>(({ comment, set
   );
 });
 
+CommentItem.displayName = "CommentItem";
+
 export default CommentItem;
