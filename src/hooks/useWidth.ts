@@ -14,7 +14,7 @@ export const useWidth = () => {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, []);
+  }, [handleResize]);
 
   return { isLargeScreen };
 };
