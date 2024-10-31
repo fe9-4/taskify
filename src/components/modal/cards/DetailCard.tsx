@@ -15,7 +15,6 @@ import { CardDataProps } from "@/types/cardType";
 import { StatusTitleChip } from "../../chip/StatusChip";
 import TagChip from "@/components/chip/TagChip";
 import EditDeleteDropdown from "@/components/dropdown/EditDeleteDropdown";
-import { useToggleModal } from "@/hooks/useToggleModal";
 import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import CommentList from "../comments/CommentList";
 
