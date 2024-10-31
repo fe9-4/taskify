@@ -28,12 +28,10 @@ const MyDashboard = () => {
   const { user } = useAuth();
 
   useEffect(() => {
-    if (!user && pathname === "/") {
-      router.push("/");
-    } else {
+    if (!user) {
       router.push("/login");
     }
-  }, [user, router, pathname]);
+  }, [user, pathname, router]);
 
   const getCurrentDashboards = useCallback(async () => {
     try {

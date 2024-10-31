@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 import {
   Dashboard,
   UpdateDashboard,
@@ -9,7 +10,6 @@ import {
   DashboardListSchema,
   DashboardSchema,
 } from "@/zodSchema/dashboardSchema";
-import { useAuth } from "@/hooks/useAuth";
 
 interface CreateDashboardData {
   title: string;
@@ -31,8 +31,8 @@ export const useDashboard = ({
   showErrorToast?: boolean;
   customErrorMessage?: string;
 }) => {
-  const router = useRouter();
   const { user } = useAuth();
+  const router = useRouter();
   const queryClient = useQueryClient();
   const dashboardIdString = String(dashboardId);
 
@@ -76,7 +76,7 @@ export const useDashboard = ({
         throw error;
       }
     },
-    enabled: !!dashboardId,
+    enabled: !!user && !!dashboardId,
   });
 
   // 대시보드 생성

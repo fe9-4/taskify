@@ -4,7 +4,6 @@ import { useForm } from "react-hook-form";
 import InputItem from "../../input/InputItem";
 import { CancelBtn, ConfirmBtn } from "../../button/ButtonComponents";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAuth } from "@/hooks/useAuth";
 import { useMember } from "@/hooks/useMember";
 import { FormData, FormSchema, Invitation } from "@/zodSchema/invitationSchema";
 import { useDashboard } from "@/hooks/useDashboard";
@@ -17,15 +16,6 @@ const InvitationDashboard = () => {
   const currentDashboardId = params?.dashboardId ? Number(params.dashboardId) : null;
   const pathname = usePathname();
   const router = useRouter();
-  const { user } = useAuth();
-
-  useEffect(() => {
-    if (!user && pathname === "/") {
-      router.push("/");
-    } else {
-      router.push("/login");
-    }
-  }, [user, router, pathname]);
 
   const {
     register,
