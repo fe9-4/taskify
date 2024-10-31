@@ -15,7 +15,7 @@ export const DashboardMemberDisplay = () => {
   const toggleModal = useToggleModal();
 
   // 대시보드 목록 조회
-  const { dashboardInfo, isLoading: isDashboardLoading, error: dashboardError } = useDashboard(currentDashboardId || 0);
+  const { dashboardInfo } = useDashboard({ dashboardId: currentDashboardId || 0 });
 
   // 실제 표시할 대시보드 정보
   const displayDashboard = dashboardInfo;
@@ -44,7 +44,7 @@ export const DashboardMemberDisplay = () => {
   };
 
   // 로딩 중이거나 에러 발생 시 렌더링하지 않음
-  if (isDashboardLoading || isMemberLoading || dashboardError || memberError) return null;
+  if (isMemberLoading || memberError) return null;
 
   // 대시보드 소유자 여부 확인
   const isDashboardOwner = displayDashboard?.createdByMe || false;

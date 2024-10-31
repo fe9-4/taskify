@@ -2,10 +2,10 @@ import Image from "next/image";
 import TagChip from "@/components/chip/TagChip";
 import { HiOutlineCalendar } from "react-icons/hi";
 import { Draggable } from "@hello-pangea/dnd";
-import { CardResponseSchemaType } from "@/zodSchema/cardSchema";
+import { CardDataProps } from "@/types/cardType";
 
 interface IProps {
-  card: CardResponseSchemaType;
+  card: CardDataProps;
   index: number;
   columnId: number;
   columnTitle: string;

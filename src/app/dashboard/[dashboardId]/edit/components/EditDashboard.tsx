@@ -18,7 +18,7 @@ const EditDashboard = ({ dashboardId }: { dashboardId: number }) => {
     formState: { isValid, isDirty },
   } = useForm<FieldValues>({ mode: "onChange" });
 
-  const { dashboardInfo, updateDashboard, isUpdating } = useDashboard(dashboardId);
+  const { dashboardInfo, updateDashboard, isUpdating } = useDashboard({ dashboardId });
 
   useEffect(() => {
     if (dashboardInfo) {

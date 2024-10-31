@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { boolean, z } from "zod";
 import { DateSchema } from "./commonSchema";
 
 // 대시보드 수정 요청 스키마

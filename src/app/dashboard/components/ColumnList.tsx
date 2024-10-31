@@ -1,4 +1,3 @@
-import { useCallback, useEffect, useRef } from "react";
 import { useAtom } from "jotai";
 import { HiOutlineCog } from "react-icons/hi";
 import { NumChip } from "../../../components/chip/PlusAndNumChip";
@@ -7,11 +6,28 @@ import { ColumnAtom, CreateCardParamsAtom, DetailCardParamsAtom } from "@/store/
 import { useToggleModal } from "@/hooks/useToggleModal";
 import { Droppable } from "@hello-pangea/dnd";
 import ColumnItem from "./ColumnItem";
-import { useCard } from "@/hooks/useCard";
+import axios from "axios";
+import { useCallback, useEffect, useState } from "react";
+import { CardDataProps } from "@/types/cardType";
+import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 
 interface IProps {
   columnTitle: string;
   columnId: number;
+}
+
+interface CardType {
+  id: number;
+  title: string;
+  description: string;
+  dueDate: string;
+  tags: string[];
+  assignee: {
+    id: number;
+    nickname: string;
+    profileImageUrl: string | null;
+  };
+  imageUrl: string;
 }
 
 const ColumnList = ({ columnTitle, columnId }: IProps) => {
@@ -19,31 +35,29 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [, setColumnAtom] = useAtom(ColumnAtom);
   const [, setIsCreateCardParams] = useAtom(CreateCardParamsAtom);
   const [, setIsDetailCardParams] = useAtom(DetailCardParamsAtom);
-  const loadingRef = useRef<HTMLDivElement | null>(null);
+  const [cards, setCards] = useState<CardType[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isCardUpdate, setIsCardUpdate] = useAtom(dashboardCardUpdateAtom);
+  const COMMON_SIZE = 3;
 
-  const { cards, totalCount, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useCard(columnId, 10);
-
-  const onIntersect = useCallback(
-    (entries: IntersectionObserverEntry[]) => {
-      const target = entries[0];
-      if (target.isIntersecting && hasNextPage && !isFetchingNextPage) {
-        fetchNextPage();
-      }
-    },
-    [hasNextPage, isFetchingNextPage, fetchNextPage]
-  );
+  const fetchCards = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get(`/api/cards?columnId=${columnId}&size=${COMMON_SIZE}`);
+      setCards(response.data.cards || []);
+      setTotalCount(response.data.totalCount || 0);
+      setIsCardUpdate(true);
+    } catch (error) {
+      console.error("카드 목록 조회 실패:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [columnId, setIsCardUpdate]);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(onIntersect, {
-      threshold: 1.0,
-    });
-
-    if (loadingRef.current) {
-      observer.observe(loadingRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [onIntersect]);
+    fetchCards();
+  }, [columnId, isCardUpdate, fetchCards]);
 
   const handleEditModal = () => {
     setColumnAtom({ title: columnTitle, columnId });
@@ -83,7 +97,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
               cards.map((card, index) => (
                 <ColumnItem
                   key={card.id}
-                  card={card}
+                  card={card as CardDataProps}
                   index={index}
                   columnId={columnId}
                   columnTitle={columnTitle}
@@ -99,7 +113,6 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
           </div>
         )}
       </Droppable>
-      {hasNextPage && <div ref={loadingRef} className="h-[1px]" />}
     </div>
   );
 };

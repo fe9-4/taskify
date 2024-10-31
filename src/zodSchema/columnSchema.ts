@@ -3,7 +3,7 @@ import { DateSchema } from "./commonSchema";
 
 // 컬럼 생성 요청 스키마
 export const CreateColumnSchema = z.object({
-  title: z.string().min(1, "제목을 입력해주세요").max(20, "제목은 20자 이하로 입력해주세요"),
+  title: z.string(),
   dashboardId: z.number(),
 });
 
@@ -28,10 +28,7 @@ export const ColumnSchema = z.object({
 
 export type ColumnSchemaType = z.infer<typeof ColumnSchema>;
 
-// 컬럼 목록 응답 스키마 (배열 형태로 수정)
-export const ColumnListSchema = z.object({
-  result: z.string(),
-  data: z.array(ColumnSchema),
-});
+// 컬럼 목록 응답 스키마를 배열 형태로 수정
+export const ColumnListSchema = z.array(ColumnSchema);
 
 export type ColumnListSchemaType = z.infer<typeof ColumnListSchema>;

@@ -28,12 +28,15 @@ import { ICurrentManager } from "@/types/currentManager";
 import { useCard } from "@/hooks/useCard";
 import { currentColumnListAtom } from "@/store/dashboardAtom";
 import { useColumn } from "@/hooks/useColumn";
+import { ICurrentColumn } from "@/types/dashboardType";
 
 const UpdateCard = () => {
   const { dashboardId } = useParams();
   const cardId = useAtomValue(UpdateCardParamsAtom);
   const [, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
   const [columnId, setColumnId] = useState<string>("");
+
+  if (!dashboardId) throw new Error("Dashboard ID is required");
 
   const { memberData } = useMember({
     dashboardId: Number(dashboardId),
@@ -58,14 +61,14 @@ const UpdateCard = () => {
 
   const { updateCard } = useCard(Number(columnId));
 
-  const { columns } = useColumn(Number(dashboardId));
+  const { columnList } = useColumn({ dashboardId: Number(dashboardId) });
   const [, setCurrentColumnList] = useAtom(currentColumnListAtom);
 
   useEffect(() => {
-    if (columns) {
-      setCurrentColumnList(columns);
+    if (columnList) {
+      setCurrentColumnList(columnList as unknown as ICurrentColumn[]);
     }
-  }, [columns, setCurrentColumnList]);
+  }, [columnList, setCurrentColumnList]);
 
   useEffect(() => {
     if (fileError) {
@@ -213,10 +216,10 @@ const UpdateCard = () => {
           imageUrl: uploadedImageUrl || "",
         };
 
-        console.log("카드 수정 데이터:", updateData);
         await updateCard(updateData);
         toggleModal("updateCard", false);
         setDashboardCardUpdate(true);
+        setTimeout(() => setDashboardCardUpdate(false), 100);
       } catch (error) {
         console.error("카드 수정 오류:", error);
         toast.error("카드 수정에 실패하였습니다.");

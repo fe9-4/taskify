@@ -1,5 +1,5 @@
 "use client";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import Button from "./Button";
 import DashboardList from "./DashboardList";
 import Logo from "./Logo";
@@ -16,13 +16,15 @@ const Sidebar = () => {
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(10);
   const [isExpanded, setIsExpanded] = useState(false);
+  const params = useParams();
+  const currentDashboardId = params?.dashboardId ? Number(params.dashboardId) : null;
 
   const pathname = usePathname();
   const { isLargeScreen } = useWidth();
   const { user } = useAuth();
-  const { dashboardData } = useDashboard();
+  const { dashboardData } = useDashboard({ dashboardId: currentDashboardId || 0, page, size });
 
-  const totalPage: number = Math.ceil(dashboardData?.totalCount || 0 / size);
+  const totalPage: number = Math.ceil(dashboardData?.totalCount / size);
 
   const onClickSidebar = () => {
     if (!isLargeScreen) {
@@ -46,7 +48,7 @@ const Sidebar = () => {
       <Logo isExpanded={isExpanded} />
       <div className="relative flex h-[700px] w-full shrink-0 flex-col">
         <Button isExpanded={isExpanded} />
-        <DashboardList list={dashboardData?.dashboards || []} isExpanded={isExpanded} />
+        <DashboardList list={dashboardData?.dashboards} isExpanded={isExpanded} />
         <button
           type="button"
           onClick={onClickSidebar}
@@ -60,7 +62,7 @@ const Sidebar = () => {
           <HiChevronDoubleLeft className={cls("size-5 text-gray01", isExpanded ? "" : "hidden")} />
         </button>
         <div className={cls("absolute bottom-0 md:mt-6 md:block xl:mt-8", isExpanded ? "" : "hidden")}>
-          {dashboardData?.totalCount && dashboardData.totalCount > size ? (
+          {dashboardData?.totalCount > size ? (
             <Pagination totalPage={totalPage} setPage={setPage} page={page} />
           ) : (
             <></>

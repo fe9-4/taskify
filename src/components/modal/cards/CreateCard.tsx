@@ -128,6 +128,7 @@ const CreateCard = () => {
           toast.success("카드가 생성되었습니다! 🎉");
           toggleModal("createCard", false);
           setDashboardCardUpdate(true);
+          setTimeout(() => setDashboardCardUpdate(false), 100);
         }
       } catch (error) {
         toast.error("카드 생성에 실패하였습니다.");
