@@ -52,7 +52,7 @@ const CommentList = ({ cardId, columnId }: CommentListProps) => {
   useEffect(() => {
     getComments();
     setObserve(false);
-  }, [observe, getComments]);
+  }, [observe]);
 
   const setObserveTarget: Dispatch<SetStateAction<any>> = useIntersectionObserver(() => {
     setObserve(true);

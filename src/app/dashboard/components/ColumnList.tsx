@@ -8,7 +8,7 @@ import { NumChip } from "../../../components/chip/PlusAndNumChip";
 import { AddTodoBtn } from "../../../components/button/ButtonComponents";
 import { ColumnAtom, CreateCardParamsAtom, DetailCardParamsAtom } from "@/store/modalAtom";
 import { ICard } from "@/types/dashboardType";
-import { currentColumnListAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
+import { cardLocationChangeAtom, currentColumnListAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { useToggleModal } from "@/hooks/useToggleModal";
 
 interface IProps {
@@ -19,35 +19,42 @@ interface IProps {
 const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [cardList, setCardList] = useState<ICard["cards"]>([]);
   const [hasMore, setHasMore] = useState(true);
-  const [size, setSize] = useState(3);
-  const toggleModal = useToggleModal();
+  const [size] = useState(3);
+  const [cursorId, setCursorId] = useState<ICard["cursorId"]>();
+  const [totalCount, setTotalCount] = useState<ICard["totalCount"]>(0);
   const [, setColumnAtom] = useAtom(ColumnAtom);
   const [, setIsCreateCardParams] = useAtom(CreateCardParamsAtom);
   const [, setIsDetailCardParams] = useAtom(DetailCardParamsAtom);
   const [, setCurrentColumnList] = useAtom(currentColumnListAtom);
   const [dashboardCardUpdate, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
-  const observeRef = useRef<IntersectionObserver | null>(null);
-  const loadingRef = useRef<HTMLDivElement | null>(null);
-  
+  const [cardLocationChange, setCardLocationChange] = useAtom(cardLocationChangeAtom);
+  const toggleModal = useToggleModal();
+  const observeRef = useRef<HTMLDivElement | null>(null);
+
   const getCardList = useCallback(async () => {
     if (!hasMore) return;
 
     try {
-      const response = await axios.get(`/api/cards?size=${size}&columnId=${columnId}`);
-
+      const response = await axios.get(`/api/cards?size=${size}&columnId=${columnId}&cursorId=${cursorId}`);
+      
       if (response.status === 200) {
         const newCardList: ICard["cards"] = response.data.cards;
+        setTotalCount(response.data.totalCount);
 
         setCardList((prev) => {
           const existingId = new Set(prev.map((card) => card.id));
           const filteredNewCardList = newCardList.filter((card) => !existingId.has(card.id));
-
+          
           if (filteredNewCardList.length === 0 || filteredNewCardList.length < size) {
             setHasMore(false);
           }
 
           return [...prev, ...filteredNewCardList];
         });
+
+        if (newCardList.length >= size) {
+          setCursorId(newCardList[newCardList.length - 1].id);
+        } 
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -55,44 +62,47 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
         toast.error(error.response?.data);
       }
     }
-  }, [columnId, hasMore, size]);
+  }, [columnId, hasMore, size, cursorId]);
 
   // 카드아이템 무한스크롤
   useEffect(() => {
-    getCardList();
-
-    observeRef.current = new IntersectionObserver((entries) => {
+    const observer = new IntersectionObserver((entries) => {
       const lastCardItem = entries[0];
 
       if (lastCardItem.isIntersecting && hasMore) {
         getCardList();
       }
-    });
+    }, { threshold: 1 });
 
-    const currentLoadingRef = loadingRef.current;
+    const currentLoadingRef = observeRef.current;
 
     if (currentLoadingRef) {
-      observeRef.current.observe(currentLoadingRef);
+      observer.observe(currentLoadingRef);
     }
 
     return () => {
       if (currentLoadingRef) {
-        observeRef.current?.unobserve(currentLoadingRef);
+        observer?.unobserve(currentLoadingRef);
       }
     };
-  }, [hasMore, size, getCardList]);
+  }, [hasMore, getCardList]);
 
   // 카드 실시간 업데이트
   useEffect(() => {
     if (dashboardCardUpdate) {
       getCardList();
 
-      setCardList((prev) => prev.filter((card) => card.columnId !== columnId));
-
       setHasMore(true);
       setDashboardCardUpdate(false);
     }
-  }, [getCardList, dashboardCardUpdate, columnId, setDashboardCardUpdate]);
+  }, [dashboardCardUpdate, getCardList]);
+
+  useEffect(() => {
+    if (cardLocationChange) {
+      setCardList((prev) => prev.filter((card) => card.columnId !== columnId));
+      setCardLocationChange(false);
+    }
+  }, [cardLocationChange, columnId]);
 
   // 카드 수정시 드롭다운에 보내는 데이터
   useEffect(() => {
@@ -124,7 +134,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
             <span className="size-2 rounded-full bg-violet01" />
             <h2 className="text-lg font-bold text-black">{columnTitle}</h2>
           </div>
-          <NumChip num={cardList.length} />
+          <NumChip num={totalCount} />
         </div>
         <button onClick={handleEditModal}>
           <HiOutlineCog className="size-[22px] text-gray01" />
@@ -138,24 +148,24 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
           }}
         />
         {cardList.length > 0 ? (
-          cardList.map((item, i) => (
+          cardList.map((item) => (
             <div key={item.id}>
               <button
                 className="size-full"
                 onClick={() => {
                   toggleModal("detailCard", true);
                   setIsDetailCardParams(item.id);
-                  setColumnAtom({ title: columnTitle, columnId });
+                  setColumnAtom({ title: columnTitle, columnId });  
                 }}
               >
                 <ColumnItem cards={item} />
-                {i === cardList.length - 1 && <div ref={loadingRef} className="h-[1px]" />}
               </button>
             </div>
           ))
         ) : (
           <p className="flex items-center justify-center text-center font-bold">등록된 카드가 없습니다.</p>
         )}
+        {hasMore && <div ref={observeRef} className="flex items-center justify-center font-bold">카드 더 보기</div>}
       </div>
     </div>
   );
