@@ -179,8 +179,11 @@ const CreateCard = () => {
         <InputItem
           label="제목"
           id="title"
-          {...register("title")}
+          {...register("title", {
+            required: "제목은 필수입니다",
+          })}
           errors={errors.title && errors.title.message}
+          placeholder="제목을 입력해 주세요"
           required
         />
 
@@ -197,6 +200,7 @@ const CreateCard = () => {
           isTextArea
           size="description"
           required
+          placeholder="설명을 입력해 주세요"
           errors={errors.description && errors.description.message}
         />
 

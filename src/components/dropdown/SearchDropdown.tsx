@@ -61,7 +61,7 @@ const SearchDropdown = ({ validation, setValue, inviteMemberList, setManager, cu
       </label>
       <div className="flex w-full flex-col space-y-[2px] bg-white" ref={dropdownRef}>
         <div className="flex h-[50px] w-full items-center justify-between overflow-hidden rounded-lg px-4 ring-1 ring-inset ring-gray03 transition-all focus-within:ring-violet01 focus:outline-none focus:ring-1 focus:ring-inset">
-          <div className="flex items-center space-x-2 w-full">
+          <div className="flex w-full items-center space-x-2">
             {selectedName && (
               <span className="flex h-[26px] w-7 items-center justify-center rounded-full bg-[#A3C4A2] text-xs font-semibold text-white ring-white ring-offset-2">
                 {selectedName.nickname.charAt(0)}
