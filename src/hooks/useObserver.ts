@@ -23,7 +23,7 @@ const useIntersectionObserver = (callback: () => void) => {
         currentObserver.unobserve(currentTarget);
       }
     };
-  }, [observeTarget]);
+  }, [observeTarget, callback]);
 
   return setObserveTarget;
 };
