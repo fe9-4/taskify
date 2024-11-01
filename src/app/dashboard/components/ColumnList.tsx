@@ -14,10 +14,9 @@ import { useToggleModal } from "@/hooks/useModal";
 interface IProps {
   columnTitle: string;
   columnId: number;
-  dashboardId: string | string[];
 }
 
-const ColumnList = ({ columnTitle, columnId, dashboardId }: IProps) => {
+const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [cardList, setCardList] = useState<ICard["cards"]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [size] = useState(3);
@@ -28,15 +27,15 @@ const ColumnList = ({ columnTitle, columnId, dashboardId }: IProps) => {
   const [, setIsDetailCardParams] = useAtom(DetailCardParamsAtom);
   const [, setCurrentColumnList] = useAtom(currentColumnListAtom);
   const [dashboardCardUpdate, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
-  const toggleModal = useToggleModal();
   const observeRef = useRef<HTMLDivElement | null>(null);
-  
+  const toggleModal = useToggleModal();
+
   const getCardList = useCallback(async () => {
     if (!hasMore) return;
 
     try {
       const response = await axios.get(`/api/cards?size=${size}&columnId=${columnId}&cursorId=${cursorId}`);
-      
+
       if (response.status === 200) {
         const newCardList: ICard["cards"] = response.data.cards;
         setTotalCount(response.data.totalCount);
@@ -44,7 +43,7 @@ const ColumnList = ({ columnTitle, columnId, dashboardId }: IProps) => {
         setCardList((prev) => {
           const existingId = new Set(prev.map((card) => card.id));
           const filteredNewCardList = newCardList.filter((card) => !existingId.has(card.id));
-          
+
           if (filteredNewCardList.length === 0 || filteredNewCardList.length < size) {
             setHasMore(false);
           }
@@ -54,7 +53,7 @@ const ColumnList = ({ columnTitle, columnId, dashboardId }: IProps) => {
 
         if (newCardList.length >= size) {
           setCursorId(newCardList[newCardList.length - 1].id);
-        } 
+        }
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -66,13 +65,16 @@ const ColumnList = ({ columnTitle, columnId, dashboardId }: IProps) => {
 
   // 카드아이템 무한스크롤
   useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      const lastCardItem = entries[0];
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const lastCardItem = entries[0];
 
-      if (lastCardItem.isIntersecting && hasMore) {
-        getCardList();
-      }
-    }, { threshold: 1 });
+        if (lastCardItem.isIntersecting && hasMore) {
+          getCardList();
+        }
+      },
+      { threshold: 1 }
+    );
 
     const currentLoadingRef = observeRef.current;
 
@@ -101,7 +103,7 @@ const ColumnList = ({ columnTitle, columnId, dashboardId }: IProps) => {
     if (columnTitle && columnId) {
       setCurrentColumnList((prev) => {
         const newColumn = { id: columnId, title: columnTitle };
-        
+
         const checkList = prev.some((column) => column.id === columnId);
 
         if (!checkList) {
@@ -147,7 +149,7 @@ const ColumnList = ({ columnTitle, columnId, dashboardId }: IProps) => {
                 onClick={() => {
                   toggleModal("detailCard", true);
                   setIsDetailCardParams(item.id);
-                  setColumnAtom({ title: columnTitle, columnId });  
+                  setColumnAtom({ title: columnTitle, columnId });
                 }}
               >
                 <ColumnItem cards={item} />
@@ -157,7 +159,11 @@ const ColumnList = ({ columnTitle, columnId, dashboardId }: IProps) => {
         ) : (
           <p className="flex items-center justify-center text-center font-bold">등록된 카드가 없습니다.</p>
         )}
-        {hasMore && <div ref={observeRef} className="flex items-center justify-center font-bold">카드 더 보기</div>}
+        {hasMore && (
+          <div ref={observeRef} className="flex items-center justify-center font-bold">
+            카드 더 보기
+          </div>
+        )}
       </div>
     </div>
   );
