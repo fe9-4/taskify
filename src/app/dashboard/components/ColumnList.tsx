@@ -10,6 +10,7 @@ import { ColumnAtom, TodoCardId } from "@/store/modalAtom";
 import { ICard } from "@/types/dashboardType";
 import { currentColumnListAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { useToggleModal } from "@/hooks/useModal";
+import { useWidth } from "@/hooks/useWidth";
 
 interface IProps {
   columnTitle: string;
@@ -28,6 +29,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [dashboardCardUpdate, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
   const observeRef = useRef<HTMLDivElement | null>(null);
   const toggleModal = useToggleModal();
+  const isLargeScreen = useWidth();
 
   const getCardList = useCallback(async () => {
     if (!hasMore) return;
@@ -72,7 +74,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
           getCardList();
         }
       },
-      { threshold: 1 }
+      { threshold: 0.5 }
     );
 
     const currentLoadingRef = observeRef.current;
@@ -158,11 +160,9 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
         ) : (
           <p className="flex items-center justify-center text-center font-bold">등록된 카드가 없습니다.</p>
         )}
-        {hasMore && (
-          <div ref={observeRef} className="flex items-center justify-center font-bold">
-            카드 더 보기
-          </div>
-        )}
+        <div ref={observeRef} className="hidden font-bold xl:flex xl:items-center xl:justify-center">
+          카드 더 보기
+        </div>
       </div>
     </div>
   );

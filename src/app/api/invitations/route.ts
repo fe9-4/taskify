@@ -30,8 +30,7 @@ export const GET = async (req: Request) => {
       const data = response.data;
       
       const inviteList = data.invitations;
-      const cursorId = data.cursorId;
-      return NextResponse.json({ inviteList, cursorId }, { status: 200 });
+      return NextResponse.json(inviteList, { status: 200 });
     }
   } catch (error) {
     if (axios.isAxiosError(error)) {

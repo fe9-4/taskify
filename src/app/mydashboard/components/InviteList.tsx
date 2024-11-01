@@ -20,7 +20,7 @@ const InviteList = () => {
       const response = await axios.get(`/api/invitations?size=${size}&cursorId=${cursorId}`);
 
       if (response.status === 200) {
-        const newInviteList: IInvitation["invitations"] = response.data.inviteList;
+        const newInviteList: IInvitation["invitations"] = response.data;
 
         setInvitationList((prev) => {
           const existingId = new Set(prev.map((item) => item.dashboard.id));
@@ -61,7 +61,7 @@ const InviteList = () => {
           getInvitationList();
         }
       },
-      { threshold: 1 }
+      { threshold: 0.5 }
     );
 
     const currentLoadingRef = observeRef.current;
@@ -99,11 +99,12 @@ const InviteList = () => {
       ) : (
         <InviteItem invitationList={invitationList} setInvitationList={setInvitationList} />
       )}
-      {hasMore && (
-        <div ref={observeRef} className="flex items-center justify-center font-bold">
-          초대 더 보기
-        </div>
-      )}
+      {hasMore &&
+        (invitationList.length > size ? (
+          <div ref={observeRef} className="flex items-center justify-center font-bold">
+            초대 더 보기
+          </div>
+        ) : null)}
     </div>
   );
 };
