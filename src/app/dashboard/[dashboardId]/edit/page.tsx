@@ -3,32 +3,25 @@ import { DeleteDashboardBtn } from "@/components/button/ButtonComponents";
 import EditDashboard from "@/app/dashboard/[dashboardId]/edit/components/EditDashboard";
 import Link from "next/link";
 import { IoIosArrowBack } from "react-icons/io";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import DashboardMemberList from "./components/DashboardMemberList";
 import InviteList from "./components/InviteList";
 import Section from "./components/Section";
-import toast from "react-hot-toast";
-import axios from "axios";
-import useLoading from "@/hooks/useLoading";
 import { useDeleteModal } from "@/hooks/useModal";
+import { useDashboard } from "@/hooks/useDashboard";
 
 const EditPage = () => {
   const { dashboardId } = useParams();
-  const router = useRouter();
-  const { isLoading, withLoading } = useLoading();
-  const setDeleteModal = useDeleteModal();
   const id = Number(dashboardId);
+  const setDeleteModal = useDeleteModal();
+  const { deleteDashboard, isDeleting } = useDashboard({ dashboardId: id });
 
   const onDelete = async () => {
-    await withLoading(async () => {
-      try {
-        await axios.delete(`/api/dashboards/${dashboardId}`);
-        toast.success("대시보드 삭제 완료");
-        router.push("/mydashboard");
-      } catch (error) {
-        toast.error("대시보드 삭제 실패");
-      }
-    });
+    try {
+      await deleteDashboard(id);
+    } catch (error) {
+      console.error("대시보드 삭제 실패:", error);
+    }
   };
 
   return (
@@ -53,7 +46,7 @@ const EditPage = () => {
           onClick={() => {
             setDeleteModal(onDelete, "대시보드를 삭제하시겠습니까?");
           }}
-          disabled={isLoading}
+          disabled={isDeleting}
         />
       </div>
     </div>

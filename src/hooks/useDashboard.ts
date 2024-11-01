@@ -11,10 +11,49 @@ import {
   DashboardSchema,
 } from "@/zodSchema/dashboardSchema";
 
+interface DashboardOptions {
+  dashboardId?: number;
+  page?: number;
+  size?: number;
+  cursorId?: number;
+  showErrorToast?: boolean;
+  customErrorMessage?: string;
+}
+
 interface CreateDashboardData {
   title: string;
   color: string;
 }
+
+// createDashboard를 위한 별도의 hook
+const useCreateDashboard = () => {
+  const queryClient = useQueryClient();
+
+  const { mutateAsync: createDashboard, isPending: isCreating } = useMutation<Dashboard, Error, CreateDashboardData>({
+    mutationFn: async (data: CreateDashboardData) => {
+      try {
+        const response = await axios.post("/api/dashboards", data);
+        console.log(response.data);
+        return DashboardSchema.parse(response.data);
+      } catch (error) {
+        if (error instanceof Error) {
+          throw new Error(error.message);
+        }
+        throw error;
+      }
+    },
+    onSuccess: (data) => {
+      toast.success("대시보드가 생성되었습니다");
+      queryClient.invalidateQueries({ queryKey: ["dashboardData"] });
+      return data;
+    },
+    onError: (error) => {
+      toast.error(error.message || "대시보드 생성에 실패했습니다");
+    },
+  });
+
+  return { createDashboard, isCreating };
+};
 
 export const useDashboard = ({
   dashboardId,
@@ -23,18 +62,10 @@ export const useDashboard = ({
   cursorId,
   showErrorToast = true,
   customErrorMessage,
-}: {
-  dashboardId?: number;
-  page?: number;
-  size?: number;
-  cursorId?: number;
-  showErrorToast?: boolean;
-  customErrorMessage?: string;
-}) => {
+}: DashboardOptions = {}) => {
   const { user } = useAuth();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const dashboardIdString = String(dashboardId);
 
   // 대시보드 목록 조회
   const { data: dashboardData } = useQuery<DashboardList>({
@@ -63,8 +94,10 @@ export const useDashboard = ({
 
   // 대시보드 상세 조회
   const { data: dashboardInfo } = useQuery<Dashboard>({
-    queryKey: ["dashboardInfo", dashboardIdString],
+    queryKey: ["dashboardInfo", dashboardId],
     queryFn: async () => {
+      if (!dashboardId) throw new Error("대시보드 ID가 필요합니다.");
+
       try {
         const response = await axios.get(`/api/dashboards/${dashboardId}`);
         return DashboardSchema.parse(response.data);
@@ -77,28 +110,6 @@ export const useDashboard = ({
       }
     },
     enabled: !!user && !!dashboardId,
-  });
-
-  // 대시보드 생성
-  const { mutateAsync: createDashboard, isPending: isCreating } = useMutation<Dashboard, Error, CreateDashboardData>({
-    mutationFn: async (data: CreateDashboardData) => {
-      try {
-        const response = await axios.post("/api/dashboards", data);
-        return response.data;
-      } catch (error) {
-        if (error instanceof Error) {
-          throw new Error(error.message);
-        }
-        throw error;
-      }
-    },
-    onSuccess: () => {
-      toast.success("대시보드가 생성되었습니다");
-      queryClient.invalidateQueries({ queryKey: ["dashboardData"] });
-    },
-    onError: (error) => {
-      toast.error(error.message || "대시보드 생성에 실패했습니다");
-    },
   });
 
   // 대시보드 수정
@@ -121,7 +132,7 @@ export const useDashboard = ({
     onSuccess: () => {
       toast.success("대시보드가 수정되었습니다");
       queryClient.invalidateQueries({ queryKey: ["dashboardData"] });
-      queryClient.invalidateQueries({ queryKey: ["dashboardInfo", dashboardIdString] });
+      queryClient.invalidateQueries({ queryKey: ["dashboardInfo", dashboardId] });
     },
     onError: (error) => {
       toast.error(error.message || "대시보드 수정에 실패했습니다");
@@ -153,11 +164,12 @@ export const useDashboard = ({
   return {
     dashboardData,
     dashboardInfo,
-    createDashboard,
     updateDashboard,
     deleteDashboard,
-    isCreating,
     isUpdating,
     isDeleting,
   };
 };
+
+// createDashboard를 별도로 export
+export { useCreateDashboard };

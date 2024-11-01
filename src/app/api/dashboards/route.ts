@@ -1,10 +1,9 @@
-import axios from "axios"
+import axios from "axios";
 import apiClient from "../apiClient";
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { CreateDashboard } from "@/types/dashboardType";
 
-// 내 대시보드 상단 대시보드 목록 조회, 사이드바 대시보드 조회 
+// 내 대시보드 상단 대시보드 목록 조회, 사이드바 대시보드 조회
 export const GET = async (req: NextRequest) => {
   const searchParams = req.nextUrl.searchParams;
   const cursorId = searchParams.get("cursorId");
@@ -55,14 +54,16 @@ export const POST = async (request: NextRequest) => {
   }
 
   try {
-    const formData: CreateDashboard = await request.json();
+    const formData = await request.json();
     const response = await apiClient.post("/dashboards", formData, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
 
-    return NextResponse.json({ user: response.data }, { status: 200 });
+    if (response.status === 201) {
+      return NextResponse.json(response.data, { status: 201 });
+    }
   } catch (error) {
     if (axios.isAxiosError(error)) {
       return new NextResponse(JSON.stringify({ message: "대시보드 생성 실패" }), { status: error.status });

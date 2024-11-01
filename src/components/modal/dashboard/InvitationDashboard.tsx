@@ -1,20 +1,20 @@
-import { useParams, usePathname, useRouter } from "next/navigation";
-import React, { useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import React from "react";
 import { useForm } from "react-hook-form";
 import InputItem from "../../input/InputItem";
 import { CancelBtn, ConfirmBtn } from "../../button/ButtonComponents";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMember } from "@/hooks/useMember";
-import { FormData, FormSchema, Invitation } from "@/zodSchema/invitationSchema";
-import { useDashboard } from "@/hooks/useDashboard";
+import { FormData, FormSchema } from "@/zodSchema/invitationSchema";
 import { useInvitation } from "@/hooks/useInvitation";
 import { useToggleModal } from "@/hooks/useModal";
+import toast from "react-hot-toast";
+import axios from "axios";
 
 const InvitationDashboard = () => {
   const toggleModal = useToggleModal();
   const params = useParams();
   const currentDashboardId = params?.dashboardId ? Number(params.dashboardId) : null;
-  const pathname = usePathname();
   const router = useRouter();
 
   const {
@@ -30,17 +30,8 @@ const InvitationDashboard = () => {
     },
   });
 
-  // 대시보드 정보 조회
-  const { dashboardInfo } = useDashboard({
-    dashboardId: currentDashboardId || 0,
-  });
-
   // 대시보드 멤버 여부 확인
-  const {
-    memberData,
-    isLoading: isMemberLoading,
-    error: memberError,
-  } = useMember({
+  const { isLoading: isMemberLoading, error: memberError } = useMember({
     dashboardId: currentDashboardId || 0,
     page: 1,
     size: 100,
@@ -53,20 +44,30 @@ const InvitationDashboard = () => {
     dashboardId: currentDashboardId || 0,
   });
 
-  useEffect(() => {
-    if (memberError) {
-      toggleModal("invitationDashboard", false);
-      router.push("/mydashboard");
-    }
-  }, [memberError, toggleModal, router]);
+  // 에러 발생 시 처리
+  if (memberError) {
+    toast.error("멤버 정보를 불러오는데 실패했습니다.");
+    toggleModal("invitationDashboard", false);
+    router.push("/mydashboard");
+    return null;
+  }
 
   const onSubmit = handleSubmit(async (data) => {
+    if (!currentDashboardId) {
+      toast.error("유효하지 않은 대시보드입니다.");
+      toggleModal("invitationDashboard", false);
+      router.push("/mydashboard");
+      return;
+    }
+
     try {
       await inviteMember(data);
       reset();
       toggleModal("invitationDashboard", false);
     } catch (error) {
-      console.error("초대 실패:", error);
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data || "초대에 실패했습니다.");
+      }
     }
   });
 
