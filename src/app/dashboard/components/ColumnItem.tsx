@@ -2,10 +2,10 @@ import React, { memo } from "react";
 import Image from "next/image";
 import TagChip from "@/components/chip/TagChip";
 import { HiOutlineCalendar } from "react-icons/hi";
-import { CardDataProps } from "@/types/cardType";
+import { ICard } from "@/types/dashboardType";
 
 interface IProps {
-  card: CardDataProps;
+  card: ICard["cards"][number];
   dragHandleProps?: any;
 }
 

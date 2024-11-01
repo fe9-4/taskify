@@ -11,14 +11,14 @@ import { ColumnTitlesAtom, RefreshDashboardAtom } from "@/store/modalAtom";
 import { useToggleModal } from "@/hooks/useModal";
 import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
-import { CardDataProps } from "@/types/cardType";
+import { ICard } from "@/types/dashboardType";
 
 interface IColumnData {
   id: number;
   title: string;
   teamId: string;
   position: number;
-  cards: CardDataProps[];
+  cards: ICard["cards"];
 }
 
 const DashboardDetail = () => {

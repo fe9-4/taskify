@@ -10,17 +10,17 @@ import { ColumnAtom, TodoCardId } from "@/store/modalAtom";
 import { currentColumnListAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { useToggleModal } from "@/hooks/useModal";
 import { Droppable, Draggable } from "@hello-pangea/dnd";
-import { CardDataProps } from "@/types/cardType";
+import { ICard } from "@/types/dashboardType";
 
 interface IProps {
   columnTitle: string;
   columnId: number;
   dragHandleProps?: any;
-  cards: CardDataProps[];
+  cards: ICard["cards"];
 }
 
 const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards }: IProps) => {
-  const [cardList, setCardList] = useState<CardDataProps[]>([]);
+  const [cardList, setCardList] = useState<ICard["cards"]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [size] = useState(10);
   const [cursorId, setCursorId] = useState<number | undefined>();
@@ -45,7 +45,7 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards }: IProps) =
       const currentCursorId = cursorId || lastCardId;
 
       const response = await axios.get<{
-        cards: CardDataProps[];
+        cards: ICard["cards"];
         totalCount: number;
       }>(`/api/cards?size=${size}&columnId=${columnId}${currentCursorId ? `&cursorId=${currentCursorId}` : ""}`);
 
