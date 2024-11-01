@@ -52,7 +52,7 @@ export const DashboardMemberDisplay = () => {
   return (
     <div className="flex h-full w-full items-center justify-between">
       {/* 대시보드 제목 영역 */}
-      <div className="w-[100px] pl-1 md:w-[180px]">
+      <div className="w-[100px] pl-1 md:w-[240px]">
         <SelectedDashboard title={displayDashboard?.title || null} isDashboardOwner={isDashboardOwner} />
       </div>
 
