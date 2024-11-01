@@ -37,7 +37,7 @@ export const useDashboard = ({
   const dashboardIdString = String(dashboardId);
 
   // 대시보드 목록 조회
-  const { data: dashboardData, refetch: refetchDashboards } = useQuery<DashboardList>({
+  const { data: dashboardData } = useQuery<DashboardList>({
     queryKey: ["dashboardData", page, size, cursorId],
     queryFn: async () => {
       try {
@@ -62,7 +62,7 @@ export const useDashboard = ({
   });
 
   // 대시보드 상세 조회
-  const { data: dashboardInfo, refetch: refetchDashboardInfo } = useQuery<Dashboard>({
+  const { data: dashboardInfo } = useQuery<Dashboard>({
     queryKey: ["dashboardInfo", dashboardIdString],
     queryFn: async () => {
       try {
@@ -94,7 +94,6 @@ export const useDashboard = ({
     },
     onSuccess: () => {
       toast.success("대시보드가 생성되었습니다");
-      refetchDashboards();
       queryClient.invalidateQueries({ queryKey: ["dashboardData"] });
     },
     onError: (error) => {
@@ -121,8 +120,6 @@ export const useDashboard = ({
     },
     onSuccess: () => {
       toast.success("대시보드가 수정되었습니다");
-      refetchDashboards();
-      refetchDashboardInfo();
       queryClient.invalidateQueries({ queryKey: ["dashboardData"] });
       queryClient.invalidateQueries({ queryKey: ["dashboardInfo", dashboardIdString] });
     },
@@ -145,7 +142,6 @@ export const useDashboard = ({
     },
     onSuccess: () => {
       toast.success("대시보드가 삭제되었습니다");
-      refetchDashboards();
       queryClient.invalidateQueries({ queryKey: ["dashboardData"] });
       router.push("/mydashboard");
     },
@@ -163,7 +159,5 @@ export const useDashboard = ({
     isCreating,
     isUpdating,
     isDeleting,
-    refetchDashboards,
-    refetchDashboardInfo,
   };
 };

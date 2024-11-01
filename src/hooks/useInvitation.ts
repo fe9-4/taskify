@@ -24,11 +24,11 @@ export const useInvitation = ({ dashboardId }: { dashboardId: number }) => {
   });
 
   // 초대 목록 조회
-  const { data: invitationList, refetch } = useQuery<InvitationList>({
+  const { data: invitationList } = useQuery<InvitationList>({
     queryKey: ["invitations", dashboardIdString],
     queryFn: async () => {
       try {
-        const response = await axios.get(`/api/dashboards/${dashboardId}/invitations?page=1&size=100`);
+        const response = await axios.get(`/api/dashboards/${dashboardIdString}/invitations?page=1&size=100`);
 
         return InvitationListSchema.parse(response.data);
       } catch (error) {
@@ -78,7 +78,6 @@ export const useInvitation = ({ dashboardId }: { dashboardId: number }) => {
     },
     onSuccess: () => {
       toast.success("초대 완료");
-      refetch();
       queryClient.invalidateQueries({ queryKey: ["invitations", dashboardIdString] });
     },
     onError: (error) => {
@@ -94,7 +93,6 @@ export const useInvitation = ({ dashboardId }: { dashboardId: number }) => {
     },
     onSuccess: () => {
       toast.success("초대가 취소되었습니다");
-      refetch();
       queryClient.invalidateQueries({ queryKey: ["invitations", dashboardIdString] });
     },
     onError: () => {
@@ -108,6 +106,5 @@ export const useInvitation = ({ dashboardId }: { dashboardId: number }) => {
     isInviting,
     cancelInvitation,
     isCanceling,
-    refetch,
   };
 };
