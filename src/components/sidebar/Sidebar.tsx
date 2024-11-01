@@ -1,5 +1,6 @@
 "use client";
-import { usePathname } from "next/navigation";
+
+import { useParams, usePathname, useRouter } from "next/navigation";
 import Button from "./Button";
 import DashboardList from "./DashboardList";
 import Logo from "./Logo";
@@ -9,20 +10,21 @@ import Pagination from "../pagination/Pagination";
 import { useDashboard } from "@/hooks/useDashboard";
 import { useAuth } from "@/hooks/useAuth";
 import { cls } from "@/lib/utils";
-import { HiChevronDoubleRight } from "react-icons/hi";
-import { HiChevronDoubleLeft } from "react-icons/hi";
+import { HiChevronDoubleRight, HiChevronDoubleLeft } from "react-icons/hi";
 
 const Sidebar = () => {
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(10);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const pathname = usePathname();
+  const params = useParams();
+  const currentDashboardId = params?.dashboardId ? Number(params.dashboardId) : null;
   const { isLargeScreen } = useWidth();
-  const { user } = useAuth();
-  const { dashboards } = useDashboard({ cursorId: 1, page, size });
+  const pathname = usePathname();
+  const { user, isLoading } = useAuth();
 
-  const totalPage: number = Math.ceil(dashboards.total / size);
+  const { dashboardData } = useDashboard({ dashboardId: currentDashboardId || 0, page, size });
+  const totalPage: number = dashboardData ? Math.ceil(dashboardData.totalCount / size) : 0;
 
   const onClickSidebar = () => {
     if (!isLargeScreen) {
@@ -34,7 +36,9 @@ const Sidebar = () => {
     setSize(isLargeScreen ? 15 : 10);
   }, [isLargeScreen]);
 
-  if (!user || pathname === "/" || pathname === "/login" || pathname === "/signup") return null;
+  if (isLoading || pathname === "/" || pathname === "/login" || pathname === "/signup") return null;
+
+  if (!isLoading && !user) return null;
 
   return (
     <aside
@@ -46,7 +50,7 @@ const Sidebar = () => {
       <Logo isExpanded={isExpanded} />
       <div className="relative flex h-[700px] w-full shrink-0 flex-col">
         <Button isExpanded={isExpanded} />
-        <DashboardList list={dashboards.all} isExpanded={isExpanded} />
+        <DashboardList list={dashboardData?.dashboards} isExpanded={isExpanded} />
         <button
           type="button"
           onClick={onClickSidebar}
@@ -60,7 +64,9 @@ const Sidebar = () => {
           <HiChevronDoubleLeft className={cls("size-5 text-gray01", isExpanded ? "" : "hidden")} />
         </button>
         <div className={cls("absolute bottom-0 md:mt-6 md:block xl:mt-8", isExpanded ? "" : "hidden")}>
-          {dashboards.total > size ? <Pagination totalPage={totalPage} setPage={setPage} page={page} /> : <></>}
+          {dashboardData && dashboardData.totalCount > size ? (
+            <Pagination totalPage={totalPage} setPage={setPage} page={page} />
+          ) : null}
         </div>
       </div>
     </aside>

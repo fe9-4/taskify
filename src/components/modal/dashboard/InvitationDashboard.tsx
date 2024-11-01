@@ -1,10 +1,9 @@
-import { useParams, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import InputItem from "../../input/InputItem";
 import { CancelBtn, ConfirmBtn } from "../../button/ButtonComponents";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAuth } from "@/hooks/useAuth";
 import { useMember } from "@/hooks/useMember";
 import { FormData, FormSchema, Invitation } from "@/zodSchema/invitationSchema";
 import { useDashboard } from "@/hooks/useDashboard";
@@ -14,9 +13,9 @@ import { useToggleModal } from "@/hooks/useModal";
 const InvitationDashboard = () => {
   const toggleModal = useToggleModal();
   const params = useParams();
-  const router = useRouter();
   const currentDashboardId = params?.dashboardId ? Number(params.dashboardId) : null;
-  const { user } = useAuth();
+  const pathname = usePathname();
+  const router = useRouter();
 
   const {
     register,
@@ -32,18 +31,9 @@ const InvitationDashboard = () => {
   });
 
   // 대시보드 정보 조회
-  const {
-    getDashboardById,
-    isLoading: isDashboardLoading,
-    error: dashboardError,
-  } = useDashboard({
-    page: 1,
-    size: 10,
-    showErrorToast: true,
-    customErrorMessage: "대시보드를 찾을 수 없습니다.",
+  const { dashboardInfo } = useDashboard({
+    dashboardId: currentDashboardId || 0,
   });
-
-  const currentDashboard = currentDashboardId ? getDashboardById(currentDashboardId) : null;
 
   // 대시보드 멤버 여부 확인
   const {
@@ -64,11 +54,11 @@ const InvitationDashboard = () => {
   });
 
   useEffect(() => {
-    if (dashboardError || memberError) {
+    if (memberError) {
       toggleModal("invitationDashboard", false);
       router.push("/mydashboard");
     }
-  }, [dashboardError, memberError, toggleModal, router]);
+  }, [memberError, toggleModal, router]);
 
   const onSubmit = handleSubmit(async (data) => {
     try {
@@ -80,7 +70,7 @@ const InvitationDashboard = () => {
     }
   });
 
-  if (isDashboardLoading || !currentDashboard) {
+  if (isMemberLoading) {
     return null;
   }
 
@@ -100,7 +90,7 @@ const InvitationDashboard = () => {
           <CancelBtn type="button" onClick={() => toggleModal("invitationDashboard", false)}>
             취소
           </CancelBtn>
-          <ConfirmBtn type="submit" disabled={!isValid || isDashboardLoading || isMemberLoading || isInviting}>
+          <ConfirmBtn type="submit" disabled={!isValid || isMemberLoading || isInviting}>
             {isInviting ? "초대중..." : "초대하기"}
           </ConfirmBtn>
         </div>
