@@ -31,6 +31,8 @@ const DashboardDetail = () => {
   const [columnList, setColumnList] = useState<IColumnData[]>([]);
 
   const getColumn = useCallback(async () => {
+    setColumnList([]);
+
     try {
       const response = await axios.get(`/api/columns?dashboardId=${dashboardId}`);
 
@@ -70,7 +72,7 @@ const DashboardDetail = () => {
 
   useEffect(() => {
     getColumn();
-  }, [getColumn, updateDashBoard, isCardUpdate]);
+  }, [getColumn, updateDashBoard, isCardUpdate , dashboardId]);
 
   const onDragEnd = async (result: DropResult) => {
     const { destination, source, type } = result;

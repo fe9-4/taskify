@@ -1,45 +1,43 @@
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useEffect, memo, useState, useRef, useCallback } from "react";
 import ColumnItem from "./ColumnItem";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useAtom } from "jotai";
 import { HiOutlineCog } from "react-icons/hi";
 import { NumChip } from "../../../components/chip/PlusAndNumChip";
 import { AddTodoBtn } from "../../../components/button/ButtonComponents";
-import { ColumnAtom, CreateCardParamsAtom, DetailCardParamsAtom } from "@/store/modalAtom";
+import { ColumnAtom, TodoCardId } from "@/store/modalAtom";
+import { ICard } from "@/types/dashboardType";
 import { currentColumnListAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { useToggleModal } from "@/hooks/useModal";
-import { Droppable, Draggable } from "@hello-pangea/dnd";
-import { CardDataProps } from "@/types/cardType";
 
 interface IProps {
   columnTitle: string;
   columnId: number;
-  dragHandleProps?: any;
-  cards: CardDataProps[];
 }
 
-const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards }: IProps) => {
-  const [cardList, setCardList] = useState<CardDataProps[]>(cards);
+const ColumnList = ({ columnTitle, columnId }: IProps) => {
+  const [cardList, setCardList] = useState<ICard["cards"]>([]);
   const [hasMore, setHasMore] = useState(true);
-  const [size, setSize] = useState(3);
-  const toggleModal = useToggleModal();
+  const [size] = useState(3);
+  const [cursorId, setCursorId] = useState<ICard["cursorId"]>();
+  const [totalCount, setTotalCount] = useState<ICard["totalCount"]>(0);
   const [, setColumnAtom] = useAtom(ColumnAtom);
-  const [, setIsCreateCardParams] = useAtom(CreateCardParamsAtom);
-  const [, setIsDetailCardParams] = useAtom(DetailCardParamsAtom);
+  const [, setDetailCardId] = useAtom(TodoCardId);
   const [, setCurrentColumnList] = useAtom(currentColumnListAtom);
   const [dashboardCardUpdate, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
-  const observeRef = useRef<IntersectionObserver | null>(null);
-  const loadingRef = useRef<HTMLDivElement | null>(null);
+  const observeRef = useRef<HTMLDivElement | null>(null);
+  const toggleModal = useToggleModal();
 
   const getCardList = useCallback(async () => {
     if (!hasMore) return;
 
     try {
-      const response = await axios.get(`/api/cards?size=${size}&columnId=${columnId}`);
+      const response = await axios.get(`/api/cards?size=${size}&columnId=${columnId}&cursorId=${cursorId}`);
 
       if (response.status === 200) {
-        const newCardList: CardDataProps[] = response.data.cards;
+        const newCardList: ICard["cards"] = response.data.cards;
+        setTotalCount(response.data.totalCount);
 
         setCardList((prev) => {
           const existingId = new Set(prev.map((card) => card.id));
@@ -51,6 +49,10 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards }: IProps) =
 
           return [...prev, ...filteredNewCardList];
         });
+
+        if (newCardList.length >= size) {
+          setCursorId(newCardList[newCardList.length - 1].id);
+        }
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -58,44 +60,42 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards }: IProps) =
         toast.error(error.response?.data);
       }
     }
-  }, [columnId, hasMore, size]);
+  }, [columnId, hasMore, size, cursorId]);
 
   // 카드아이템 무한스크롤
   useEffect(() => {
-    getCardList();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const lastCardItem = entries[0];
 
-    observeRef.current = new IntersectionObserver((entries) => {
-      const lastCardItem = entries[0];
+        if (lastCardItem.isIntersecting && hasMore) {
+          getCardList();
+        }
+      },
+      { threshold: 1 }
+    );
 
-      if (lastCardItem.isIntersecting && hasMore) {
-        getCardList();
-      }
-    });
-
-    const currentLoadingRef = loadingRef.current;
+    const currentLoadingRef = observeRef.current;
 
     if (currentLoadingRef) {
-      observeRef.current.observe(currentLoadingRef);
+      observer.observe(currentLoadingRef);
     }
 
     return () => {
       if (currentLoadingRef) {
-        observeRef.current?.unobserve(currentLoadingRef);
+        observer?.unobserve(currentLoadingRef);
       }
     };
-  }, [hasMore, size, getCardList]);
+  }, [hasMore, getCardList]);
 
   // 카드 실시간 업데이트
   useEffect(() => {
     if (dashboardCardUpdate) {
       getCardList();
-
-      setCardList((prev) => prev.filter((card) => card.columnId !== columnId));
-
       setHasMore(true);
       setDashboardCardUpdate(false);
     }
-  }, [getCardList, dashboardCardUpdate, columnId, setDashboardCardUpdate]);
+  }, [dashboardCardUpdate, getCardList, setDashboardCardUpdate]);
 
   // 카드 수정시 드롭다운에 보내는 데이터
   useEffect(() => {
@@ -119,53 +119,51 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards }: IProps) =
     toggleModal("editColumn", true);
   };
 
-  const handleCardClick = (cardId: number) => {
-    setIsDetailCardParams(cardId);
-    setColumnAtom({ title: columnTitle, columnId });
-    toggleModal("detailCard", true);
-  };
-
   return (
     <div className="space-y-6 px-4 pt-4 md:border-b md:border-gray04 md:pb-6 xl:flex xl:min-h-screen xl:flex-col xl:border-b-0 xl:border-r">
-      <div className="flex items-center justify-between" {...dragHandleProps}>
+      <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <div className="flex items-center space-x-2">
             <span className="size-2 rounded-full bg-violet01" />
             <h2 className="text-lg font-bold text-black">{columnTitle}</h2>
           </div>
-          <NumChip num={cardList.length} />
+          <NumChip num={totalCount} />
         </div>
         <button onClick={handleEditModal}>
           <HiOutlineCog className="size-[22px] text-gray01" />
         </button>
       </div>
-      <Droppable droppableId={`column-${columnId}`} type="CARD">
-        {(provided) => (
-          <div className="flex min-w-[314px] flex-col space-y-2" ref={provided.innerRef} {...provided.droppableProps}>
-            <AddTodoBtn
-              onClick={() => {
-                setIsCreateCardParams(columnId);
-                toggleModal("createCard", true);
-              }}
-            />
-            {cardList.map((item, index) => (
-              <Draggable key={item.id} draggableId={`card-${item.id}`} index={index}>
-                {(provided, snapshot) => (
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    className={`${snapshot.isDragging ? "opacity-50" : ""}`}
-                    onClick={() => handleCardClick(item.id)}
-                  >
-                    <ColumnItem card={item} dragHandleProps={provided.dragHandleProps} />
-                  </div>
-                )}
-              </Draggable>
-            ))}
-            {provided.placeholder}
+      <div className="flex min-w-[314px] flex-col space-y-2">
+        <AddTodoBtn
+          onClick={() => {
+            setColumnAtom({ title: columnTitle, columnId });
+            toggleModal("createCard", true);
+          }}
+        />
+        {cardList.length > 0 ? (
+          cardList.map((item) => (
+            <div key={item.id}>
+              <button
+                className="size-full"
+                onClick={() => {
+                  toggleModal("detailCard", true);
+                  setDetailCardId(item.id);
+                  setColumnAtom({ title: columnTitle, columnId });
+                }}
+              >
+                <ColumnItem cards={item} />
+              </button>
+            </div>
+          ))
+        ) : (
+          <p className="flex items-center justify-center text-center font-bold">등록된 카드가 없습니다.</p>
+        )}
+        {hasMore && (
+          <div ref={observeRef} className="flex items-center justify-center font-bold">
+            카드 더 보기
           </div>
         )}
-      </Droppable>
+      </div>
     </div>
   );
 };

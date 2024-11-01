@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 export const CardSchema = z.object({
-  dashboardId: z.number(),
   assigneeUserId: z.number(),
+  dashboardId: z.number(),
   columnId: z.number(),
   title: z.string().min(1, "제목은 필수입니다"),
   description: z.string().min(1, "설명은 필수입니다"),
