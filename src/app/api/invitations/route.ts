@@ -9,6 +9,7 @@ export const GET = async (req: Request) => {
 
   const { searchParams } = new URL(req.url);
   const size = searchParams.get("size");
+  const cursorId = Number(searchParams.get("cursorId")) || null;
   
   if (!token) {
     return new NextResponse("사용자 정보를 찾을 수 없습니다.", { status: 401 });
@@ -19,7 +20,7 @@ export const GET = async (req: Request) => {
   }
   
   try {
-    const response = await apiClient.get(`/invitations?size=${size}`, {
+    const response = await apiClient.get(`/invitations?size=${size}${cursorId !== null ? `&cursorId=${cursorId}` : ""}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -29,7 +30,8 @@ export const GET = async (req: Request) => {
       const data = response.data;
       
       const inviteList = data.invitations;
-      return NextResponse.json(inviteList, { status: 200 });
+      const cursorId = data.cursorId;
+      return NextResponse.json({ inviteList, cursorId }, { status: 200 });
     }
   } catch (error) {
     if (axios.isAxiosError(error)) {

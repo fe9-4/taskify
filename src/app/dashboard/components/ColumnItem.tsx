@@ -21,7 +21,7 @@ const ColumnItem = ({ cards }: IProps) => {
         />
         <div className="flex flex-col space-y-[6px] md:w-full md:flex-row md:space-x-[6px] xl:flex-col">
           <div className="flex w-full flex-col space-y-[6px]">
-            <h3 className="text-start font-medium">{cards.title}</h3>
+            <h3 className="text-start font-medium truncate">{cards.title}</h3>
             <div className="flex w-full flex-col space-y-[6px] md:flex-row md:space-x-[6px] md:space-y-0 xl:flex-col xl:space-x-0 xl:space-y-[6px]">
               <div className="flex w-full flex-wrap items-center gap-[6px] md:w-64">
                 {cards.tags.map((tag) => (
