@@ -99,7 +99,7 @@ const DetailCard = () => {
                 </button>
               </div>
 
-              <h2 className="w-full truncate break-all text-2xl font-bold text-black03 md:w-4/5 md:grid-cols-1 md:text-3xl">
+              <h2 className="text-overflow w-full break-all text-2xl font-bold text-black03 md:w-4/5 md:grid-cols-1 md:text-3xl">
                 {card.title}
               </h2>
             </div>
@@ -134,7 +134,9 @@ const DetailCard = () => {
                   ))}
                 </div>
 
-                <p className="break-all text-xs font-normal text-black md:text-base">{card.description}</p>
+                <p className="whitespace-pre-line break-all text-xs font-normal text-black md:text-base">
+                  {card.description}
+                </p>
 
                 <div className="relative my-4 h-[168px] w-[290px] overflow-hidden md:h-[246px] md:w-[420px] lg:h-[260px] lg:w-[445px]">
                   {card.imageUrl ? (

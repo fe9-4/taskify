@@ -35,7 +35,7 @@ const InputDate = forwardRef<HTMLDivElement, InputDateProps>(({ label, id, value
   const displayValue = selectedDate ? formatDateTime(selectedDate) : placeholder;
 
   return (
-    <div className="flex flex-col gap-2" ref={ref}>
+    <div className="z-10 flex flex-col gap-2" ref={ref}>
       {label && <label className="text-lg font-medium text-black03 md:text-xl">{label}</label>}
 
       <div className="relative flex items-center">
@@ -48,7 +48,7 @@ const InputDate = forwardRef<HTMLDivElement, InputDateProps>(({ label, id, value
           id={id}
           ref={datePickerRef}
           className={cls(
-            "flex h-[50px] w-[287px] cursor-pointer items-center rounded-lg pl-11 text-base placeholder-gray02 ring-1 ring-inset ring-gray03 transition-all focus-within:ring-violet01 focus:outline-none focus:ring-1 focus:ring-inset md:w-[520px] md:text-lg",
+            "flex h-[50px] w-full cursor-pointer items-center rounded-lg pl-11 text-base placeholder-gray02 ring-1 ring-inset ring-gray03 transition-all focus-within:ring-violet01 focus:outline-none focus:ring-1 focus:ring-inset md:w-[520px] md:text-lg",
             selectedDate ? "text-black03" : "text-gray02"
           )}
           selected={selectedDate}
