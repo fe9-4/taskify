@@ -5,8 +5,10 @@ import toast from "react-hot-toast";
 import CommentItem from "./CommentItem";
 import CreateComment from "./CreateComment";
 import useIntersectionObserver from "@/hooks/useObserver";
+import { cls } from "@/lib/utils";
+import { HiChevronDoubleUp } from "react-icons/hi";
 
-const CommentList = ({ cardId, columnId }: CommentListProps) => {
+const CommentList = ({ cardId, columnId, handleScrollTop }: CommentListProps) => {
   const [comments, setComments] = useState<CommentProps[]>([]);
   const [cursorId, setCursorId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -74,6 +76,18 @@ const CommentList = ({ cardId, columnId }: CommentListProps) => {
             등록된 댓글이 없습니다.
           </p>
         )}
+
+        <button
+          onClick={handleScrollTop}
+          className={cls(
+            "fixed right-0 transform rounded-full bg-[#f1effd] p-2 transition-all duration-500 md:right-4",
+            comments.length > 10
+              ? "bottom-0 scale-100 opacity-100 delay-200 md:bottom-4"
+              : "bottom-4 scale-90 opacity-0 delay-0 md:bottom-8"
+          )}
+        >
+          <HiChevronDoubleUp className="size-5 text-[#5534da]" />
+        </button>
       </div>
       {isLoading && <p className="text-xs text-gray02 md:text-base">Loading...</p>}
     </>

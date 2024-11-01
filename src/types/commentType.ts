@@ -1,5 +1,4 @@
-import { SetStateAction } from "jotai";
-import { ChangeEventHandler } from "react";
+import { MouseEventHandler } from "react";
 
 export interface CommentProps {
   id: number;
@@ -19,4 +18,5 @@ export interface authorProps {
 export interface CommentListProps {
   cardId: number;
   columnId: number;
+  handleScrollTop: MouseEventHandler;
 }
