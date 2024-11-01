@@ -175,7 +175,7 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards }: IProps) =
 
   return (
     <div className="space-y-6 px-4 pt-4 md:border-b md:border-gray04 md:pb-6 xl:flex xl:min-h-screen xl:flex-col xl:border-b-0 xl:border-r">
-      <div className="flex items-center justify-between" {...dragHandleProps}>
+      <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <div className="flex items-center space-x-2">
             <span className="size-2 rounded-full bg-violet01" />
@@ -207,13 +207,12 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards }: IProps) =
                     <div
                       ref={provided.innerRef}
                       {...provided.draggableProps}
-                      {...provided.dragHandleProps}
                       className={`${snapshot.isDragging ? "opacity-50" : ""} ${
                         isDropDisabled && snapshot.draggingOver ? "cursor-not-allowed" : ""
                       }`}
                     >
                       <div onClick={() => !snapshot.isDragging && handleCardClick(item.id)}>
-                        <ColumnItem card={item} />
+                        <ColumnItem card={item} dragHandleProps={provided.dragHandleProps} />
                       </div>
                     </div>
                   )}

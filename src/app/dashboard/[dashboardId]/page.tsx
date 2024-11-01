@@ -146,13 +146,17 @@ const DashboardDetail = () => {
               {columnList.map((column, index) => (
                 <Draggable key={column.id} draggableId={`column-${column.id}`} index={index}>
                   {(provided) => (
-                    <div ref={provided.innerRef} {...provided.draggableProps} className="flex flex-col">
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      className="flex flex-col"
+                    >
                       <ColumnList
                         key={column.id}
                         columnTitle={column.title}
                         columnId={column.id}
                         cards={column.cards}
-                        dragHandleProps={provided.dragHandleProps}
                       />
                     </div>
                   )}
