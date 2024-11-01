@@ -31,8 +31,6 @@ const DashboardDetail = () => {
   const [columnList, setColumnList] = useState<IColumnData[]>([]);
 
   const getColumn = useCallback(async () => {
-    setColumnList([]);
-
     try {
       const response = await axios.get(`/api/columns?dashboardId=${dashboardId}`);
 
@@ -72,7 +70,7 @@ const DashboardDetail = () => {
 
   useEffect(() => {
     getColumn();
-  }, [getColumn, updateDashBoard, isCardUpdate , dashboardId]);
+  }, [getColumn, updateDashBoard, isCardUpdate]);
 
   const onDragEnd = async (result: DropResult) => {
     const { destination, source, type } = result;
@@ -84,58 +82,54 @@ const DashboardDetail = () => {
       const sourceColumnId = parseInt(source.droppableId.split("-")[1]);
       const destinationColumnId = parseInt(destination.droppableId.split("-")[1]);
 
-      if (sourceColumnId === destinationColumnId) {
-        toast.success("컬럼 내에서의 카드 이동은 지원되지 않습니다.");
-        setIsCardUpdate(true);
+      if (sourceColumnId === destinationColumnId && source.index === destination.index) {
         return;
       }
 
-      // 불변성을 유지하며 상태 업데이트
+      // 이동할 카드 정보를 찾고 상태 업데이트를 한 번에 처리
       setColumnList((prevColumns) => {
-        const newColumns = prevColumns.map((column) => {
+        const sourceColumn = prevColumns.find((col) => col.id === sourceColumnId);
+        const destColumn = prevColumns.find((col) => col.id === destinationColumnId);
+
+        if (!sourceColumn || !destColumn) return prevColumns;
+
+        const cardToMove = sourceColumn.cards[source.index];
+        if (!cardToMove || !cardToMove.assignee || cardToMove.tags.length === 0) return prevColumns;
+
+        // API 호출
+        (async () => {
+          try {
+            await axios.put(`/api/cards/${cardId}`, {
+              columnId: destinationColumnId,
+              assigneeUserId: cardToMove.assignee?.id,
+              title: cardToMove.title,
+              description: cardToMove.description,
+              dueDate: cardToMove.dueDate,
+              tags: cardToMove.tags || [],
+              imageUrl: cardToMove.imageUrl,
+            });
+          } catch (error) {
+            console.error("카드 이동 업데이트 오류", error);
+            toast.error("카드 이동 중 오류가 발생했습니다.");
+            getColumn(); // 에러 발생 시 상태 복구
+          }
+        })();
+
+        // 상태 업데이트
+        return prevColumns.map((column) => {
           if (column.id === sourceColumnId) {
-            const newCards = Array.from(column.cards);
-            const [movedCard] = newCards.splice(source.index, 1);
+            const newCards = [...column.cards];
+            newCards.splice(source.index, 1);
             return { ...column, cards: newCards };
           }
           if (column.id === destinationColumnId) {
-            const newCards = Array.from(column.cards);
-            newCards.splice(
-              destination.index,
-              0,
-              prevColumns.find((col) => col.id === sourceColumnId)?.cards[source.index] as CardDataProps
-            );
+            const newCards = [...column.cards];
+            newCards.splice(destination.index, 0, cardToMove);
             return { ...column, cards: newCards };
           }
           return column;
         });
-        return newColumns;
       });
-
-      try {
-        // 필요한 필드가 모두 있는지 확인하고, 없으면 기본값 설정
-        const cardToMove = columnList.find((column) => column.id === sourceColumnId)?.cards[source.index];
-
-        if (!cardToMove) throw new Error("이동할 카드를 찾을 수 없습니다.");
-        if (!cardToMove.assignee) throw new Error("담당자 정보가 없습니다.");
-        if (cardToMove.tags.length === 0) throw new Error("태그 정보가 없습니다.");
-
-        await axios.put(`/api/cards/${cardId}`, {
-          columnId: destinationColumnId,
-          assigneeUserId: cardToMove.assignee?.id,
-          title: cardToMove.title,
-          description: cardToMove.description,
-          dueDate: cardToMove.dueDate,
-          tags: cardToMove.tags,
-          imageUrl: cardToMove.imageUrl,
-        });
-      } catch (error) {
-        console.error("카드 이동 업데이트 오류", error);
-        toast.error("카드 이동 중 오류가 발생했습니다.");
-
-        // 오류 발생 시 상태 롤백 (필요한 경우 구현)
-        getColumn(); // 상태를 다시 불러오는 함수 호출
-      }
     }
   };
 
