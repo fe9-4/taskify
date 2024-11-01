@@ -26,6 +26,10 @@ export interface UpdateCardProps extends CardProps {
   assignee?: AssigneeType;
 }
 
+export interface CardDataType extends UpdateCardProps {
+  assignee: AssigneeType;
+}
+
 export interface CardDataProps {
   id: number;
   title: string;

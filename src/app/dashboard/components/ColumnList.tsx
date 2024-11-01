@@ -6,7 +6,7 @@ import { useAtom } from "jotai";
 import { HiOutlineCog } from "react-icons/hi";
 import { NumChip } from "../../../components/chip/PlusAndNumChip";
 import { AddTodoBtn } from "../../../components/button/ButtonComponents";
-import { ColumnAtom, CreateCardParamsAtom, DetailCardParamsAtom } from "@/store/modalAtom";
+import { ColumnAtom, TodoCardId } from "@/store/modalAtom";
 import { ICard } from "@/types/dashboardType";
 import { currentColumnListAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { useToggleModal } from "@/hooks/useModal";
@@ -23,8 +23,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
   const [cursorId, setCursorId] = useState<ICard["cursorId"]>();
   const [totalCount, setTotalCount] = useState<ICard["totalCount"]>(0);
   const [, setColumnAtom] = useAtom(ColumnAtom);
-  const [, setIsCreateCardParams] = useAtom(CreateCardParamsAtom);
-  const [, setIsDetailCardParams] = useAtom(DetailCardParamsAtom);
+  const [, setDetailCardId] = useAtom(TodoCardId);
   const [, setCurrentColumnList] = useAtom(currentColumnListAtom);
   const [dashboardCardUpdate, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
   const observeRef = useRef<HTMLDivElement | null>(null);
@@ -137,7 +136,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
       <div className="flex min-w-[314px] flex-col space-y-2">
         <AddTodoBtn
           onClick={() => {
-            setIsCreateCardParams(columnId);
+            setColumnAtom({ title: columnTitle, columnId });
             toggleModal("createCard", true);
           }}
         />
@@ -148,7 +147,7 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
                 className="size-full"
                 onClick={() => {
                   toggleModal("detailCard", true);
-                  setIsDetailCardParams(item.id);
+                  setDetailCardId(item.id);
                   setColumnAtom({ title: columnTitle, columnId });
                 }}
               >
