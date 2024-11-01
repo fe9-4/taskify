@@ -2,7 +2,7 @@ import Image from "next/image";
 import { formatDateTime } from "@/utils/dateFormat";
 import { CommentProps } from "@/types/commentType";
 import InputItem from "@/components/input/InputItem";
-import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
+import { ChangeEvent, Dispatch, forwardRef, SetStateAction, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 
@@ -11,7 +11,7 @@ export interface CommentItemProps {
   setComments: Dispatch<SetStateAction<CommentProps[]>>;
 }
 
-const CommentItem = ({ comment, setComments }: CommentItemProps) => {
+const CommentItem = forwardRef<HTMLDivElement, CommentItemProps>(({ comment, setComments }, ref) => {
   const [editCommentId, setEditCommentId] = useState<number | null>(null);
   const [editContent, setEditContent] = useState<string>("");
   const isEditing = comment.id === editCommentId;
@@ -58,7 +58,7 @@ const CommentItem = ({ comment, setComments }: CommentItemProps) => {
   };
 
   return (
-    <div className="mb-5 flex items-start gap-2 border-b-[1px] border-b-gray03 pb-2 pr-3">
+    <div ref={ref} className="mb-5 flex items-start gap-2 border-b-[1px] border-b-gray03 pb-2 pr-3">
       {comment.author && comment.author.profileImageUrl ? (
         <div className="relative size-6 overflow-hidden rounded-full md:size-8">
           <Image src={comment.author.profileImageUrl} fill alt={comment.author.nickname} />
@@ -98,6 +98,8 @@ const CommentItem = ({ comment, setComments }: CommentItemProps) => {
       </div>
     </div>
   );
-};
+});
+
+CommentItem.displayName = "CommentItem";
 
 export default CommentItem;
