@@ -4,7 +4,7 @@ import axios from "axios";
 import { useRouter, usePathname } from "next/navigation";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { Login } from "@/zodSchema/authSchema";
-import { User } from "@/zodSchema/commonSchema";
+import { UserSchemaType } from "@/zodSchema/commonSchema";
 import { userAtom } from "@/store/userAtoms";
 
 export const useAuth = () => {
@@ -109,9 +109,9 @@ export const useAuth = () => {
   }, [logoutMutation]);
 
   const updateUser = useCallback(
-    (updatedUserData: Partial<User>) => {
-      setUser((oldUser) => (oldUser ? { ...oldUser, ...updatedUserData } : null));
-      queryClient.setQueryData(["user"], (oldData: User | undefined) =>
+    (updatedUserData: Partial<UserSchemaType>) => {
+      setUser((oldUser: UserSchemaType | null) => (oldUser ? { ...oldUser, ...updatedUserData } : null));
+      queryClient.setQueryData(["user"], (oldData: UserSchemaType | undefined) =>
         oldData ? { ...oldData, ...updatedUserData } : undefined
       );
     },

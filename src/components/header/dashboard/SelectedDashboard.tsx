@@ -9,6 +9,11 @@ interface SelectedDashboardProps {
 export const SelectedDashboard = ({ title, isDashboardOwner }: SelectedDashboardProps) => {
   const pathname = usePathname();
 
+  const truncateText = (text: string, maxLength: number) => {
+    if (text.length <= maxLength) return text;
+    return text.slice(0, maxLength) + "...";
+  };
+
   if (pathname === "/mypage") {
     return <div className="hidden text-2xl font-bold text-black03 xl:block">계정관리</div>;
   }
@@ -23,9 +28,13 @@ export const SelectedDashboard = ({ title, isDashboardOwner }: SelectedDashboard
 
   return (
     <div className="hidden text-2xl font-bold text-black03 xl:block">
-      <div className="flex items-center gap-2">
-        {title}
-        {isDashboardOwner ? <FaCrown fill="#FDD446" className="h-3 w-[15px] xl:h-[14px] xl:w-[18px]" /> : <></>}
+      <div className="flex items-center gap-1">
+        <div className="min-w-0">{truncateText(title, 10)}</div>
+        {isDashboardOwner && (
+          <div className="flex-shrink-0">
+            <FaCrown fill="#FDD446" className="h-3 w-[15px] xl:h-[14px] xl:w-[18px]" />
+          </div>
+        )}
       </div>
     </div>
   );
