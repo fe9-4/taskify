@@ -20,7 +20,7 @@ export default function Header() {
     return null;
   }
 
-  const showHeader = isHomePage || (!isLoading && user);
+  const showHeader = isHomePage || !isLoading;
 
   if (!showHeader) {
     return null;
