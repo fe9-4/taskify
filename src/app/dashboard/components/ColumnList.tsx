@@ -1,11 +1,15 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 import ColumnItem from "./ColumnItem";
-import { useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
+import { useAtom } from "jotai";
 import { HiOutlineCog } from "react-icons/hi";
 import { NumChip } from "../../../components/chip/PlusAndNumChip";
 import { AddTodoBtn } from "../../../components/button/ButtonComponents";
+import { ColumnAtom, TodoCardId } from "@/store/modalAtom";
 import { ICard } from "@/types/dashboardType";
+import { currentColumnListAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
+import { useToggleModal } from "@/hooks/useModal";
 
 interface IProps {
   columnTitle: string;
@@ -13,29 +17,42 @@ interface IProps {
 }
 
 const ColumnList = ({ columnTitle, columnId }: IProps) => {
-  const [cardList, setCardList] = useState<ICard[]>([]);
-  const [cursorId, setCursorId] = useState<number>(1);
+  const [cardList, setCardList] = useState<ICard["cards"]>([]);
   const [hasMore, setHasMore] = useState(true);
-  const [size, setSize] = useState(3);
-  const observeRef = useRef<IntersectionObserver | null>(null);
-  const loadingRef = useRef<HTMLDivElement | null>(null);
+  const [size] = useState(3);
+  const [cursorId, setCursorId] = useState<ICard["cursorId"]>();
+  const [totalCount, setTotalCount] = useState<ICard["totalCount"]>(0);
+  const [, setColumnAtom] = useAtom(ColumnAtom);
+  const [, setDetailCardId] = useAtom(TodoCardId);
+  const [, setCurrentColumnList] = useAtom(currentColumnListAtom);
+  const [dashboardCardUpdate, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
+  const observeRef = useRef<HTMLDivElement | null>(null);
+  const toggleModal = useToggleModal();
 
-  const getCardList = async () => {
+  const getCardList = useCallback(async () => {
     if (!hasMore) return;
 
     try {
-      const response = await axios.get(`/api/dashboard/columnList?cursorId=${cursorId}&columnId=${columnId}&size=${size}`);
+      const response = await axios.get(`/api/cards?size=${size}&columnId=${columnId}&cursorId=${cursorId}`);
 
       if (response.status === 200) {
-        setCardList((prev) => [...prev, ...response.data.cards]);
-        setCursorId(response.data.cursorId);
-      }
+        const newCardList: ICard["cards"] = response.data.cards;
+        setTotalCount(response.data.totalCount);
 
-      if (response.data.cards.length === 0) {
-        setHasMore(false);
-      } else if (response.data.cards.length < size) {
-        toast.success("더 가져올 카드가 없습니다.");
-        setHasMore(false);
+        setCardList((prev) => {
+          const existingId = new Set(prev.map((card) => card.id));
+          const filteredNewCardList = newCardList.filter((card) => !existingId.has(card.id));
+
+          if (filteredNewCardList.length === 0 || filteredNewCardList.length < size) {
+            setHasMore(false);
+          }
+
+          return [...prev, ...filteredNewCardList];
+        });
+
+        if (newCardList.length >= size) {
+          setCursorId(newCardList[newCardList.length - 1].id);
+        }
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -43,38 +60,64 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
         toast.error(error.response?.data);
       }
     }
-  };
+  }, [columnId, hasMore, size, cursorId]);
 
   // 카드아이템 무한스크롤
   useEffect(() => {
-    getCardList();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const lastCardItem = entries[0];
 
-    observeRef.current = new IntersectionObserver((entries) => {
-      const lastCardItem = entries[0];
+        if (lastCardItem.isIntersecting && hasMore) {
+          getCardList();
+        }
+      },
+      { threshold: 1 }
+    );
 
-      if (lastCardItem.isIntersecting && hasMore) {
-        getCardList();
-      }
-    });
+    const currentLoadingRef = observeRef.current;
 
-    if (loadingRef.current) {
-      observeRef.current.observe(loadingRef.current);
+    if (currentLoadingRef) {
+      observer.observe(currentLoadingRef);
     }
 
     return () => {
-      if (loadingRef.current) {
-        observeRef.current?.unobserve(loadingRef.current);
+      if (currentLoadingRef) {
+        observer?.unobserve(currentLoadingRef);
       }
     };
-  }, [hasMore, cursorId, size]);
+  }, [hasMore, getCardList]);
 
-  const handleAddTodo = () => {
-    // 모달 만들어지면 모달 연결
-  };
+  // 카드 실시간 업데이트
+  useEffect(() => {
+    if (dashboardCardUpdate) {
+      getCardList();
+      setHasMore(true);
+      setDashboardCardUpdate(false);
+    }
+  }, [dashboardCardUpdate, getCardList, setDashboardCardUpdate]);
+
+  // 카드 수정시 드롭다운에 보내는 데이터
+  useEffect(() => {
+    if (columnTitle && columnId) {
+      setCurrentColumnList((prev) => {
+        const newColumn = { id: columnId, title: columnTitle };
+
+        const checkList = prev.some((column) => column.id === columnId);
+
+        if (!checkList) {
+          return [...prev, newColumn];
+        }
+
+        return prev;
+      });
+    }
+  }, [columnTitle, columnId, setCurrentColumnList]);
 
   const handleEditModal = () => {
-    // 모달 만들어지면 모달 연결
-  }
+    setColumnAtom({ title: columnTitle, columnId });
+    toggleModal("editColumn", true);
+  };
 
   return (
     <div className="space-y-6 px-4 pt-4 md:border-b md:border-gray04 md:pb-6 xl:flex xl:min-h-screen xl:flex-col xl:border-b-0 xl:border-r">
@@ -84,27 +127,45 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
             <span className="size-2 rounded-full bg-violet01" />
             <h2 className="text-lg font-bold text-black">{columnTitle}</h2>
           </div>
-          <NumChip num={cardList.length} />
+          <NumChip num={totalCount} />
         </div>
         <button onClick={handleEditModal}>
           <HiOutlineCog className="size-[22px] text-gray01" />
         </button>
       </div>
-      <div className="flex flex-col space-y-2">
-        <AddTodoBtn onClick={handleAddTodo} />
+      <div className="flex min-w-[314px] flex-col space-y-2">
+        <AddTodoBtn
+          onClick={() => {
+            setColumnAtom({ title: columnTitle, columnId });
+            toggleModal("createCard", true);
+          }}
+        />
         {cardList.length > 0 ? (
-          cardList.map((item, i) => (
-            <div key={item.cards.id}>
-              <ColumnItem cards={item.cards} />
-              {i === cardList.length - 1 && <div ref={loadingRef} className="h-[1px]" />}
+          cardList.map((item) => (
+            <div key={item.id}>
+              <button
+                className="size-full"
+                onClick={() => {
+                  toggleModal("detailCard", true);
+                  setDetailCardId(item.id);
+                  setColumnAtom({ title: columnTitle, columnId });
+                }}
+              >
+                <ColumnItem cards={item} />
+              </button>
             </div>
           ))
         ) : (
           <p className="flex items-center justify-center text-center font-bold">등록된 카드가 없습니다.</p>
+        )}
+        {hasMore && (
+          <div ref={observeRef} className="flex items-center justify-center font-bold">
+            카드 더 보기
+          </div>
         )}
       </div>
     </div>
   );
 };
 
-export default ColumnList;
+export default memo(ColumnList);

@@ -1,6 +1,5 @@
-import { ChangeEventHandler, KeyboardEventHandler, MouseEventHandler } from "react";
+import { ChangeEventHandler, KeyboardEventHandler } from "react";
 import { inputFileSize } from "@/components/input/InputFile";
-import { CardProps } from "./cardType";
 
 type Size = keyof typeof inputFileSize.size;
 
@@ -12,14 +11,13 @@ export interface InputProps extends textAreaProps {
   errors?: string;
   type?: string;
   name?: string;
-  required?: boolean;
   autoComplete?: string;
   className?: string;
   tag?: string;
   size?: string;
+  readOnly?: boolean;
   onChange?: ChangeEventHandler;
   onKeyDown?: KeyboardEventHandler;
-  readOnly?: boolean;
 }
 
 export interface textAreaProps {
@@ -38,17 +36,16 @@ export interface InputFileProps {
 
 export interface InputDateProps {
   id: string;
-  name: string;
   label: string;
   value: string | any;
   placeholder: string;
-  onChange: (date: Date | null) => void;
+  onChange: (date: string) => void;
 }
 
 export interface InputTagProps {
-  cardData: CardProps;
+  tags: string[];
   tagInput: string;
   onKeyDown: KeyboardEventHandler;
-  onClick: (tagRemove: string) => void;
+  onClick: (tag: string) => void;
   onChange: ChangeEventHandler;
 }

@@ -1,17 +1,32 @@
-import React from "react";
-import { Dashboard } from "@/zodSchema/dashboardSchema";
+import { usePathname } from "next/navigation";
+import { FaCrown } from "react-icons/fa";
 
 interface SelectedDashboardProps {
-  selectedDashboardId: number | null;
-  dashboards: Dashboard[];
+  title: string | null;
+  isDashboardOwner: boolean;
 }
 
-export const SelectedDashboard: React.FC<SelectedDashboardProps> = ({ selectedDashboardId, dashboards }) => {
-  // 대시보드를 최신순으로 정렬
-  const sortedDashboards = dashboards.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+export const SelectedDashboard = ({ title, isDashboardOwner }: SelectedDashboardProps) => {
+  const pathname = usePathname();
 
-  // 선택된 대시보드 또는 최신 대시보드
-  const displayDashboard = sortedDashboards.find((d) => d.id === selectedDashboardId) || sortedDashboards[0];
+  if (pathname === "/mypage") {
+    return <div className="hidden text-2xl font-bold text-black03 xl:block">계정관리</div>;
+  }
 
-  return <div>{displayDashboard.title}</div>;
+  if (pathname === "/mydashboard") {
+    return <div className="hidden text-2xl font-bold text-black03 xl:block">내 대시보드</div>;
+  }
+
+  if (!title) {
+    return null;
+  }
+
+  return (
+    <div className="hidden text-2xl font-bold text-black03 xl:block">
+      <div className="flex items-center gap-2">
+        {title}
+        {isDashboardOwner ? <FaCrown fill="#FDD446" className="h-3 w-[15px] xl:h-[14px] xl:w-[18px]" /> : <></>}
+      </div>
+    </div>
+  );
 };

@@ -6,6 +6,10 @@ import ColumnList from "@/app/dashboard/components/ColumnList";
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { AddColumnBtn } from "@/components/button/ButtonComponents";
+import { useAtom, useAtomValue } from "jotai";
+import { ColumnTitlesAtom, RefreshDashboardAtom } from "@/store/modalAtom";
+import { useToggleModal } from "@/hooks/useModal";
+import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 
 interface IColumnData {
   id: number;
@@ -18,13 +22,18 @@ interface IColumnList {
 
 const DashboardDetail = () => {
   const { dashboardId } = useParams();
+  const toggleModal = useToggleModal();
+  const [, setColumnTitles] = useAtom(ColumnTitlesAtom);
+  const updateDashBoard = useAtomValue(RefreshDashboardAtom);
+  const isCardUpdate = useAtomValue(dashboardCardUpdateAtom);
 
   const [columnList, setColumnList] = useState<IColumnList["data"]>([]);
-  const [addColumn, setAddColumn] = useState(false);
 
   const getColumn = useCallback(async () => {
+    setColumnList([]);
+
     try {
-      const response = await axios.get(`/api/dashboard/${dashboardId}`);
+      const response = await axios.get(`/api/columns?dashboardId=${dashboardId}`);
 
       if (response.status === 200) {
         setColumnList(response.data);
@@ -38,23 +47,25 @@ const DashboardDetail = () => {
   }, [dashboardId]);
 
   const handleColumnBtn = () => {
-    setAddColumn(!addColumn);
-    // console.log("컬럼 추가 모달 오픈");
+    const columTitles = columnList.map((column) => column.title);
+    setColumnTitles(columTitles);
+    toggleModal("createColumn", true);
   };
 
+  // 모달 창이 닫힐때 마다 대시보드 새로 불러오기
   useEffect(() => {
     getColumn();
-  }, [getColumn]);
+  }, [getColumn, updateDashBoard, isCardUpdate , dashboardId]);
 
   return (
-    <div className="flex flex-col space-y-6 pb-6 xl:flex-row xl:space-x-6 xl:space-y-0 overflow-auto">
+    <div className="flex flex-col space-y-6 overflow-auto pb-6 xl:flex-row xl:space-x-6 xl:space-y-0 xl:pr-4">
       <div className="flex flex-col space-y-6 xl:flex-row xl:space-y-0">
         {columnList.map((column) => (
           <ColumnList key={column.id} columnTitle={column.title} columnId={column.id} />
         ))}
       </div>
-      <div className="flex h-fit justify-center xl:justify-start xl:pt-[66px]">
-        <AddColumnBtn onClick={handleColumnBtn} />
+      <div className="px-4 xl:px-0 xl:pt-[66px]">
+        {columnList.length < 10 && <AddColumnBtn onClick={handleColumnBtn} />}
       </div>
     </div>
   );

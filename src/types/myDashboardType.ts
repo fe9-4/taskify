@@ -8,29 +8,31 @@ interface IDashboardList {
 }
 
 export interface IMyDashboard {
-  dsahboards: IDashboardList[];
+  dashboards: IDashboardList[];
   totalCount: number;
   cursorId: number;
 }
 
-interface IInvitationList {
+export interface IInvitationList {
   id: number;
   inviter: {
     nickname: string;
     email: string;
-  }
+  };
   teamId: string;
   dashboard: {
     title: string;
-  }
+    id: number;
+  };
   invitee: {
     nickname: string;
     email: string;
-  }
+    id: number;
+  };
   inviteAccepted: boolean;
 }
 
 export interface IInvitation {
-  totalCount: number;
+  cursorId: number;
   invitations: IInvitationList[];
 }
