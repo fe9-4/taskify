@@ -1,19 +1,19 @@
-import React, { memo } from "react";
+import React, { forwardRef, memo } from "react";
 import Image from "next/image";
 import TagChip from "@/components/chip/TagChip";
 import { HiOutlineCalendar } from "react-icons/hi";
-import { CardDataProps } from "@/types/cardType";
+import { Iitem } from "@/types/dashboardType";
 
 interface IProps {
-  card: CardDataProps;
+  card: Iitem;
   dragHandleProps?: any;
 }
 
-const ColumnItem = ({ card, dragHandleProps }: IProps) => {
+const ColumnItem = forwardRef<HTMLElement, IProps>(({ card, dragHandleProps }, ref) => {
   if (!card) return null;
 
   return (
-    <section className="w-full border-b pb-6 md:border-0 md:pb-0" {...dragHandleProps}>
+    <section ref={ref} className="w-full border-b pb-6 md:border-0 md:pb-0" {...dragHandleProps}>
       <div className="mt-4 flex flex-col space-y-2 rounded-md border border-gray03 bg-white p-3 md:flex-row md:items-center md:space-x-2 md:space-y-0 md:px-4 xl:flex-col xl:space-x-0 xl:space-y-[6px]">
         <Image
           src={card.imageUrl}
@@ -25,7 +25,7 @@ const ColumnItem = ({ card, dragHandleProps }: IProps) => {
         />
         <div className="flex flex-col space-y-[6px] md:w-full md:flex-row md:space-x-[6px] xl:flex-col">
           <div className="flex w-full flex-col space-y-[6px]">
-            <h3 className="text-start font-medium truncate">{card.title}</h3>
+            <h3 className="truncate text-start font-medium">{card.title}</h3>
             <div className="flex w-full flex-col space-y-[6px] md:flex-row md:space-x-[6px] md:space-y-0 xl:flex-col xl:space-x-0 xl:space-y-[6px]">
               <div className="flex w-full flex-wrap items-center gap-[6px] md:w-64">
                 {card.tags.map((tag) => (
@@ -47,6 +47,8 @@ const ColumnItem = ({ card, dragHandleProps }: IProps) => {
       </div>
     </section>
   );
-};
+});
+
+ColumnItem.displayName = "ColumnItem";
 
 export default memo(ColumnItem);

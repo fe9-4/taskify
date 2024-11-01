@@ -11,14 +11,15 @@ import { ColumnTitlesAtom, RefreshDashboardAtom } from "@/store/modalAtom";
 import { useToggleModal } from "@/hooks/useModal";
 import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
-import { CardDataProps } from "@/types/cardType";
+import { ICard } from "@/types/dashboardType";
 
 interface IColumnData {
   id: number;
   title: string;
   teamId: string;
   position: number;
-  cards: CardDataProps[];
+  cards: ICard["cards"];
+  totalCount: ICard["totalCount"];
 }
 
 const DashboardDetail = () => {
@@ -27,22 +28,22 @@ const DashboardDetail = () => {
   const [, setColumnTitles] = useAtom(ColumnTitlesAtom);
   const updateDashBoard = useAtomValue(RefreshDashboardAtom);
   const [isCardUpdate, setIsCardUpdate] = useAtom(dashboardCardUpdateAtom);
-
+  
   const [columnList, setColumnList] = useState<IColumnData[]>([]);
-
+  
   const getColumn = useCallback(async () => {
     try {
       const response = await axios.get(`/api/columns?dashboardId=${dashboardId}`);
 
       if (response.status === 200) {
         const columns = response.data;
-
+        
         const columnsWithCards = await Promise.all(
           columns.map(async (column: IColumnData) => {
             try {
-              const cardsResponse = await axios.get(`/api/cards?columnId=${column.id}&size=100`);
+              const cardsResponse = await axios.get(`/api/cards?columnId=${column.id}&size=3`);
               if (cardsResponse.status === 200) {
-                return { ...column, cards: cardsResponse.data.cards };
+                return { ...column, cards: cardsResponse.data.cards, totalCount: cardsResponse.data.totalCount };
               } else {
                 return { ...column, cards: [] };
               }
@@ -153,6 +154,7 @@ const DashboardDetail = () => {
                         columnId={column.id}
                         cards={column.cards}
                         dragHandleProps={provided.dragHandleProps}
+                        totalCount={column.totalCount}
                       />
                     </div>
                   )}

@@ -10,66 +10,60 @@ import { ColumnAtom, TodoCardId } from "@/store/modalAtom";
 import { currentColumnListAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { useToggleModal } from "@/hooks/useModal";
 import { Droppable, Draggable } from "@hello-pangea/dnd";
-import { CardDataProps } from "@/types/cardType";
-import { useWidth } from "@/hooks/useWidth";
+import { ICard } from "@/types/dashboardType";
 
 interface IProps {
   columnTitle: string;
   columnId: number;
   dragHandleProps?: any;
-  cards: CardDataProps[];
+  cards: ICard["cards"];
+  totalCount: ICard["totalCount"];
 }
 
-const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards }: IProps) => {
-  const [cardList, setCardList] = useState<CardDataProps[]>([]);
+const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount }: IProps) => {
+  const [cardList, setCardList] = useState<ICard["cards"]>([]);
   const [hasMore, setHasMore] = useState(true);
-  const [size] = useState(10);
+  const [size] = useState(3);
   const [cursorId, setCursorId] = useState<number | undefined>();
-  const [totalCount, setTotalCount] = useState(0);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const previousHasMore = useRef(true);
   const [, setColumnAtom] = useAtom(ColumnAtom);
   const [, setDetailCardId] = useAtom(TodoCardId);
   const [, setCurrentColumnList] = useAtom(currentColumnListAtom);
   const [dashboardCardUpdate, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
-  const observeRef = useRef<HTMLDivElement | null>(null);
+  const observeRef = useRef(null);
   const toggleModal = useToggleModal();
   const [isDropDisabled, setIsDropDisabled] = useState(false);
   const dragSourceColumnRef = useRef<string | null>(null);
   const isDraggingOverRef = useRef(isDraggingOver);
-  const isLargeScreen = useWidth();
-
+  
   const getCardList = useCallback(async () => {
-    if (!hasMore) return;
+    if (!hasMore || isLoading) return;
+    setIsLoading(true);
 
     try {
       const lastCardId = cards[cards.length - 1]?.id;
       const currentCursorId = cursorId || lastCardId;
 
       const response = await axios.get<{
-        cards: CardDataProps[];
-        totalCount: number;
+        cards: ICard["cards"];
       }>(`/api/cards?size=${size}&columnId=${columnId}${currentCursorId ? `&cursorId=${currentCursorId}` : ""}`);
 
       if (response.status === 200) {
         const newCardList = response.data.cards;
-        setTotalCount(response.data.totalCount);
 
         setCardList((prev) => {
           const existingIds = new Set([...cards, ...prev].map((card) => card.id));
           const filteredNewCardList = newCardList.filter((card) => !existingIds.has(card.id));
 
-          if (filteredNewCardList.length === 0 || filteredNewCardList.length < size) {
-            setHasMore(false);
-          }
+          setHasMore(filteredNewCardList.length >= size);
 
           return [...prev, ...filteredNewCardList];
         });
 
-        if (newCardList.length >= size) {
+        if (newCardList.length > 0) {
           setCursorId(newCardList[newCardList.length - 1].id);
-        } else {
-          setHasMore(false);
         }
       }
     } catch (error) {
@@ -77,6 +71,8 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards }: IProps) =
         console.error("ColumnList getCardList에 API 오류 발생", error);
         toast.error(error.response?.data || "카드 목록 조회 중 오류가 발생했습니다.");
       }
+    } finally {
+      setIsLoading(false);
     }
   }, [columnId, hasMore, size, cursorId, cards]);
 
@@ -225,16 +221,20 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards }: IProps) =
               {!isDraggingOver &&
                 cardList
                   .filter((item) => !cards.some((card) => card.id === item.id))
-                  .map((item) => (
+                  .map((item, i) => (
                     <div key={item.id} onClick={() => handleCardClick(item.id)}>
-                      <ColumnItem card={item} />
+                      <ColumnItem ref={i === cardList.length - 1 ? observeRef : null} card={item} />
                     </div>
                   ))}
-              {hasMore && !isDraggingOver && (
-                <div ref={observeRef} className="flex items-center justify-center font-bold">
+              {cards.length > 0 && (
+                <button
+                  onClick={getCardList}
+                  className="w-full rounded-md border border-gray03 bg-white py-2 font-bold xl:hidden"
+                >
                   카드 더 보기
-                </div>
+                </button>
               )}
+              {isLoading && <p className="text-center font-bold">카드 불러오는 중...</p>}
             </div>
           );
         }}
