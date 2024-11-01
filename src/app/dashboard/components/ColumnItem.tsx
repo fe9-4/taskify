@@ -24,7 +24,7 @@ const ColumnItem = ({ card, dragHandleProps }: IProps) => {
           width={260}
           height={150}
           className="max-h-[150px] w-full rounded-md object-cover md:h-[53px] md:w-[90px] xl:h-40 xl:w-full"
-          unoptimized
+          priority={true}
         />
         <div className="flex flex-col space-y-[6px] md:w-full md:flex-row md:space-x-[6px] xl:flex-col">
           <div className="flex w-full flex-col space-y-[6px]">

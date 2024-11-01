@@ -15,24 +15,15 @@ import { HiChevronDoubleRight, HiChevronDoubleLeft } from "react-icons/hi";
 const Sidebar = () => {
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(10);
-  const [cursor, serCursor] = useState(0);
   const [isExpanded, setIsExpanded] = useState(false);
 
   const params = useParams();
   const currentDashboardId = params?.dashboardId ? Number(params.dashboardId) : null;
   const { isLargeScreen } = useWidth();
   const pathname = usePathname();
-  const router = useRouter();
-  const { user } = useAuth();
-
-  useEffect(() => {
-    if (!user) {
-      router.push("/login");
-    }
-  }, [user, router]);
+  const { user, isLoading } = useAuth();
 
   const { dashboardData } = useDashboard({ dashboardId: currentDashboardId || 0, page, size });
-
   const totalPage: number = dashboardData ? Math.ceil(dashboardData.totalCount / size) : 0;
 
   const onClickSidebar = () => {
@@ -45,7 +36,9 @@ const Sidebar = () => {
     setSize(isLargeScreen ? 15 : 10);
   }, [isLargeScreen]);
 
-  if (!user || pathname === "/" || pathname === "/login" || pathname === "/signup") return null;
+  if (isLoading || pathname === "/" || pathname === "/login" || pathname === "/signup") return null;
+
+  if (!isLoading && !user) return null;
 
   return (
     <aside

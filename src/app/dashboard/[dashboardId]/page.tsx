@@ -22,7 +22,7 @@ interface IColumnData {
 }
 
 const DashboardDetail = () => {
-  const { dashboardId } = useParams();
+  const { dashboardId } = useParams<{ dashboardId: string }>();
   const toggleModal = useToggleModal();
   const [, setColumnTitles] = useAtom(ColumnTitlesAtom);
   const updateDashBoard = useAtomValue(RefreshDashboardAtom);
@@ -47,7 +47,6 @@ const DashboardDetail = () => {
                 return { ...column, cards: [] };
               }
             } catch (error) {
-              console.error(`카드 조회 중 오류 발생 (컬럼 ID: ${column.id})`, error);
               toast.error("카드 목록 조회 중 오류가 발생했습니다.");
               return { ...column, cards: [] };
             }
@@ -58,7 +57,6 @@ const DashboardDetail = () => {
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.error("대시보드 컬럼 목록 조회 api에서 오류 발생", error);
         toast.error(error.response?.data);
       }
     }

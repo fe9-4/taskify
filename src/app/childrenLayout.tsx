@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { HydrationBoundary, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider } from "jotai";
 import { Toaster } from "react-hot-toast";
+import Loading from "./loading";
 
 export default function ClientLayout({ children }: PropsWithChildren) {
   const [queryClient] = useState(() => new QueryClient());
@@ -12,27 +13,9 @@ export default function ClientLayout({ children }: PropsWithChildren) {
   const router = useRouter();
   const marginClass = ["/login", "/signup", "/"].includes(pathname) ? "" : "xl:ml-[300px] md:ml-[160px] ml-[67px]";
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const handleSyntaxError = (event: ErrorEvent) => {
-      if (event.error instanceof SyntaxError || event.message.includes("SyntaxError")) {
-        console.error("SyntaxError detected, refreshing...");
-        router.refresh();
-      }
-    };
-
-    if (typeof window !== "undefined") {
-      window.addEventListener("error", handleSyntaxError);
-      window.onerror = (message, source, lineno, colno, error) => {
-        if (error instanceof SyntaxError || message.toString().includes("SyntaxError")) {
-          console.error("Global SyntaxError detected, refreshing...");
-          router.refresh();
-          return true;
-        }
-        return false;
-      };
-    }
-
     const checkAuth = async () => {
       try {
         const response = await fetch("/api/auth/checkCookie");
@@ -41,28 +24,25 @@ export default function ClientLayout({ children }: PropsWithChildren) {
       } catch (error) {
         console.error("Auth check failed:", error);
         setIsAuthenticated(false);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     checkAuth();
-
-    return () => {
-      if (typeof window !== "undefined") {
-        window.removeEventListener("error", handleSyntaxError);
-        window.onerror = null;
-      }
-    };
   }, [router]);
 
   useEffect(() => {
-    if (isAuthenticated === false) {
-      if (pathname !== "/") {
-        router.push("/login");
-      } else {
-        router.refresh();
-      }
+    const publicPaths = ["/", "/login", "/signup"];
+
+    if (!isLoading && isAuthenticated === false && !publicPaths.includes(pathname)) {
+      router.push("/login");
     }
-  }, [isAuthenticated, pathname, router]);
+  }, [isAuthenticated, pathname, router, isLoading]);
+
+  if (isLoading) {
+    return <Loading />;
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
