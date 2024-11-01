@@ -1,7 +1,7 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
-import { useAtom } from "jotai";
+import { useSetAtom } from "jotai";
 import { CombiBtn } from "@/components/button/ButtonComponents";
 import { myDashboardUpdateAtom } from "@/store/myDashboardAtom";
 import { IInvitation } from "@/types/myDashboardType";
@@ -14,7 +14,7 @@ interface IProps {
 
 const InviteItem = ({ invitationList, setInvitationList }: IProps) => {
   const [search, setSearch] = useState("");
-  const [, setMyDashboardUpdated] = useAtom(myDashboardUpdateAtom);
+  const setMyDashboardUpdated = useSetAtom(myDashboardUpdateAtom);
 
   const handleChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;

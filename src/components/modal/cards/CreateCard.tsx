@@ -7,19 +7,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CardSchema } from "@/zodSchema/cardSchema";
 import axios from "axios";
 import toast from "react-hot-toast";
-
 import { useAuth } from "@/hooks/useAuth";
 import { useMember } from "@/hooks/useMember";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { useToggleModal } from "@/hooks/useModal";
 import useLoading from "@/hooks/useLoading";
-
-import { useAtom, useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { ColumnAtom } from "@/store/modalAtom";
 import { CreateCardProps } from "@/types/cardType";
 import { uploadType } from "@/types/uploadType";
-
 import { CancelBtn, ConfirmBtn } from "@/components/button/ButtonComponents";
 import SearchDropdown from "@/components/dropdown/SearchDropdown";
 import InputItem from "@/components/input/InputItem";
@@ -39,7 +36,7 @@ const CreateCard = () => {
   const { isLoading, withLoading } = useLoading();
 
   const toggleModal = useToggleModal();
-  const [, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
+  const setDashboardCardUpdate = useSetAtom(dashboardCardUpdateAtom);
 
   const {
     uploadFile,

@@ -2,23 +2,21 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import Image from "next/image";
-
-import { useAtom, useAtomValue } from "jotai";
-import { ColumnAtom, TodoCardId } from "@/store/modalAtom";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { ColumnAtom, CardIdAtom } from "@/store/modalAtom";
 import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { useDeleteModal, useToggleModal } from "@/hooks/useModal";
 import { CardDataProps } from "@/types/cardType";
-
 import { StatusTitleChip } from "@/components/chip/StatusChip";
 import TagChip from "@/components/chip/TagChip";
 import EditDeleteDropdown from "@/components/dropdown/EditDeleteDropdown";
 import CommentList from "../comments/CommentList";
 
 const DetailCard = () => {
-  const [cardId, setCardId] = useAtom(TodoCardId);
+  const [cardId, setCardId] = useAtom(CardIdAtom);
   const { columnId, title } = useAtomValue(ColumnAtom);
   const [cardData, setCardData] = useState<CardDataProps>();
-  const [, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
+  const setDashboardCardUpdate = useSetAtom(dashboardCardUpdateAtom);
 
   const toggleModal = useToggleModal();
   const setDeleteModal = useDeleteModal();
