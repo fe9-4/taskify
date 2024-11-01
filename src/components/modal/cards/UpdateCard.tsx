@@ -139,9 +139,8 @@ const UpdateCard = () => {
       !!dueDate &&
       tags.length > 0 &&
       (selectedFile !== null || previewUrl !== null) &&
-      !!selectedValue &&
       Number(watch("assigneeUserId")) > 0,
-    [title, description, dueDate, tags, selectedFile, previewUrl, selectedValue, watch]
+    [title, description, dueDate, tags, selectedFile, previewUrl, watch]
   );
 
   const handleAddTag = (tag: string) => {

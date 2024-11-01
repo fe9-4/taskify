@@ -61,7 +61,8 @@ export const GET = async (req: Request) => {
   const { searchParams } = new URL(req.url);
   const columnId = searchParams.get("columnId");
   const size = searchParams.get("size");
-
+  const cursorId = Number(searchParams.get("cursorId")) || null;
+  
   if (!token) {
     return new NextResponse("사용자 정보를 찾을 수 없습니다.", { status: 401 });
   }
@@ -71,7 +72,7 @@ export const GET = async (req: Request) => {
   }
 
   try {
-    const response = await apiClient.get(`/cards?size=${size}&columnId=${columnId}`, {
+    const response = await apiClient.get(`/cards?size=${size}&columnId=${columnId}${cursorId !== null ? `&cursorId=${cursorId}` : ""}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
