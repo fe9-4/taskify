@@ -44,7 +44,7 @@ export interface Iitem {
 
 export interface ICard {
   cards: Iitem[];
-  totalCount?: number;
+  totalCount: number;
   cursorId?: number | null;
 }
 
