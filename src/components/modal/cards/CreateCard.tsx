@@ -7,32 +7,39 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CardSchema } from "@/zodSchema/cardSchema";
 import axios from "axios";
 import toast from "react-hot-toast";
-import useLoading from "@/hooks/useLoading";
+
 import { useAuth } from "@/hooks/useAuth";
-import { useFileUpload } from "@/hooks/useFileUpload";
 import { useMember } from "@/hooks/useMember";
-import { formatDateTime } from "@/utils/dateFormat";
+import { useFileUpload } from "@/hooks/useFileUpload";
+import { useToggleModal } from "@/hooks/useModal";
+import useLoading from "@/hooks/useLoading";
+
+import { useAtom, useAtomValue } from "jotai";
+import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
+import { ColumnAtom } from "@/store/modalAtom";
 import { CreateCardProps } from "@/types/cardType";
+import { uploadType } from "@/types/uploadType";
+
 import { CancelBtn, ConfirmBtn } from "@/components/button/ButtonComponents";
 import SearchDropdown from "@/components/dropdown/SearchDropdown";
 import InputItem from "@/components/input/InputItem";
 import InputDate from "@/components/input/InputDate";
 import InputTag from "@/components/input/InputTag";
 import InputFile from "@/components/input/InputFile";
-import { useAtom, useAtomValue } from "jotai";
-import { CreateCardParamsAtom } from "@/store/modalAtom";
-import { uploadType } from "@/types/uploadType";
-import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
-import { useToggleModal } from "@/hooks/useModal";
 
 const CreateCard = () => {
   const { user } = useAuth();
   const { dashboardId } = useParams();
+  const { columnId } = useAtomValue(ColumnAtom);
   const { memberData } = useMember({ dashboardId: Number(dashboardId) });
-  const columnId = useAtomValue(CreateCardParamsAtom);
+
+  const [tagInput, setTagInput] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const { isLoading, withLoading } = useLoading();
-  const [, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
+
   const toggleModal = useToggleModal();
+  const [, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
 
   const {
     uploadFile,
@@ -46,8 +53,6 @@ const CreateCard = () => {
     }
   }, [fileError]);
 
-  const [tagInput, setTagInput] = useState("");
-
   const {
     register,
     handleSubmit,
@@ -60,7 +65,7 @@ const CreateCard = () => {
     resolver: zodResolver(CardSchema),
     mode: "onChange",
     defaultValues: {
-      assigneeUserId: Number(user && user.id),
+      assigneeUserId: Number(user?.id || 0),
       dashboardId: Number(dashboardId),
       columnId: Number(columnId),
       title: "",
@@ -71,17 +76,12 @@ const CreateCard = () => {
     },
   });
 
-  // 폼 필드 값 실시간 감시
   const dueDate = useWatch({ control, name: "dueDate" });
   const tags = useWatch({ control, name: "tags" });
   const title = watch("title");
   const description = watch("description");
 
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
-  const isFormValid =
-    title?.trim() !== "" && description?.trim() !== "" && !!dueDate && tags.length > 0 && selectedFile !== null;
+  const isFormValid = title.trim() && description.trim() && dueDate && tags.length > 0 && selectedFile !== null;
 
   const handleAddTag = (tag: string) => {
     if (tagInput.trim() && !tags.includes(tag)) {
@@ -92,19 +92,21 @@ const CreateCard = () => {
 
   const handleImageChange = (file: string | File | null) => {
     if (!file) {
-      setSelectedFile(null);
-      setPreviewUrl(null);
-      setValue("imageUrl", null);
+      resetImage();
       return;
     }
 
-    if (!(file instanceof File)) {
-      return;
+    if (file instanceof File) {
+      setSelectedFile(file);
+      const preview = URL.createObjectURL(file);
+      setPreviewUrl(preview);
     }
+  };
 
-    setSelectedFile(file);
-    const preview = URL.createObjectURL(file);
-    setPreviewUrl(preview);
+  const resetImage = () => {
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    setValue("imageUrl", null);
   };
 
   const onSubmit: SubmitHandler<CreateCardProps> = async (data) => {
@@ -113,17 +115,12 @@ const CreateCard = () => {
         let uploadedImageUrl = null;
         if (selectedFile) {
           uploadedImageUrl = await uploadFile(selectedFile);
-          if (!uploadedImageUrl) {
-            throw new Error("이미지 업로드 실패");
-          }
+          if (!uploadedImageUrl) throw new Error("이미지 업로드 실패");
         }
 
-        const cardData = {
-          ...data,
-          imageUrl: uploadedImageUrl,
-        };
-
+        const cardData = { ...data, imageUrl: uploadedImageUrl };
         const response = await axios.post(`/api/cards`, cardData);
+
         if (response.data) {
           toast.success("카드가 생성되었습니다! 🎉");
           toggleModal("createCard", false);
@@ -135,13 +132,6 @@ const CreateCard = () => {
     });
   };
 
-  const managerValidation = register("assigneeUserId", {
-    required: {
-      value: true,
-      message: "담당자를 선택해 주세요",
-    },
-  });
-
   return (
     <section className="w-[327px] rounded-2xl bg-white px-4 pb-5 pt-8 md:w-[584px] md:p-8 md:pt-10">
       <h3 className="mb-5 text-2xl font-bold text-black03 md:mb-6 md:text-3xl">할 일 생성</h3>
@@ -151,9 +141,7 @@ const CreateCard = () => {
           name="assigneeUserId"
           control={control}
           render={({ field }) => {
-            const selectedMember = memberData.members.find((member) => member.userId === field.value);
-
-            const currentManager = selectedMember || {
+            const selectedMember = memberData.members.find((member) => member.userId === field.value) || {
               id: 0,
               userId: 0,
               email: "",
@@ -164,13 +152,12 @@ const CreateCard = () => {
             return (
               <SearchDropdown
                 inviteMemberList={memberData.members}
-                currentManager={currentManager}
+                currentManager={selectedMember}
                 setManager={(manager) => {
                   field.onChange(manager.userId);
                   setValue("assigneeUserId", manager.userId);
                 }}
                 setValue={setValue}
-                validation={managerValidation}
               />
             );
           }}
@@ -179,19 +166,15 @@ const CreateCard = () => {
         <InputItem
           label="제목"
           id="title"
-          {...register("title", {
-            required: "제목은 필수입니다",
-          })}
-          errors={errors.title && errors.title.message}
+          {...register("title")}
           placeholder="제목을 입력해 주세요"
-          required
+          errors={errors.title?.message}
         />
 
         <InputItem
           label="설명"
           id="description"
           {...register("description", {
-            required: "설명은 필수입니다",
             onChange: (e) => {
               setValue("description", e.target.value);
               trigger("description");
@@ -199,28 +182,16 @@ const CreateCard = () => {
           })}
           isTextArea
           size="description"
-          required
           placeholder="설명을 입력해 주세요"
-          errors={errors.description && errors.description.message}
+          errors={errors.description?.message}
         />
 
-        <Controller
-          name="dueDate"
-          control={control}
-          render={({ field }) => (
-            <InputDate
-              label="마감일"
-              id="dueDate"
-              name="dueDate"
-              value={field.value}
-              onChange={(date) => {
-                const formattedDate = date ? formatDateTime(date) : "";
-                field.onChange(formattedDate);
-                setValue("dueDate", formattedDate);
-              }}
-              placeholder="날짜를 입력해 주세요"
-            />
-          )}
+        <InputDate
+          label="마감일"
+          id="dueDate"
+          placeholder="날짜를 입력해 주세요"
+          value={watch("dueDate")}
+          onChange={(formattedDate) => setValue("dueDate", formattedDate)}
         />
 
         <InputTag

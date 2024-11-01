@@ -15,21 +15,10 @@ export const DashboardMemberDisplay = () => {
   const toggleModal = useToggleModal();
 
   // 대시보드 목록 조회
-  const {
-    dashboardInfo,
-    getDashboardById,
-    isLoading: isDashboardLoading,
-    error: dashboardError,
-  } = useDashboard({
-    page: 1,
-    size: 10,
-    showErrorToast: true,
-    customErrorMessage: "대시보드를 찾을 수 없습니다.",
-    dashboardId: currentDashboardId || undefined,
-  });
+  const { dashboardInfo } = useDashboard({ dashboardId: currentDashboardId || 0 });
 
   // 실제 표시할 대시보드 정보
-  const displayDashboard = dashboardInfo || getDashboardById(currentDashboardId || 0);
+  const displayDashboard = dashboardInfo;
 
   // 멤버 목록 조회
   const {
@@ -55,7 +44,7 @@ export const DashboardMemberDisplay = () => {
   };
 
   // 로딩 중이거나 에러 발생 시 렌더링하지 않음
-  if (isDashboardLoading || isMemberLoading || dashboardError || memberError) return null;
+  if (isMemberLoading || memberError) return null;
 
   // 대시보드 소유자 여부 확인
   const isDashboardOwner = displayDashboard?.createdByMe || false;
@@ -63,7 +52,7 @@ export const DashboardMemberDisplay = () => {
   return (
     <div className="flex h-full w-full items-center justify-between">
       {/* 대시보드 제목 영역 */}
-      <div className="w-[100px] pl-1 md:w-[180px]">
+      <div className="w-[100px] pl-1 md:w-[240px]">
         <SelectedDashboard title={displayDashboard?.title || null} isDashboardOwner={isDashboardOwner} />
       </div>
 

@@ -23,9 +23,7 @@ export const DeleteModalStateAtom = atom<DeleteModalState>({
   confirm: () => null,
 });
 
-export const CreateCardParamsAtom = atom<number>(0);
-export const DetailCardParamsAtom = atom<number>(0);
-export const UpdateCardParamsAtom = atom<number>(0);
+export const TodoCardId = atom<number>(0);
 
 export const ColumnTitlesAtom = atom<string[]>([]);
 export const ColumnAtom = atom<{ columnId: number; title: string }>({ columnId: 0, title: "" });

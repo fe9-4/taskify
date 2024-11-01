@@ -4,21 +4,19 @@ import { ICurrentManager } from "@/types/currentManager";
 import { cls } from "@/lib/utils";
 import { CreateCardProps, UpdateCardProps } from "@/types/cardType";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
-import { FieldErrors, UseFormRegisterReturn, UseFormSetValue } from "react-hook-form";
+import { UseFormSetValue } from "react-hook-form";
 import { FaCaretDown } from "react-icons/fa";
 import { HiCheck } from "react-icons/hi";
 
 interface IProps {
   inviteMemberList: ICurrentManager[];
-  currentManager: ICurrentManager;
+  currentManager: ICurrentManager | undefined;
   setManager: (manager: ICurrentManager) => void;
   setValue: UseFormSetValue<CreateCardProps | UpdateCardProps>;
-  validation: UseFormRegisterReturn;
-  errors?: FieldErrors;
 }
 
 // 초대된 멤버들을 prop으로 받고 담당자명을 추출해서 사용하세요.
-const SearchDropdown = ({ validation, setValue, inviteMemberList, setManager, currentManager }: IProps) => {
+const SearchDropdown = ({ setValue, inviteMemberList, setManager, currentManager }: IProps) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const [name, setName] = useState("");
@@ -40,7 +38,7 @@ const SearchDropdown = ({ validation, setValue, inviteMemberList, setManager, cu
 
   const handleSelectName = (manager: ICurrentManager) => {
     setManager(manager);
-    setName("");
+    setName(manager.nickname);
     setIsOpen(false);
   };
 
@@ -50,7 +48,7 @@ const SearchDropdown = ({ validation, setValue, inviteMemberList, setManager, cu
   useEffect(() => {
     if (currentManager) {
       setSelectedName(currentManager);
-      setName("");
+      setName(currentManager.nickname);
     }
   }, [currentManager]);
 
@@ -61,7 +59,7 @@ const SearchDropdown = ({ validation, setValue, inviteMemberList, setManager, cu
       </label>
       <div className="relative flex w-full flex-col space-y-[2px] bg-white" ref={dropdownRef}>
         <div className="flex h-[50px] w-full items-center justify-between overflow-hidden rounded-lg px-4 ring-1 ring-inset ring-gray03 transition-all focus-within:ring-violet01 focus:outline-none focus:ring-1 focus:ring-inset">
-          <div className="flex w-full items-center space-x-2">
+          <div className="flex w-full items-center space-x-2 text-base md:text-lg">
             {selectedName && (
               <span className="flex h-[26px] w-7 items-center justify-center rounded-full bg-[#A3C4A2] text-xs font-semibold text-white ring-white ring-offset-2">
                 {selectedName.nickname.charAt(0)}
@@ -73,7 +71,6 @@ const SearchDropdown = ({ validation, setValue, inviteMemberList, setManager, cu
               onChange={handleChangeName}
               className="w-full focus:outline-none"
               placeholder="이름을 입력해 주세요"
-              {...validation?.ref}
             />
           </div>
           <FaCaretDown />

@@ -1,4 +1,4 @@
-import { ChangeEventHandler, KeyboardEventHandler, MouseEventHandler } from "react";
+import { ChangeEventHandler, KeyboardEventHandler } from "react";
 import { inputFileSize } from "@/components/input/InputFile";
 
 type Size = keyof typeof inputFileSize.size;
@@ -11,7 +11,6 @@ export interface InputProps extends textAreaProps {
   errors?: string;
   type?: string;
   name?: string;
-  required?: boolean;
   autoComplete?: string;
   className?: string;
   tag?: string;
@@ -37,11 +36,10 @@ export interface InputFileProps {
 
 export interface InputDateProps {
   id: string;
-  name: string;
   label: string;
   value: string | any;
   placeholder: string;
-  onChange: (date: Date | null) => void;
+  onChange: (date: string) => void;
 }
 
 export interface InputTagProps {
