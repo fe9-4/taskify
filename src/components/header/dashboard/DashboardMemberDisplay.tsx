@@ -68,7 +68,7 @@ export const DashboardMemberDisplay = () => {
       </div>
 
       {/* 대시보드 관리 버튼 영역 */}
-      <div className="flex items-center">
+      <div className="flex items-center text-base text-gray01 md:text-lg">
         {isDashboardOwner && (
           <>
             {/* 관리 버튼 */}
@@ -88,7 +88,7 @@ export const DashboardMemberDisplay = () => {
             {/* 초대하기 버튼 */}
             <div
               onClick={handleInviteClick}
-              className="ml-4 flex h-[30px] w-[73px] cursor-pointer items-center justify-center gap-1 rounded-lg border border-gray03 md:h-[36px] md:w-[109px]"
+              className="ml-3 flex h-[30px] w-[73px] cursor-pointer items-center justify-center gap-1 rounded-lg border border-gray03 md:h-[36px] md:w-[109px]"
             >
               <Image
                 src="/images/header/invitation.svg"
@@ -106,7 +106,7 @@ export const DashboardMemberDisplay = () => {
           {currentDashboardId && memberData.totalCount > 0 && <MemberInitials dashboardId={currentDashboardId} />}
         </div>
         {/* 구분선 */}
-        <div className="mx-8 h-8 w-px bg-gray-300"></div>
+        <div className="mx-6 h-8 w-px bg-gray-300"></div>
       </div>
     </div>
   );
