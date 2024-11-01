@@ -28,7 +28,7 @@ const CreateDashboard = () => {
         const res = await axios.post("/api/dashboards", data);
         toast.success("대시보드 생성 완료");
         const dashboardId = res.data.user.id;
-        router.push(`dashboard/${dashboardId}`);
+        router.push(`/dashboard/${dashboardId}`);
         toggleModal("createDashboard", false);
       } catch (error) {
         toast.error("대시보드 생성 실패");
