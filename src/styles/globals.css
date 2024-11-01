@@ -55,30 +55,30 @@ body {
     @apply flex;
   }
 
-  .react-datepicker__header {
+  .react-datepicker .react-datepicker__header {
     @apply bg-violet02;
   }
 
-  .react-datepicker__day,
-  .react-datepicker__time-list-item {
+  .react-datepicker .react-datepicker__day,
+  .react-datepicker .react-datepicker__time-list-item,
+  .react-datepicker .react-datepicker__day--keyboard-selected,
+  .react-datepicker .react-datepicker__day--selected,
+  .react-datepicker .react-datepicker__time-list-item--selected {
     @apply hover:bg-violet02 !important;
   }
 
-  .react-datepicker__day--keyboard-selected,
-  .react-datepicker__day--selected {
+  .react-datepicker .react-datepicker__day--keyboard-selected,
+  .react-datepicker .react-datepicker__day--selected,
+  .react-datepicker .react-datepicker__time-list-item--selected {
     @apply bg-purple01 text-white hover:bg-purple01 !important;
   }
 
-  .react-datepicker__time-list-item--selected {
-    @apply bg-purple01 hover:bg-purple01 !important;
-  }
-
-  .react-datepicker__current-month,
-  .react-datepicker-time__header {
+  .react-datepicker .react-datepicker__current-month,
+  .react-datepicker .react-datepicker-time__header {
     @apply text-black04;
   }
 
-  .react-datepicker__day-name {
+  .react-datepicker .react-datepicker__day-name {
     @apply text-gray01;
   }
   /* ----------------------- end datepicker calendar ----------------------- */

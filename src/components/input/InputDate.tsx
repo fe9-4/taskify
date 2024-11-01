@@ -48,9 +48,11 @@ const InputDate = forwardRef<HTMLDivElement, InputDateProps>(({ label, id, value
           id={id}
           ref={datePickerRef}
           className={cls(
+            "react-datepicker-wrapper",
             "flex h-[50px] w-full cursor-pointer items-center rounded-lg pl-11 text-base placeholder-gray02 ring-1 ring-inset ring-gray03 transition-all focus-within:ring-violet01 focus:outline-none focus:ring-1 focus:ring-inset md:w-[520px] md:text-lg",
             selectedDate ? "text-black03" : "text-gray02"
           )}
+          calendarClassName="react-datepicker"
           selected={selectedDate}
           onChange={handleChange}
           showTimeSelect
