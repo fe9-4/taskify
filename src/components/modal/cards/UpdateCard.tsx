@@ -7,10 +7,19 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { UpdateCardSchema } from "@/zodSchema/cardSchema";
 import axios from "axios";
 import toast from "react-hot-toast";
+
 import { useAuth } from "@/hooks/useAuth";
-import { useFileUpload } from "@/hooks/useFileUpload";
 import { useMember } from "@/hooks/useMember";
-import { formatDateTime } from "@/utils/dateFormat";
+import { useFileUpload } from "@/hooks/useFileUpload";
+import { useToggleModal } from "@/hooks/useModal";
+import useLoading from "@/hooks/useLoading";
+
+import { useAtom, useAtomValue } from "jotai";
+import { ColumnAtom, TodoCardId } from "@/store/modalAtom";
+import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
+import { CardDataType, UpdateCardProps } from "@/types/cardType";
+import { uploadType } from "@/types/uploadType";
+
 import { CancelBtn, ConfirmBtn } from "@/components/button/ButtonComponents";
 import StatusDropdown from "@/components/dropdown/StatusDropdown";
 import SearchDropdown from "@/components/dropdown/SearchDropdown";
@@ -18,34 +27,17 @@ import InputItem from "@/components/input/InputItem";
 import InputDate from "@/components/input/InputDate";
 import InputTag from "@/components/input/InputTag";
 import InputFile from "@/components/input/InputFile";
-import { useAtom, useAtomValue } from "jotai";
-import useLoading from "@/hooks/useLoading";
-import { ColumnAtom, UpdateCardParamsAtom } from "@/store/modalAtom";
-import { uploadType } from "@/types/uploadType";
-import { UpdateCardProps } from "@/types/cardType";
-import { useToggleModal } from "@/hooks/useModal";
-import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
-
-interface CardDataType extends UpdateCardProps {
-  assignee: {
-    id: number;
-    userId: number;
-    nickname: string;
-    email: string;
-    profileImageUrl: string | null;
-  };
-}
 
 const UpdateCard = () => {
   const { user } = useAuth();
   const { dashboardId } = useParams();
-  const cardId = useAtomValue(UpdateCardParamsAtom);
-  const column = useAtomValue(ColumnAtom);
+  const { columnId } = useAtomValue(ColumnAtom);
+  const cardId = useAtomValue(TodoCardId);
   const { memberData } = useMember({ dashboardId: Number(dashboardId) });
 
   const [tagInput, setTagInput] = useState("");
   const [cardData, setCardData] = useState<CardDataType | null>(null);
-  const [selectedValue, setSelectedValue] = useState(column.columnId);
+  const [selectedValue, setSelectedValue] = useState(columnId);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const { isLoading, withLoading } = useLoading();
@@ -57,7 +49,7 @@ const UpdateCard = () => {
     uploadFile,
     isPending: isFileUploading,
     error: fileError,
-  } = useFileUpload(`/api/columns/${selectedValue}/card-image`, uploadType.CARD);
+  } = useFileUpload(`/api/columns/${columnId}/card-image`, uploadType.CARD);
 
   useEffect(() => {
     if (fileError) {
@@ -79,7 +71,7 @@ const UpdateCard = () => {
     mode: "onChange",
     defaultValues: {
       assigneeUserId: Number(user?.id) || 0,
-      columnId: column.columnId,
+      columnId: columnId,
       title: "",
       description: "",
       dueDate: "",

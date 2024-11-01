@@ -7,28 +7,30 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CardSchema } from "@/zodSchema/cardSchema";
 import axios from "axios";
 import toast from "react-hot-toast";
-import useLoading from "@/hooks/useLoading";
+
 import { useAuth } from "@/hooks/useAuth";
-import { useFileUpload } from "@/hooks/useFileUpload";
 import { useMember } from "@/hooks/useMember";
-import { formatDateTime } from "@/utils/dateFormat";
+import { useFileUpload } from "@/hooks/useFileUpload";
+import { useToggleModal } from "@/hooks/useModal";
+import useLoading from "@/hooks/useLoading";
+
+import { useAtom, useAtomValue } from "jotai";
+import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
+import { ColumnAtom } from "@/store/modalAtom";
 import { CreateCardProps } from "@/types/cardType";
+import { uploadType } from "@/types/uploadType";
+
 import { CancelBtn, ConfirmBtn } from "@/components/button/ButtonComponents";
 import SearchDropdown from "@/components/dropdown/SearchDropdown";
 import InputItem from "@/components/input/InputItem";
 import InputDate from "@/components/input/InputDate";
 import InputTag from "@/components/input/InputTag";
 import InputFile from "@/components/input/InputFile";
-import { useAtom, useAtomValue } from "jotai";
-import { CreateCardParamsAtom } from "@/store/modalAtom";
-import { uploadType } from "@/types/uploadType";
-import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
-import { useToggleModal } from "@/hooks/useModal";
 
 const CreateCard = () => {
   const { user } = useAuth();
   const { dashboardId } = useParams();
-  const columnId = useAtomValue(CreateCardParamsAtom);
+  const { columnId } = useAtomValue(ColumnAtom);
   const { memberData } = useMember({ dashboardId: Number(dashboardId) });
 
   const [tagInput, setTagInput] = useState("");
@@ -109,7 +111,6 @@ const CreateCard = () => {
 
   const onSubmit: SubmitHandler<CreateCardProps> = async (data) => {
     await withLoading(async () => {
-      console.log(data);
       try {
         let uploadedImageUrl = null;
         if (selectedFile) {

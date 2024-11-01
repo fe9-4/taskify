@@ -1,22 +1,23 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useAtom, useAtomValue } from "jotai";
-import { ColumnAtom, DetailCardParamsAtom, UpdateCardParamsAtom } from "@/store/modalAtom";
-import { useDeleteModal, useToggleModal } from "@/hooks/useModal";
-import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import Image from "next/image";
+
+import { useAtom, useAtomValue } from "jotai";
+import { ColumnAtom, TodoCardId } from "@/store/modalAtom";
+import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
+import { useDeleteModal, useToggleModal } from "@/hooks/useModal";
 import { CardDataProps } from "@/types/cardType";
+
 import { StatusTitleChip } from "@/components/chip/StatusChip";
 import TagChip from "@/components/chip/TagChip";
 import EditDeleteDropdown from "@/components/dropdown/EditDeleteDropdown";
 import CommentList from "../comments/CommentList";
 
 const DetailCard = () => {
-  const cardId = useAtomValue(DetailCardParamsAtom);
-  const column = useAtomValue(ColumnAtom);
+  const [cardId, setCardId] = useAtom(TodoCardId);
+  const { columnId, title } = useAtomValue(ColumnAtom);
   const [cardData, setCardData] = useState<CardDataProps>();
-  const [, setIsUpdateCardParams] = useAtom(UpdateCardParamsAtom);
   const [, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
 
   const toggleModal = useToggleModal();
@@ -77,7 +78,7 @@ const DetailCard = () => {
   const handleEdit = () => {
     if (cardData) {
       toggleModal("updateCard", true);
-      setIsUpdateCardParams(cardData.id);
+      setCardId(cardData.id);
       toggleModal("detailCard", false);
     }
   };
@@ -126,7 +127,7 @@ const DetailCard = () => {
 
               <div className="flex flex-1 flex-col gap-y-4">
                 <div className="flex flex-wrap items-center gap-3">
-                  <StatusTitleChip title={column.title} />
+                  <StatusTitleChip title={title} />
                   <span className="h-[20px] w-[1px] bg-gray03 md:mx-2"></span>
                   {card.tags.map((tag, index) => (
                     <TagChip tag={tag} key={`${tag}-${index + 1}`} />
@@ -151,7 +152,7 @@ const DetailCard = () => {
           </section>
         ))}
 
-      <CommentList cardId={cardId} columnId={column.columnId} />
+      <CommentList cardId={cardId} columnId={columnId} />
     </section>
   );
 };
