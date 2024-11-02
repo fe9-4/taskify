@@ -10,6 +10,7 @@ import { CancelBtn, ConfirmBtn } from "../../button/ButtonComponents";
 import { useToggleModal } from "@/hooks/useModal";
 import { useCreateDashboard } from "@/hooks/useDashboard";
 import { CreateDashboard as CreateDashboardType, Dashboard } from "@/zodSchema/dashboardSchema";
+import toastMessages from "@/lib/toastMessage";
 
 const CreateDashboard = () => {
   const {
@@ -29,11 +30,11 @@ const CreateDashboard = () => {
       try {
         const res: Dashboard = await createDashboard(data);
         const dashboardId = res.id;
-        
+
         router.push(`/dashboard/${dashboardId}`);
         toggleModal("createDashboard", false);
       } catch (error) {
-        toast.error("대시보드 생성 실패");
+        toast.error(toastMessages.error.createDashboard);
         toggleModal("createDashboard", false);
       }
     });

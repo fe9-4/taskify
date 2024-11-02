@@ -12,6 +12,7 @@ import { useToggleModal } from "@/hooks/useModal";
 import { Droppable, Draggable } from "@hello-pangea/dnd";
 import { ICard } from "@/types/dashboardType";
 import { useWidth } from "@/hooks/useWidth";
+import toastMessages from "@/lib/toastMessage";
 
 interface IProps {
   columnTitle: string;
@@ -84,7 +85,7 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error("카드 목록 조회 중 오류 발생", error);
-        toast.error(error.response?.data || "카드 목록 조회 중 오류가 발생했습니다.");
+        toast.error(error.response?.data || toastMessages.error.getCardList);
       }
     } finally {
       setIsLoading(false);

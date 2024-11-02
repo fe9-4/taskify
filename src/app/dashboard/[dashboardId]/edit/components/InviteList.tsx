@@ -7,6 +7,7 @@ import Pagination from "@/components/pagination/Pagination";
 import { useInvitation } from "@/hooks/useInvitation";
 import { Invitation } from "@/zodSchema/invitationSchema";
 import { useToggleModal } from "@/hooks/useModal";
+import toastMessages from "@/lib/toastMessage";
 
 const InviteList = ({ dashboardId }: { dashboardId: number }) => {
   const [page, setPage] = useState(1);
@@ -25,7 +26,7 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
       await cancelInvitation(invitationId);
     } catch (error) {
       console.error(`Error canceling invitation: ${invitationId}`, error);
-      toast.error("초대 취소 중 오류가 발생했습니다.");
+      toast.error(toastMessages.error.cancelInvitation);
     }
   };
 

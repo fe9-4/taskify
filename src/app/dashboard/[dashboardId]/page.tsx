@@ -12,6 +12,7 @@ import { useToggleModal } from "@/hooks/useModal";
 import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
 import { ICard } from "@/types/dashboardType";
+import toastMessages from "@/lib/toastMessage";
 
 interface IColumnData {
   id: number;
@@ -50,7 +51,7 @@ const DashboardDetail = () => {
                 return { ...column, cards: [], totalCount: 0 };
               }
             } catch (error) {
-              toast.error("카드 목록 조회 중 오류가 발생했습니다.");
+              toast.error(toastMessages.error.getCardList);
               return { ...column, cards: [], totalCount: 0 };
             }
           })
@@ -111,7 +112,7 @@ const DashboardDetail = () => {
             });
           } catch (error) {
             console.error("카드 이동 업데이트 오류", error);
-            toast.error("카드 이동 중 오류가 발생했습니다.");
+            toast.error(toastMessages.error.moveCard);
             getColumn();
           }
         })();

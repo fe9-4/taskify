@@ -4,6 +4,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { formatDateTime } from "@/utils/dateFormat";
 import { CardSchemaType, UpdateCardSchemaType } from "@/zodSchema/cardSchema";
+import toastMessages from "@/lib/toastMessage";
 
 export const useCard = (columnId?: number, size: number = 10) => {
   const queryClient = useQueryClient();
@@ -39,11 +40,11 @@ export const useCard = (columnId?: number, size: number = 10) => {
       return response.data;
     },
     onSuccess: () => {
-      toast.success("카드가 생성되었습니다");
+      toast.success(toastMessages.success.createCard);
       queryClient.invalidateQueries({ queryKey: ["cardData", columnId, size] });
     },
     onError: () => {
-      toast.error("카드 생성에 실패했습니다");
+      toast.error(toastMessages.error.createCard);
     },
   });
 
@@ -55,12 +56,12 @@ export const useCard = (columnId?: number, size: number = 10) => {
       return response.data;
     },
     onSuccess: () => {
-      toast.success("카드가 수정되었습니다");
+      toast.success(toastMessages.success.editCard);
       queryClient.invalidateQueries({ queryKey: ["cardData", columnId] });
     },
     onError: (error) => {
       console.error("카드 수정 실패:", error);
-      toast.error("카드 수정에 실패했습니다");
+      toast.error(toastMessages.error.editCard);
     },
   });
 
@@ -71,11 +72,11 @@ export const useCard = (columnId?: number, size: number = 10) => {
       return response.data;
     },
     onSuccess: () => {
-      toast.success("카드가 삭제되었습니다");
+      toast.success(toastMessages.success.deleteCard);
       queryClient.invalidateQueries({ queryKey: ["cardData"] });
     },
     onError: () => {
-      toast.error("카드 삭제에 실패했습니다");
+      toast.error(toastMessages.error.deleteCard);
     },
   });
 
@@ -117,10 +118,10 @@ export const useCard = (columnId?: number, size: number = 10) => {
       if (context?.previousData) {
         queryClient.setQueryData(["cardData"], context.previousData);
       }
-      toast.error("카드 이동에 실패했습니다");
+      toast.error(toastMessages.error.moveCard);
     },
     onSuccess: () => {
-      toast.success("카드가 이동되었습니다");
+      toast.success(toastMessages.success.moveCard);
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["cardData"] });

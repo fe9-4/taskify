@@ -10,6 +10,7 @@ import { useInvitation } from "@/hooks/useInvitation";
 import { useToggleModal } from "@/hooks/useModal";
 import toast from "react-hot-toast";
 import axios from "axios";
+import toastMessages from "@/lib/toastMessage";
 
 const InvitationDashboard = () => {
   const toggleModal = useToggleModal();
@@ -46,7 +47,7 @@ const InvitationDashboard = () => {
 
   // 에러 발생 시 처리
   if (memberError) {
-    toast.error("멤버 정보를 불러오는데 실패했습니다.");
+    toast.error(toastMessages.error.getMemberList);
     toggleModal("invitationDashboard", false);
     router.push("/mydashboard");
     return null;
@@ -54,7 +55,7 @@ const InvitationDashboard = () => {
 
   const onSubmit = handleSubmit(async (data) => {
     if (!currentDashboardId) {
-      toast.error("유효하지 않은 대시보드입니다.");
+      toast.error(toastMessages.error.isValidDashboard);
       toggleModal("invitationDashboard", false);
       router.push("/mydashboard");
       return;
@@ -66,7 +67,7 @@ const InvitationDashboard = () => {
       toggleModal("invitationDashboard", false);
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        toast.error(error.response?.data || "초대에 실패했습니다.");
+        toast.error(error.response?.data || toastMessages.error.invitation);
       }
     }
   });
