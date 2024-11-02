@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { memo, forwardRef } from "react";
 import Image from "next/image";
 import TagChip from "@/components/chip/TagChip";
 import { HiOutlineCalendar } from "react-icons/hi";
@@ -9,14 +9,14 @@ interface IProps {
   dragHandleProps?: any;
 }
 
-const ColumnItem = ({ card, dragHandleProps }: IProps) => {
+const ColumnItem = forwardRef<HTMLDivElement, IProps>(({ card, dragHandleProps }, ref) => {
   if (!card) return null;
 
   return (
-    <section className="w-full border-b pb-6 md:border-0 md:pb-0">
+    <div ref={ref}>
       <div
         {...dragHandleProps}
-        className="mt-4 flex cursor-grab flex-col space-y-2 rounded-md border border-gray03 bg-white p-3 active:cursor-grabbing md:flex-row md:items-center md:space-x-2 md:space-y-0 md:px-4 xl:flex-col xl:space-x-0 xl:space-y-[6px]"
+        className="flex cursor-grab flex-col space-y-2 rounded-md border border-gray03 bg-white p-3 active:cursor-grabbing md:flex-row md:items-center md:space-x-2 md:space-y-0 md:px-4 xl:flex-col xl:space-x-0 xl:space-y-[6px]"
       >
         <Image
           src={card.imageUrl}
@@ -48,9 +48,9 @@ const ColumnItem = ({ card, dragHandleProps }: IProps) => {
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
-};
+});
 
 ColumnItem.displayName = "ColumnItem";
 
