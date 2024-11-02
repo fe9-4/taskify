@@ -39,7 +39,7 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
   const dragSourceColumnRef = useRef<string | null>(null);
   const isDraggingOverRef = useRef(isDraggingOver);
   const isLargeScreen = useWidth();
-  
+
   const getCardList = useCallback(async () => {
     if (!hasMore || isLoading) return;
     setIsLoading(true);
@@ -99,7 +99,7 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
     const observer = new IntersectionObserver(
       (entries) => {
         const lastCardItem = entries[0];
-        if (lastCardItem.isIntersecting && hasMore && !isDraggingOver && isLargeScreen) {
+        if (lastCardItem.isIntersecting && hasMore && !isDraggingOver) {
           getCardList();
         }
       },
@@ -116,7 +116,7 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
         observer.unobserve(currentLoadingRef);
       }
     };
-  }, [hasMore, getCardList, isDraggingOver, isLargeScreen]);
+  }, [hasMore, getCardList, isDraggingOver]);
 
   useEffect(() => {
     if (dashboardCardUpdate) {
@@ -220,23 +220,29 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
                 </Draggable>
               ))}
               {provided.placeholder}
-              {!isDraggingOver &&
-                cardList
-                  .filter((item) => !cards.some((card) => card.id === item.id))
-                  .map((item, i) => (
-                    <div key={item.id} onClick={() => handleCardClick(item.id)}>
-                      <ColumnItem ref={i === cardList.length - 1 ? observeRef : null} card={item} />
-                    </div>
-                  ))}
-              {cards.length > 0 && (
-                <button
-                  onClick={getCardList}
-                  className="w-full rounded-md border border-gray03 bg-white py-2 font-bold xl:hidden"
-                >
-                  카드 더 보기
-                </button>
+              {!isLoading ? (
+                <>
+                  {!isDraggingOver &&
+                    cardList
+                      .filter((item) => !cards.some((card) => card.id === item.id))
+                      .map((item, i) => (
+                        <div key={item.id} onClick={() => handleCardClick(item.id)}>
+                          <ColumnItem ref={i === cardList.length - 1 ? observeRef : null} card={item} />
+                        </div>
+                      ))}
+                  {cards.length > 0 && (
+                    <button
+                      onClick={getCardList}
+                      className="w-full rounded-md border border-gray03 bg-white py-2 font-bold xl:hidden"
+                    >
+                      카드 더 보기
+                    </button>
+                  )}
+                  {cards.length === 0 && <p className="text-center font-bold">등록된 카드가 없습니다.</p>}
+                </>
+              ) : (
+                <p className="text-center font-bold">카드 불러오는 중...</p>
               )}
-              {isLoading && <p className="text-center font-bold">카드 불러오는 중...</p>}
             </div>
           );
         }}
