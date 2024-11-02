@@ -21,8 +21,8 @@ interface IProps {
   totalCount: ICard["totalCount"];
 }
 
-const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount }: IProps) => {
-  const [cardList, setCardList] = useState<ICard["cards"]>([]);
+const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards: initialCards, totalCount }: IProps) => {
+  const [cards, setCards] = useState<ICard["cards"]>(initialCards);
   const [hasMore, setHasMore] = useState(true);
   const [cursorId, setCursorId] = useState<number | undefined>();
   const [isDraggingOver, setIsDraggingOver] = useState(false);
@@ -68,12 +68,12 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
   // 초기 데이터 설정
   useEffect(() => {
     if (isInitialLoadingRef.current) {
-      setCardList([]);
-      setCursorId(cards.length > 0 ? cards[cards.length - 1].id : undefined);
-      setHasMore(cards.length < totalCount);
+      setCards(initialCards);
+      setCursorId(initialCards.length > 0 ? initialCards[initialCards.length - 1].id : undefined);
+      setHasMore(initialCards.length < totalCount);
       isInitialLoadingRef.current = false;
     }
-  }, [cards, totalCount]);
+  }, [initialCards, totalCount]);
 
   // getCardList 함수를 먼저 선언
   const getCardList = useCallback(async () => {
@@ -88,21 +88,19 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
       }>(`/api/cards?size=${ADDITIONAL_CARDS_SIZE}&columnId=${columnId}${lastCardId ? `&cursorId=${lastCardId}` : ""}`);
 
       if (response.status === 200) {
-        const newCardList = response.data.cards;
+        const newCards = response.data.cards;
 
-        setCardList((prev) => {
-          const existingIds = new Set([...cards, ...prev].map((card) => card.id));
-          const filteredNewCardList = newCardList.filter((card) => !existingIds.has(card.id));
+        setCards((prev) => {
+          const existingIds = new Set(prev.map((card) => card.id));
+          const filteredNewCards = newCards.filter((card) => !existingIds.has(card.id));
 
-          if (filteredNewCardList.length > 0) {
-            setCursorId(filteredNewCardList[filteredNewCardList.length - 1].id);
+          if (filteredNewCards.length > 0) {
+            setCursorId(filteredNewCards[filteredNewCards.length - 1].id);
           }
 
-          setHasMore(
-            filteredNewCardList.length > 0 && prev.length + filteredNewCardList.length + cards.length < totalCount
-          );
+          setHasMore(filteredNewCards.length > 0 && prev.length + filteredNewCards.length < totalCount);
 
-          return [...prev, ...filteredNewCardList];
+          return [...prev, ...filteredNewCards];
         });
       }
     } catch (error) {
@@ -113,7 +111,7 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
     } finally {
       setIsLoading(false);
     }
-  }, [columnId, hasMore, cursorId, isLoading, cards, totalCount]);
+  }, [columnId, hasMore, cursorId, isLoading, totalCount]);
 
   // 그 다음 무한 스크롤 useEffect 선언
   useEffect(() => {
@@ -128,7 +126,7 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
         // 초기 로딩 시 즉시 트리거되는 것을 방지
         if (target.isIntersecting && hasMore && !isDraggingOver && !isLoading) {
           // 현재 보이는 카드의 총 개수 확인
-          const totalVisibleCards = cards.length + cardList.length;
+          const totalVisibleCards = cards.length + cards.length;
           const minimumCardsBeforeLoad = 3; // 최소 3개의 카드가 있어야 추가 로드
 
           // 최소 카드 개수 이상일 때만 추가 로드
@@ -152,17 +150,17 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
         observer.unobserve(currentRef);
       }
     };
-  }, [hasMore, isDraggingOver, isLoading, isXLargeScreen, getCardList, cards.length, cardList.length]);
+  }, [hasMore, isDraggingOver, isLoading, isXLargeScreen, getCardList, cards.length]);
 
   useLayoutEffect(() => {
     if (dashboardCardUpdate) {
-      setCardList([]);
+      setCards(initialCards);
       setCursorId(undefined);
       setHasMore(true);
       getCardList();
       setDashboardCardUpdate(false);
     }
-  }, [dashboardCardUpdate, getCardList, setDashboardCardUpdate]);
+  }, [dashboardCardUpdate, getCardList, setDashboardCardUpdate, initialCards]);
 
   useEffect(() => {
     if (columnTitle && columnId) {
@@ -263,33 +261,26 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
                   ))}
                   {provided.placeholder}
 
-                  {!isDraggingOver &&
-                    cardList.map((item) => (
-                      <div key={item.id} onClick={() => handleCardClick(item.id)}>
-                        <ColumnItem card={item} />
-                      </div>
-                    ))}
-
                   {isXLargeScreen && hasMore && !isDraggingOver && !isLoading && (
                     <div ref={observeRef} className="h-10" />
                   )}
+
+                  {!isXLargeScreen && hasMore && !isDraggingOver && (
+                    <button
+                      onClick={getCardList}
+                      disabled={isLoading}
+                      className="mt-2 w-full rounded-md border border-gray03 bg-white py-2 font-bold hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      {isLoading ? "로딩 중..." : "카드 더 보기"}
+                    </button>
+                  )}
+
+                  {isLoading && (
+                    <div className="py-2 text-center">
+                      <p className="font-bold text-gray01">카드 불러오는 중...</p>
+                    </div>
+                  )}
                 </div>
-
-                {!isXLargeScreen && hasMore && !isDraggingOver && (
-                  <button
-                    onClick={getCardList}
-                    disabled={isLoading}
-                    className="mt-2 w-full rounded-md border border-gray03 bg-white py-2 font-bold hover:bg-gray-50 disabled:opacity-50"
-                  >
-                    {isLoading ? "로딩 중..." : "카드 더 보기"}
-                  </button>
-                )}
-
-                {isLoading && (
-                  <div className="py-2 text-center">
-                    <p className="font-bold text-gray01">카드 불러오는 중...</p>
-                  </div>
-                )}
               </div>
             </div>
           );
