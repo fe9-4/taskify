@@ -9,7 +9,7 @@ import { AddColumnBtn } from "@/components/button/ButtonComponents";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { ColumnTitlesAtom, RefreshDashboardAtom } from "@/store/modalAtom";
 import { useToggleModal } from "@/hooks/useModal";
-import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
+import { currentColumnListAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
 import { ICard } from "@/types/dashboardType";
 import toastMessages from "@/lib/toastMessage";
@@ -29,6 +29,7 @@ const DashboardDetail = () => {
   const [isCardUpdate] = useAtom(dashboardCardUpdateAtom);
 
   const [columnList, setColumnList] = useState<IColumnData[]>([]);
+  const setCurrentColumnList = useSetAtom(currentColumnListAtom);
 
   // 화면 크기 변경 감지를 위한 상태 추가
   const [isXLargeScreen, setIsXLargeScreen] = useState(false);
@@ -59,6 +60,8 @@ const DashboardDetail = () => {
   }, []);
 
   const getColumn = useCallback(async () => {
+    setCurrentColumnList([]);
+
     try {
       const response = await axios.get(`/api/columns?dashboardId=${dashboardId}`);
 
@@ -86,6 +89,7 @@ const DashboardDetail = () => {
           })
         );
 
+        setCurrentColumnList(columnsWithCards);
         setColumnList(columnsWithCards);
       }
     } catch (error) {
