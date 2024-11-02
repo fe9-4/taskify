@@ -7,19 +7,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { UpdateCardSchema } from "@/zodSchema/cardSchema";
 import axios from "axios";
 import toast from "react-hot-toast";
-
 import { useAuth } from "@/hooks/useAuth";
 import { useMember } from "@/hooks/useMember";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { useToggleModal } from "@/hooks/useModal";
 import useLoading from "@/hooks/useLoading";
-
-import { useAtom, useAtomValue } from "jotai";
-import { ColumnAtom, TodoCardId } from "@/store/modalAtom";
+import { useSetAtom, useAtomValue } from "jotai";
+import { ColumnAtom, CardIdAtom } from "@/store/modalAtom";
 import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { CardDataType, UpdateCardProps } from "@/types/cardType";
 import { uploadType } from "@/types/uploadType";
-
 import { CancelBtn, ConfirmBtn } from "@/components/button/ButtonComponents";
 import StatusDropdown from "@/components/dropdown/StatusDropdown";
 import SearchDropdown from "@/components/dropdown/SearchDropdown";
@@ -32,7 +29,7 @@ const UpdateCard = () => {
   const { user } = useAuth();
   const { dashboardId } = useParams();
   const { columnId } = useAtomValue(ColumnAtom);
-  const cardId = useAtomValue(TodoCardId);
+  const cardId = useAtomValue(CardIdAtom);
   const { memberData } = useMember({ dashboardId: Number(dashboardId) });
 
   const [tagInput, setTagInput] = useState("");
@@ -43,7 +40,7 @@ const UpdateCard = () => {
   const { isLoading, withLoading } = useLoading();
 
   const toggleModal = useToggleModal();
-  const [, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
+  const setDashboardCardUpdate = useSetAtom(dashboardCardUpdateAtom);
 
   const {
     uploadFile,
@@ -53,7 +50,7 @@ const UpdateCard = () => {
 
   useEffect(() => {
     if (fileError) {
-      toast.error("이미지 업로드 중 오류가 발생했습니다.");
+      toast.error("이미지 업로드에 실패하였습니다.");
     }
   }, [fileError]);
 
@@ -96,7 +93,7 @@ const UpdateCard = () => {
         tags: data.tags || [],
       });
     } catch {
-      toast.error("카드 데이터를 불러오는데 실패했습니다.");
+      toast.error("카드 데이터를 불러오는데 실패하였습니다.");
     }
   }, [cardId, reset]);
 
@@ -157,7 +154,7 @@ const UpdateCard = () => {
 
         if (selectedFile) {
           uploadedImageUrl = await uploadFile(selectedFile);
-          if (!uploadedImageUrl) throw new Error("이미지 업로드 실패");
+          if (!uploadedImageUrl) throw new Error("이미지 업로드 중 오류 발생");
         }
 
         const cardData = {
@@ -172,7 +169,7 @@ const UpdateCard = () => {
 
         const response = await axios.put(`/api/cards/${cardId}`, cardData);
         if (response.status === 200) {
-          toast.success("카드가 수정되었습니다! 🎉");
+          toast.success("카드가 수정되었습니다.");
           toggleModal("updateCard", false);
           setDashboardCardUpdate(true);
         }
@@ -183,7 +180,7 @@ const UpdateCard = () => {
   };
 
   return (
-    <section className="w-[327px] rounded-2xl bg-white p-8 md:w-[584px]">
+    <section className="w-[327px] rounded-2xl bg-white p-4 md:w-[584px] md:p-8">
       <h3 className="mb-5 text-2xl font-bold text-black03 md:mb-6 md:text-3xl">할 일 수정</h3>
 
       <form onSubmit={handleSubmit(onSubmit)} className="grid gap-8">

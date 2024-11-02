@@ -1,7 +1,7 @@
 import { useForm, useWatch } from "react-hook-form";
 import InputItem from "../../input/InputItem";
 import { CancelBtn, ConfirmBtn } from "../../button/ButtonComponents";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { ColumnAtom, ColumnTitlesAtom, RefreshDashboardAtom } from "@/store/modalAtom";
 import useLoading from "@/hooks/useLoading";
 import axios from "axios";
@@ -12,7 +12,7 @@ import { useDeleteModal, useToggleModal } from "@/hooks/useModal";
 const EditColumn = () => {
   const toggleModal = useToggleModal();
   const setDeleteModal = useDeleteModal();
-  const [, setRefreshDashboard] = useAtom(RefreshDashboardAtom);
+  const setRefreshDashboard = useSetAtom(RefreshDashboardAtom);
   const { isLoading, withLoading } = useLoading();
   const ColumnTitles = useAtomValue(ColumnTitlesAtom);
   const Column = useAtomValue(ColumnAtom);

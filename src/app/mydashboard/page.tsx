@@ -5,8 +5,8 @@ import toast from "react-hot-toast";
 import InviteList from "@/app/mydashboard/components/InviteList";
 import Pagination from "../../components/pagination/Pagination";
 import { useCallback, useEffect, useState } from "react";
+import { useAtom, useSetAtom } from "jotai";
 import { usePathname, useRouter } from "next/navigation";
-import { useAtom } from "jotai";
 import { AddDashboardBtn, DashboardCard } from "@/components/button/ButtonComponents";
 import { IMyDashboard } from "@/types/myDashboardType";
 import { currentDashboardIdAtom, myDashboardUpdateAtom } from "@/store/myDashboardAtom";
@@ -22,7 +22,7 @@ const MyDashboard = () => {
 
   const toggleModal = useToggleModal();
   const [isUpdatedList, setIsUpdatedList] = useAtom(myDashboardUpdateAtom);
-  const [, setDashboardIdList] = useAtom(currentDashboardIdAtom);
+  const setDashboardIdList = useSetAtom(currentDashboardIdAtom);
   const pathname = usePathname();
   const router = useRouter();
   const { user } = useAuth();
