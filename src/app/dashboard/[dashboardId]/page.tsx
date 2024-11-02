@@ -18,6 +18,7 @@ interface IColumnData {
   id: number;
   title: string;
   cards: ICard["cards"];
+  allCards: ICard["cards"];
   totalCount: ICard["totalCount"];
 }
 
@@ -69,19 +70,23 @@ const DashboardDetail = () => {
         const columnsWithCards = await Promise.all(
           columns.map(async (column: IColumnData) => {
             try {
-              const cardsResponse = await axios.get(`/api/cards?columnId=${column.id}&size=${initialSize}`);
+              const cardsResponse = await axios.get(`/api/cards?columnId=${column.id}&size=100`);
               if (cardsResponse.status === 200) {
+                const allCards = cardsResponse.data.cards;
+                const visibleCards = allCards.slice(0, initialSize);
+
                 return {
                   ...column,
-                  cards: cardsResponse.data.cards,
+                  cards: visibleCards,
+                  allCards: allCards,
                   totalCount: cardsResponse.data.totalCount,
                 };
               } else {
-                return { ...column, cards: [], totalCount: 0 };
+                return { ...column, cards: [], allCards: [], totalCount: 0 };
               }
             } catch (error) {
               toast.error(toastMessages.error.getCardList);
-              return { ...column, cards: [], totalCount: 0 };
+              return { ...column, cards: [], allCards: [], totalCount: 0 };
             }
           })
         );
@@ -115,51 +120,54 @@ const DashboardDetail = () => {
       const sourceColumnId = parseInt(source.droppableId.split("-")[1]);
       const destinationColumnId = parseInt(destination.droppableId.split("-")[1]);
 
-      if (sourceColumnId === destinationColumnId && source.index === destination.index) {
+      if (sourceColumnId === destinationColumnId) {
+        toast.error(toastMessages.error.moveCard);
         return;
       }
 
-      setColumnList((prevColumns) => {
-        const sourceColumn = prevColumns.find((col) => col.id === sourceColumnId);
-        const destColumn = prevColumns.find((col) => col.id === destinationColumnId);
+      const sourceColumn = columnList.find((col) => col.id === sourceColumnId);
+      const destColumn = columnList.find((col) => col.id === destinationColumnId);
 
-        if (!sourceColumn || !destColumn) return prevColumns;
+      if (!sourceColumn || !destColumn) return;
 
-        const cardToMove = sourceColumn.cards[source.index];
-        if (!cardToMove || !cardToMove.assignee || cardToMove.tags.length === 0) return prevColumns;
+      const cardToMove = sourceColumn.allCards[source.index];
+      if (!cardToMove || !cardToMove.assignee || cardToMove.tags.length === 0) return;
 
-        (async () => {
-          try {
-            await axios.put(`/api/cards/${cardId}`, {
-              columnId: destinationColumnId,
-              assigneeUserId: cardToMove.assignee?.id,
-              title: cardToMove.title,
-              description: cardToMove.description,
-              dueDate: cardToMove.dueDate,
-              tags: cardToMove.tags || [],
-              imageUrl: cardToMove.imageUrl,
-            });
-          } catch (error) {
-            console.error("카드 이동 업데이트 오류", error);
-            toast.error(toastMessages.error.moveCard);
-            getColumn();
-          }
-        })();
-
-        return prevColumns.map((column) => {
-          if (column.id === sourceColumnId) {
-            const newCards = [...column.cards];
-            newCards.splice(source.index, 1);
-            return { ...column, cards: newCards };
-          }
-          if (column.id === destinationColumnId) {
-            const newCards = [...column.cards];
-            newCards.splice(destination.index, 0, cardToMove);
-            return { ...column, cards: newCards };
-          }
-          return column;
+      try {
+        // 즉시 UI 업데이트
+        setColumnList((prevColumns) => {
+          return prevColumns.map((column) => {
+            if (column.id === sourceColumnId) {
+              const newAllCards = [...column.allCards];
+              newAllCards.splice(source.index, 1);
+              const newCards = newAllCards.slice(0, column.cards.length);
+              return { ...column, allCards: newAllCards, cards: newCards };
+            }
+            if (column.id === destinationColumnId) {
+              const newAllCards = [...column.allCards];
+              newAllCards.splice(destination.index, 0, cardToMove);
+              const newCards = newAllCards.slice(0, column.cards.length);
+              return { ...column, allCards: newAllCards, cards: newCards };
+            }
+            return column;
+          });
         });
-      });
+
+        // API 호출
+        await axios.put(`/api/cards/${cardId}`, {
+          columnId: destinationColumnId,
+          assigneeUserId: cardToMove.assignee?.id,
+          title: cardToMove.title,
+          description: cardToMove.description,
+          dueDate: cardToMove.dueDate,
+          tags: cardToMove.tags || [],
+          imageUrl: cardToMove.imageUrl,
+        });
+      } catch (error) {
+        console.error("카드 이동 업데이트 오류", error);
+        toast.error(toastMessages.error.moveCard);
+        getColumn();
+      }
     }
   };
 
@@ -187,6 +195,7 @@ const DashboardDetail = () => {
                         columnId={column.id}
                         dragHandleProps={provided.dragHandleProps}
                         cards={column.cards}
+                        allCards={column.allCards || []}
                         totalCount={column.totalCount}
                       />
                     </div>

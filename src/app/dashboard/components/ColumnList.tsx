@@ -1,12 +1,9 @@
-import axios from "axios";
-import toast from "react-hot-toast";
 import { useAtom, useSetAtom } from "jotai";
 import { ColumnAtom, CardIdAtom } from "@/store/modalAtom";
-import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { currentColumnListAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { useToggleModal } from "@/hooks/useModal";
 import { ICard } from "@/types/dashboardType";
-import toastMessages from "@/lib/toastMessage";
 import { NumChip } from "@/components/chip/PlusAndNumChip";
 import { HiOutlineCog } from "react-icons/hi";
 import { Draggable, Droppable } from "@hello-pangea/dnd";
@@ -18,20 +15,27 @@ interface IProps {
   columnId: number;
   dragHandleProps?: any;
   cards: ICard["cards"];
+  allCards: ICard["cards"];
   totalCount: ICard["totalCount"];
 }
 
-const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards: initialCards, totalCount }: IProps) => {
+const ColumnList = ({
+  columnTitle,
+  columnId,
+  dragHandleProps,
+  cards: initialCards = [],
+  allCards = [],
+  totalCount,
+}: IProps) => {
   const [cards, setCards] = useState<ICard["cards"]>(initialCards);
-  const [hasMore, setHasMore] = useState(true);
-  const [cursorId, setCursorId] = useState<number | undefined>();
+  const [currentIndex, setCurrentIndex] = useState(initialCards.length);
+  const [hasMore, setHasMore] = useState(false);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isXLargeScreen, setIsXLargeScreen] = useState(false);
   const observeRef = useRef<HTMLDivElement | null>(null);
-  const isInitialLoadingRef = useRef(true);
   const dragSourceColumnRef = useRef<string | null>(null);
-  const ADDITIONAL_CARDS_SIZE = 3; // 추가 로드 시 고정 크기
+  const ADDITIONAL_CARDS_SIZE = 3;
   const setColumnAtom = useSetAtom(ColumnAtom);
   const setDetailCardId = useSetAtom(CardIdAtom);
   const setCurrentColumnList = useSetAtom(currentColumnListAtom);
@@ -39,16 +43,12 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards: initialCard
   const toggleModal = useToggleModal();
   const [isDropDisabled, setIsDropDisabled] = useState(false);
 
-  // XLarge 화면 크기 체크
   useEffect(() => {
     const checkScreenSize = () => {
       setIsXLargeScreen(window.innerWidth >= 1280);
     };
 
-    // 초기 체크
     checkScreenSize();
-
-    // resize 이벤트에 throttle 적용
     let timeoutId: NodeJS.Timeout;
     const handleResize = () => {
       if (timeoutId) {
@@ -66,71 +66,39 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards: initialCard
     };
   }, []);
 
-  // 초기 데이터 설정
   useEffect(() => {
-    if (isInitialLoadingRef.current) {
+    if (initialCards && allCards) {
       setCards(initialCards);
-      setCursorId(initialCards.length > 0 ? initialCards[initialCards.length - 1].id : undefined);
-      setHasMore(initialCards.length < totalCount);
-      isInitialLoadingRef.current = false;
+      setCurrentIndex(initialCards.length);
+      setHasMore(initialCards.length < allCards.length);
     }
-  }, [initialCards, totalCount]);
+  }, [initialCards, allCards]);
 
-  // getCardList 함수를 먼저 선언
-  const getCardList = useCallback(async () => {
-    if (!hasMore || isLoading || isInitialLoadingRef.current) return;
+  const loadMoreCards = useCallback(() => {
+    if (!hasMore || isLoading || !allCards) return;
     setIsLoading(true);
 
-    try {
-      const lastCardId = cursorId;
-
-      const response = await axios.get<{
-        cards: ICard["cards"];
-      }>(`/api/cards?size=${ADDITIONAL_CARDS_SIZE}&columnId=${columnId}${lastCardId ? `&cursorId=${lastCardId}` : ""}`);
-
-      if (response.status === 200) {
-        const newCards = response.data.cards;
-
-        setCards((prev) => {
-          const existingIds = new Set(prev.map((card) => card.id));
-          const filteredNewCards = newCards.filter((card) => !existingIds.has(card.id));
-
-          if (filteredNewCards.length > 0) {
-            setCursorId(filteredNewCards[filteredNewCards.length - 1].id);
-          }
-
-          setHasMore(filteredNewCards.length > 0 && prev.length + filteredNewCards.length < totalCount);
-
-          return [...prev, ...filteredNewCards];
-        });
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.error("카드 목록 조회 중 오류 발생", error);
-        toast.error(error.response?.data || toastMessages.error.getCardList);
-      }
-    } finally {
-      setIsLoading(false);
+    const nextCards = allCards.slice(currentIndex, currentIndex + ADDITIONAL_CARDS_SIZE);
+    if (nextCards.length > 0) {
+      setCards((prev) => {
+        const newCards = [...prev, ...nextCards];
+        const newAllCards = [...allCards];
+        return newCards;
+      });
+      setCurrentIndex((prev) => prev + ADDITIONAL_CARDS_SIZE);
+      setHasMore(currentIndex + ADDITIONAL_CARDS_SIZE < allCards.length);
     }
-  }, [columnId, hasMore, cursorId, isLoading, totalCount]);
+    setIsLoading(false);
+  }, [allCards, currentIndex, hasMore, isLoading, ADDITIONAL_CARDS_SIZE]);
 
-  // 그 다음 무한 스크롤 useEffect 선언
   useEffect(() => {
-    if (!isXLargeScreen || !observeRef.current || isInitialLoadingRef.current) {
-      return;
-    }
+    if (!isXLargeScreen || !observeRef.current) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         const target = entries[0];
         if (target.isIntersecting && hasMore && !isDraggingOver && !isLoading) {
-          // 현재 보이는 카드의 총 개수 확인
-          const totalVisibleCards = cards.length;
-          const minimumCardsBeforeLoad = 3;
-
-          if (totalVisibleCards >= minimumCardsBeforeLoad) {
-            getCardList();
-          }
+          loadMoreCards();
         }
       },
       {
@@ -148,17 +116,16 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards: initialCard
         observer.unobserve(currentRef);
       }
     };
-  }, [hasMore, isDraggingOver, isLoading, isXLargeScreen, getCardList, cards.length]);
+  }, [hasMore, isDraggingOver, isLoading, isXLargeScreen, loadMoreCards]);
 
   useLayoutEffect(() => {
     if (dashboardCardUpdate) {
       setCards(initialCards);
-      setCursorId(undefined);
-      setHasMore(true);
-      getCardList();
+      setCurrentIndex(initialCards.length);
+      setHasMore(currentIndex < allCards.length);
       setDashboardCardUpdate(false);
     }
-  }, [dashboardCardUpdate, getCardList, setDashboardCardUpdate, initialCards]);
+  }, [dashboardCardUpdate, initialCards, allCards.length, currentIndex, setDashboardCardUpdate]);
 
   useEffect(() => {
     if (columnTitle && columnId) {
@@ -173,7 +140,6 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards: initialCard
     }
   }, [columnTitle, columnId, setCurrentColumnList]);
 
-  // **드래그 앤 드롭 핸들러**
   useEffect(() => {
     const handleDragStart = (event: any) => {
       if (event.type === "card") {
@@ -238,19 +204,22 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards: initialCard
                   }}
                 />
                 <div className="flex flex-col space-y-2">
-                  {cards.map((item, index) => (
+                  {allCards.map((item, index) => (
                     <Draggable key={item.id} draggableId={`card-${item.id}`} index={index}>
                       {(provided, snapshot) => (
                         <div
                           ref={provided.innerRef}
                           {...provided.draggableProps}
-                          {...provided.dragHandleProps}
                           className={`${snapshot.isDragging ? "opacity-50" : ""} ${
                             isDropDisabled && snapshot.draggingOver ? "cursor-not-allowed" : ""
-                          }`}
+                          } ${index >= cards.length ? "hidden" : ""}`}
                         >
                           <div onClick={() => !snapshot.isDragging && handleCardClick(item.id)}>
-                            <ColumnItem card={item} />
+                            <ColumnItem
+                              card={item}
+                              dragHandleProps={provided.dragHandleProps}
+                              ref={index === cards.length - 1 && isXLargeScreen ? observeRef : null}
+                            />
                           </div>
                         </div>
                       )}
@@ -261,14 +230,14 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards: initialCard
                     <>
                       {!isXLargeScreen && (
                         <button
-                          onClick={getCardList}
+                          onClick={loadMoreCards}
                           disabled={isLoading}
                           className="mt-2 w-full rounded-md border border-gray03 bg-white py-2 font-bold hover:bg-gray-50 disabled:opacity-50"
                         >
                           {isLoading ? "로딩 중..." : "카드 더 보기"}
                         </button>
                       )}
-                      {isXLargeScreen && !isLoading && <div ref={observeRef} className="h-4 w-full" />}
+                      {isXLargeScreen && !isLoading && <div ref={observeRef} className="h-4" />}
                     </>
                   )}
                   {isLoading && (
@@ -286,4 +255,4 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards: initialCard
   );
 };
 
-export default memo(ColumnList);
+export default ColumnList;

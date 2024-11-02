@@ -1,4 +1,4 @@
-import React, { memo, forwardRef } from "react";
+import React, { forwardRef } from "react";
 import Image from "next/image";
 import TagChip from "@/components/chip/TagChip";
 import { HiOutlineCalendar } from "react-icons/hi";
@@ -54,4 +54,4 @@ const ColumnItem = forwardRef<HTMLDivElement, IProps>(({ card, dragHandleProps }
 
 ColumnItem.displayName = "ColumnItem";
 
-export default memo(ColumnItem);
+export default ColumnItem;
