@@ -11,6 +11,7 @@ import { currentColumnListAtom, dashboardCardUpdateAtom } from "@/store/dashboar
 import { useToggleModal } from "@/hooks/useModal";
 import { Droppable, Draggable } from "@hello-pangea/dnd";
 import { ICard } from "@/types/dashboardType";
+import { useWidth } from "@/hooks/useWidth";
 
 interface IProps {
   columnTitle: string;
@@ -37,6 +38,7 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
   const [isDropDisabled, setIsDropDisabled] = useState(false);
   const dragSourceColumnRef = useRef<string | null>(null);
   const isDraggingOverRef = useRef(isDraggingOver);
+  const isLargeScreen = useWidth();
   
   const getCardList = useCallback(async () => {
     if (!hasMore || isLoading) return;
@@ -74,7 +76,7 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
     } finally {
       setIsLoading(false);
     }
-  }, [columnId, hasMore, size, cursorId, cards]);
+  }, [columnId, hasMore, size, cursorId, cards, isLoading]);
 
   useLayoutEffect(() => {
     if (isDraggingOverRef.current !== isDraggingOver) {
@@ -97,7 +99,7 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
     const observer = new IntersectionObserver(
       (entries) => {
         const lastCardItem = entries[0];
-        if (lastCardItem.isIntersecting && hasMore && !isDraggingOver) {
+        if (lastCardItem.isIntersecting && hasMore && !isDraggingOver && isLargeScreen) {
           getCardList();
         }
       },
@@ -114,7 +116,7 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
         observer.unobserve(currentLoadingRef);
       }
     };
-  }, [hasMore, getCardList, isDraggingOver]);
+  }, [hasMore, getCardList, isDraggingOver, isLargeScreen]);
 
   useEffect(() => {
     if (dashboardCardUpdate) {
