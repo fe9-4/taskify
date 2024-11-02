@@ -30,9 +30,6 @@ const DashboardDetail = () => {
 
   const [columnList, setColumnList] = useState<IColumnData[]>([]);
 
-  // 화면 크기 변경 감지를 위한 상태 추가
-  const [isXLargeScreen, setIsXLargeScreen] = useState(false);
-
   const calculateInitialCardCount = useCallback(() => {
     const BASE_CARD_COUNT = 3;
     const ADDITIONAL_CARD_COUNT = 1;

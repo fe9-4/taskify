@@ -39,7 +39,6 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
   const dragSourceColumnRef = useRef<string | null>(null);
   const ADDITIONAL_CARDS_SIZE = 3; // 추가 로드 시 고정 크기
 
-  // XLarge 화면 크기 체크
   useEffect(() => {
     const checkScreenSize = () => {
       setIsXLargeScreen(window.innerWidth >= 1280);
@@ -65,19 +64,6 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
       window.removeEventListener("resize", handleResize);
     };
   }, []);
-
-  // isXLargeScreen 변경 시 초기화 로직 수정
-  useEffect(() => {
-    // 컬럼 초기화
-    setCardList([]);
-    setCursorId(cards.length > 0 ? cards[cards.length - 1].id : undefined);
-    setHasMore(cards.length < totalCount);
-
-    // setTimeout을 사용하여 다음 tick에서 초기화 완료 처리
-    setTimeout(() => {
-      isInitialLoadingRef.current = false;
-    }, 0);
-  }, [isXLargeScreen, cards, totalCount]);
 
   // 초기 데이터 설정
   useEffect(() => {
@@ -285,11 +271,11 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
                     ))}
 
                   {isXLargeScreen && hasMore && !isDraggingOver && !isLoading && (
-                    <div ref={observeRef} className="h-10" /> // 높이 증가
+                    <div ref={observeRef} className="h-10" />
                   )}
                 </div>
 
-                {!isDraggingOver && hasMore && !isXLargeScreen && (
+                {!isXLargeScreen && hasMore && !isDraggingOver && (
                   <button
                     onClick={getCardList}
                     disabled={isLoading}
