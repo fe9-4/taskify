@@ -12,6 +12,7 @@ import { UpdateUserProfile, UpdateUserProfileSchema } from "@/zodSchema/userSche
 import InputFile from "@/components/input/InputFile";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { uploadType } from "@/types/uploadType";
+import toastMessages from "@/lib/toastMessage";
 
 const UpdateProfile = () => {
   const { user, updateUser } = useAuth();
@@ -89,11 +90,11 @@ const UpdateProfile = () => {
         profileImageUrl: imageUrl,
       });
       updateUser(response.data.user);
-      toast.success("프로필 업데이트 완료");
+      toast.success(toastMessages.success.updateProfile);
       setIsProfileChanged(false);
       reset();
     } catch (error) {
-      toast.error("프로필 업데이트 실패");
+      toast.error(toastMessages.error.updateProfile);
     }
   };
 

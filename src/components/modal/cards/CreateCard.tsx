@@ -23,6 +23,7 @@ import InputItem from "@/components/input/InputItem";
 import InputDate from "@/components/input/InputDate";
 import InputTag from "@/components/input/InputTag";
 import InputFile from "@/components/input/InputFile";
+import toastMessages from "@/lib/toastMessage";
 
 const CreateCard = () => {
   const { user } = useAuth();
@@ -46,7 +47,7 @@ const CreateCard = () => {
 
   useEffect(() => {
     if (fileError) {
-      toast.error("이미지 업로드에 실패하였습니다.");
+      toast.error(toastMessages.error.uploardImage);
     }
   }, [fileError]);
 
@@ -119,12 +120,12 @@ const CreateCard = () => {
         const response = await axios.post(`/api/cards`, cardData);
 
         if (response.data) {
-          toast.success("카드가 생성되었습니다.");
+          toast.success(toastMessages.success.createCard);
           toggleModal("createCard", false);
           setDashboardCardUpdate(true);
         }
       } catch (error) {
-        toast.error("카드 생성에 실패하였습니다.");
+        toast.error(toastMessages.error.createCard);
       }
     });
   };

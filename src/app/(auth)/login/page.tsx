@@ -6,11 +6,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import axios from "axios";
 import { ActiveBtn } from "@/components/button/ButtonComponents";
 import InputItem from "@/components/input/InputItem";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
+import toastMessages from "@/lib/toastMessage";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -41,13 +41,12 @@ const LoginPage = () => {
       const result = await login(data);
       if (result.success) {
         reset();
-        toast.success("로그인에 성공했습니다.");
+        toast.success(toastMessages.success.login);
       } else {
-        toast.error(result.message || "로그인에 실패했습니다.");
+        toast.error(result.message || toastMessages.error.login);
       }
     } catch (error) {
-      console.error("로그인 오류:", error);
-      toast.error("로그인 중 오류가 발생했습니다.");
+      toast.error(toastMessages.error.login);
     }
   };
 

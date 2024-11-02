@@ -24,6 +24,7 @@ import InputItem from "@/components/input/InputItem";
 import InputDate from "@/components/input/InputDate";
 import InputTag from "@/components/input/InputTag";
 import InputFile from "@/components/input/InputFile";
+import toastMessages from "@/lib/toastMessage";
 
 const UpdateCard = () => {
   const { user } = useAuth();
@@ -50,7 +51,7 @@ const UpdateCard = () => {
 
   useEffect(() => {
     if (fileError) {
-      toast.error("이미지 업로드에 실패하였습니다.");
+      toast.error(toastMessages.error.uploardImage);
     }
   }, [fileError]);
 
@@ -93,7 +94,7 @@ const UpdateCard = () => {
         tags: data.tags || [],
       });
     } catch {
-      toast.error("카드 데이터를 불러오는데 실패하였습니다.");
+      toast.error(toastMessages.error.getCard);
     }
   }, [cardId, reset]);
 
@@ -169,12 +170,12 @@ const UpdateCard = () => {
 
         const response = await axios.put(`/api/cards/${cardId}`, cardData);
         if (response.status === 200) {
-          toast.success("카드가 수정되었습니다.");
+          toast.success(toastMessages.success.editCard);
           toggleModal("updateCard", false);
           setDashboardCardUpdate(true);
         }
       } catch {
-        toast.error("카드 수정에 실패하였습니다.");
+        toast.error(toastMessages.error.editCard);
       }
     });
   };

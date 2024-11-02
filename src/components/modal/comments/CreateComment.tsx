@@ -9,6 +9,7 @@ import { Dispatch } from "react";
 import { SetStateAction } from "jotai";
 import { CommentProps } from "@/types/commentType";
 import { InsertBtn } from "@/components/button/ButtonComponents";
+import toastMessages from "@/lib/toastMessage";
 
 interface Props {
   cardId: number;
@@ -40,10 +41,10 @@ const CreateComment = ({ cardId, columnId, setComments }: Props) => {
         const response = await axios.post("/api/comments", formData);
         const newComment = response.data.user;
         setComments((prevComments) => [newComment, ...prevComments]);
-        toast.success("댓글이 생성되었습니다.");
+        toast.success(toastMessages.success.createComment);
         reset({ content: "" });
       } catch (error) {
-        toast.error("댓글 생성에 실패하였습니다.");
+        toast.error(toastMessages.error.createComment);
       }
     });
   };

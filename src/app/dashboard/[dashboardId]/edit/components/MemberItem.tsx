@@ -5,6 +5,7 @@ import { Member } from "@/zodSchema/memberSchema";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import { Montserrat } from "next/font/google";
+import toastMessages from "@/lib/toastMessage";
 
 const montserrat = Montserrat({
   weight: "600",
@@ -16,7 +17,7 @@ const MemberItem = ({ member, onClick }: { member: Member; onClick: (userId: num
 
   const onClickDeleteMember = (id: number, nickname: string) => {
     if (member.isOwner) {
-      toast.error("대시보드를 생성한 유저는 삭제할 수 없습니다");
+      toast.error(toastMessages.error.isDashboardOwner);
     } else {
       onClick(id, nickname);
     }
