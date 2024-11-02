@@ -25,6 +25,7 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
   const [hasMore, setHasMore] = useState(true);
   const [cursorId, setCursorId] = useState<number | undefined>();
   const [isDraggingOver, setIsDraggingOver] = useState(false);
+  const [isXLargeScreen, setIsXLargeScreen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isXLargeScreen, setIsXLargeScreen] = useState(false);
   const observeRef = useRef<HTMLDivElement | null>(null);
@@ -81,6 +82,7 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
   // 초기 데이터 설정
   useEffect(() => {
     if (isInitialLoadingRef.current) {
+    if (isInitialLoadingRef.current) {
       setCardList([]);
       setCursorId(cards.length > 0 ? cards[cards.length - 1].id : undefined);
       setHasMore(cards.length < totalCount);
@@ -88,6 +90,7 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
     }
   }, [cards, totalCount]);
 
+  // getCardList 함수를 먼저 선언
   // getCardList 함수를 먼저 선언
   const getCardList = useCallback(async () => {
     if (!hasMore || isLoading || isInitialLoadingRef.current) return;
@@ -98,6 +101,7 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
 
       const response = await axios.get<{
         cards: ICard["cards"];
+      }>(`/api/cards?size=${ADDITIONAL_CARDS_SIZE}&columnId=${columnId}${lastCardId ? `&cursorId=${lastCardId}` : ""}`);
       }>(`/api/cards?size=${ADDITIONAL_CARDS_SIZE}&columnId=${columnId}${lastCardId ? `&cursorId=${lastCardId}` : ""}`);
 
       if (response.status === 200) {

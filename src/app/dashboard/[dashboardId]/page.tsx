@@ -29,34 +29,6 @@ const DashboardDetail = () => {
 
   const [columnList, setColumnList] = useState<IColumnData[]>([]);
 
-  // 화면 크기 변경 감지를 위한 상태 추가
-  const [isXLargeScreen, setIsXLargeScreen] = useState(false);
-
-  const calculateInitialCardCount = useCallback(() => {
-    const BASE_CARD_COUNT = 3;
-    const ADDITIONAL_CARD_COUNT = 1;
-
-    // 화면 크기 체크
-    const isXLargeScreen = window.innerWidth >= 1280;
-
-    // XL 미만이면 무조건 3건 반환
-    if (!isXLargeScreen) {
-      return BASE_CARD_COUNT;
-    }
-
-    // XL 이상일 때만 화면 높이에 따른 계산 수행
-    const windowHeight = window.innerHeight;
-    const cardHeight = 271;
-    const visibleCardCount = Math.floor(windowHeight / cardHeight);
-
-    // 화면에 3개 이상 표시 가능하면 4개 반환, 아니면 3개 반환
-    if (visibleCardCount > BASE_CARD_COUNT) {
-      return BASE_CARD_COUNT + ADDITIONAL_CARD_COUNT;
-    }
-
-    return BASE_CARD_COUNT;
-  }, []);
-
   const getColumn = useCallback(async () => {
     try {
       const response = await axios.get(`/api/columns?dashboardId=${dashboardId}`);
@@ -199,7 +171,7 @@ const DashboardDetail = () => {
         <Droppable droppableId="columns" direction="horizontal" type="COLUMN">
           {(provided) => (
             <div
-              className="flex h-full w-full flex-col gap-6 p-4 xl:flex-row"
+              className="flex h-full w-full flex-col gap-6 overflow-y-auto p-4 xl:flex-row xl:overflow-x-auto xl:overflow-y-hidden"
               {...provided.droppableProps}
               ref={provided.innerRef}
             >
@@ -209,7 +181,7 @@ const DashboardDetail = () => {
                     <div
                       ref={provided.innerRef}
                       {...provided.draggableProps}
-                      className="w-full flex-shrink-0 xl:h-full xl:w-80"
+                      className="w-full flex-shrink-0 overflow-auto xl:h-full xl:w-80 [&::-webkit-scrollbar]:hidden"
                     >
                       <ColumnList
                         key={column.id}
@@ -225,7 +197,7 @@ const DashboardDetail = () => {
               ))}
               {provided.placeholder}
               {columnList.length < 10 && (
-                <div className="flex-shrink-0 self-start p-4">
+                <div className="py-4 xl:pt-[66px]">
                   <AddColumnBtn onClick={handleColumnBtn} />
                 </div>
               )}
