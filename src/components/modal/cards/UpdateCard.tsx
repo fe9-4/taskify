@@ -7,19 +7,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { UpdateCardSchema } from "@/zodSchema/cardSchema";
 import axios from "axios";
 import toast from "react-hot-toast";
-
 import { useAuth } from "@/hooks/useAuth";
 import { useMember } from "@/hooks/useMember";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { useToggleModal } from "@/hooks/useModal";
 import useLoading from "@/hooks/useLoading";
-
-import { useAtom, useAtomValue } from "jotai";
-import { ColumnAtom, TodoCardId } from "@/store/modalAtom";
+import { useSetAtom, useAtomValue } from "jotai";
+import { ColumnAtom, CardIdAtom } from "@/store/modalAtom";
 import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { CardDataType, UpdateCardProps } from "@/types/cardType";
 import { uploadType } from "@/types/uploadType";
-
 import { CancelBtn, ConfirmBtn } from "@/components/button/ButtonComponents";
 import StatusDropdown from "@/components/dropdown/StatusDropdown";
 import SearchDropdown from "@/components/dropdown/SearchDropdown";
@@ -32,7 +29,7 @@ const UpdateCard = () => {
   const { user } = useAuth();
   const { dashboardId } = useParams();
   const { columnId } = useAtomValue(ColumnAtom);
-  const cardId = useAtomValue(TodoCardId);
+  const cardId = useAtomValue(CardIdAtom);
   const { memberData } = useMember({ dashboardId: Number(dashboardId) });
 
   const [tagInput, setTagInput] = useState("");
@@ -43,7 +40,7 @@ const UpdateCard = () => {
   const { isLoading, withLoading } = useLoading();
 
   const toggleModal = useToggleModal();
-  const [, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
+  const setDashboardCardUpdate = useSetAtom(dashboardCardUpdateAtom);
 
   const {
     uploadFile,
