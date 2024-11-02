@@ -99,12 +99,7 @@ const InviteList = () => {
       ) : (
         <InviteItem invitationList={invitationList} setInvitationList={setInvitationList} />
       )}
-      {hasMore &&
-        (invitationList.length > size ? (
-          <div ref={observeRef} className="flex items-center justify-center font-bold">
-            초대 더 보기
-          </div>
-        ) : null)}
+      {hasMore && <div ref={observeRef} className="h-4 w-full" />}
     </div>
   );
 };
