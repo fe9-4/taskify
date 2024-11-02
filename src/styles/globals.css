@@ -62,15 +62,17 @@ body {
   .react-datepicker .react-datepicker__day,
   .react-datepicker .react-datepicker__time-list-item,
   .react-datepicker .react-datepicker__day--keyboard-selected,
-  .react-datepicker .react-datepicker__day--selected,
   .react-datepicker .react-datepicker__time-list-item--selected {
     @apply hover:bg-violet02 !important;
   }
 
-  .react-datepicker .react-datepicker__day--keyboard-selected,
   .react-datepicker .react-datepicker__day--selected,
   .react-datepicker .react-datepicker__time-list-item--selected {
     @apply bg-purple01 text-white hover:bg-purple01 !important;
+  }
+
+  .react-datepicker .react-datepicker__day--keyboard-selected {
+    @apply bg-violet02 text-violet01 !important;
   }
 
   .react-datepicker .react-datepicker__current-month,

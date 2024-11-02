@@ -18,7 +18,7 @@ interface IProps {
 const StatusDropdown = ({ setSelectedValueId }: IProps) => {
   const currentColumnList = useAtomValue(currentColumnListAtom);
   const column = useAtomValue(ColumnAtom);
-  
+
   const [isOpen, setIsOpen] = useState(false);
   const [value, setValue] = useState(column.title);
   const dropdownRef = useRef<HTMLDivElement>(null);
