@@ -30,6 +30,9 @@ const DashboardDetail = () => {
 
   const [columnList, setColumnList] = useState<IColumnData[]>([]);
 
+  // 화면 크기 변경 감지를 위한 상태 추가
+  const [isXLargeScreen, setIsXLargeScreen] = useState(false);
+
   const calculateInitialCardCount = useCallback(() => {
     const BASE_CARD_COUNT = 3;
     const ADDITIONAL_CARD_COUNT = 1;
@@ -166,7 +169,7 @@ const DashboardDetail = () => {
         <Droppable droppableId="columns" direction="horizontal" type="COLUMN">
           {(provided) => (
             <div
-              className="flex h-full w-full flex-col gap-6 overflow-y-auto p-4 xl:flex-row xl:overflow-x-auto xl:overflow-y-hidden"
+              className="flex h-full w-full flex-col p-4 xl:flex-row xl:space-x-4"
               {...provided.droppableProps}
               ref={provided.innerRef}
             >
