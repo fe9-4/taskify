@@ -1,10 +1,16 @@
 import ColorChip from "@/components/chip/ColorChip";
+import { CreateDashboard } from "@/zodSchema/dashboardSchema";
 import { FieldValues, UseFormRegister, UseFormWatch } from "react-hook-form";
 import { FaCheck } from "react-icons/fa6";
 
 interface Props {
   register: UseFormRegister<FieldValues>;
   watch: UseFormWatch<FieldValues>;
+}
+
+interface SelectColorChipProps {
+  register: UseFormRegister<CreateDashboard>;
+  watch: UseFormWatch<CreateDashboard>;
 }
 
 const COLORS = [
@@ -16,6 +22,22 @@ const COLORS = [
 ];
 
 const SelectColorChip = ({ register, watch }: Props) => {
+  const selectedColor = watch("color");
+
+  return (
+    <div className="flex gap-2">
+      {COLORS.map((item) => (
+        <label key={item.label} className="relative">
+          <ColorChip color={item.value} />
+          {selectedColor === item.color && <FaCheck className="absolute left-[3px] top-[3px] size-6 text-white" />}
+          <input type="radio" {...register("color", { required: true })} value={item.color} className="hidden" />
+        </label>
+      ))}
+    </div>
+  );
+};
+
+export const SelectColorChipByCreate = ({ register, watch }: SelectColorChipProps) => {
   const selectedColor = watch("color");
 
   return (

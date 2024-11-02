@@ -53,7 +53,7 @@ export const DashboardMemberDisplay = () => {
     <div className="flex h-full w-full items-center justify-between">
       {/* 대시보드 제목 영역 */}
       <div className="w-[100px] pl-1 md:w-[240px]">
-        <SelectedDashboard title={displayDashboard?.title || null} isDashboardOwner={isDashboardOwner} />
+        <SelectedDashboard title={displayDashboard?.title || ""} isDashboardOwner={isDashboardOwner} />
       </div>
 
       {/* 대시보드 관리 버튼 영역 */}
@@ -92,7 +92,7 @@ export const DashboardMemberDisplay = () => {
         )}
         {/* 멤버 이니셜 표시 */}
         <div className="ml-6">
-          {currentDashboardId && memberData.totalCount > 0 && <MemberInitials dashboardId={currentDashboardId} />}
+          {currentDashboardId && memberData?.totalCount > 0 && <MemberInitials dashboardId={currentDashboardId} />}
         </div>
         {/* 구분선 */}
         <div className="mx-6 h-8 w-px bg-gray-300"></div>

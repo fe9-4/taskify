@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams, usePathname, useRouter } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import Button from "./Button";
 import DashboardList from "./DashboardList";
 import Logo from "./Logo";

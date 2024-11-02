@@ -1,11 +1,15 @@
-import { boolean, z } from "zod";
+import { z } from "zod";
 import { DateSchema } from "./commonSchema";
 
-// 대시보드 수정 요청 스키마
-export const UpdateDashboardSchema = z.object({
+// 대시보드 생성 요청 스키마
+export const CreateDashboardSchema = z.object({
   title: z.string(),
   color: z.string(),
 });
+
+export type CreateDashboard = z.infer<typeof CreateDashboardSchema>;
+// 대시보드 수정 요청 스키마
+export const UpdateDashboardSchema = z.object(CreateDashboardSchema.shape);
 
 export type UpdateDashboard = z.infer<typeof UpdateDashboardSchema>;
 

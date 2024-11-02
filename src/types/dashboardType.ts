@@ -45,7 +45,7 @@ export interface Iitem {
 export interface ICard {
   cards: Iitem[];
   totalCount: number;
-  cursorId?: number | null;
+  cursorId: number | undefined;
 }
 
 export interface CreateDashboard {
