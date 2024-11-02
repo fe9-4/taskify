@@ -1,17 +1,17 @@
 import axios from "axios";
 import toast from "react-hot-toast";
-import ColumnItem from "./ColumnItem";
 import { useAtom, useSetAtom } from "jotai";
-import { HiOutlineCog } from "react-icons/hi";
-import { NumChip } from "../../../components/chip/PlusAndNumChip";
-import { AddTodoBtn } from "../../../components/button/ButtonComponents";
 import { ColumnAtom, CardIdAtom } from "@/store/modalAtom";
 import { memo, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { currentColumnListAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { useToggleModal } from "@/hooks/useModal";
-import { Droppable, Draggable } from "@hello-pangea/dnd";
 import { ICard } from "@/types/dashboardType";
-import { useWidth } from "@/hooks/useWidth";
+import toastMessages from "@/lib/toastMessage";
+import { NumChip } from "@/components/chip/PlusAndNumChip";
+import { HiOutlineCog } from "react-icons/hi";
+import { Draggable, Droppable } from "@hello-pangea/dnd";
+import { AddTodoBtn } from "@/components/button/ButtonComponents";
+import ColumnItem from "./ColumnItem";
 
 interface IProps {
   columnTitle: string;
@@ -24,20 +24,18 @@ interface IProps {
 const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount }: IProps) => {
   const [cardList, setCardList] = useState<ICard["cards"]>([]);
   const [hasMore, setHasMore] = useState(true);
-  const [size] = useState(3);
   const [cursorId, setCursorId] = useState<number | undefined>();
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [isXLargeScreen, setIsXLargeScreen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const observeRef = useRef<HTMLDivElement | null>(null);
   const setColumnAtom = useSetAtom(ColumnAtom);
   const setDetailCardId = useSetAtom(CardIdAtom);
   const setCurrentColumnList = useSetAtom(currentColumnListAtom);
   const [dashboardCardUpdate, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
-  const observeRef = useRef<HTMLDivElement | null>(null);
   const toggleModal = useToggleModal();
   const [isDropDisabled, setIsDropDisabled] = useState(false);
   const dragSourceColumnRef = useRef<string | null>(null);
-  const isLargeScreen = useWidth();
   const ADDITIONAL_CARDS_SIZE = 3; // 추가 로드 시 고정 크기
   const isInitialLoadingRef = useRef(true);
 
@@ -84,13 +82,16 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
   // 초기 데이터 설정
   useEffect(() => {
     if (isInitialLoadingRef.current) {
-      setCardList([]);
-      setCursorId(cards.length > 0 ? cards[cards.length - 1].id : undefined);
-      setHasMore(cards.length < totalCount);
-      isInitialLoadingRef.current = false;
+      if (isInitialLoadingRef.current) {
+        setCardList([]);
+        setCursorId(cards.length > 0 ? cards[cards.length - 1].id : undefined);
+        setHasMore(cards.length < totalCount);
+        isInitialLoadingRef.current = false;
+      }
     }
   }, [cards, totalCount]);
 
+  // getCardList 함수를 먼저 선언
   // getCardList 함수를 먼저 선언
   const getCardList = useCallback(async () => {
     if (!hasMore || isLoading || isInitialLoadingRef.current) return;
@@ -124,7 +125,7 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.error("카드 목록 조회 중 오류 발생", error);
-        toast.error(error.response?.data || "카드 목록 조회 중 오류가 발생했습니다.");
+        toast.error(error.response?.data || toastMessages.error.getCardList);
       }
     } finally {
       setIsLoading(false);
@@ -249,67 +250,61 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
           }
 
           return (
-            <div className="flex flex-col space-y-2" ref={provided.innerRef} {...provided.droppableProps}>
+            <div
+              className="flex min-h-0 flex-1 flex-col space-y-2 overflow-y-auto p-4"
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+            >
+              <AddTodoBtn
+                onClick={() => {
+                  setColumnAtom({ title: columnTitle, columnId });
+                  toggleModal("createCard", true);
+                }}
+              />
               <div className="flex flex-col space-y-2">
-                <AddTodoBtn
-                  onClick={() => {
-                    setColumnAtom({ title: columnTitle, columnId });
-                    toggleModal("createCard", true);
-                  }}
-                />
-                <div className="flex h-full flex-col space-y-4">
-                  {cards.map((item, index) => (
-                    <Draggable key={item.id} draggableId={`card-${item.id}`} index={index}>
-                      {(provided, snapshot) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          className={`${snapshot.isDragging ? "opacity-50" : ""} ${
-                            isDropDisabled && snapshot.draggingOver ? "cursor-not-allowed" : ""
-                          }`}
-                        >
-                          <div onClick={() => !snapshot.isDragging && handleCardClick(item.id)}>
-                            <ColumnItem card={item} />
-                          </div>
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                  {!isDraggingOver &&
-                    cardList.map((item, i) => (
-                      <div key={item.id} onClick={() => handleCardClick(item.id)}>
-                        <ColumnItem ref={i === cardList.length - 1 ? observeRef : null} card={item} />
-                      </div>
-                    ))}
-                </div>
-                {!isDraggingOver && hasMore && (
-                  <>
-                    {!isDraggingOver && hasMore && !isXLargeScreen && (
-                      <button
-                        onClick={getCardList}
-                        disabled={isLoading}
-                        className="mt-2 w-full rounded-md border border-gray03 bg-white py-2 font-bold hover:bg-gray-50 disabled:opacity-50"
-                      >
-                        {isLoading ? "로딩 중..." : "카드 더 보기"}
-                      </button>
-                    )}
-                    {!isLoading && (
+                {cards.map((item, index) => (
+                  <Draggable key={item.id} draggableId={`card-${item.id}`} index={index}>
+                    {(provided, snapshot) => (
                       <div
-                        ref={observeRef}
-                        className="h-4 w-full"
-                        style={{ display: isLargeScreen ? "block" : "none" }}
-                      />
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        className={`${snapshot.isDragging ? "opacity-50" : ""} ${
+                          isDropDisabled && snapshot.draggingOver ? "cursor-not-allowed" : ""
+                        }`}
+                      >
+                        <div onClick={() => !snapshot.isDragging && handleCardClick(item.id)}>
+                          <ColumnItem card={item} />
+                        </div>
+                      </div>
                     )}
-                  </>
-                )}
-                {isLoading && (
-                  <div className="py-2 text-center">
-                    <p className="font-bold text-gray01">카드 불러오는 중...</p>
-                  </div>
-                )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+                {!isDraggingOver &&
+                  cardList.map((item) => (
+                    <div key={item.id} onClick={() => handleCardClick(item.id)}>
+                      <ColumnItem card={item} />
+                    </div>
+                  ))}
+                {isXLargeScreen && hasMore && !isDraggingOver && !isLoading && (
+                    <div ref={observeRef} className="h-10" /> // 높이 증가
+                  )}
               </div>
+              {!isDraggingOver && hasMore && !isXLargeScreen && (
+                  <button
+                    onClick={getCardList}
+                    disabled={isLoading}
+                    className="mt-2 w-full rounded-md border border-gray03 bg-white py-2 font-bold hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    {isLoading ? "로딩 중..." : "카드 더 보기"}
+                  </button>
+                )}
+              {isLoading && (
+                <div className="py-2 text-center">
+                  <p className="font-bold text-gray01">카드 불러오는 중...</p>
+                </div>
+              )}
             </div>
           );
         }}

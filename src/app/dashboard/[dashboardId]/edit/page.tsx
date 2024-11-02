@@ -18,7 +18,7 @@ const EditPage = () => {
 
   const onDelete = async () => {
     try {
-      await deleteDashboard(id);
+      await deleteDashboard(1);
     } catch (error) {
       console.error("대시보드 삭제 실패:", error);
     }

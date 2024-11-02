@@ -8,6 +8,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { IoIosClose } from "react-icons/io";
 import { useDeleteModal, useToggleModal } from "@/hooks/useModal";
+import toastMessages from "@/lib/toastMessage";
 
 const EditColumn = () => {
   const toggleModal = useToggleModal();
@@ -30,11 +31,11 @@ const EditColumn = () => {
     await withLoading(async () => {
       try {
         await axios.put(`/api/columns/${Column.columnId}`, { ...data, columnId: Column.columnId });
-        toast.success("컬럼 수정 완료");
+        toast.success(toastMessages.success.editColumn);
         toggleModal("editColumn", false);
         setRefreshDashboard((prev) => !prev);
       } catch (error) {
-        toast.error("컬럼 수정 실패");
+        toast.error(toastMessages.error.editColumn);
         toggleModal("editColumn", false);
       }
     });
@@ -44,12 +45,12 @@ const EditColumn = () => {
     await withLoading(async () => {
       try {
         await axios.delete(`/api/columns/${Column.columnId}`);
-        toast.success("컬럼 삭제 완료");
+        toast.success(toastMessages.success.deleteColumn);
         toggleModal("deleteModal", false);
         toggleModal("editColumn", false);
         setRefreshDashboard((prev) => !prev);
       } catch (error) {
-        toast.error("컬럼 삭제 실패");
+        toast.error(toastMessages.error.deleteColumn);
         toggleModal("deleteModal", false);
       }
     });

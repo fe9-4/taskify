@@ -10,6 +10,7 @@ import {
   DashboardListSchema,
   DashboardSchema,
 } from "@/zodSchema/dashboardSchema";
+import toastMessages from "@/lib/toastMessage";
 
 interface DashboardOptions {
   dashboardId?: number;
@@ -33,7 +34,6 @@ const useCreateDashboard = () => {
     mutationFn: async (data: CreateDashboardData) => {
       try {
         const response = await axios.post("/api/dashboards", data);
-        console.log(response.data);
         return DashboardSchema.parse(response.data);
       } catch (error) {
         if (error instanceof Error) {
@@ -43,12 +43,12 @@ const useCreateDashboard = () => {
       }
     },
     onSuccess: (data) => {
-      toast.success("대시보드가 생성되었습니다");
+      toast.success(toastMessages.success.createDashboard);
       queryClient.invalidateQueries({ queryKey: ["dashboardData"] });
       return data;
     },
     onError: (error) => {
-      toast.error(error.message || "대시보드 생성에 실패했습니다");
+      toast.error(error.message || toastMessages.error.createDashboard);
     },
   });
 
@@ -79,7 +79,7 @@ export const useDashboard = ({
       } catch (error) {
         console.error("Error fetching dashboards:", error);
         if (showErrorToast) {
-          toast.error(customErrorMessage || "대시보드 목록을 불러오는데 실패했습니다.");
+          toast.error(customErrorMessage || toastMessages.error.getDashboardList);
         }
         throw error;
       }
@@ -104,7 +104,7 @@ export const useDashboard = ({
       } catch (error) {
         console.error("Error fetching dashboard info:", error);
         if (showErrorToast) {
-          toast.error(customErrorMessage || "대시보드 정보를 불러오는데 실패했습니다.");
+          toast.error(customErrorMessage || toastMessages.error.getDashboard);
         }
         throw error;
       }
@@ -130,12 +130,12 @@ export const useDashboard = ({
       }
     },
     onSuccess: () => {
-      toast.success("대시보드가 수정되었습니다");
+      toast.success(toastMessages.success.editDashboard);
       queryClient.invalidateQueries({ queryKey: ["dashboardData"] });
       queryClient.invalidateQueries({ queryKey: ["dashboardInfo", dashboardId] });
     },
     onError: (error) => {
-      toast.error(error.message || "대시보드 수정에 실패했습니다");
+      toast.error(error.message || toastMessages.error.editDashboard);
     },
   });
 
@@ -152,12 +152,12 @@ export const useDashboard = ({
       }
     },
     onSuccess: () => {
-      toast.success("대시보드가 삭제되었습니다");
+      toast.success(toastMessages.success.deleteDashboard);
       queryClient.invalidateQueries({ queryKey: ["dashboardData"] });
       router.push("/mydashboard");
     },
     onError: (error) => {
-      toast.error(error.message || "대시보드 삭제에 실패했습니다");
+      toast.error(error.message || toastMessages.error.deleteDashboard);
     },
   });
 

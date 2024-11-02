@@ -6,6 +6,7 @@ import { CombiBtn } from "@/components/button/ButtonComponents";
 import { myDashboardUpdateAtom } from "@/store/myDashboardAtom";
 import { IInvitation } from "@/types/myDashboardType";
 import { HiOutlineSearch } from "react-icons/hi";
+import toastMessages from "@/lib/toastMessage";
 
 interface IProps {
   invitationList: IInvitation["invitations"];
@@ -33,7 +34,7 @@ const InviteItem = ({ invitationList, setInvitationList }: IProps) => {
       });
 
       if (response.status === 200) {
-        toast.success("대시보드가 추가되었습니다.");
+        toast.success(toastMessages.success.acceptInvitation);
         setInvitationList((prev) => prev.filter((item) => item.id !== id));
         setMyDashboardUpdated(true);
       }
@@ -53,7 +54,7 @@ const InviteItem = ({ invitationList, setInvitationList }: IProps) => {
       });
 
       if (response.status === 200) {
-        toast.success("초대를 거절하였습니다.");
+        toast.success(toastMessages.success.refuseInvitation);
         setInvitationList((prev) => prev.filter((item) => item.id !== id));
         setMyDashboardUpdated(true);
       }
