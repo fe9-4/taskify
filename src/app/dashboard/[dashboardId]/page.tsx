@@ -200,7 +200,7 @@ const DashboardDetail = () => {
         <Droppable droppableId="columns" direction="horizontal" type="COLUMN">
           {(provided) => (
             <div
-              className="flex h-full w-full flex-col gap-6 p-4 xl:flex-row"
+              className="flex h-full w-full flex-col p-4 xl:flex-row xl:space-x-4"
               {...provided.droppableProps}
               ref={provided.innerRef}
             >
@@ -210,7 +210,7 @@ const DashboardDetail = () => {
                     <div
                       ref={provided.innerRef}
                       {...provided.draggableProps}
-                      className="w-full flex-shrink-0 xl:h-full xl:w-80"
+                      className="w-full flex-shrink-0 overflow-auto xl:h-full xl:w-80 [&::-webkit-scrollbar]:hidden"
                     >
                       <ColumnList
                         key={column.id}
@@ -226,7 +226,7 @@ const DashboardDetail = () => {
               ))}
               {provided.placeholder}
               {columnList.length < 10 && (
-                <div className="flex-shrink-0 self-start p-4">
+                <div className="py-4 xl:pt-[66px]">
                   <AddColumnBtn onClick={handleColumnBtn} />
                 </div>
               )}

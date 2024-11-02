@@ -16,7 +16,7 @@ const ColumnItem = forwardRef<HTMLDivElement, IProps>(({ card, dragHandleProps }
     <div ref={ref}>
       <div
         {...dragHandleProps}
-        className="flex cursor-grab flex-col space-y-2 rounded-md border border-gray03 bg-white p-3 active:cursor-grabbing md:flex-row md:items-center md:space-x-2 md:space-y-0 md:px-4 xl:flex-col xl:space-x-0 xl:space-y-[6px]"
+        className="flex cursor-grab flex-col space-y-2 rounded-md border border-gray03 bg-white p-3 active:cursor-grabbing md:flex-row md:items-center md:space-x-2 md:space-y-0 xl:flex-col xl:space-x-0 xl:space-y-[6px]"
       >
         <Image
           src={card.imageUrl}
