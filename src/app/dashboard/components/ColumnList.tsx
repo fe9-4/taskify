@@ -11,7 +11,6 @@ import { currentColumnListAtom, dashboardCardUpdateAtom } from "@/store/dashboar
 import { useToggleModal } from "@/hooks/useModal";
 import { Droppable, Draggable } from "@hello-pangea/dnd";
 import { ICard } from "@/types/dashboardType";
-import { useWidth } from "@/hooks/useWidth";
 
 interface IProps {
   columnTitle: string;
@@ -28,23 +27,60 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
   const [cursorId, setCursorId] = useState<number | undefined>();
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isXLargeScreen, setIsXLargeScreen] = useState(false);
+  const observeRef = useRef<HTMLDivElement | null>(null);
+  const isInitialLoadingRef = useRef(true);
   const setColumnAtom = useSetAtom(ColumnAtom);
   const setDetailCardId = useSetAtom(CardIdAtom);
   const setCurrentColumnList = useSetAtom(currentColumnListAtom);
-  const previousHasMore = useRef(true);
   const [dashboardCardUpdate, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
-  const observeRef = useRef<HTMLDivElement | null>(null);
   const toggleModal = useToggleModal();
   const [isDropDisabled, setIsDropDisabled] = useState(false);
   const dragSourceColumnRef = useRef<string | null>(null);
-  const isLargeScreen = useWidth();
 
-  const isInitialLoadingRef = useRef(true);
-  const isMounted = useRef(false);
-
+  // XLarge 화면 크기 체크
   useEffect(() => {
-    if (!isMounted.current) {
-      isMounted.current = true;
+    const checkScreenSize = () => {
+      setIsXLargeScreen(window.innerWidth >= 1280);
+    };
+
+    // 초기 체크
+    checkScreenSize();
+
+    // resize 이벤트에 throttle 적용
+    let timeoutId: NodeJS.Timeout;
+    const handleResize = () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+      timeoutId = setTimeout(checkScreenSize, 200);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  // isXLargeScreen 변경 시 초기화 로직 수정
+  useEffect(() => {
+    // 컬럼 초기화
+    setCardList([]);
+    setCursorId(cards.length > 0 ? cards[cards.length - 1].id : undefined);
+    setHasMore(cards.length < totalCount);
+
+    // setTimeout을 사용하여 다음 tick에서 초기화 완료 처리
+    setTimeout(() => {
+      isInitialLoadingRef.current = false;
+    }, 0);
+  }, [isXLargeScreen, cards, totalCount]);
+
+  // 초기 데이터 설정
+  useEffect(() => {
+    if (isInitialLoadingRef.current) {
       setCardList([]);
       setCursorId(cards.length > 0 ? cards[cards.length - 1].id : undefined);
       setHasMore(cards.length < totalCount);
@@ -52,6 +88,7 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
     }
   }, [cards, totalCount]);
 
+  // getCardList 함수를 먼저 선언
   const getCardList = useCallback(async () => {
     if (!hasMore || isLoading || isInitialLoadingRef.current) return;
     setIsLoading(true);
@@ -91,6 +128,36 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
     }
   }, [columnId, hasMore, size, cursorId, isLoading, cards, totalCount]);
 
+  // 그 다음 무한 스크롤 useEffect 선언
+  useEffect(() => {
+    if (!isXLargeScreen || !observeRef.current || isInitialLoadingRef.current) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const target = entries[0];
+        if (target.isIntersecting && hasMore && !isDraggingOver && !isLoading) {
+          getCardList();
+        }
+      },
+      {
+        root: null,
+        rootMargin: "0px",
+        threshold: 0.5,
+      }
+    );
+
+    const currentRef = observeRef.current;
+    observer.observe(currentRef);
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, [hasMore, isDraggingOver, isLoading, isXLargeScreen, getCardList]);
+
   useLayoutEffect(() => {
     if (dashboardCardUpdate) {
       setCardList([]);
@@ -113,49 +180,6 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
       });
     }
   }, [columnTitle, columnId, setCurrentColumnList]);
-
-  // **xl 이상에서의 무한 스크롤 구현**
-  useEffect(() => {
-    if (!isLargeScreen) {
-      return;
-    }
-
-    if (!observeRef.current) {
-      return;
-    }
-
-    let timeoutId: NodeJS.Timeout;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const target = entries[0];
-        if (target.isIntersecting && hasMore && !isDraggingOver && !isLoading) {
-          if (timeoutId) {
-            clearTimeout(timeoutId);
-          }
-          timeoutId = setTimeout(() => {
-            getCardList();
-          }, 300);
-        }
-      },
-      {
-        root: null,
-        rootMargin: "0px",
-        threshold: 0.5,
-      }
-    );
-
-    const currentRef = observeRef.current;
-    observer.observe(currentRef);
-
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-      if (currentRef) {
-        observer.unobserve(currentRef);
-      }
-    };
-  }, [hasMore, getCardList, isDraggingOver, isLoading, isLargeScreen]);
 
   // **드래그 앤 드롭 핸들러**
   useEffect(() => {
@@ -193,7 +217,7 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
   };
 
   return (
-    <div className="bg-gray06 flex w-full flex-col rounded-lg xl:h-full xl:w-80">
+    <div className="bg-gray06 flex h-full w-full flex-col rounded-lg xl:w-80">
       <div className="flex items-center justify-between rounded-t-lg bg-white p-4" {...dragHandleProps}>
         <div className="flex items-center space-x-3">
           <div className="flex items-center space-x-2">
@@ -253,7 +277,8 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
               </div>
               {!isDraggingOver && hasMore && (
                 <>
-                  {!isLargeScreen && (
+                  {/* xl 미만에서만 버튼 표시 */}
+                  {!isXLargeScreen && (
                     <button
                       onClick={getCardList}
                       disabled={isLoading}
@@ -262,15 +287,13 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
                       {isLoading ? "로딩 중..." : "카드 더 보기"}
                     </button>
                   )}
-                  {isLargeScreen && !isLoading && (
-                    <div
-                      ref={observeRef}
-                      className="h-4 w-full"
-                      style={{ display: isLargeScreen ? "block" : "none" }}
-                    />
-                  )}
+
+                  {/* xl 이상에서만 무한 스크롤 */}
+                  {isXLargeScreen && !isLoading && <div ref={observeRef} className="h-4" />}
                 </>
               )}
+
+              {/* 로딩 상태 */}
               {isLoading && (
                 <div className="py-2 text-center">
                   <p className="font-bold text-gray01">카드 불러오는 중...</p>
