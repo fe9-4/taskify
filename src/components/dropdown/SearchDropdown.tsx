@@ -53,7 +53,7 @@ const SearchDropdown = ({ setValue, inviteMemberList, setManager, currentManager
   }, [currentManager]);
 
   return (
-    <section className="flex flex-col gap-2">
+    <section className="z-[11] flex flex-col gap-2">
       <label htmlFor="assignee" className="text-lg font-medium text-black03 md:text-xl">
         담당자
       </label>
