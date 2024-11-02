@@ -3,6 +3,7 @@ import axios from "axios";
 import { MemberForm, MemberList, MemberListSchema } from "@/zodSchema/memberSchema";
 import toast from "react-hot-toast";
 import { useState } from "react";
+import toastMessages from "@/lib/toastMessage";
 
 interface UseDashboardMemberProps extends MemberForm {
   showErrorToast?: boolean;
@@ -57,12 +58,12 @@ export const useMember = ({
     },
     onSuccess: (_, memberId) => {
       const member = queryResult.data?.members.find((m) => m.id === memberId);
-      toast.success(`멤버가 삭제되었습니다`);
+      toast.success(toastMessages.success.deleteMember);
       queryClient.invalidateQueries({ queryKey: ["memberData", dashboardId, page, size] });
     },
     onError: (error) => {
       console.error("Error deleting member:", error);
-      toast.error("삭제하는 중 오류가 발생했습니다.");
+      toast.error(toastMessages.error.deleteMember);
     },
   });
 
