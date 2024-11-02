@@ -9,6 +9,7 @@ import {
   ColumnListSchema,
   ColumnSchemaType,
 } from "@/zodSchema/columnSchema";
+import toastMessages from "@/lib/toastMessage";
 
 const MAX_COLUMNS = 10;
 
@@ -35,7 +36,7 @@ export const useColumn = ({
       } catch (error) {
         console.error("Error fetching columns:", error);
         if (showErrorToast) {
-          toast.error(customErrorMessage || "컬럼 목록을 불러오는데 실패했습니다.");
+          toast.error(customErrorMessage || toastMessages.error.getColumnList);
         }
         throw error;
       }
@@ -64,7 +65,7 @@ export const useColumn = ({
       }
     },
     onSuccess: (newColumn) => {
-      toast.success("컬럼이 생성되었습니다");
+      toast.success(toastMessages.success.createColumn);
       queryClient.setQueryData<ColumnListSchemaType>(["columnList", dashboardIdString], (old) =>
         old ? [...old, newColumn] : [newColumn]
       );
@@ -74,7 +75,7 @@ export const useColumn = ({
       });
     },
     onError: (error) => {
-      toast.error(error.message || "컬럼 생성에 실패했습니다");
+      toast.error(error.message || toastMessages.error.createColumn);
     },
   });
 
@@ -96,7 +97,7 @@ export const useColumn = ({
       }
     },
     onSuccess: (updatedColumn) => {
-      toast.success("컬럼이 수정되었습니다");
+      toast.success(toastMessages.success.editColumn);
       queryClient.setQueryData<ColumnListSchemaType>(["columnList", dashboardIdString], (old) =>
         old ? old.map((col) => (col.id === updatedColumn.id ? updatedColumn : col)) : []
       );
@@ -106,7 +107,7 @@ export const useColumn = ({
       });
     },
     onError: (error) => {
-      toast.error(error.message || "컬럼 수정에 실패했습니다");
+      toast.error(error.message || toastMessages.error.editColumn);
     },
   });
 
@@ -123,7 +124,7 @@ export const useColumn = ({
       }
     },
     onSuccess: (_, deletedColumnId) => {
-      toast.success("컬럼이 삭제되었습니다");
+      toast.success(toastMessages.success.deleteColumn);
       queryClient.setQueryData<ColumnListSchemaType>(["columnList", dashboardIdString], (old) =>
         old ? old.filter((col) => col.id !== deletedColumnId) : []
       );
@@ -133,7 +134,7 @@ export const useColumn = ({
       });
     },
     onError: (error) => {
-      toast.error(error.message || "컬럼 삭제에 실패했습니다");
+      toast.error(error.message || toastMessages.error.deleteColumn);
     },
   });
 
@@ -155,10 +156,10 @@ export const useColumn = ({
       }
     },
     onSuccess: () => {
-      toast.success("이미지가 업로드되었습니다");
+      toast.success(toastMessages.success.uploardImage);
     },
     onError: (error) => {
-      toast.error(error.message || "이미지 업로드에 실패했습니다");
+      toast.error(error.message || toastMessages.error.uploardImage);
     },
   });
 

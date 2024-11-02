@@ -7,6 +7,7 @@ import CreateComment from "./CreateComment";
 import useIntersectionObserver from "@/hooks/useObserver";
 import { cls } from "@/lib/utils";
 import { HiChevronDoubleUp } from "react-icons/hi";
+import toastMessages from "@/lib/toastMessage";
 
 const CommentList = ({ cardId, columnId, handleScrollTop }: CommentListProps) => {
   const [comments, setComments] = useState<CommentProps[]>([]);
@@ -43,7 +44,7 @@ const CommentList = ({ cardId, columnId, handleScrollTop }: CommentListProps) =>
         setHasMore(false);
       }
     } catch (error) {
-      if (axios.isAxiosError(error)) toast.error("댓글 조회에 실패하였습니다.");
+      if (axios.isAxiosError(error)) toast.error(toastMessages.error.getComment);
       setHasMore(false);
     } finally {
       setIsLoading(false);

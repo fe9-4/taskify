@@ -4,6 +4,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useMember } from "@/hooks/useMember";
+import toastMessages from "@/lib/toastMessage";
 
 interface InviteEmailData {
   email: string;
@@ -77,11 +78,11 @@ export const useInvitation = ({ dashboardId }: { dashboardId: number }) => {
       }
     },
     onSuccess: () => {
-      toast.success("초대 완료");
+      toast.success(toastMessages.success.invitation);
       queryClient.invalidateQueries({ queryKey: ["invitations", dashboardIdString] });
     },
     onError: (error) => {
-      toast.error(error.message || "초대 실패");
+      toast.error(error.message || toastMessages.error.invitation);
     },
   });
 
@@ -92,11 +93,11 @@ export const useInvitation = ({ dashboardId }: { dashboardId: number }) => {
       return response.data;
     },
     onSuccess: () => {
-      toast.success("초대가 취소되었습니다");
+      toast.success(toastMessages.success.cancelInvitation);
       queryClient.invalidateQueries({ queryKey: ["invitations", dashboardIdString] });
     },
     onError: () => {
-      toast.error("오류가 발생하여 초대가 취소되지 않았습니다.");
+      toast.error(toastMessages.error.cancelInvitation);
     },
   });
 

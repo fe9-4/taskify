@@ -11,6 +11,7 @@ import { StatusTitleChip } from "@/components/chip/StatusChip";
 import TagChip from "@/components/chip/TagChip";
 import EditDeleteDropdown from "@/components/dropdown/EditDeleteDropdown";
 import CommentList from "@/components/modal/comments/CommentList";
+import toastMessages from "@/lib/toastMessage";
 
 const DetailCard = () => {
   const [cardId, setCardId] = useAtom(CardIdAtom);
@@ -31,7 +32,7 @@ const DetailCard = () => {
         setCardData(response.data);
       } catch (error) {
         if (axios.isAxiosError(error)) {
-          toast.error("카드 조회에 실패하였습니다.");
+          toast.error(toastMessages.error.getCard);
         }
       }
     };
@@ -43,13 +44,13 @@ const DetailCard = () => {
     try {
       const response = await axios.delete(`/api/cards/${cardId}`);
       if (response.status === 201) {
-        toast.success("카드가 삭제되었습니다.");
+        toast.success(toastMessages.success.deleteCard);
         toggleModal("detailCard", false);
         setDashboardCardUpdate(true);
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        toast.error("카드 삭제에 실패하였습니다.");
+        toast.error(toastMessages.error.deleteCard);
       }
     }
   };

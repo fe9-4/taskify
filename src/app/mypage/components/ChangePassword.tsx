@@ -9,6 +9,7 @@ import { ActiveBtn } from "@/components/button/ButtonComponents";
 import InputItem from "@/components/input/InputItem";
 import { useAuth } from "@/hooks/useAuth";
 import { UpdateUserPassword, UpdateUserPasswordSchema } from "@/zodSchema/userSchema";
+import toastMessages from "@/lib/toastMessage";
 
 const ChangePassword = () => {
   const { logout } = useAuth();
@@ -22,11 +23,11 @@ const ChangePassword = () => {
   const onSubmitPasswordChange: SubmitHandler<UpdateUserPassword> = async (data) => {
     try {
       await axios.put("/api/auth/changePassword", data);
-      toast.success("비밀번호 변경 완료");
+      toast.success(toastMessages.success.editPassword);
       passwordForm.reset();
       logout();
     } catch (error) {
-      toast.error("비밀번호 변경 실패");
+      toast.error(toastMessages.error.editPassword);
     }
   };
 
