@@ -6,7 +6,7 @@ import ColumnList from "@/app/dashboard/components/ColumnList";
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { AddColumnBtn } from "@/components/button/ButtonComponents";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { ColumnTitlesAtom, RefreshDashboardAtom } from "@/store/modalAtom";
 import { useToggleModal } from "@/hooks/useModal";
 import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
@@ -23,7 +23,7 @@ interface IColumnData {
 const DashboardDetail = () => {
   const { dashboardId } = useParams<{ dashboardId: string }>();
   const toggleModal = useToggleModal();
-  const [, setColumnTitles] = useAtom(ColumnTitlesAtom);
+  const setColumnTitles = useSetAtom(ColumnTitlesAtom);
   const updateDashBoard = useAtomValue(RefreshDashboardAtom);
   const [isCardUpdate] = useAtom(dashboardCardUpdateAtom);
 

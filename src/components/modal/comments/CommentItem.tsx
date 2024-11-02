@@ -89,7 +89,7 @@ const CommentItem = forwardRef<HTMLDivElement, CommentItemProps>(({ comment, set
         <div className="flex flex-col gap-2">
           {isEditing && <InputItem value={editContent} onChange={handleEditChange} isTextArea />}
           {!isEditing && (
-            <p className="break-all text-sm leading-snug text-black03 md:text-base md:leading-normal">
+            <p className="whitespace-pre-line break-all text-sm leading-snug text-black03 md:text-base md:leading-normal">
               {comment.content}
             </p>
           )}

@@ -29,6 +29,7 @@ const CreateDashboard = () => {
       try {
         const res: Dashboard = await createDashboard(data);
         const dashboardId = res.id;
+        
         router.push(`/dashboard/${dashboardId}`);
         toggleModal("createDashboard", false);
       } catch (error) {

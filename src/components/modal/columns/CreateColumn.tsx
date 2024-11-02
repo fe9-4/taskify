@@ -1,7 +1,7 @@
 import { useForm, useWatch } from "react-hook-form";
 import InputItem from "../../input/InputItem";
 import { CancelBtn, ConfirmBtn } from "../../button/ButtonComponents";
-import { useAtom, useAtomValue } from "jotai";
+import { useSetAtom, useAtomValue } from "jotai";
 import { ColumnTitlesAtom, RefreshDashboardAtom } from "@/store/modalAtom";
 import { useParams } from "next/navigation";
 import useLoading from "@/hooks/useLoading";
@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 import { useToggleModal } from "@/hooks/useModal";
 
 const CreateColumn = () => {
-  const [, setRefreshDashboard] = useAtom(RefreshDashboardAtom);
+  const setRefreshDashboard = useSetAtom(RefreshDashboardAtom);
   const toggleModal = useToggleModal();
   const { dashboardId } = useParams();
   const { isLoading, withLoading } = useLoading();
