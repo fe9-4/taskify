@@ -46,7 +46,7 @@ const CreateCard = () => {
 
   useEffect(() => {
     if (fileError) {
-      toast.error("이미지 업로드 중 오류가 발생했습니다.");
+      toast.error("이미지 업로드에 실패하였습니다.");
     }
   }, [fileError]);
 
@@ -112,14 +112,14 @@ const CreateCard = () => {
         let uploadedImageUrl = null;
         if (selectedFile) {
           uploadedImageUrl = await uploadFile(selectedFile);
-          if (!uploadedImageUrl) throw new Error("이미지 업로드 실패");
+          if (!uploadedImageUrl) throw new Error("이미지 업로드에 실패하였습니다.");
         }
 
         const cardData = { ...data, imageUrl: uploadedImageUrl };
         const response = await axios.post(`/api/cards`, cardData);
 
         if (response.data) {
-          toast.success("카드가 생성되었습니다! 🎉");
+          toast.success("카드가 생성되었습니다.");
           toggleModal("createCard", false);
           setDashboardCardUpdate(true);
         }

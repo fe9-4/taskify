@@ -10,7 +10,7 @@ import { CardDataProps } from "@/types/cardType";
 import { StatusTitleChip } from "@/components/chip/StatusChip";
 import TagChip from "@/components/chip/TagChip";
 import EditDeleteDropdown from "@/components/dropdown/EditDeleteDropdown";
-import CommentList from "../comments/CommentList";
+import CommentList from "@/components/modal/comments/CommentList";
 
 const DetailCard = () => {
   const [cardId, setCardId] = useAtom(CardIdAtom);
@@ -22,7 +22,7 @@ const DetailCard = () => {
   const setDeleteModal = useDeleteModal();
 
   const [isOpen, setIsOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement | null>(null);
+  const detailCardToptRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const getCardData = async () => {
@@ -61,18 +61,6 @@ const DetailCard = () => {
   const toggleDropdown = useCallback(() => setIsOpen((prev) => !prev), []);
   const closeModal = () => toggleModal("detailCard", false);
 
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
   const handleEdit = () => {
     if (cardData) {
       toggleModal("updateCard", true);
@@ -81,8 +69,14 @@ const DetailCard = () => {
     }
   };
 
+  const handleScrollTop = () => {
+    if (detailCardToptRef.current) {
+      detailCardToptRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
-    <section className="w-[327px] gap-3 rounded-lg bg-white p-4 md:w-[678px] md:px-6 md:py-8">
+    <section className="w-[327px] gap-3 rounded-lg bg-white p-4 md:w-[678px] md:px-6 md:py-8" ref={detailCardToptRef}>
       {cardData &&
         [cardData].map((card) => (
           <section key={card.id}>
@@ -97,7 +91,7 @@ const DetailCard = () => {
                 </button>
               </div>
 
-              <h2 className="w-full truncate break-all text-2xl font-bold text-black03 md:w-4/5 md:grid-cols-1 md:text-3xl">
+              <h2 className="text-overflow w-full break-all text-2xl font-bold text-black03 md:w-4/5 md:grid-cols-1 md:text-3xl">
                 {card.title}
               </h2>
             </div>
@@ -132,7 +126,9 @@ const DetailCard = () => {
                   ))}
                 </div>
 
-                <p className="break-all text-xs font-normal text-black md:text-base">{card.description}</p>
+                <p className="whitespace-pre-line break-all text-xs font-normal text-black md:text-base">
+                  {card.description}
+                </p>
 
                 <div className="relative my-4 h-[168px] w-[290px] overflow-hidden md:h-[246px] md:w-[420px] lg:h-[260px] lg:w-[445px]">
                   {card.imageUrl ? (
@@ -150,7 +146,7 @@ const DetailCard = () => {
           </section>
         ))}
 
-      <CommentList cardId={cardId} columnId={columnId} />
+      <CommentList cardId={cardId} columnId={columnId} handleScrollTop={handleScrollTop} />
     </section>
   );
 };

@@ -50,7 +50,7 @@ const UpdateCard = () => {
 
   useEffect(() => {
     if (fileError) {
-      toast.error("이미지 업로드 중 오류가 발생했습니다.");
+      toast.error("이미지 업로드에 실패하였습니다.");
     }
   }, [fileError]);
 
@@ -93,7 +93,7 @@ const UpdateCard = () => {
         tags: data.tags || [],
       });
     } catch {
-      toast.error("카드 데이터를 불러오는데 실패했습니다.");
+      toast.error("카드 데이터를 불러오는데 실패하였습니다.");
     }
   }, [cardId, reset]);
 
@@ -154,7 +154,7 @@ const UpdateCard = () => {
 
         if (selectedFile) {
           uploadedImageUrl = await uploadFile(selectedFile);
-          if (!uploadedImageUrl) throw new Error("이미지 업로드 실패");
+          if (!uploadedImageUrl) throw new Error("이미지 업로드 중 오류 발생");
         }
 
         const cardData = {
@@ -169,7 +169,7 @@ const UpdateCard = () => {
 
         const response = await axios.put(`/api/cards/${cardId}`, cardData);
         if (response.status === 200) {
-          toast.success("카드가 수정되었습니다! 🎉");
+          toast.success("카드가 수정되었습니다.");
           toggleModal("updateCard", false);
           setDashboardCardUpdate(true);
         }
@@ -180,7 +180,7 @@ const UpdateCard = () => {
   };
 
   return (
-    <section className="w-[327px] rounded-2xl bg-white p-8 md:w-[584px]">
+    <section className="w-[327px] rounded-2xl bg-white p-4 md:w-[584px] md:p-8">
       <h3 className="mb-5 text-2xl font-bold text-black03 md:mb-6 md:text-3xl">할 일 수정</h3>
 
       <form onSubmit={handleSubmit(onSubmit)} className="grid gap-8">
