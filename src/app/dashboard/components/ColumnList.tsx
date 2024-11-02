@@ -23,7 +23,6 @@ interface IProps {
 const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount }: IProps) => {
   const [cardList, setCardList] = useState<ICard["cards"]>([]);
   const [hasMore, setHasMore] = useState(true);
-  const [size] = useState(3);
   const [cursorId, setCursorId] = useState<number | undefined>();
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -37,6 +36,7 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
   const toggleModal = useToggleModal();
   const [isDropDisabled, setIsDropDisabled] = useState(false);
   const dragSourceColumnRef = useRef<string | null>(null);
+  const ADDITIONAL_CARDS_SIZE = 3; // 추가 로드 시 고정 크기
 
   // XLarge 화면 크기 체크
   useEffect(() => {
@@ -98,7 +98,7 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
 
       const response = await axios.get<{
         cards: ICard["cards"];
-      }>(`/api/cards?size=${size}&columnId=${columnId}${lastCardId ? `&cursorId=${lastCardId}` : ""}`);
+      }>(`/api/cards?size=${ADDITIONAL_CARDS_SIZE}&columnId=${columnId}${lastCardId ? `&cursorId=${lastCardId}` : ""}`);
 
       if (response.status === 200) {
         const newCardList = response.data.cards;
@@ -126,10 +126,11 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
     } finally {
       setIsLoading(false);
     }
-  }, [columnId, hasMore, size, cursorId, isLoading, cards, totalCount]);
+  }, [columnId, hasMore, cursorId, isLoading, cards, totalCount]);
 
   // 그 다음 무한 스크롤 useEffect 선언
   useEffect(() => {
+    // xl 이상에서만 무한 스크롤 적용
     if (!isXLargeScreen || !observeRef.current || isInitialLoadingRef.current) {
       return;
     }
@@ -137,14 +138,22 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
     const observer = new IntersectionObserver(
       (entries) => {
         const target = entries[0];
+        // 초기 로딩 시 즉시 트리거되는 것을 방지
         if (target.isIntersecting && hasMore && !isDraggingOver && !isLoading) {
-          getCardList();
+          // 현재 보이는 카드의 총 개수 확인
+          const totalVisibleCards = cards.length + cardList.length;
+          const minimumCardsBeforeLoad = 3; // 최소 3개의 카드가 있어야 추가 로드
+
+          // 최소 카드 개수 이상일 때만 추가 로드
+          if (totalVisibleCards >= minimumCardsBeforeLoad) {
+            getCardList();
+          }
         }
       },
       {
         root: null,
-        rootMargin: "0px",
-        threshold: 0.5,
+        rootMargin: "50px", // 감지 영역 축소
+        threshold: 0.5, // 임계값 증가
       }
     );
 
@@ -156,7 +165,7 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
         observer.unobserve(currentRef);
       }
     };
-  }, [hasMore, isDraggingOver, isLoading, isXLargeScreen, getCardList]);
+  }, [hasMore, isDraggingOver, isLoading, isXLargeScreen, getCardList, cards.length, cardList.length]);
 
   useLayoutEffect(() => {
     if (dashboardCardUpdate) {
@@ -218,7 +227,7 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
 
   return (
     <div className="bg-gray06 flex h-full w-full flex-col rounded-lg xl:w-80">
-      <div className="flex items-center justify-between rounded-t-lg bg-white p-4" {...dragHandleProps}>
+      <div className="flex flex-shrink-0 items-center justify-between rounded-t-lg bg-white p-4" {...dragHandleProps}>
         <div className="flex items-center space-x-3">
           <div className="flex items-center space-x-2">
             <span className="size-2 rounded-full bg-violet01" />
@@ -237,68 +246,64 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
           }
 
           return (
-            <div
-              className="flex min-h-0 flex-1 flex-col space-y-2 overflow-y-auto p-4"
-              ref={provided.innerRef}
-              {...provided.droppableProps}
-            >
-              <AddTodoBtn
-                onClick={() => {
-                  setColumnAtom({ title: columnTitle, columnId });
-                  toggleModal("createCard", true);
-                }}
-              />
-              <div className="flex flex-col space-y-2">
-                {cards.map((item, index) => (
-                  <Draggable key={item.id} draggableId={`card-${item.id}`} index={index}>
-                    {(provided, snapshot) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        className={`${snapshot.isDragging ? "opacity-50" : ""} ${
-                          isDropDisabled && snapshot.draggingOver ? "cursor-not-allowed" : ""
-                        }`}
-                      >
-                        <div onClick={() => !snapshot.isDragging && handleCardClick(item.id)}>
-                          <ColumnItem card={item} />
+            <div className="flex flex-1 flex-col overflow-y-auto" ref={provided.innerRef} {...provided.droppableProps}>
+              <div className="flex flex-col space-y-2 p-4">
+                <AddTodoBtn
+                  onClick={() => {
+                    setColumnAtom({ title: columnTitle, columnId });
+                    toggleModal("createCard", true);
+                  }}
+                />
+
+                <div className="flex flex-col space-y-2">
+                  {cards.map((item, index) => (
+                    <Draggable key={item.id} draggableId={`card-${item.id}`} index={index}>
+                      {(provided, snapshot) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          className={`${snapshot.isDragging ? "opacity-50" : ""} ${
+                            isDropDisabled && snapshot.draggingOver ? "cursor-not-allowed" : ""
+                          }`}
+                        >
+                          <div onClick={() => !snapshot.isDragging && handleCardClick(item.id)}>
+                            <ColumnItem card={item} />
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-                {!isDraggingOver &&
-                  cardList.map((item) => (
-                    <div key={item.id} onClick={() => handleCardClick(item.id)}>
-                      <ColumnItem card={item} />
-                    </div>
+                      )}
+                    </Draggable>
                   ))}
-              </div>
-              {!isDraggingOver && hasMore && (
-                <>
-                  {/* xl 미만에서만 버튼 표시 */}
-                  {!isXLargeScreen && (
-                    <button
-                      onClick={getCardList}
-                      disabled={isLoading}
-                      className="mt-2 w-full rounded-md border border-gray03 bg-white py-2 font-bold hover:bg-gray-50 disabled:opacity-50"
-                    >
-                      {isLoading ? "로딩 중..." : "카드 더 보기"}
-                    </button>
+                  {provided.placeholder}
+
+                  {!isDraggingOver &&
+                    cardList.map((item) => (
+                      <div key={item.id} onClick={() => handleCardClick(item.id)}>
+                        <ColumnItem card={item} />
+                      </div>
+                    ))}
+
+                  {isXLargeScreen && hasMore && !isDraggingOver && !isLoading && (
+                    <div ref={observeRef} className="h-10" /> // 높이 증가
                   )}
-
-                  {/* xl 이상에서만 무한 스크롤 */}
-                  {isXLargeScreen && !isLoading && <div ref={observeRef} className="h-4" />}
-                </>
-              )}
-
-              {/* 로딩 상태 */}
-              {isLoading && (
-                <div className="py-2 text-center">
-                  <p className="font-bold text-gray01">카드 불러오는 중...</p>
                 </div>
-              )}
+
+                {!isDraggingOver && hasMore && !isXLargeScreen && (
+                  <button
+                    onClick={getCardList}
+                    disabled={isLoading}
+                    className="mt-2 w-full rounded-md border border-gray03 bg-white py-2 font-bold hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    {isLoading ? "로딩 중..." : "카드 더 보기"}
+                  </button>
+                )}
+
+                {isLoading && (
+                  <div className="py-2 text-center">
+                    <p className="font-bold text-gray01">카드 불러오는 중...</p>
+                  </div>
+                )}
+              </div>
             </div>
           );
         }}
