@@ -230,7 +230,7 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
   };
 
   return (
-    <div className="h-full space-y-6 border-b py-4 md:border-gray04 md:pb-6 xl:flex xl:flex-col xl:border-b-0 xl:border-r xl:py-0 xl:pr-4 xl:pt-4 bg-gray05">
+    <div className="h-full space-y-6 border-b bg-gray05 py-4 md:border-gray04 md:pb-6 xl:flex xl:flex-col xl:border-b-0 xl:border-r xl:py-0 xl:pr-4 xl:pt-4">
       <div className="flex flex-shrink-0 items-center justify-between rounded-t-lg" {...dragHandleProps}>
         <div className="flex items-center space-x-3">
           <div className="flex items-center space-x-2">
@@ -251,17 +251,17 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
 
           return (
             <div
-              className="flex min-h-0 flex-1 flex-col space-y-2 overflow-y-auto p-4"
+              className="flex flex-col space-y-2 overflow-y-auto [&::-webkit-scrollbar]:hidden"
               ref={provided.innerRef}
               {...provided.droppableProps}
             >
-              <AddTodoBtn
-                onClick={() => {
-                  setColumnAtom({ title: columnTitle, columnId });
-                  toggleModal("createCard", true);
-                }}
-              />
               <div className="flex flex-col space-y-2">
+                <AddTodoBtn
+                  onClick={() => {
+                    setColumnAtom({ title: columnTitle, columnId });
+                    toggleModal("createCard", true);
+                  }}
+                />
                 {cards.map((item, index) => (
                   <Draggable key={item.id} draggableId={`card-${item.id}`} index={index}>
                     {(provided, snapshot) => (
@@ -288,18 +288,18 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
                     </div>
                   ))}
                 {isXLargeScreen && hasMore && !isDraggingOver && !isLoading && (
-                    <div ref={observeRef} className="h-10" /> // 높이 증가
-                  )}
+                  <div ref={observeRef} className="h-10" /> // 높이 증가
+                )}
               </div>
               {!isDraggingOver && hasMore && !isXLargeScreen && (
-                  <button
-                    onClick={getCardList}
-                    disabled={isLoading}
-                    className="mt-2 w-full rounded-md border border-gray03 bg-white py-2 font-bold hover:bg-gray-50 disabled:opacity-50"
-                  >
-                    {isLoading ? "로딩 중..." : "카드 더 보기"}
-                  </button>
-                )}
+                <button
+                  onClick={getCardList}
+                  disabled={isLoading}
+                  className="mt-2 w-full rounded-md border border-gray03 bg-white py-2 font-bold hover:bg-gray-50 disabled:opacity-50"
+                >
+                  {isLoading ? "로딩 중..." : "카드 더 보기"}
+                </button>
+              )}
               {isLoading && (
                 <div className="py-2 text-center">
                   <p className="font-bold text-gray01">카드 불러오는 중...</p>
