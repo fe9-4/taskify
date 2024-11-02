@@ -30,6 +30,34 @@ const DashboardDetail = () => {
 
   const [columnList, setColumnList] = useState<IColumnData[]>([]);
 
+  // 화면 크기 변경 감지를 위한 상태 추가
+  const [isXLargeScreen, setIsXLargeScreen] = useState(false);
+
+  const calculateInitialCardCount = useCallback(() => {
+    const BASE_CARD_COUNT = 3;
+    const ADDITIONAL_CARD_COUNT = 1;
+
+    // 화면 크기 체크
+    const isXLargeScreen = window.innerWidth >= 1280;
+
+    // XL 미만이면 무조건 3건 반환
+    if (!isXLargeScreen) {
+      return BASE_CARD_COUNT;
+    }
+
+    // XL 이상일 때만 화면 높이에 따른 계산 수행
+    const windowHeight = window.innerHeight;
+    const cardHeight = 271;
+    const visibleCardCount = Math.floor(windowHeight / cardHeight);
+
+    // 화면에 3개 이상 표시 가능하면 4개 반환, 아니면 3개 반환
+    if (visibleCardCount > BASE_CARD_COUNT) {
+      return BASE_CARD_COUNT + ADDITIONAL_CARD_COUNT;
+    }
+
+    return BASE_CARD_COUNT;
+  }, []);
+
   const getColumn = useCallback(async () => {
     try {
       const response = await axios.get(`/api/columns?dashboardId=${dashboardId}`);
@@ -72,37 +100,6 @@ const DashboardDetail = () => {
     setColumnTitles(columnTitles);
     toggleModal("createColumn", true);
   };
-
-  // 화면 크기 변경 감지
-  useEffect(() => {
-    const checkScreenSize = () => {
-      const newIsXLargeScreen = window.innerWidth >= 1280;
-      if (newIsXLargeScreen !== isXLargeScreen) {
-        setIsXLargeScreen(newIsXLargeScreen);
-        // 화면 크기가 변경되면 컬럼 데이터 다시 로드
-        getColumn();
-      }
-    };
-
-    // 초기 체크
-    checkScreenSize();
-
-    let timeoutId: NodeJS.Timeout;
-    const handleResize = () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-      timeoutId = setTimeout(checkScreenSize, 200);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-      window.removeEventListener("resize", handleResize);
-    };
-  }, [isXLargeScreen, getColumn]);
 
   useEffect(() => {
     getColumn();
