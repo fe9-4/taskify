@@ -10,7 +10,7 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { ColumnTitlesAtom, RefreshDashboardAtom } from "@/store/modalAtom";
 import { useToggleModal } from "@/hooks/useModal";
 import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
-import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
+import { DragDropContext, Droppable, DropResult } from "@hello-pangea/dnd";
 import { ICard } from "@/types/dashboardType";
 import toastMessages from "@/lib/toastMessage";
 
@@ -18,7 +18,6 @@ interface IColumnData {
   id: number;
   title: string;
   cards: ICard["cards"];
-  allCards: ICard["cards"];
   totalCount: ICard["totalCount"];
 }
 
@@ -28,69 +27,40 @@ const DashboardDetail = () => {
   const setColumnTitles = useSetAtom(ColumnTitlesAtom);
   const updateDashBoard = useAtomValue(RefreshDashboardAtom);
   const [isCardUpdate] = useAtom(dashboardCardUpdateAtom);
-
   const [columnList, setColumnList] = useState<IColumnData[]>([]);
-
-  // 화면 크기 변경 감지를 위한 상태 추가
-  const [isXLargeScreen, setIsXLargeScreen] = useState(false);
 
   const calculateInitialCardCount = useCallback(() => {
     const BASE_CARD_COUNT = 3;
     const ADDITIONAL_CARD_COUNT = 1;
-
-    // 화면 크기 체크
     const isXLargeScreen = window.innerWidth >= 1280;
-
-    // XL 미만이면 무조건 3건 반환
-    if (!isXLargeScreen) {
-      return BASE_CARD_COUNT;
-    }
-
-    // XL 이상일 때만 화면 높이에 따른 계산 수행
-    const windowHeight = window.innerHeight;
-    const cardHeight = 271;
-    const visibleCardCount = Math.floor(windowHeight / cardHeight);
-
-    // 화면에 3개 이상 표시 가능하면 4개 반환, 아니면 3개 반환
-    if (visibleCardCount > BASE_CARD_COUNT) {
-      return BASE_CARD_COUNT + ADDITIONAL_CARD_COUNT;
-    }
-
-    return BASE_CARD_COUNT;
+    return isXLargeScreen ? BASE_CARD_COUNT + ADDITIONAL_CARD_COUNT : BASE_CARD_COUNT;
   }, []);
 
   const getColumn = useCallback(async () => {
     try {
       const response = await axios.get(`/api/columns?dashboardId=${dashboardId}`);
-
       if (response.status === 200) {
         const columns = response.data;
         const initialSize = calculateInitialCardCount();
-
         const columnsWithCards = await Promise.all(
           columns.map(async (column: IColumnData) => {
             try {
-              const cardsResponse = await axios.get(`/api/cards?columnId=${column.id}&size=100`);
+              const cardsResponse = await axios.get(`/api/cards?columnId=${column.id}&size=${initialSize}`);
               if (cardsResponse.status === 200) {
-                const allCards = cardsResponse.data.cards;
-                const visibleCards = allCards.slice(0, initialSize);
-
                 return {
                   ...column,
-                  cards: visibleCards,
-                  allCards: allCards,
+                  cards: cardsResponse.data.cards,
                   totalCount: cardsResponse.data.totalCount,
                 };
               } else {
-                return { ...column, cards: [], allCards: [], totalCount: 0 };
+                return { ...column, cards: [], totalCount: 0 };
               }
             } catch (error) {
               toast.error(toastMessages.error.getCardList);
-              return { ...column, cards: [], allCards: [], totalCount: 0 };
+              return { ...column, cards: [], totalCount: 0 };
             }
           })
         );
-
         setColumnList(columnsWithCards);
       }
     } catch (error) {
@@ -111,49 +81,44 @@ const DashboardDetail = () => {
   }, [getColumn, updateDashBoard, isCardUpdate]);
 
   const onDragEnd = async (result: DropResult) => {
-    const { destination, source, type } = result;
+    const { destination, source, draggableId, type } = result;
 
     if (!destination) return;
+    if (destination.droppableId === source.droppableId) {
+      toast.error(toastMessages.error.moveCard);
+      return;
+    }
 
     if (type === "CARD") {
-      const cardId = parseInt(result.draggableId.split("-")[1]);
+      const cardId = parseInt(draggableId.split("-")[1]);
       const sourceColumnId = parseInt(source.droppableId.split("-")[1]);
       const destinationColumnId = parseInt(destination.droppableId.split("-")[1]);
-
-      if (sourceColumnId === destinationColumnId) {
-        toast.error(toastMessages.error.moveCard);
-        return;
-      }
 
       const sourceColumn = columnList.find((col) => col.id === sourceColumnId);
       const destColumn = columnList.find((col) => col.id === destinationColumnId);
 
       if (!sourceColumn || !destColumn) return;
 
-      const cardToMove = sourceColumn.allCards[source.index];
-      if (!cardToMove || !cardToMove.assignee || cardToMove.tags.length === 0) return;
+      const cardToMove = sourceColumn.cards[source.index];
+      if (!cardToMove) return;
 
       try {
-        // 즉시 UI 업데이트
         setColumnList((prevColumns) => {
           return prevColumns.map((column) => {
             if (column.id === sourceColumnId) {
-              const newAllCards = [...column.allCards];
-              newAllCards.splice(source.index, 1);
-              const newCards = newAllCards.slice(0, column.cards.length);
-              return { ...column, allCards: newAllCards, cards: newCards };
+              const newCards = [...column.cards];
+              newCards.splice(source.index, 1);
+              return { ...column, cards: newCards };
             }
             if (column.id === destinationColumnId) {
-              const newAllCards = [...column.allCards];
-              newAllCards.splice(destination.index, 0, cardToMove);
-              const newCards = newAllCards.slice(0, column.cards.length);
-              return { ...column, allCards: newAllCards, cards: newCards };
+              const newCards = [...column.cards];
+              newCards.splice(destination.index, 0, cardToMove);
+              return { ...column, cards: newCards };
             }
             return column;
           });
         });
 
-        // API 호출
         await axios.put(`/api/cards/${cardId}`, {
           columnId: destinationColumnId,
           assigneeUserId: cardToMove.assignee?.id,
@@ -181,26 +146,15 @@ const DashboardDetail = () => {
               {...provided.droppableProps}
               ref={provided.innerRef}
             >
-              {columnList.map((column, index) => (
-                <Draggable key={column.id} draggableId={`column-${column.id}`} index={index}>
-                  {(provided) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      className="w-full flex-shrink-0 overflow-auto xl:h-full xl:w-80 [&::-webkit-scrollbar]:hidden"
-                    >
-                      <ColumnList
-                        key={column.id}
-                        columnTitle={column.title}
-                        columnId={column.id}
-                        dragHandleProps={provided.dragHandleProps}
-                        cards={column.cards}
-                        allCards={column.allCards || []}
-                        totalCount={column.totalCount}
-                      />
-                    </div>
-                  )}
-                </Draggable>
+              {columnList.map((column) => (
+                <div key={column.id} className="h-full flex-shrink-0 xl:w-80">
+                  <ColumnList
+                    columnId={column.id}
+                    columnTitle={column.title}
+                    cards={column.cards}
+                    totalCount={column.totalCount}
+                  />
+                </div>
               ))}
               {provided.placeholder}
               {columnList.length < 10 && (
