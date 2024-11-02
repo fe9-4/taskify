@@ -16,9 +16,8 @@ import { ICard } from "@/types/dashboardType";
 interface IColumnData {
   id: number;
   title: string;
-  teamId: string;
-  position: number;
   cards: ICard["cards"];
+  totalCount: ICard["totalCount"];
 }
 
 const DashboardDetail = () => {
@@ -40,7 +39,7 @@ const DashboardDetail = () => {
         const columnsWithCards = await Promise.all(
           columns.map(async (column: IColumnData) => {
             try {
-              const cardsResponse = await axios.get(`/api/cards?columnId=${column.id}&size=100`);
+              const cardsResponse = await axios.get(`/api/cards?columnId=${column.id}&size=3`);
               if (cardsResponse.status === 200) {
                 return { ...column, cards: cardsResponse.data.cards };
               } else {
@@ -157,6 +156,7 @@ const DashboardDetail = () => {
                         columnTitle={column.title}
                         columnId={column.id}
                         cards={column.cards}
+                        totalCount={column.totalCount}
                       />
                     </div>
                   )}

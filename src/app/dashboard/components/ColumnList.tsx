@@ -17,28 +17,30 @@ interface IProps {
   columnId: number;
   dragHandleProps?: any;
   cards: ICard["cards"];
+  totalCount: ICard["totalCount"];
 }
 
-const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards }: IProps) => {
+const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount }: IProps) => {
   const [cardList, setCardList] = useState<ICard["cards"]>([]);
   const [hasMore, setHasMore] = useState(true);
-  const [size] = useState(10);
+  const [size] = useState(3);
   const [cursorId, setCursorId] = useState<number | undefined>();
-  const [totalCount, setTotalCount] = useState(0);
   const [isDraggingOver, setIsDraggingOver] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const previousHasMore = useRef(true);
   const [, setColumnAtom] = useAtom(ColumnAtom);
   const [, setDetailCardId] = useAtom(TodoCardId);
   const [, setCurrentColumnList] = useAtom(currentColumnListAtom);
   const [dashboardCardUpdate, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
-  const observeRef = useRef<HTMLDivElement | null>(null);
+  const observeRef = useRef(null);
   const toggleModal = useToggleModal();
   const [isDropDisabled, setIsDropDisabled] = useState(false);
   const dragSourceColumnRef = useRef<string | null>(null);
   const isDraggingOverRef = useRef(isDraggingOver);
 
   const getCardList = useCallback(async () => {
-    if (!hasMore) return;
+    if (!hasMore || isLoading) return;
+    setIsLoading(true);
 
     try {
       const lastCardId = cards[cards.length - 1]?.id;
@@ -46,28 +48,22 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards }: IProps) =
 
       const response = await axios.get<{
         cards: ICard["cards"];
-        totalCount: number;
       }>(`/api/cards?size=${size}&columnId=${columnId}${currentCursorId ? `&cursorId=${currentCursorId}` : ""}`);
 
       if (response.status === 200) {
         const newCardList = response.data.cards;
-        setTotalCount(response.data.totalCount);
 
         setCardList((prev) => {
           const existingIds = new Set([...cards, ...prev].map((card) => card.id));
           const filteredNewCardList = newCardList.filter((card) => !existingIds.has(card.id));
 
-          if (filteredNewCardList.length === 0 || filteredNewCardList.length < size) {
-            setHasMore(false);
-          }
+          setHasMore(filteredNewCardList.length >= size);
 
           return [...prev, ...filteredNewCardList];
         });
 
-        if (newCardList.length >= size) {
+        if (newCardList.length > 0) {
           setCursorId(newCardList[newCardList.length - 1].id);
-        } else {
-          setHasMore(false);
         }
       }
     } catch (error) {
@@ -75,8 +71,10 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards }: IProps) =
         console.error("ColumnList getCardList에 API 오류 발생", error);
         toast.error(error.response?.data || "카드 목록 조회 중 오류가 발생했습니다.");
       }
+    } finally {
+      setIsLoading(false);
     }
-  }, [columnId, hasMore, size, cursorId, cards]);
+  }, [columnId, hasMore, size, cursorId, cards, isLoading]);
 
   useLayoutEffect(() => {
     if (isDraggingOverRef.current !== isDraggingOver) {
@@ -103,7 +101,7 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards }: IProps) =
           getCardList();
         }
       },
-      { threshold: 1 }
+      { threshold: 0.5 }
     );
 
     const currentLoadingRef = observeRef.current;
@@ -175,7 +173,7 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards }: IProps) =
 
   return (
     <div className="space-y-6 px-4 pt-4 md:border-b md:border-gray04 md:pb-6 xl:flex xl:min-h-screen xl:flex-col xl:border-b-0 xl:border-r">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between" {...dragHandleProps}>
         <div className="flex items-center space-x-3">
           <div className="flex items-center space-x-2">
             <span className="size-2 rounded-full bg-violet01" />
@@ -207,12 +205,13 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards }: IProps) =
                     <div
                       ref={provided.innerRef}
                       {...provided.draggableProps}
+                      {...provided.dragHandleProps}
                       className={`${snapshot.isDragging ? "opacity-50" : ""} ${
                         isDropDisabled && snapshot.draggingOver ? "cursor-not-allowed" : ""
                       }`}
                     >
                       <div onClick={() => !snapshot.isDragging && handleCardClick(item.id)}>
-                        <ColumnItem card={item} dragHandleProps={provided.dragHandleProps} />
+                        <ColumnItem card={item} />
                       </div>
                     </div>
                   )}
@@ -222,16 +221,20 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards }: IProps) =
               {!isDraggingOver &&
                 cardList
                   .filter((item) => !cards.some((card) => card.id === item.id))
-                  .map((item) => (
+                  .map((item, i) => (
                     <div key={item.id} onClick={() => handleCardClick(item.id)}>
-                      <ColumnItem card={item} />
+                      <ColumnItem ref={i === cardList.length - 1 ? observeRef : null} card={item} />
                     </div>
                   ))}
-              {hasMore && !isDraggingOver && (
-                <div ref={observeRef} className="flex items-center justify-center font-bold">
+              {cards.length > 0 && (
+                <button
+                  onClick={getCardList}
+                  className="w-full rounded-md border border-gray03 bg-white py-2 font-bold xl:hidden"
+                >
                   카드 더 보기
-                </div>
+                </button>
               )}
+              {isLoading && <p className="text-center font-bold">카드 불러오는 중...</p>}
             </div>
           );
         }}

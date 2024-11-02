@@ -52,4 +52,6 @@ const ColumnItem = ({ card, dragHandleProps }: IProps) => {
   );
 };
 
+ColumnItem.displayName = "ColumnItem";
+
 export default memo(ColumnItem);
