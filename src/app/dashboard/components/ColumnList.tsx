@@ -1,5 +1,5 @@
 import { ColumnAtom, CardIdAtom } from "@/store/modalAtom";
-import { useSetAtom } from "jotai";
+import { useSetAtom, useAtom } from "jotai";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ICard } from "@/types/dashboardType";
 import { NumChip } from "@/components/chip/PlusAndNumChip";
@@ -9,6 +9,8 @@ import ColumnItem from "./ColumnItem";
 import { AddTodoBtn } from "@/components/button/ButtonComponents";
 import { useToggleModal } from "@/hooks/useModal";
 import axios from "axios";
+import { columnCardsAtom } from "@/store/dashboardAtom";
+import React from "react";
 
 interface IProps {
   columnTitle: string;
@@ -18,45 +20,62 @@ interface IProps {
 }
 
 const ColumnList = ({ columnTitle, columnId, cards: initialCards = [], totalCount }: IProps) => {
-  const [cards, setCards] = useState<ICard["cards"]>(initialCards);
-  const [hasMore, setHasMore] = useState(false);
+  const [columnCards, setColumnCards] = useAtom(columnCardsAtom);
   const [isLoading, setIsLoading] = useState(false);
-  const [cursorId, setCursorId] = useState<number | null>(null);
   const observeRef = useRef<HTMLDivElement | null>(null);
   const ADDITIONAL_CARDS_SIZE = 3;
   const setColumnAtom = useSetAtom(ColumnAtom);
   const setDetailCardId = useSetAtom(CardIdAtom);
   const toggleModal = useToggleModal();
 
+  const currentColumn = columnCards[columnId] || {
+    cards: [],
+    hasMore: false,
+    cursorId: null,
+    totalCount: 0,
+  };
+
   useEffect(() => {
     if (initialCards && initialCards.length > 0) {
-      setCards(initialCards);
-      setCursorId(initialCards[initialCards.length - 1]?.id || null);
-      setHasMore(initialCards.length < totalCount);
+      setColumnCards((prev) => ({
+        ...prev,
+        [columnId]: {
+          cards: initialCards,
+          hasMore: initialCards.length < totalCount,
+          cursorId: initialCards[initialCards.length - 1]?.id || null,
+          totalCount,
+        },
+      }));
     }
-  }, [initialCards, totalCount]);
+  }, [initialCards, totalCount, columnId, setColumnCards]);
 
   const loadMoreCards = useCallback(async () => {
-    if (!hasMore || isLoading || !cursorId) return;
+    if (!currentColumn.hasMore || isLoading || !currentColumn.cursorId) return;
     setIsLoading(true);
 
     try {
       const response = await axios.get(
-        `/api/cards?columnId=${columnId}&size=${ADDITIONAL_CARDS_SIZE}&cursorId=${cursorId}`
+        `/api/cards?columnId=${columnId}&size=${ADDITIONAL_CARDS_SIZE}&cursorId=${currentColumn.cursorId}`
       );
 
       if (response.status === 200) {
         const newCards = response.data.cards;
-        setCards((prev) => [...prev, ...newCards]);
-        setCursorId(newCards[newCards.length - 1]?.id || null);
-        setHasMore(response.data.totalCount > cards.length + newCards.length);
+        setColumnCards((prev) => ({
+          ...prev,
+          [columnId]: {
+            ...prev[columnId],
+            cards: [...prev[columnId].cards, ...newCards],
+            hasMore: response.data.totalCount > prev[columnId].cards.length + newCards.length,
+            cursorId: newCards[newCards.length - 1]?.id || null,
+          },
+        }));
       }
     } catch (error) {
       console.error("Error loading more cards:", error);
     } finally {
       setIsLoading(false);
     }
-  }, [columnId, cursorId, hasMore, isLoading, cards.length]);
+  }, [columnId, currentColumn.hasMore, currentColumn.cursorId, isLoading, setColumnCards]);
 
   const handleEditModal = () => {
     setColumnAtom({ title: columnTitle, columnId });
@@ -76,7 +95,7 @@ const ColumnList = ({ columnTitle, columnId, cards: initialCards = [], totalCoun
     const observer = new IntersectionObserver(
       (entries) => {
         const target = entries[0];
-        if (target.isIntersecting && hasMore && !isLoading) {
+        if (target.isIntersecting && currentColumn.hasMore && !isLoading) {
           loadMoreCards();
         }
       },
@@ -95,7 +114,7 @@ const ColumnList = ({ columnTitle, columnId, cards: initialCards = [], totalCoun
         observer.unobserve(currentRef);
       }
     };
-  }, [hasMore, isLoading, loadMoreCards]);
+  }, [currentColumn.hasMore, isLoading, loadMoreCards]);
 
   return (
     <div className="bg-gray06 flex h-full w-full flex-col rounded-lg">
@@ -122,17 +141,12 @@ const ColumnList = ({ columnTitle, columnId, cards: initialCards = [], totalCoun
                 }}
               />
               <div className="mt-2 space-y-2">
-                {cards.map((item, index) => (
+                {currentColumn.cards.map((item, index) => (
                   <ColumnItem key={item.id} card={item} index={index} onClick={() => handleCardClick(item.id)} />
                 ))}
                 {provided.placeholder}
                 {/* 무한 스크롤을 위한 관찰 대상 요소 */}
-                {hasMore && !isLoading && <div ref={observeRef} className="h-4 w-full" />}
-                {isLoading && (
-                  <div className="py-2 text-center">
-                    <p className="font-bold text-gray01">카드 불러오는 중...</p>
-                  </div>
-                )}
+                {currentColumn.hasMore && !isLoading && <div ref={observeRef} className="h-4 w-full" />}
               </div>
             </div>
           </div>
@@ -142,4 +156,4 @@ const ColumnList = ({ columnTitle, columnId, cards: initialCards = [], totalCoun
   );
 };
 
-export default ColumnList;
+export default React.memo(ColumnList);

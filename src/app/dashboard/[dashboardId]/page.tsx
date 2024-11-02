@@ -9,7 +9,7 @@ import { AddColumnBtn } from "@/components/button/ButtonComponents";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { ColumnTitlesAtom, RefreshDashboardAtom } from "@/store/modalAtom";
 import { useToggleModal } from "@/hooks/useModal";
-import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
+import { dashboardCardUpdateAtom, columnCardsAtom } from "@/store/dashboardAtom";
 import { DragDropContext, Droppable, DropResult } from "@hello-pangea/dnd";
 import { ICard } from "@/types/dashboardType";
 import toastMessages from "@/lib/toastMessage";
@@ -28,6 +28,7 @@ const DashboardDetail = () => {
   const updateDashBoard = useAtomValue(RefreshDashboardAtom);
   const [isCardUpdate] = useAtom(dashboardCardUpdateAtom);
   const [columnList, setColumnList] = useState<IColumnData[]>([]);
+  const [columnCards, setColumnCards] = useAtom(columnCardsAtom);
 
   const calculateInitialCardCount = useCallback(() => {
     const BASE_CARD_COUNT = 3;
@@ -94,30 +95,58 @@ const DashboardDetail = () => {
       const sourceColumnId = parseInt(source.droppableId.split("-")[1]);
       const destinationColumnId = parseInt(destination.droppableId.split("-")[1]);
 
-      const sourceColumn = columnList.find((col) => col.id === sourceColumnId);
-      const destColumn = columnList.find((col) => col.id === destinationColumnId);
+      const sourceCards = columnCards[sourceColumnId]?.cards || [];
+      const cardToMove = sourceCards[source.index];
 
-      if (!sourceColumn || !destColumn) return;
-
-      const cardToMove = sourceColumn.cards[source.index];
       if (!cardToMove) return;
 
       try {
-        setColumnList((prevColumns) => {
-          return prevColumns.map((column) => {
-            if (column.id === sourceColumnId) {
-              const newCards = [...column.cards];
-              newCards.splice(source.index, 1);
-              return { ...column, cards: newCards };
-            }
-            if (column.id === destinationColumnId) {
-              const newCards = [...column.cards];
-              newCards.splice(destination.index, 0, cardToMove);
-              return { ...column, cards: newCards };
-            }
-            return column;
-          });
-        });
+        const updatedColumnCards = { ...columnCards };
+        const updatedColumnList = [...columnList];
+
+        if (updatedColumnCards[sourceColumnId]) {
+          const newSourceCards = [...updatedColumnCards[sourceColumnId].cards];
+          newSourceCards.splice(source.index, 1);
+          updatedColumnCards[sourceColumnId] = {
+            ...updatedColumnCards[sourceColumnId],
+            cards: newSourceCards,
+            totalCount: updatedColumnCards[sourceColumnId].totalCount - 1,
+          };
+        }
+
+        if (updatedColumnCards[destinationColumnId]) {
+          const newDestCards = [...updatedColumnCards[destinationColumnId].cards];
+          newDestCards.splice(destination.index, 0, cardToMove);
+          updatedColumnCards[destinationColumnId] = {
+            ...updatedColumnCards[destinationColumnId],
+            cards: newDestCards,
+            totalCount: updatedColumnCards[destinationColumnId].totalCount + 1,
+          };
+        }
+
+        const sourceColumnIndex = updatedColumnList.findIndex((col) => col.id === sourceColumnId);
+        const destColumnIndex = updatedColumnList.findIndex((col) => col.id === destinationColumnId);
+
+        if (sourceColumnIndex !== -1) {
+          updatedColumnList[sourceColumnIndex] = {
+            ...updatedColumnList[sourceColumnIndex],
+            cards: updatedColumnList[sourceColumnIndex].cards.filter((card) => card.id !== cardToMove.id),
+            totalCount: updatedColumnList[sourceColumnIndex].totalCount - 1,
+          };
+        }
+
+        if (destColumnIndex !== -1) {
+          const newCards = [...updatedColumnList[destColumnIndex].cards];
+          newCards.splice(destination.index, 0, cardToMove);
+          updatedColumnList[destColumnIndex] = {
+            ...updatedColumnList[destColumnIndex],
+            cards: newCards,
+            totalCount: updatedColumnList[destColumnIndex].totalCount + 1,
+          };
+        }
+
+        setColumnCards(updatedColumnCards);
+        setColumnList(updatedColumnList);
 
         await axios.put(`/api/cards/${cardId}`, {
           columnId: destinationColumnId,
