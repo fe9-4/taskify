@@ -18,7 +18,7 @@ const MyDashboard = () => {
   const { user } = useAuth();
 
   // useDashboard 훅 사용
-  const { dashboardData } = useDashboard({
+  const { dashboardData, isLoading: isDashboardLoading } = useDashboard({
     page,
     size,
     showErrorToast: true,
@@ -27,10 +27,10 @@ const MyDashboard = () => {
 
   // 로그인 상태 체크
   useEffect(() => {
-    if (!user) {
+    if (!user && !isDashboardLoading) {
       router.push("/login");
     }
-  }, [user, router]);
+  }, [user, isDashboardLoading, router]);
 
   // 페이지네이션을 위한 총 페이지 수 계산
   const totalPage = Math.ceil((dashboardData?.totalCount || 0) / size);

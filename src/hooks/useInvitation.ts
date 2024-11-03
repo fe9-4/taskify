@@ -21,7 +21,6 @@ export const useInvitation = ({ dashboardId }: { dashboardId: number }) => {
     page: 1,
     size: 100,
     showErrorToast: true,
-    customErrorMessage: "멤버 목록을 불러오는데 실패했습니다.",
   });
 
   // 초대 목록 조회

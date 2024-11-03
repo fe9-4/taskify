@@ -17,18 +17,17 @@ const pastelColors = [
 ];
 
 export const MemberInitials = ({ dashboardId }: MemberInitialsProps) => {
-  // useMember 로 멤버 목록 조회
-  const { memberData, isLoading, error } = useMember({
+  // useMember 호출 최적화
+  const { memberData, isLoading } = useMember({
     dashboardId,
     page: 1,
     size: 10,
-    showErrorToast: true,
-    customErrorMessage: "멤버 목록을 불러오는데 실패했습니다.",
+    enabled: !!dashboardId, // dashboardId가 있을 때만 API 호출
+    staleTime: 30000, // 캐시 시간 설정
   });
 
-  if (isLoading) return <div>로딩중...</div>;
-  if (error) return <div>에러 발생: {error.message}</div>;
-  if (!memberData.totalCount) return null;
+  if (!dashboardId) return null;
+  if (isLoading) return null;
 
   const totalMembers = memberData.totalCount;
 

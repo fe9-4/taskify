@@ -147,6 +147,11 @@ const ColumnList = ({ columnTitle, columnId, cards: initialCards = [], totalCoun
                 {provided.placeholder}
                 {/* 무한 스크롤을 위한 관찰 대상 요소 */}
                 {currentColumn.hasMore && !isLoading && <div ref={observeRef} className="h-4 w-full" />}
+                {isLoading && (
+                  <div className="py-2 text-center">
+                    <p className="font-bold text-gray01">카드 불러오는 중...</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

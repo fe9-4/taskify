@@ -31,8 +31,6 @@ const UpdateCard = () => {
   const { dashboardId } = useParams();
   const { columnId } = useAtomValue(ColumnAtom);
   const cardId = useAtomValue(CardIdAtom);
-  const { memberData } = useMember({ dashboardId: Number(dashboardId) });
-
   const [tagInput, setTagInput] = useState("");
   const [cardData, setCardData] = useState<CardDataType | null>(null);
   const [selectedValue, setSelectedValue] = useState(columnId);
@@ -179,6 +177,31 @@ const UpdateCard = () => {
       }
     });
   };
+
+  const {
+    memberData,
+    isLoading: isMemberLoading,
+    error: memberError,
+  } = useMember({
+    dashboardId: Number(dashboardId),
+    page: 1,
+    size: 100,
+    enabled: !!dashboardId,
+  });
+
+  useEffect(() => {
+    if (memberError) {
+      toggleModal("updateCard", false);
+    }
+  }, [memberError, toggleModal]);
+
+  if (isMemberLoading) {
+    return (
+      <div className="flex h-[400px] w-[327px] items-center justify-center rounded-2xl bg-white md:w-[584px]">
+        <span className="text-gray02">멤버 정보를 불러오는 중...</span>
+      </div>
+    );
+  }
 
   return (
     <section className="w-[327px] rounded-2xl bg-white p-4 md:w-[584px] md:p-8">

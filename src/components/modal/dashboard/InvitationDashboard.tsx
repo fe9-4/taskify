@@ -1,5 +1,5 @@
 import { useParams, useRouter } from "next/navigation";
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import InputItem from "../../input/InputItem";
 import { CancelBtn, ConfirmBtn } from "../../button/ButtonComponents";
@@ -32,26 +32,23 @@ const InvitationDashboard = () => {
   });
 
   // 대시보드 멤버 여부 확인
-  const { isLoading: isMemberLoading, error: memberError } = useMember({
-    dashboardId: currentDashboardId || 0,
+  const { memberData, isLoading, error } = useMember({
+    dashboardId: Number(currentDashboardId),
     page: 1,
     size: 100,
-    showErrorToast: true,
-    customErrorMessage: "멤버 목록을 불러오는데 실패했습니다.",
+    enabled: !!currentDashboardId,
   });
+
+  useEffect(() => {
+    if (error) {
+      toggleModal("invitationDashboard", false);
+    }
+  }, [error, toggleModal]);
 
   // 초대 관리 커스텀 훅
   const { inviteMember, isInviting } = useInvitation({
     dashboardId: currentDashboardId || 0,
   });
-
-  // 에러 발생 시 처리
-  if (memberError) {
-    toast.error(toastMessages.error.getMemberList);
-    toggleModal("invitationDashboard", false);
-    router.push("/mydashboard");
-    return null;
-  }
 
   const onSubmit = handleSubmit(async (data) => {
     if (!currentDashboardId) {
@@ -72,7 +69,7 @@ const InvitationDashboard = () => {
     }
   });
 
-  if (isMemberLoading) {
+  if (isLoading) {
     return null;
   }
 
@@ -92,7 +89,7 @@ const InvitationDashboard = () => {
           <CancelBtn type="button" onClick={() => toggleModal("invitationDashboard", false)}>
             취소
           </CancelBtn>
-          <ConfirmBtn type="submit" disabled={!isValid || isMemberLoading || isInviting}>
+          <ConfirmBtn type="submit" disabled={!isValid || isLoading || isInviting}>
             {isInviting ? "초대중..." : "초대하기"}
           </ConfirmBtn>
         </div>
