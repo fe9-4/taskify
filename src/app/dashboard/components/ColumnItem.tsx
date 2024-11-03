@@ -1,4 +1,4 @@
-import React, { forwardRef, memo } from "react";
+import React, { forwardRef } from "react";
 import Image from "next/image";
 import TagChip from "@/components/chip/TagChip";
 import { HiOutlineCalendar } from "react-icons/hi";
@@ -6,26 +6,14 @@ import { Iitem } from "@/types/dashboardType";
 import { Draggable } from "@hello-pangea/dnd";
 import { cls } from "@/lib/utils";
 
-interface ColumnItemProps {
-  card: {
-    id: number;
-    title: string;
-    description: string;
-    dueDate: string;
-    imageUrl: string | null;
-    assignee: {
-      id: number;
-      nickname: string;
-      profileImageUrl: string | null;
-    } | null;
-    tags: string[];
-  };
-  index?: number;
+interface IProps {
+  card: Iitem;
+  index: number;
   onClick?: () => void;
 }
 
-const ColumnItem = forwardRef<HTMLDivElement, ColumnItemProps>(({ card, index, onClick }, ref) => {
-  const tags = card.tags || [];
+const ColumnItem = forwardRef<HTMLDivElement, IProps>(({ card, index, onClick }, ref) => {
+  if (!card) return null;
 
   return (
     <Draggable draggableId={`card-${card.id}`} index={index}>
@@ -61,7 +49,7 @@ const ColumnItem = forwardRef<HTMLDivElement, ColumnItemProps>(({ card, index, o
                 <h3 className="text-start font-medium">{card.title}</h3>
                 <div className="flex w-full flex-col space-y-[6px] md:flex-row md:space-x-[6px] md:space-y-0 xl:flex-col xl:space-x-0 xl:space-y-[6px]">
                   <div className="flex w-full flex-wrap items-center gap-[6px] md:w-64">
-                    {tags.map((tag) => (
+                    {card.tags.map((tag) => (
                       <TagChip key={tag} tag={tag} />
                     ))}
                   </div>
@@ -86,4 +74,4 @@ const ColumnItem = forwardRef<HTMLDivElement, ColumnItemProps>(({ card, index, o
 
 ColumnItem.displayName = "ColumnItem";
 
-export default memo(ColumnItem);
+export default ColumnItem;
