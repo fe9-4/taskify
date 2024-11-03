@@ -24,6 +24,8 @@ const ColumnList = ({ columnTitle, columnId, cards: initialCards = [], totalCoun
   const [columnCards, setColumnCards] = useAtom(columnCardsAtom);
   const setColumnAtom = useSetAtom(ColumnAtom);
   const setDetailCardId = useSetAtom(CardIdAtom);
+  const setCurrentColumnList = useSetAtom(currentColumnListAtom);
+  const [dashboardCardUpdate, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
   const toggleModal = useToggleModal();
   const ADDITIONAL_CARDS_SIZE = 3; // 추가 로드 시 고정 크기
 
@@ -142,13 +144,13 @@ const ColumnList = ({ columnTitle, columnId, cards: initialCards = [], totalCoun
     <div className="h-full space-y-6 border-b bg-gray05 py-4 md:border-gray04 md:pb-6 xl:flex xl:flex-col xl:border-b-0 xl:border-r xl:pr-4">
       <div className="flex flex-shrink-0 items-center justify-between rounded-t-lg">
         <div className="flex items-center space-x-3">
-          <h2 className="text-lg font-bold text-black">{columnTitle}</h2>
+          <div className="flex items-center space-x-2">
+            <span className="size-2 rounded-full bg-violet01" />
+            <h2 className="text-lg font-bold text-black">{columnTitle}</h2>
+          </div>
           <NumChip num={totalCount} />
         </div>
-        <button
-          onClick={handleEditModal}
-          className="hover:bg-gray06 flex h-full w-10 items-center justify-center rounded-md"
-        >
+        <button onClick={handleEditModal}>
           <HiOutlineCog className="size-[22px] text-gray01" />
         </button>
       </div>
@@ -196,4 +198,4 @@ const ColumnList = ({ columnTitle, columnId, cards: initialCards = [], totalCoun
   );
 };
 
-export default React.memo(ColumnList);
+export default memo(ColumnList);
