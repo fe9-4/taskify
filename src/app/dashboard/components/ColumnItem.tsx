@@ -4,6 +4,7 @@ import TagChip from "@/components/chip/TagChip";
 import { HiOutlineCalendar } from "react-icons/hi";
 import { Iitem } from "@/types/dashboardType";
 import { Draggable } from "@hello-pangea/dnd";
+import { cls } from "@/lib/utils";
 
 interface IProps {
   card: Iitem;
@@ -30,7 +31,10 @@ const ColumnItem = forwardRef<HTMLDivElement, IProps>(({ card, index, onClick },
                 onClick();
               }
             }}
-            className={`flex cursor-grab flex-col space-y-2 rounded-md border border-gray03 bg-white p-3 active:cursor-grabbing md:flex-row md:items-center md:space-x-2 md:space-y-0 xl:flex-col xl:space-x-0 xl:space-y-[6px] ${snapshot.isDragging ? "shadow-lg ring-2 ring-violet01" : ""} `}
+            className={cls(
+              "flex cursor-grab flex-col space-y-2 rounded-md border border-gray03 bg-white p-3 active:cursor-grabbing md:flex-row md:items-center md:space-x-2 md:space-y-0 xl:flex-col xl:space-x-0 xl:space-y-[6px]",
+              snapshot.isDragging ? "ring-2, shadow-lg ring-violet01" : ""
+            )}
           >
             <Image
               src={card.imageUrl}
@@ -45,7 +49,9 @@ const ColumnItem = forwardRef<HTMLDivElement, IProps>(({ card, index, onClick },
                 <h3 className="text-start font-medium">{card.title}</h3>
                 <div className="flex w-full flex-col space-y-[6px] md:flex-row md:space-x-[6px] md:space-y-0 xl:flex-col xl:space-x-0 xl:space-y-[6px]">
                   <div className="flex w-full flex-wrap items-center gap-[6px] md:w-64">
-                    {card.tags?.map((tag) => <TagChip key={tag} tag={tag} />)}
+                    {card.tags.map((tag) => (
+                      <TagChip key={tag} tag={tag} />
+                    ))}
                   </div>
                   <div className="flex w-full items-center justify-between md:self-end">
                     <div className="flex items-center space-x-1 text-gray01">

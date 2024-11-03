@@ -3,16 +3,16 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 import ColumnList from "@/app/dashboard/components/ColumnList";
+import toastMessages from "@/lib/toastMessage";
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { AddColumnBtn } from "@/components/button/ButtonComponents";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { ColumnTitlesAtom, RefreshDashboardAtom } from "@/store/modalAtom";
 import { useToggleModal } from "@/hooks/useModal";
-import { dashboardCardUpdateAtom, columnCardsAtom } from "@/store/dashboardAtom";
+import { columnCardsAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { DragDropContext, Droppable, DropResult } from "@hello-pangea/dnd";
 import { ICard } from "@/types/dashboardType";
-import toastMessages from "@/lib/toastMessage";
+import { PlusChip } from "@/components/chip/PlusAndNumChip";
 
 interface IColumnData {
   id: number;
@@ -26,7 +26,7 @@ const DashboardDetail = () => {
   const toggleModal = useToggleModal();
   const setColumnTitles = useSetAtom(ColumnTitlesAtom);
   const updateDashBoard = useAtomValue(RefreshDashboardAtom);
-  const [isCardUpdate] = useAtom(dashboardCardUpdateAtom);
+  const [isCardUpdate, setIsCardUpdate] = useAtom(dashboardCardUpdateAtom);
   const [columnList, setColumnList] = useState<IColumnData[]>([]);
   const [columnCards, setColumnCards] = useAtom(columnCardsAtom);
 
@@ -79,7 +79,15 @@ const DashboardDetail = () => {
 
   useEffect(() => {
     getColumn();
-  }, [getColumn, updateDashBoard, isCardUpdate]);
+  }, [getColumn, updateDashBoard]);
+
+  // 추가되면 실시간 반영되도록 하는 함수
+  useEffect(() => {
+    if (isCardUpdate) {
+      getColumn();
+      setIsCardUpdate(false);
+    }
+  }, [getColumn, isCardUpdate, setIsCardUpdate]);
 
   const onDragEnd = async (result: DropResult) => {
     const { destination, source, draggableId, type } = result;
@@ -167,7 +175,7 @@ const DashboardDetail = () => {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="h-[calc(100vh-64px)] w-full">
+      <div className="h-dvh w-full">
         <Droppable droppableId="columns" direction="horizontal" type="COLUMN">
           {(provided) => (
             <div
@@ -176,7 +184,11 @@ const DashboardDetail = () => {
               ref={provided.innerRef}
             >
               {columnList.map((column) => (
-                <div key={column.id} className="h-full flex-shrink-0 xl:w-80">
+                <div
+                  key={column.id}
+                  ref={provided.innerRef}
+                  className="w-full flex-shrink-0 overflow-auto xl:h-full xl:w-80 [&::-webkit-scrollbar]:hidden"
+                >
                   <ColumnList
                     columnId={column.id}
                     columnTitle={column.title}
@@ -187,9 +199,13 @@ const DashboardDetail = () => {
               ))}
               {provided.placeholder}
               {columnList.length < 10 && (
-                <div className="py-4 xl:pt-[66px]">
-                  <AddColumnBtn onClick={handleColumnBtn} />
-                </div>
+                <button
+                  onClick={handleColumnBtn}
+                  className="my-4 flex w-full items-center justify-center space-x-3 rounded-lg border border-gray03 bg-white py-4 xl:mt-16 xl:h-[70px] xl:min-w-[354px] xl:max-w-[354px] xl:py-0"
+                >
+                  <span className="text-lg font-bold">새로운 컬럼 추가하기</span>
+                  <PlusChip />
+                </button>
               )}
             </div>
           )}
