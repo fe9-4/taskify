@@ -9,6 +9,7 @@ import {
   DashboardList,
   DashboardListSchema,
   DashboardSchema,
+  CreateDashboard,
 } from "@/zodSchema/dashboardSchema";
 import toastMessages from "@/lib/toastMessage";
 
@@ -19,19 +20,15 @@ interface DashboardOptions {
   cursorId?: number;
   showErrorToast?: boolean;
   customErrorMessage?: string;
-}
-
-interface CreateDashboardData {
-  title: string;
-  color: string;
+  enabled?: boolean;
 }
 
 // createDashboard를 위한 별도의 hook
 const useCreateDashboard = () => {
   const queryClient = useQueryClient();
 
-  const { mutateAsync: createDashboard, isPending: isCreating } = useMutation<Dashboard, Error, CreateDashboardData>({
-    mutationFn: async (data: CreateDashboardData) => {
+  const { mutateAsync: createDashboard, isPending: isCreating } = useMutation<Dashboard, Error, CreateDashboard>({
+    mutationFn: async (data: CreateDashboard) => {
       try {
         const response = await axios.post("/api/dashboards", data);
         return DashboardSchema.parse(response.data);
@@ -62,13 +59,14 @@ export const useDashboard = ({
   cursorId,
   showErrorToast = true,
   customErrorMessage,
+  enabled = true,
 }: DashboardOptions = {}) => {
   const { user } = useAuth();
   const router = useRouter();
   const queryClient = useQueryClient();
 
   // 대시보드 목록 조회
-  const { data: dashboardData } = useQuery<DashboardList>({
+  const { data: dashboardData, isLoading: isDashboardListLoading } = useQuery<DashboardList>({
     queryKey: ["dashboardData", page, size, cursorId],
     queryFn: async () => {
       try {
@@ -84,7 +82,7 @@ export const useDashboard = ({
         throw error;
       }
     },
-    enabled: !!user,
+    enabled: !!user && enabled,
     initialData: {
       dashboards: [],
       totalCount: 0,
@@ -93,7 +91,7 @@ export const useDashboard = ({
   });
 
   // 대시보드 상세 조회
-  const { data: dashboardInfo } = useQuery<Dashboard>({
+  const { data: dashboardInfo, isLoading: isDashboardInfoLoading } = useQuery<Dashboard>({
     queryKey: ["dashboardInfo", dashboardId],
     queryFn: async () => {
       if (!dashboardId) throw new Error("대시보드 ID가 필요합니다.");
@@ -109,7 +107,7 @@ export const useDashboard = ({
         throw error;
       }
     },
-    enabled: !!user && !!dashboardId,
+    enabled: !!user && !!dashboardId && enabled,
   });
 
   // 대시보드 수정
@@ -166,6 +164,7 @@ export const useDashboard = ({
     dashboardInfo,
     updateDashboard,
     deleteDashboard,
+    isLoading: isDashboardListLoading || isDashboardInfoLoading,
     isUpdating,
     isDeleting,
   };

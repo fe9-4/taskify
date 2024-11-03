@@ -2,12 +2,13 @@
 
 import { HiChevronDown } from "react-icons/hi";
 import { HiCheck } from "react-icons/hi";
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from "react";
 import { cls } from "@/lib/utils";
 import { StatusTitleChip } from "../chip/StatusChip";
 import { useAtomValue } from "jotai";
-import { currentColumnListAtom } from "@/store/dashboardAtom";
+import { currentColumnListAtom, currentDashboardIdAtom } from "@/store/dashboardAtom";
 import { ColumnAtom } from "@/store/modalAtom";
+import { useParams } from "next/navigation";
 
 interface IProps {
   setSelectedValueId: Dispatch<SetStateAction<number>>;
@@ -18,10 +19,19 @@ interface IProps {
 const StatusDropdown = ({ setSelectedValueId }: IProps) => {
   const currentColumnList = useAtomValue(currentColumnListAtom);
   const column = useAtomValue(ColumnAtom);
+  const { dashboardId } = useParams();
+  const currentDashboardId = useAtomValue(currentDashboardIdAtom);
   
   const [isOpen, setIsOpen] = useState(false);
   const [value, setValue] = useState(column.title);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const filteredColumnList = useMemo(() => {
+    if (currentDashboardId === dashboardId) {
+      return currentColumnList;
+    }
+    return [];
+  }, [currentColumnList, currentDashboardId, dashboardId]);
 
   const handleClickOutside = (e: MouseEvent) => {
     if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -62,8 +72,8 @@ const StatusDropdown = ({ setSelectedValueId }: IProps) => {
           <HiChevronDown />
         </button>
         {isOpen && (
-          <div className="absolute left-0 right-0 top-[50px] z-10 flex flex-col overflow-hidden rounded-bl-md rounded-br-md rounded-tl-md rounded-tr-md border border-gray03 bg-white">
-            {currentColumnList.map((item) => (
+          <div className="absolute left-0 right-0 top-[50px] z-20 flex flex-col overflow-hidden rounded-bl-md rounded-br-md rounded-tl-md rounded-tr-md border border-gray03 bg-white">
+            {filteredColumnList.map((item) => (
               <button
                 type="button"
                 key={item.id}

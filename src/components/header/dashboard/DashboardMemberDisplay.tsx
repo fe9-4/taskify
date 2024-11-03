@@ -10,28 +10,31 @@ import { useToggleModal } from "@/hooks/useModal";
 export const DashboardMemberDisplay = () => {
   const router = useRouter();
   const params = useParams();
+  const toggleModal = useToggleModal();
   const currentDashboardId = params?.dashboardId ? Number(params.dashboardId) : null;
 
-  const toggleModal = useToggleModal();
+  // 대시보드 정보 조회
+  const { dashboardInfo, isLoading: isDashboardInfoLoading } = useDashboard({
+    dashboardId: currentDashboardId || 0,
+  });
 
-  // 대시보드 목록 조회
-  const { dashboardInfo } = useDashboard({ dashboardId: currentDashboardId || 0 });
+  // 멤버 목록 조회 - 대시보드 정보가 있을 때만
+  const { memberData, isLoading: isMemberLoading } = useMember({
+    dashboardId: currentDashboardId || 0,
+    page: 1,
+    size: 100,
+    enabled: !!dashboardInfo,
+  });
+
+  // 대시보드 ID가 없는 경우 렌더링하지 않음
+  if (!currentDashboardId) return null;
+  if (isDashboardInfoLoading || isMemberLoading) return null;
 
   // 실제 표시할 대시보드 정보
   const displayDashboard = dashboardInfo;
 
-  // 멤버 목록 조회
-  const {
-    memberData,
-    isLoading: isMemberLoading,
-    error: memberError,
-  } = useMember({
-    dashboardId: currentDashboardId || 0,
-    page: 1,
-    size: 100,
-    showErrorToast: true,
-    customErrorMessage: "멤버 목록을 불러오는데 실패했습니다.",
-  });
+  // 대시보드 소유자 여부 확인
+  const isDashboardOwner = displayDashboard?.createdByMe || false;
 
   // 초대하기 버튼 클릭 핸들러
   const handleInviteClick = () => {
@@ -42,12 +45,6 @@ export const DashboardMemberDisplay = () => {
   const handleSettingClick = () => {
     router.push(`/dashboard/${currentDashboardId}/edit`);
   };
-
-  // 로딩 중이거나 에러 발생 시 렌더링하지 않음
-  if (isMemberLoading || memberError) return null;
-
-  // 대시보드 소유자 여부 확인
-  const isDashboardOwner = displayDashboard?.createdByMe || false;
 
   return (
     <div className="flex h-full w-full items-center justify-between">

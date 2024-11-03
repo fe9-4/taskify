@@ -9,7 +9,12 @@ import { useParams } from "next/navigation";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { ColumnTitlesAtom, RefreshDashboardAtom } from "@/store/modalAtom";
 import { useToggleModal } from "@/hooks/useModal";
-import { columnCardsAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
+import {
+  columnCardsAtom,
+  currentColumnListAtom,
+  dashboardCardUpdateAtom,
+  resetColumnListAtom,
+} from "@/store/dashboardAtom";
 import { DragDropContext, Droppable, DropResult } from "@hello-pangea/dnd";
 import { ICard } from "@/types/dashboardType";
 import { PlusChip } from "@/components/chip/PlusAndNumChip";
@@ -29,6 +34,8 @@ const DashboardDetail = () => {
   const [isCardUpdate, setIsCardUpdate] = useAtom(dashboardCardUpdateAtom);
   const [columnList, setColumnList] = useState<IColumnData[]>([]);
   const [columnCards, setColumnCards] = useAtom(columnCardsAtom);
+  const setResetColumnList = useSetAtom(resetColumnListAtom);
+  const setCurrentColumnList = useSetAtom(currentColumnListAtom);
 
   const calculateInitialCardCount = useCallback(() => {
     const BASE_CARD_COUNT = 3;
@@ -37,12 +44,26 @@ const DashboardDetail = () => {
     return isXLargeScreen ? BASE_CARD_COUNT + ADDITIONAL_CARD_COUNT : BASE_CARD_COUNT;
   }, []);
 
+  // 컬럼 리스트 초기화 및 설정
+  useEffect(() => {
+    if (dashboardId) {
+      setResetColumnList(dashboardId);
+    }
+  }, [dashboardId, setResetColumnList]);
+
   const getColumn = useCallback(async () => {
     try {
       const response = await axios.get(`/api/columns?dashboardId=${dashboardId}`);
 
       if (response.status === 200) {
         const columns = response.data;
+        setCurrentColumnList(
+          columns.map((column: IColumnData) => ({
+            id: column.id,
+            title: column.title,
+          }))
+        );
+
         const initialSize = calculateInitialCardCount();
         const columnsWithCards = await Promise.all(
           columns.map(async (column: IColumnData) => {
@@ -70,7 +91,7 @@ const DashboardDetail = () => {
         toast.error(error.response?.data);
       }
     }
-  }, [dashboardId, calculateInitialCardCount]);
+  }, [dashboardId, calculateInitialCardCount, setCurrentColumnList]);
 
   const handleColumnBtn = () => {
     const columnTitles = columnList.map((column) => column.title);
@@ -200,13 +221,15 @@ const DashboardDetail = () => {
               ))}
               {provided.placeholder}
               {columnList.length < 10 && (
-                <button
-                  onClick={handleColumnBtn}
-                  className="my-4 flex w-full items-center justify-center space-x-3 rounded-lg border border-gray03 bg-white py-4 xl:mt-16 xl:h-[70px] xl:min-w-[354px] xl:max-w-[354px] xl:py-0"
-                >
-                  <span className="text-lg font-bold">새로운 컬럼 추가하기</span>
-                  <PlusChip />
-                </button>
+                <div className="my-4 xl:my-0">
+                  <button
+                    onClick={handleColumnBtn}
+                    className="mb-4 flex w-full items-center justify-center space-x-3 rounded-lg border border-gray03 bg-white py-4 xl:mt-16 xl:h-[70px] xl:min-w-[354px] xl:max-w-[354px] xl:py-0"
+                  >
+                    <span className="text-lg font-bold">새로운 컬럼 추가하기</span>
+                    <PlusChip />
+                  </button>
+                </div>
               )}
             </div>
           )}
