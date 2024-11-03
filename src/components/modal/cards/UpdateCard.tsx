@@ -14,7 +14,7 @@ import { useToggleModal } from "@/hooks/useModal";
 import useLoading from "@/hooks/useLoading";
 import { useSetAtom, useAtomValue } from "jotai";
 import { ColumnAtom, CardIdAtom } from "@/store/modalAtom";
-import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
+import { columnCardsAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { CardDataType, UpdateCardProps } from "@/types/cardType";
 import { uploadType } from "@/types/uploadType";
 import { CancelBtn, ConfirmBtn } from "@/components/button/ButtonComponents";
@@ -37,9 +37,9 @@ const UpdateCard = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const { isLoading, withLoading } = useLoading();
-
   const toggleModal = useToggleModal();
   const setDashboardCardUpdate = useSetAtom(dashboardCardUpdateAtom);
+  const setColumnCards = useSetAtom(columnCardsAtom);
 
   const {
     uploadFile,
@@ -147,6 +147,11 @@ const UpdateCard = () => {
   }, [previewUrl]);
 
   const onSubmit: SubmitHandler<UpdateCardProps> = async (data) => {
+    if (!data.tags || data.tags.length === 0) {
+      toast.error("태그를 하나 이상 입력해주세요.");
+      return;
+    }
+
     await withLoading(async () => {
       try {
         let uploadedImageUrl = previewUrl;
@@ -156,11 +161,15 @@ const UpdateCard = () => {
           if (!uploadedImageUrl) throw new Error("이미지 업로드 중 오류 발생");
         }
 
+        if (!data.title || !data.description || !data.dueDate || !uploadedImageUrl || !data.assigneeUserId) {
+          throw new Error("필수 항목이 누락되었습니다.");
+        }
+
         const cardData = {
           columnId: selectedValue,
           assigneeUserId: Number(data.assigneeUserId),
-          title: data.title,
-          description: data.description,
+          title: data.title.trim(),
+          description: data.description.trim(),
           dueDate: data.dueDate,
           tags: data.tags,
           imageUrl: uploadedImageUrl,
@@ -168,11 +177,42 @@ const UpdateCard = () => {
 
         const response = await axios.put(`/api/cards/${cardId}`, cardData);
         if (response.status === 200) {
+          const updatedCard = {
+            ...response.data,
+            tags: response.data.tags,
+          };
+
+          if (columnId !== selectedValue) {
+            setColumnCards((prev) => {
+              const sourceColumn = prev[columnId];
+              const targetColumn = prev[selectedValue];
+
+              if (!sourceColumn || !targetColumn) {
+                return prev;
+              }
+
+              return {
+                ...prev,
+                [columnId]: {
+                  ...sourceColumn,
+                  cards: sourceColumn.cards.filter((card) => card.id !== cardId),
+                  totalCount: Math.max(0, sourceColumn.totalCount - 1),
+                },
+                [selectedValue]: {
+                  ...targetColumn,
+                  cards: [updatedCard, ...targetColumn.cards],
+                  totalCount: targetColumn.totalCount + 1,
+                },
+              };
+            });
+          }
+
           toast.success(toastMessages.success.editCard);
           toggleModal("updateCard", false);
           setDashboardCardUpdate(true);
         }
-      } catch {
+      } catch (error) {
+        console.error("Card update error:", error);
         toast.error(toastMessages.error.editCard);
       }
     });
