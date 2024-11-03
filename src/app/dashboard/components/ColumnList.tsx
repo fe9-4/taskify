@@ -3,13 +3,14 @@ import ColumnItem from "./ColumnItem";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useAtom, useSetAtom } from "jotai";
 import { ColumnAtom, CardIdAtom } from "@/store/modalAtom";
-import { columnCardsAtom, currentColumnListAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
+import { columnCardsAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { useToggleModal } from "@/hooks/useModal";
 import { ICard } from "@/types/dashboardType";
 import { NumChip } from "@/components/chip/PlusAndNumChip";
 import { HiOutlineCog } from "react-icons/hi";
 import { Droppable } from "@hello-pangea/dnd";
 import { AddTodoBtn } from "@/components/button/ButtonComponents";
+import { useParams } from "next/navigation";
 
 interface IProps {
   columnTitle: string;
@@ -24,7 +25,6 @@ const ColumnList = ({ columnTitle, columnId, cards: initialCards = [], totalCoun
   const [columnCards, setColumnCards] = useAtom(columnCardsAtom);
   const setColumnAtom = useSetAtom(ColumnAtom);
   const setDetailCardId = useSetAtom(CardIdAtom);
-  const setCurrentColumnList = useSetAtom(currentColumnListAtom);
   const [dashboardCardUpdate, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
   const toggleModal = useToggleModal();
   const ADDITIONAL_CARDS_SIZE = 3; // 추가 로드 시 고정 크기
@@ -106,20 +106,6 @@ const ColumnList = ({ columnTitle, columnId, cards: initialCards = [], totalCoun
       }
     };
   }, [currentColumn.hasMore, isLoading, loadMoreCards]);
-
-  // 드롭다운으로 현재 컬럼정보 보내주는 함수
-  useEffect(() => {
-    if (columnTitle && columnId) {
-      setCurrentColumnList((prev) => {
-        const newColumn = { id: columnId, title: columnTitle };
-        const checkList = prev.some((column) => column.id === columnId);
-        if (!checkList) {
-          return [...prev, newColumn];
-        }
-        return prev;
-      });
-    }
-  }, [columnTitle, columnId, setCurrentColumnList]);
 
   // 수정, 삭제 시 업데이트함수 (아직 제대로 작동 안함)
   useEffect(() => {

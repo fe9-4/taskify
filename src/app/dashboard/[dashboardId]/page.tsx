@@ -9,7 +9,12 @@ import { useParams } from "next/navigation";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { ColumnTitlesAtom, RefreshDashboardAtom } from "@/store/modalAtom";
 import { useToggleModal } from "@/hooks/useModal";
-import { columnCardsAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
+import {
+  columnCardsAtom,
+  dashboardCardUpdateAtom,
+  resetColumnListAtom,
+  currentColumnListAtom,
+} from "@/store/dashboardAtom";
 import { DragDropContext, Droppable, DropResult } from "@hello-pangea/dnd";
 import { ICard } from "@/types/dashboardType";
 import { PlusChip } from "@/components/chip/PlusAndNumChip";
@@ -29,6 +34,8 @@ const DashboardDetail = () => {
   const [isCardUpdate, setIsCardUpdate] = useAtom(dashboardCardUpdateAtom);
   const [columnList, setColumnList] = useState<IColumnData[]>([]);
   const [columnCards, setColumnCards] = useAtom(columnCardsAtom);
+  const setResetColumnList = useSetAtom(resetColumnListAtom);
+  const setCurrentColumnList = useSetAtom(currentColumnListAtom);
 
   const calculateInitialCardCount = useCallback(() => {
     const BASE_CARD_COUNT = 3;
@@ -37,11 +44,27 @@ const DashboardDetail = () => {
     return isXLargeScreen ? BASE_CARD_COUNT + ADDITIONAL_CARD_COUNT : BASE_CARD_COUNT;
   }, []);
 
+  // 컬럼 리스트 초기화 및 설정
+  useEffect(() => {
+    if (dashboardId) {
+      setResetColumnList(dashboardId);
+    }
+  }, [dashboardId, setResetColumnList]);
+
+  // 컬럼 데이터 가져오기
   const getColumn = useCallback(async () => {
     try {
       const response = await axios.get(`/api/columns?dashboardId=${dashboardId}`);
       if (response.status === 200) {
         const columns = response.data;
+        // 컬럼 리스트 설정
+        setCurrentColumnList(
+          columns.map((column: IColumnData) => ({
+            id: column.id,
+            title: column.title,
+          }))
+        );
+
         const initialSize = calculateInitialCardCount();
         const columnsWithCards = await Promise.all(
           columns.map(async (column: IColumnData) => {
@@ -69,7 +92,7 @@ const DashboardDetail = () => {
         toast.error(error.response?.data);
       }
     }
-  }, [dashboardId, calculateInitialCardCount]);
+  }, [dashboardId, calculateInitialCardCount, setCurrentColumnList]);
 
   const handleColumnBtn = () => {
     const columnTitles = columnList.map((column) => column.title);
