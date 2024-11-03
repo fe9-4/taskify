@@ -85,6 +85,25 @@ body {
   }
   /* ----------------------- end datepicker calendar ----------------------- */
 
+  /* ----------------------- start scrollbar ----------------------- */
+  body::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    scroll-behavior: smooth;
+  }
+
+  body::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  body::-webkit-scrollbar-thumb {
+    background: rgba(85, 52, 218, 0.6);
+    border-radius: 10px;
+    background-clip: padding-box;
+    border: 2px solid transparent;
+  }
+  /* ----------------------- end scrollbar ----------------------- */
+
   .text-overflow {
     text-overflow: ellipsis;
     overflow: hidden;
