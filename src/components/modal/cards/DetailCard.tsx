@@ -137,6 +137,7 @@ const DetailCard = () => {
                       src={card.imageUrl}
                       alt={card.assignee.nickname}
                       fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                       className="rounded-md object-cover"
                       priority={true}
                     />

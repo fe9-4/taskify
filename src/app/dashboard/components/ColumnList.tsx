@@ -92,7 +92,6 @@ const ColumnList = ({ columnTitle, columnId, dragHandleProps, cards, totalCount 
   }, [cards, totalCount]);
 
   // getCardList 함수를 먼저 선언
-  // getCardList 함수를 먼저 선언
   const getCardList = useCallback(async () => {
     if (!hasMore || isLoading || isInitialLoadingRef.current) return;
     setIsLoading(true);

@@ -1,7 +1,7 @@
 const toastMessages = {
   success: {
     login: "로그인에 성공했습니다",
-    signup: "가입에 성공했습니다",
+    signup: "회원가입에 성공했습니다",
     editPassword: "비밀번호가 변경되었습니다",
     updateProfile: "프로필이 업데이트 되었습니다",
 
@@ -64,7 +64,7 @@ const toastMessages = {
     deleteCard: "카드 삭제가 실패하였습니다",
     moveCard: "카드 이동이 실패하였습니다",
 
-    getComment: "댓글 조회에 실해하였습니다",
+    getComment: "댓글 조회에 실패하였습니다",
     createComment: "댓글 생성이 실패하였습니다",
     editCommnet: "댓글 수정이 실패하였습니다",
     deleteComment: "댓글 삭제가 실패하였습니다",
