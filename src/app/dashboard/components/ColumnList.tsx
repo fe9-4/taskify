@@ -107,7 +107,7 @@ const ColumnList = ({ columnTitle, columnId, cards: initialCards = [], totalCoun
     };
   }, [currentColumn.hasMore, isLoading, loadMoreCards]);
 
-  // 수정, 삭제 시 업데이트함수 (아직 제대로 작동 안함)
+  // 수정, 삭제 시 업데이트함수
   useEffect(() => {
     if (dashboardCardUpdate) {
       loadMoreCards();
