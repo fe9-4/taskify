@@ -97,7 +97,7 @@ const DashboardDetail = () => {
         toast.error(error.response?.data);
       }
     }
-  }, [dashboardId, calculateInitialCardCount]);
+  }, [dashboardId, calculateInitialCardCount, setCurrentColumnList]);
 
   const handleColumnBtn = () => {
     const columnTitles = columnList.map((column) => column.title);
