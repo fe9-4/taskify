@@ -27,8 +27,8 @@ export const metadata: Metadata = {
     },
     description: "새로운 일정관리 | Taskify",
     images: "/icons/favicon.ico",
-    url: "https://taskify-codeit-9-4.netlify.app/"
-  }
+    url: "https://taskify-codeit-9-4.netlify.app/",
+  },
 };
 
 export default function RootLayout({
@@ -38,7 +38,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className={`${montserrat.variable} font-pretendard min-h-screen text-black03`}>
+      <body className={`${montserrat.variable} font-pretendard min-h-screen bg-gray05 text-black03`}>
         <div id="modal-root"></div>
         <ClientLayout>
           <ModalContainer />
