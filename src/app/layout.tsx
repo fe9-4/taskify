@@ -26,7 +26,7 @@ export const metadata: Metadata = {
       default: "새로운 일정관리 | Taskify",
     },
     description: "새로운 일정관리 | Taskify",
-    images: "/icons/favicon.ico",
+    images: "/images/landing1.png",
     url: "https://www.taskify.kr/",
   },
 };
