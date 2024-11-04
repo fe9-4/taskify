@@ -39,7 +39,9 @@ export const PUT = async (request: NextRequest, { params }: { params: { cardId: 
       },
     });
 
-    return NextResponse.json({ user: response.data }, { status: 200 });
+    if (response.status === 200) {
+      return NextResponse.json(response.data, { status: 200 });
+    }
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.error("할 일 카드 수정 중 오류 발생: ", error);
@@ -101,7 +103,9 @@ export const DELETE = async (request: NextRequest, { params }: { params: { cardI
       },
     });
 
-    return NextResponse.json(response.data, { status: 201 });
+    if (response.status === 204) {
+      return new NextResponse(null, { status: 204 });
+    }
   } catch (error) {
     if (axios.isAxiosError(error)) {
       console.error("할 일 카드 삭제 중 오류 발생: ", error);

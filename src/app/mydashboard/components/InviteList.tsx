@@ -80,7 +80,7 @@ const InviteList = () => {
   return (
     <div
       className={cls(
-        "flex max-h-[770px] flex-col space-y-[105px] overflow-auto bg-white px-5 pb-20 pt-6 md:max-h-[592px] xl:max-h-[650px] xl:w-[1022px]",
+        "flex max-h-[770px] flex-col space-y-[105px] overflow-auto bg-white px-5 pb-20 pt-6 md:max-h-[592px] xl:max-h-[650px] xl:w-[1022px] [&::-webkit-scrollbar]:hidden",
         invitationList.length > 0 ? "space-y-[10px] pb-6" : ""
       )}
     >

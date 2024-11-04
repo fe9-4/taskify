@@ -24,7 +24,7 @@ const toastMessages = {
     createCard: "카드가 생성되었습니다",
     editCard: "카드가 수정되었습니다",
     deleteCard: "카드가 삭제되었습니다",
-    moveCard: "카드가 이동되었습니다",
+    moveCard: "같은 컬럼 내 카드 이동은 지원하지 않습니다",
 
     createComment: "댓글이 생성되었습니다",
     editCommnet: "댓글이 수정되었습니다",

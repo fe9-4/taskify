@@ -29,7 +29,16 @@ const CreateCard = () => {
   const { user } = useAuth();
   const { dashboardId } = useParams();
   const { columnId } = useAtomValue(ColumnAtom);
-  const { memberData } = useMember({ dashboardId: Number(dashboardId) });
+  const {
+    memberData,
+    isLoading: isMemberLoading,
+    error: memberError,
+  } = useMember({
+    dashboardId: Number(dashboardId),
+    page: 1,
+    size: 100,
+    enabled: !!dashboardId,
+  });
 
   const [tagInput, setTagInput] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -50,6 +59,12 @@ const CreateCard = () => {
       toast.error(toastMessages.error.uploardImage);
     }
   }, [fileError]);
+
+  useEffect(() => {
+    if (memberError) {
+      toggleModal("createCard", false);
+    }
+  }, [memberError, toggleModal]);
 
   const {
     register,
@@ -129,6 +144,14 @@ const CreateCard = () => {
       }
     });
   };
+
+  if (isMemberLoading) {
+    return (
+      <div className="flex h-[400px] w-[327px] items-center justify-center rounded-2xl bg-white md:w-[584px]">
+        <span className="text-gray02">멤버 정보를 불러오는 중...</span>
+      </div>
+    );
+  }
 
   return (
     <section className="w-[327px] rounded-2xl bg-white px-4 pb-5 pt-8 md:w-[584px] md:p-8 md:pt-10">
