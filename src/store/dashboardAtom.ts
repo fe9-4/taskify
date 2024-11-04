@@ -1,4 +1,4 @@
-import { ICard, ICurrentColumn } from "@/types/dashboardType";
+import { ICurrentColumn, ICard } from "@/types/dashboardType";
 import { atom } from "jotai";
 
 export const dashboardCardUpdateAtom = atom(false);

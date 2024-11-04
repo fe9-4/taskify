@@ -42,7 +42,8 @@ const Sidebar = () => {
     setSize(isLargeScreen ? 15 : 10);
   }, [isLargeScreen]);
 
-  if (isLoading || pathname === "/" || pathname === "/login" || pathname === "/signup") return null;
+  if (isLoading || isDashboardLoading || pathname === "/" || pathname === "/login" || pathname === "/signup")
+    return null;
 
   if (!user) return null;
 
