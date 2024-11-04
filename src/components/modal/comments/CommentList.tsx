@@ -5,13 +5,16 @@ import toast from "react-hot-toast";
 import CommentItem from "./CommentItem";
 import CreateComment from "./CreateComment";
 import useIntersectionObserver from "@/hooks/useObserver";
+import { cls } from "@/lib/utils";
+import { HiChevronDoubleUp } from "react-icons/hi";
+import toastMessages from "@/lib/toastMessage";
 
-const CommentList = ({ cardId, columnId }: CommentListProps) => {
+const CommentList = ({ cardId, columnId, handleScrollTop }: CommentListProps) => {
   const [comments, setComments] = useState<CommentProps[]>([]);
   const [cursorId, setCursorId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const size = 10;
+  const size = 3;
 
   const getComments = useCallback(async () => {
     if (isLoading || !hasMore) return;
@@ -41,7 +44,7 @@ const CommentList = ({ cardId, columnId }: CommentListProps) => {
         setHasMore(false);
       }
     } catch (error) {
-      if (axios.isAxiosError(error)) toast.error("댓글 조회에 실패하였습니다.");
+      if (axios.isAxiosError(error)) toast.error(toastMessages.error.getComment);
       setHasMore(false);
     } finally {
       setIsLoading(false);
@@ -70,12 +73,21 @@ const CommentList = ({ cardId, columnId }: CommentListProps) => {
             />
           ))
         ) : (
-          <p className="mb-3 flex items-center justify-center text-center text-xs font-medium text-gray02 md:mb-2 md:text-lg">
+          <p className="mb-3 flex items-center justify-center text-center text-xs font-medium text-gray02 md:mb-8 md:text-lg">
             등록된 댓글이 없습니다.
           </p>
         )}
       </div>
       {isLoading && <p className="text-xs text-gray02 md:text-base">Loading...</p>}
+      <button
+        onClick={handleScrollTop}
+        className={cls(
+          "sticky bottom-4 ml-auto mr-[-8px] mt-[-36px] transform rounded-full bg-violet02 p-2 outline-none transition-all delay-500 duration-500 focus:outline-none",
+          comments.length > 5 ? "block scale-100 opacity-100" : "hidden scale-90 opacity-0"
+        )}
+      >
+        <HiChevronDoubleUp className="size-5 text-violet01" />
+      </button>
     </>
   );
 };

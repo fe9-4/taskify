@@ -1,18 +1,19 @@
 import { useForm, useWatch } from "react-hook-form";
 import InputItem from "../../input/InputItem";
 import { CancelBtn, ConfirmBtn } from "../../button/ButtonComponents";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { ColumnAtom, ColumnTitlesAtom, RefreshDashboardAtom } from "@/store/modalAtom";
 import useLoading from "@/hooks/useLoading";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { IoIosClose } from "react-icons/io";
 import { useDeleteModal, useToggleModal } from "@/hooks/useModal";
+import toastMessages from "@/lib/toastMessage";
 
 const EditColumn = () => {
   const toggleModal = useToggleModal();
   const setDeleteModal = useDeleteModal();
-  const [, setRefreshDashboard] = useAtom(RefreshDashboardAtom);
+  const setRefreshDashboard = useSetAtom(RefreshDashboardAtom);
   const { isLoading, withLoading } = useLoading();
   const ColumnTitles = useAtomValue(ColumnTitlesAtom);
   const Column = useAtomValue(ColumnAtom);
@@ -30,11 +31,11 @@ const EditColumn = () => {
     await withLoading(async () => {
       try {
         await axios.put(`/api/columns/${Column.columnId}`, { ...data, columnId: Column.columnId });
-        toast.success("컬럼 수정 완료");
+        toast.success(toastMessages.success.editColumn);
         toggleModal("editColumn", false);
         setRefreshDashboard((prev) => !prev);
       } catch (error) {
-        toast.error("컬럼 수정 실패");
+        toast.error(toastMessages.error.editColumn);
         toggleModal("editColumn", false);
       }
     });
@@ -44,12 +45,12 @@ const EditColumn = () => {
     await withLoading(async () => {
       try {
         await axios.delete(`/api/columns/${Column.columnId}`);
-        toast.success("컬럼 삭제 완료");
+        toast.success(toastMessages.success.deleteColumn);
         toggleModal("deleteModal", false);
         toggleModal("editColumn", false);
         setRefreshDashboard((prev) => !prev);
       } catch (error) {
-        toast.error("컬럼 삭제 실패");
+        toast.error(toastMessages.error.deleteColumn);
         toggleModal("deleteModal", false);
       }
     });

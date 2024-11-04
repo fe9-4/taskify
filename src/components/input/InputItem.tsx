@@ -28,7 +28,7 @@ const InputItem = forwardRef<HTMLInputElement, InputProps>(
         {isTextArea ? (
           <textarea
             className={cls(
-              "relative w-full resize-none rounded-lg p-4 text-base text-black03 placeholder-gray02 ring-1 ring-inset ring-gray03 transition-all focus-within:ring-violet01 focus:outline-none focus:ring-inset md:py-4 md:text-lg",
+              "relative w-full resize-none rounded-lg p-4 text-base text-black03 placeholder-gray02 ring-1 ring-inset ring-gray03 transition-all focus-within:ring-violet01 focus:outline-none focus:ring-inset md:py-4 md:text-lg [&::-webkit-scrollbar]:hidden",
               size === "description" ? "h-[126px]" : "h-[70px] md:h-[110px]",
               errors ? "ring-red01 transition-all focus-within:ring-red01" : "focus-within:ring-violet01"
             )}

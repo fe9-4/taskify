@@ -1,6 +1,7 @@
 import toast from "react-hot-toast";
 import { PaginationBtn } from "@/components/button/ButtonComponents";
 import { Dispatch, MouseEvent, SetStateAction, useEffect, useState } from "react";
+import toastMessages from "@/lib/toastMessage";
 
 interface IProps {
   totalPage: number;
@@ -25,7 +26,7 @@ const Pagination = ({ totalPage, setPage, page }: IProps) => {
 
     if (nextPage > totalPage) {
       setIsDisabledNext(true);
-      toast.error("마지막 페이지입니다.");
+      toast.error(toastMessages.error.lasgPage);
     } else {
       setPage(nextPage);
       setIsDisabledNext(false);
@@ -39,7 +40,7 @@ const Pagination = ({ totalPage, setPage, page }: IProps) => {
     if (prevPage < 1) {
       setPage(1);
       setIsDisabledPrev(true);
-      toast.error("첫 번째 페이지입니다.");
+      toast.error(toastMessages.error.firstPage);
     } else {
       setPage(prevPage);
       setIsDisabledPrev(false);

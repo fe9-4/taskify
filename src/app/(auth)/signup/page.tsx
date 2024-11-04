@@ -11,6 +11,7 @@ import InputItem from "@/components/input/InputItem";
 import { ActiveBtn } from "@/components/button/ButtonComponents";
 import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import toastMessages from "@/lib/toastMessage";
 
 const SignupPage = () => {
   const router = useRouter();
@@ -45,11 +46,10 @@ const SignupPage = () => {
       const { confirmPassword, ...signupData } = data;
       await axios.post("/api/users", signupData);
 
-      toast.success("가입이 완료되었습니다");
+      toast.success(toastMessages.success.signup);
       reset();
       router.push("/login");
     } catch (error) {
-      console.error("회원가입 오류:", error);
       toast.error(
         axios.isAxiosError(error)
           ? error.response?.data?.message || "회원가입 중 오류가 발생했습니다."

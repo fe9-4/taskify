@@ -8,16 +8,16 @@ import { cls } from "@/lib/utils";
 
 const InviteList = () => {
   const [invitationList, setInvitationList] = useState<IInvitation["invitations"]>([]);
-  const [size, setSize] = useState(10);
+  const [size] = useState(10);
   const [hasMore, setHasMore] = useState(true);
-  const observeRef = useRef<IntersectionObserver | null>(null);
-  const loadingRef = useRef<HTMLDivElement | null>(null);
+  const [cursorId, setCursorId] = useState<IInvitation["cursorId"]>();
+  const observeRef = useRef<HTMLDivElement | null>(null);
 
   const getInvitationList = useCallback(async () => {
     if (!hasMore) return;
 
     try {
-      const response = await axios.get(`/api/invitations?size=${size}`);
+      const response = await axios.get(`/api/invitations?size=${size}&cursorId=${cursorId}`);
 
       if (response.status === 200) {
         const newInviteList: IInvitation["invitations"] = response.data;
@@ -33,12 +33,16 @@ const InviteList = () => {
             return true;
           });
 
-          if (filteredNewInviteList.length === 0 || filteredNewInviteList.length < size) {
+          if (filteredNewInviteList.length < size) {
             setHasMore(false);
           }
 
           return [...prev, ...filteredNewInviteList];
         });
+
+        if (newInviteList.length >= size) {
+          setCursorId(newInviteList[newInviteList.length - 1].id);
+        }
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -46,36 +50,37 @@ const InviteList = () => {
         toast.error(error.response?.data);
       }
     }
-  }, [hasMore, size]);
+  }, [hasMore, size, cursorId]);
 
   useEffect(() => {
-    getInvitationList();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const lastInviteItem = entries[0];
 
-    observeRef.current = new IntersectionObserver((entries) => {
-      const lastInviteItem = entries[0];
+        if (lastInviteItem.isIntersecting && hasMore) {
+          getInvitationList();
+        }
+      },
+      { threshold: 0.5 }
+    );
 
-      if (lastInviteItem.isIntersecting && hasMore) {
-        getInvitationList();
-      }
-    });
-
-    const currentLoadingRef = loadingRef.current;
+    const currentLoadingRef = observeRef.current;
 
     if (currentLoadingRef) {
-      observeRef.current.observe(currentLoadingRef);
+      observer.observe(currentLoadingRef);
     }
 
     return () => {
       if (currentLoadingRef) {
-        observeRef.current?.unobserve(currentLoadingRef);
+        observer.unobserve(currentLoadingRef);
       }
     };
-  }, [hasMore, size, getInvitationList]);
+  }, [hasMore, getInvitationList]);
 
   return (
     <div
       className={cls(
-        "flex max-h-[770px] flex-col space-y-[105px] overflow-auto bg-white px-5 pb-20 pt-6 md:max-h-[592px] xl:max-h-[650px] xl:w-[1022px]",
+        "flex max-h-[770px] flex-col space-y-[105px] overflow-auto bg-white px-5 pb-20 pt-6 md:max-h-[592px] xl:max-h-[650px] xl:w-[1022px] [&::-webkit-scrollbar]:hidden",
         invitationList.length > 0 ? "space-y-[10px] pb-6" : ""
       )}
     >
@@ -92,11 +97,9 @@ const InviteList = () => {
           <span className="text-xs text-gray02 md:text-xl">아직 초대받은 대시보드가 없어요</span>
         </div>
       ) : (
-        <>
-          <InviteItem invitationList={invitationList} setInvitationList={setInvitationList} />
-          <div ref={loadingRef} className="h-[1px]" />
-        </>
+        <InviteItem invitationList={invitationList} setInvitationList={setInvitationList} />
       )}
+      {hasMore && <div ref={observeRef} className="h-4 w-full" />}
     </div>
   );
 };

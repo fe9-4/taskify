@@ -4,6 +4,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useMember } from "@/hooks/useMember";
+import toastMessages from "@/lib/toastMessage";
 
 interface InviteEmailData {
   email: string;
@@ -20,15 +21,14 @@ export const useInvitation = ({ dashboardId }: { dashboardId: number }) => {
     page: 1,
     size: 100,
     showErrorToast: true,
-    customErrorMessage: "멤버 목록을 불러오는데 실패했습니다.",
   });
 
   // 초대 목록 조회
-  const { data: invitationList, refetch } = useQuery<InvitationList>({
+  const { data: invitationList } = useQuery<InvitationList>({
     queryKey: ["invitations", dashboardIdString],
     queryFn: async () => {
       try {
-        const response = await axios.get(`/api/dashboards/${dashboardId}/invitations?page=1&size=100`);
+        const response = await axios.get(`/api/dashboards/${dashboardIdString}/invitations?page=1&size=100`);
 
         return InvitationListSchema.parse(response.data);
       } catch (error) {
@@ -77,12 +77,11 @@ export const useInvitation = ({ dashboardId }: { dashboardId: number }) => {
       }
     },
     onSuccess: () => {
-      toast.success("초대 완료");
-      refetch();
+      toast.success(toastMessages.success.invitation);
       queryClient.invalidateQueries({ queryKey: ["invitations", dashboardIdString] });
     },
     onError: (error) => {
-      toast.error(error.message || "초대 실패");
+      toast.error(error.message || toastMessages.error.invitation);
     },
   });
 
@@ -93,12 +92,11 @@ export const useInvitation = ({ dashboardId }: { dashboardId: number }) => {
       return response.data;
     },
     onSuccess: () => {
-      toast.success("초대가 취소되었습니다");
-      refetch();
+      toast.success(toastMessages.success.cancelInvitation);
       queryClient.invalidateQueries({ queryKey: ["invitations", dashboardIdString] });
     },
     onError: () => {
-      toast.error("오류가 발생하여 초대가 취소되지 않았습니다.");
+      toast.error(toastMessages.error.cancelInvitation);
     },
   });
 
@@ -108,6 +106,5 @@ export const useInvitation = ({ dashboardId }: { dashboardId: number }) => {
     isInviting,
     cancelInvitation,
     isCanceling,
-    refetch,
   };
 };

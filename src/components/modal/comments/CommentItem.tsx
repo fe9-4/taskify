@@ -5,6 +5,7 @@ import InputItem from "@/components/input/InputItem";
 import { ChangeEvent, Dispatch, forwardRef, SetStateAction, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import toastMessages from "@/lib/toastMessage";
 
 export interface CommentItemProps {
   comment: CommentProps;
@@ -36,11 +37,11 @@ const CommentItem = forwardRef<HTMLDivElement, CommentItemProps>(({ comment, set
       setComments((prevComments) =>
         prevComments.map((comment) => (comment.id === commentId ? { ...comment, content: editContent } : comment))
       );
-      toast.success("댓글이 수정되었습니다.");
+      toast.success(toastMessages.success.editCommnet);
       setEditCommentId(null);
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        toast.error("댓글 수정에 실패했습니다.");
+        toast.error(toastMessages.error.editCommnet);
       }
     }
   };
@@ -49,16 +50,16 @@ const CommentItem = forwardRef<HTMLDivElement, CommentItemProps>(({ comment, set
     try {
       const response = await axios.delete(`/api/comments/${commentId}`);
       setComments((prevComments) => prevComments.filter((comment) => comment.id !== commentId));
-      if (response.status === 201) toast.success("댓글이 삭제되었습니다.");
+      if (response.status === 201) toast.success(toastMessages.success.deleteComment);
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        toast.error("댓글 삭제에 실패했습니다.");
+        toast.error(toastMessages.error.deleteComment);
       }
     }
   };
 
   return (
-    <div ref={ref} className="mb-5 flex items-start gap-2 border-b-[1px] border-b-gray03 pb-2 pr-3">
+    <div ref={ref} className="mt-5 flex items-start gap-2 border-b-[1px] border-b-gray03 pb-3 pr-3">
       {comment.author && comment.author.profileImageUrl ? (
         <div className="relative size-6 overflow-hidden rounded-full md:size-8">
           <Image src={comment.author.profileImageUrl} fill alt={comment.author.nickname} />
@@ -89,7 +90,7 @@ const CommentItem = forwardRef<HTMLDivElement, CommentItemProps>(({ comment, set
         <div className="flex flex-col gap-2">
           {isEditing && <InputItem value={editContent} onChange={handleEditChange} isTextArea />}
           {!isEditing && (
-            <p className="break-all text-sm leading-snug text-black03 md:text-base md:leading-normal">
+            <p className="whitespace-pre-line break-all text-sm leading-snug text-black03 md:text-base md:leading-normal">
               {comment.content}
             </p>
           )}

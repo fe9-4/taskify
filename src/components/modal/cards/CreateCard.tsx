@@ -7,31 +7,38 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CardSchema } from "@/zodSchema/cardSchema";
 import axios from "axios";
 import toast from "react-hot-toast";
-
 import { useAuth } from "@/hooks/useAuth";
 import { useMember } from "@/hooks/useMember";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { useToggleModal } from "@/hooks/useModal";
 import useLoading from "@/hooks/useLoading";
-
-import { useAtom, useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { ColumnAtom } from "@/store/modalAtom";
 import { CreateCardProps } from "@/types/cardType";
 import { uploadType } from "@/types/uploadType";
-
 import { CancelBtn, ConfirmBtn } from "@/components/button/ButtonComponents";
 import SearchDropdown from "@/components/dropdown/SearchDropdown";
 import InputItem from "@/components/input/InputItem";
 import InputDate from "@/components/input/InputDate";
 import InputTag from "@/components/input/InputTag";
 import InputFile from "@/components/input/InputFile";
+import toastMessages from "@/lib/toastMessage";
 
 const CreateCard = () => {
   const { user } = useAuth();
   const { dashboardId } = useParams();
   const { columnId } = useAtomValue(ColumnAtom);
-  const { memberData } = useMember({ dashboardId: Number(dashboardId) });
+  const {
+    memberData,
+    isLoading: isMemberLoading,
+    error: memberError,
+  } = useMember({
+    dashboardId: Number(dashboardId),
+    page: 1,
+    size: 100,
+    enabled: !!dashboardId,
+  });
 
   const [tagInput, setTagInput] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -39,7 +46,7 @@ const CreateCard = () => {
   const { isLoading, withLoading } = useLoading();
 
   const toggleModal = useToggleModal();
-  const [, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
+  const setDashboardCardUpdate = useSetAtom(dashboardCardUpdateAtom);
 
   const {
     uploadFile,
@@ -49,9 +56,15 @@ const CreateCard = () => {
 
   useEffect(() => {
     if (fileError) {
-      toast.error("이미지 업로드 중 오류가 발생했습니다.");
+      toast.error(toastMessages.error.uploardImage);
     }
   }, [fileError]);
+
+  useEffect(() => {
+    if (memberError) {
+      toggleModal("createCard", false);
+    }
+  }, [memberError, toggleModal]);
 
   const {
     register,
@@ -115,22 +128,30 @@ const CreateCard = () => {
         let uploadedImageUrl = null;
         if (selectedFile) {
           uploadedImageUrl = await uploadFile(selectedFile);
-          if (!uploadedImageUrl) throw new Error("이미지 업로드 실패");
+          if (!uploadedImageUrl) throw new Error("이미지 업로드에 실패하였습니다.");
         }
 
         const cardData = { ...data, imageUrl: uploadedImageUrl };
         const response = await axios.post(`/api/cards`, cardData);
 
         if (response.data) {
-          toast.success("카드가 생성되었습니다! 🎉");
+          toast.success(toastMessages.success.createCard);
           toggleModal("createCard", false);
           setDashboardCardUpdate(true);
         }
       } catch (error) {
-        toast.error("카드 생성에 실패하였습니다.");
+        toast.error(toastMessages.error.createCard);
       }
     });
   };
+
+  if (isMemberLoading) {
+    return (
+      <div className="flex h-[400px] w-[327px] items-center justify-center rounded-2xl bg-white md:w-[584px]">
+        <span className="text-gray02">멤버 정보를 불러오는 중...</span>
+      </div>
+    );
+  }
 
   return (
     <section className="w-[327px] rounded-2xl bg-white px-4 pb-5 pt-8 md:w-[584px] md:p-8 md:pt-10">

@@ -7,19 +7,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { UpdateCardSchema } from "@/zodSchema/cardSchema";
 import axios from "axios";
 import toast from "react-hot-toast";
-
 import { useAuth } from "@/hooks/useAuth";
 import { useMember } from "@/hooks/useMember";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { useToggleModal } from "@/hooks/useModal";
 import useLoading from "@/hooks/useLoading";
-
-import { useAtom, useAtomValue } from "jotai";
-import { ColumnAtom, TodoCardId } from "@/store/modalAtom";
-import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
+import { useSetAtom, useAtomValue } from "jotai";
+import { ColumnAtom, CardIdAtom } from "@/store/modalAtom";
+import { columnCardsAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { CardDataType, UpdateCardProps } from "@/types/cardType";
 import { uploadType } from "@/types/uploadType";
-
 import { CancelBtn, ConfirmBtn } from "@/components/button/ButtonComponents";
 import StatusDropdown from "@/components/dropdown/StatusDropdown";
 import SearchDropdown from "@/components/dropdown/SearchDropdown";
@@ -27,14 +24,13 @@ import InputItem from "@/components/input/InputItem";
 import InputDate from "@/components/input/InputDate";
 import InputTag from "@/components/input/InputTag";
 import InputFile from "@/components/input/InputFile";
+import toastMessages from "@/lib/toastMessage";
 
 const UpdateCard = () => {
   const { user } = useAuth();
   const { dashboardId } = useParams();
   const { columnId } = useAtomValue(ColumnAtom);
-  const cardId = useAtomValue(TodoCardId);
-  const { memberData } = useMember({ dashboardId: Number(dashboardId) });
-
+  const cardId = useAtomValue(CardIdAtom);
   const [tagInput, setTagInput] = useState("");
   const [cardData, setCardData] = useState<CardDataType | null>(null);
   const [selectedValue, setSelectedValue] = useState(columnId);
@@ -43,7 +39,8 @@ const UpdateCard = () => {
   const { isLoading, withLoading } = useLoading();
 
   const toggleModal = useToggleModal();
-  const [, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
+  const setDashboardCardUpdate = useSetAtom(dashboardCardUpdateAtom);
+  const setColumnCards = useSetAtom(columnCardsAtom);
 
   const {
     uploadFile,
@@ -53,7 +50,7 @@ const UpdateCard = () => {
 
   useEffect(() => {
     if (fileError) {
-      toast.error("이미지 업로드 중 오류가 발생했습니다.");
+      toast.error(toastMessages.error.uploardImage);
     }
   }, [fileError]);
 
@@ -96,7 +93,7 @@ const UpdateCard = () => {
         tags: data.tags || [],
       });
     } catch {
-      toast.error("카드 데이터를 불러오는데 실패했습니다.");
+      toast.error(toastMessages.error.getCard);
     }
   }, [cardId, reset]);
 
@@ -118,7 +115,7 @@ const UpdateCard = () => {
       (selectedFile !== null || previewUrl !== null) &&
       selectedValue > 0 &&
       Number(watch("assigneeUserId")) > 0,
-    [title, description, dueDate, tags, selectedFile, previewUrl, watch]
+    [title, description, dueDate, tags, selectedFile, previewUrl, watch, selectedValue]
   );
 
   const handleAddTag = (tag: string) => {
@@ -151,20 +148,29 @@ const UpdateCard = () => {
   }, [previewUrl]);
 
   const onSubmit: SubmitHandler<UpdateCardProps> = async (data) => {
+    if (!data.tags || data.tags.length === 0) {
+      toast.error("태그를 하나 이상 입력해주세요.");
+      return;
+    }
+
     await withLoading(async () => {
       try {
         let uploadedImageUrl = previewUrl;
 
         if (selectedFile) {
           uploadedImageUrl = await uploadFile(selectedFile);
-          if (!uploadedImageUrl) throw new Error("이미지 업로드 실패");
+          if (!uploadedImageUrl) throw new Error("이미지 업로드 중 오류 발생");
+        }
+
+        if (!data.title || !data.description || !data.dueDate || !uploadedImageUrl || !data.assigneeUserId) {
+          throw new Error("필수 항목이 누락되었습니다.");
         }
 
         const cardData = {
           columnId: selectedValue,
           assigneeUserId: Number(data.assigneeUserId),
-          title: data.title,
-          description: data.description,
+          title: data.title.trim(),
+          description: data.description.trim(),
           dueDate: data.dueDate,
           tags: data.tags,
           imageUrl: uploadedImageUrl,
@@ -172,22 +178,78 @@ const UpdateCard = () => {
 
         const response = await axios.put(`/api/cards/${cardId}`, cardData);
         if (response.status === 200) {
-          toast.success("카드가 수정되었습니다! 🎉");
+          const updatedCard = {
+            ...response.data,
+            tags: response.data.tags,
+          };
+
+          if (columnId !== selectedValue) {
+            setColumnCards((prev) => {
+              const sourceColumn = prev[columnId];
+              const targetColumn = prev[selectedValue];
+
+              if (!sourceColumn || !targetColumn) {
+                return prev;
+              }
+
+              return {
+                ...prev,
+                [columnId]: {
+                  ...sourceColumn,
+                  cards: sourceColumn.cards.filter((card) => card.id !== cardId),
+                  totalCount: Math.max(0, sourceColumn.totalCount - 1),
+                },
+                [selectedValue]: {
+                  ...targetColumn,
+                  cards: [updatedCard, ...targetColumn.cards],
+                  totalCount: targetColumn.totalCount + 1,
+                },
+              };
+            });
+          }
+
+          toast.success(toastMessages.success.editCard);
           toggleModal("updateCard", false);
           setDashboardCardUpdate(true);
         }
-      } catch {
-        toast.error("카드 수정에 실패하였습니다.");
+      } catch (error) {
+        console.error("Card update error:", error);
+        toast.error(toastMessages.error.editCard);
       }
     });
   };
 
+  const {
+    memberData,
+    isLoading: isMemberLoading,
+    error: memberError,
+  } = useMember({
+    dashboardId: Number(dashboardId),
+    page: 1,
+    size: 100,
+    enabled: !!dashboardId,
+  });
+
+  useEffect(() => {
+    if (memberError) {
+      toggleModal("updateCard", false);
+    }
+  }, [memberError, toggleModal]);
+
+  if (isMemberLoading) {
+    return (
+      <div className="flex h-[400px] w-[327px] items-center justify-center rounded-2xl bg-white md:w-[584px]">
+        <span className="text-gray02">멤버 정보를 불러오는 중...</span>
+      </div>
+    );
+  }
+
   return (
-    <section className="w-[327px] rounded-2xl bg-white p-8 md:w-[584px]">
+    <section className="w-[327px] rounded-2xl bg-white p-4 md:w-[584px] md:p-8">
       <h3 className="mb-5 text-2xl font-bold text-black03 md:mb-6 md:text-3xl">할 일 수정</h3>
 
       <form onSubmit={handleSubmit(onSubmit)} className="grid gap-8">
-        <div className="grid gap-8 md:flex md:gap-7">
+        <div className="grid gap-8 md:grid-cols-2 md:gap-7">
           <StatusDropdown setSelectedValueId={setSelectedValue} />
           <Controller
             name="assigneeUserId"

@@ -1,16 +1,18 @@
 import { useForm, useWatch } from "react-hook-form";
 import InputItem from "../../input/InputItem";
 import { CancelBtn, ConfirmBtn } from "../../button/ButtonComponents";
-import { useAtom, useAtomValue } from "jotai";
+import { useSetAtom, useAtomValue } from "jotai";
 import { ColumnTitlesAtom, RefreshDashboardAtom } from "@/store/modalAtom";
 import { useParams } from "next/navigation";
 import useLoading from "@/hooks/useLoading";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useToggleModal } from "@/hooks/useModal";
+import toastMessages from "@/lib/toastMessage";
+import { useColumn } from "@/hooks/useColumn";
 
 const CreateColumn = () => {
-  const [, setRefreshDashboard] = useAtom(RefreshDashboardAtom);
+  const setRefreshDashboard = useSetAtom(RefreshDashboardAtom);
   const toggleModal = useToggleModal();
   const { dashboardId } = useParams();
   const { isLoading, withLoading } = useLoading();
@@ -22,6 +24,8 @@ const CreateColumn = () => {
     formState: { isValid },
   } = useForm();
 
+  const { createColumn } = useColumn({ dashboardId: Number(dashboardId) });
+
   const title = useWatch({ control, name: "title" });
   const isDuplicate = ColumnTitles.includes(title);
 
@@ -29,11 +33,11 @@ const CreateColumn = () => {
     await withLoading(async () => {
       try {
         await axios.post("/api/columns", { ...data, dashboardId: Number(dashboardId) });
-        toast.success("컬럼 생성 완료");
+        toast.success(toastMessages.success.createColumn);
         toggleModal("createColumn", false);
         setRefreshDashboard((prev) => !prev);
       } catch (error) {
-        toast.error("컬럼 생성 실패");
+        toast.error(toastMessages.error.createColumn);
         toggleModal("createColumn", false);
       }
     });

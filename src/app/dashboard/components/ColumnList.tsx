@@ -1,127 +1,133 @@
 import axios from "axios";
-import toast from "react-hot-toast";
 import ColumnItem from "./ColumnItem";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
-import { useAtom } from "jotai";
-import { HiOutlineCog } from "react-icons/hi";
-import { NumChip } from "../../../components/chip/PlusAndNumChip";
-import { AddTodoBtn } from "../../../components/button/ButtonComponents";
-import { ColumnAtom, TodoCardId } from "@/store/modalAtom";
-import { ICard } from "@/types/dashboardType";
-import { currentColumnListAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
+import { useAtom, useSetAtom } from "jotai";
+import { ColumnAtom, CardIdAtom } from "@/store/modalAtom";
+import { columnCardsAtom, dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { useToggleModal } from "@/hooks/useModal";
+import { ICard } from "@/types/dashboardType";
+import { NumChip } from "@/components/chip/PlusAndNumChip";
+import { HiOutlineCog } from "react-icons/hi";
+import { Droppable } from "@hello-pangea/dnd";
+import { AddTodoBtn } from "@/components/button/ButtonComponents";
 
 interface IProps {
   columnTitle: string;
   columnId: number;
+  cards: ICard["cards"];
+  totalCount: ICard["totalCount"];
 }
 
-const ColumnList = ({ columnTitle, columnId }: IProps) => {
-  const [cardList, setCardList] = useState<ICard["cards"]>([]);
-  const [hasMore, setHasMore] = useState(true);
-  const [size] = useState(3);
-  const [cursorId, setCursorId] = useState<ICard["cursorId"]>();
-  const [totalCount, setTotalCount] = useState<ICard["totalCount"]>(0);
-  const [, setColumnAtom] = useAtom(ColumnAtom);
-  const [, setDetailCardId] = useAtom(TodoCardId);
-  const [, setCurrentColumnList] = useAtom(currentColumnListAtom);
-  const [dashboardCardUpdate, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
+const ColumnList = ({ columnTitle, columnId, cards: initialCards = [], totalCount }: IProps) => {
+  const [isLoading, setIsLoading] = useState(false);
   const observeRef = useRef<HTMLDivElement | null>(null);
+  const [columnCards, setColumnCards] = useAtom(columnCardsAtom);
+  const setColumnAtom = useSetAtom(ColumnAtom);
+  const setDetailCardId = useSetAtom(CardIdAtom);
+  const [dashboardCardUpdate, setDashboardCardUpdate] = useAtom(dashboardCardUpdateAtom);
   const toggleModal = useToggleModal();
+  const ADDITIONAL_CARDS_SIZE = 3; // 추가 로드 시 고정 크기
 
-  const getCardList = useCallback(async () => {
-    if (!hasMore) return;
+  const currentColumn = columnCards[columnId] || {
+    cards: [],
+    hasMore: false,
+    cursorId: null,
+    totalCount: 0,
+  };
+
+  useEffect(() => {
+    if (initialCards && initialCards.length > 0) {
+      setColumnCards((prev) => ({
+        ...prev,
+        [columnId]: {
+          cards: initialCards,
+          hasMore: initialCards.length < totalCount,
+          cursorId: initialCards[initialCards.length - 1]?.id || null,
+          totalCount,
+        },
+      }));
+    }
+  }, [initialCards, totalCount, columnId, setColumnCards]);
+
+  // loadMoreCards 함수를 먼저 선언
+  const loadMoreCards = useCallback(async () => {
+    if (!currentColumn.hasMore || isLoading || !currentColumn.cursorId) return;
+    setIsLoading(true);
 
     try {
-      const response = await axios.get(`/api/cards?size=${size}&columnId=${columnId}&cursorId=${cursorId}`);
+      const response = await axios.get(
+        `/api/cards?columnId=${columnId}&size=${ADDITIONAL_CARDS_SIZE}&cursorId=${currentColumn.cursorId}`
+      );
 
       if (response.status === 200) {
-        const newCardList: ICard["cards"] = response.data.cards;
-        setTotalCount(response.data.totalCount);
-
-        setCardList((prev) => {
-          const existingId = new Set(prev.map((card) => card.id));
-          const filteredNewCardList = newCardList.filter((card) => !existingId.has(card.id));
-
-          if (filteredNewCardList.length === 0 || filteredNewCardList.length < size) {
-            setHasMore(false);
-          }
-
-          return [...prev, ...filteredNewCardList];
-        });
-
-        if (newCardList.length >= size) {
-          setCursorId(newCardList[newCardList.length - 1].id);
-        }
+        const newCards = response.data.cards;
+        setColumnCards((prev) => ({
+          ...prev,
+          [columnId]: {
+            ...prev[columnId],
+            cards: [...prev[columnId].cards, ...newCards],
+            hasMore: response.data.totalCount > prev[columnId].cards.length + newCards.length,
+            cursorId: newCards[newCards.length - 1]?.id || null,
+          },
+        }));
       }
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.error("ColumnList getCardList에서 api 오류 발생", error);
-        toast.error(error.response?.data);
-      }
+      console.error("Error loading more cards:", error);
+    } finally {
+      setIsLoading(false);
     }
-  }, [columnId, hasMore, size, cursorId]);
+  }, [columnId, currentColumn.hasMore, currentColumn.cursorId, isLoading, setColumnCards]);
 
-  // 카드아이템 무한스크롤
+  // Intersection Observer 설정
   useEffect(() => {
+    if (!observeRef.current) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
-        const lastCardItem = entries[0];
-
-        if (lastCardItem.isIntersecting && hasMore) {
-          getCardList();
+        const target = entries[0];
+        if (target.isIntersecting && currentColumn.hasMore && !isLoading) {
+          loadMoreCards();
         }
       },
-      { threshold: 1 }
+      {
+        root: null,
+        rootMargin: "50px",
+        threshold: 0.1,
+      }
     );
 
-    const currentLoadingRef = observeRef.current;
-
-    if (currentLoadingRef) {
-      observer.observe(currentLoadingRef);
-    }
+    const currentRef = observeRef.current;
+    observer.observe(currentRef);
 
     return () => {
-      if (currentLoadingRef) {
-        observer?.unobserve(currentLoadingRef);
+      if (currentRef) {
+        observer.unobserve(currentRef);
       }
     };
-  }, [hasMore, getCardList]);
+  }, [currentColumn.hasMore, isLoading, loadMoreCards]);
 
-  // 카드 실시간 업데이트
+  // 수정, 삭제 시 업데이트함수
   useEffect(() => {
     if (dashboardCardUpdate) {
-      getCardList();
-      setHasMore(true);
+      loadMoreCards();
       setDashboardCardUpdate(false);
     }
-  }, [dashboardCardUpdate, getCardList, setDashboardCardUpdate]);
-
-  // 카드 수정시 드롭다운에 보내는 데이터
-  useEffect(() => {
-    if (columnTitle && columnId) {
-      setCurrentColumnList((prev) => {
-        const newColumn = { id: columnId, title: columnTitle };
-
-        const checkList = prev.some((column) => column.id === columnId);
-
-        if (!checkList) {
-          return [...prev, newColumn];
-        }
-
-        return prev;
-      });
-    }
-  }, [columnTitle, columnId, setCurrentColumnList]);
+  }, [dashboardCardUpdate, loadMoreCards, setDashboardCardUpdate]);
 
   const handleEditModal = () => {
     setColumnAtom({ title: columnTitle, columnId });
     toggleModal("editColumn", true);
   };
 
+  const handleCardClick = (cardId: number) => {
+    toggleModal("detailCard", true);
+    setDetailCardId(cardId);
+    setColumnAtom({ title: columnTitle, columnId });
+  };
+
   return (
-    <div className="space-y-6 px-4 pt-4 md:border-b md:border-gray04 md:pb-6 xl:flex xl:min-h-screen xl:flex-col xl:border-b-0 xl:border-r">
-      <div className="flex items-center justify-between">
+    <div className="h-full space-y-6 border-b bg-gray05 py-4 md:border-gray04 xl:flex xl:flex-col xl:border-b-0 xl:border-r xl:px-5 xl:py-1">
+      <div className="flex flex-shrink-0 items-center justify-between rounded-t-lg">
         <div className="flex items-center space-x-3">
           <div className="flex items-center space-x-2">
             <span className="size-2 rounded-full bg-violet01" />
@@ -133,37 +139,46 @@ const ColumnList = ({ columnTitle, columnId }: IProps) => {
           <HiOutlineCog className="size-[22px] text-gray01" />
         </button>
       </div>
-      <div className="flex min-w-[314px] flex-col space-y-2">
-        <AddTodoBtn
-          onClick={() => {
-            setColumnAtom({ title: columnTitle, columnId });
-            toggleModal("createCard", true);
-          }}
-        />
-        {cardList.length > 0 ? (
-          cardList.map((item) => (
-            <div key={item.id}>
-              <button
-                className="size-full"
+      <Droppable droppableId={`column-${columnId}`} type="CARD">
+        {(provided) => (
+          <div
+            className="flex flex-col space-y-2 overflow-y-auto [&::-webkit-scrollbar]:hidden"
+            ref={provided.innerRef}
+            {...provided.droppableProps}
+          >
+            <div className="flex flex-col space-y-2">
+              <AddTodoBtn
                 onClick={() => {
-                  toggleModal("detailCard", true);
-                  setDetailCardId(item.id);
                   setColumnAtom({ title: columnTitle, columnId });
+                  toggleModal("createCard", true);
                 }}
-              >
-                <ColumnItem cards={item} />
-              </button>
+              />
+              <div className="flex flex-col space-y-4">
+                {currentColumn.cards.map((item, index) => (
+                  <ColumnItem key={item.id} card={item} index={index} onClick={() => handleCardClick(item.id)} />
+                ))}
+                {provided.placeholder}
+                {/* 무한 스크롤을 위한 관찰 대상 요소 */}
+                {currentColumn.hasMore && !isLoading && <div ref={observeRef} className="hidden h-4 w-full xl:block" />}
+                {isLoading && (
+                  <div className="hidden py-2 text-center xl:block">
+                    <p className="font-bold text-gray01">카드 불러오는 중...</p>
+                  </div>
+                )}
+              </div>
+              {currentColumn.hasMore && (
+                <button
+                  onClick={loadMoreCards}
+                  disabled={isLoading}
+                  className="mt-2 w-full rounded-md border border-gray03 bg-white py-2 font-bold hover:bg-gray-50 disabled:opacity-50 xl:hidden"
+                >
+                  {isLoading ? "로딩 중..." : "카드 더 보기"}
+                </button>
+              )}
             </div>
-          ))
-        ) : (
-          <p className="flex items-center justify-center text-center font-bold">등록된 카드가 없습니다.</p>
-        )}
-        {hasMore && (
-          <div ref={observeRef} className="flex items-center justify-center font-bold">
-            카드 더 보기
           </div>
         )}
-      </div>
+      </Droppable>
     </div>
   );
 };

@@ -4,19 +4,19 @@ import { useForm } from "react-hook-form";
 import InputItem from "../../input/InputItem";
 import { CancelBtn, ConfirmBtn } from "../../button/ButtonComponents";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAuth } from "@/hooks/useAuth";
 import { useMember } from "@/hooks/useMember";
-import { FormData, FormSchema, Invitation } from "@/zodSchema/invitationSchema";
-import { useDashboard } from "@/hooks/useDashboard";
+import { FormData, FormSchema } from "@/zodSchema/invitationSchema";
 import { useInvitation } from "@/hooks/useInvitation";
 import { useToggleModal } from "@/hooks/useModal";
+import toast from "react-hot-toast";
+import axios from "axios";
+import toastMessages from "@/lib/toastMessage";
 
 const InvitationDashboard = () => {
   const toggleModal = useToggleModal();
   const params = useParams();
-  const router = useRouter();
   const currentDashboardId = params?.dashboardId ? Number(params.dashboardId) : null;
-  const { user } = useAuth();
+  const router = useRouter();
 
   const {
     register,
@@ -31,56 +31,45 @@ const InvitationDashboard = () => {
     },
   });
 
-  // 대시보드 정보 조회
-  const {
-    getDashboardById,
-    isLoading: isDashboardLoading,
-    error: dashboardError,
-  } = useDashboard({
-    page: 1,
-    size: 10,
-    showErrorToast: true,
-    customErrorMessage: "대시보드를 찾을 수 없습니다.",
-  });
-
-  const currentDashboard = currentDashboardId ? getDashboardById(currentDashboardId) : null;
-
-  // 대시보드 멤버 여부 확인
-  const {
-    memberData,
-    isLoading: isMemberLoading,
-    error: memberError,
-  } = useMember({
-    dashboardId: currentDashboardId || 0,
+   // 대시보드 멤버 여부 확인
+   const { memberData, isLoading, error } = useMember({
+    dashboardId: Number(currentDashboardId),
     page: 1,
     size: 100,
-    showErrorToast: true,
-    customErrorMessage: "멤버 목록을 불러오는데 실패했습니다.",
-  });
+    enabled: !!currentDashboardId,
+   });
+  
+   useEffect(() => {
+    if (error) {
+      toggleModal("invitationDashboard", false);
+    }
+  }, [error, toggleModal]);
 
   // 초대 관리 커스텀 훅
   const { inviteMember, isInviting } = useInvitation({
     dashboardId: currentDashboardId || 0,
   });
 
-  useEffect(() => {
-    if (dashboardError || memberError) {
+  const onSubmit = handleSubmit(async (data) => {
+    if (!currentDashboardId) {
+      toast.error(toastMessages.error.isValidDashboard);
       toggleModal("invitationDashboard", false);
       router.push("/mydashboard");
+      return;
     }
-  }, [dashboardError, memberError, toggleModal, router]);
 
-  const onSubmit = handleSubmit(async (data) => {
     try {
       await inviteMember(data);
       reset();
       toggleModal("invitationDashboard", false);
     } catch (error) {
-      console.error("초대 실패:", error);
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data || toastMessages.error.invitation);
+      }
     }
   });
 
-  if (isDashboardLoading || !currentDashboard) {
+  if (isLoading) {
     return null;
   }
 
@@ -100,7 +89,7 @@ const InvitationDashboard = () => {
           <CancelBtn type="button" onClick={() => toggleModal("invitationDashboard", false)}>
             취소
           </CancelBtn>
-          <ConfirmBtn type="submit" disabled={!isValid || isDashboardLoading || isMemberLoading || isInviting}>
+          <ConfirmBtn type="submit" disabled={!isValid || isLoading || isInviting}>
             {isInviting ? "초대중..." : "초대하기"}
           </ConfirmBtn>
         </div>

@@ -4,9 +4,9 @@ import { ActiveBtn } from "@/components/button/ButtonComponents";
 import InputItem from "@/components/input/InputItem";
 import { FieldValues, useForm } from "react-hook-form";
 import SelectColorChip from "@/components/chip/SelectColorChip";
-import { ValueType } from "@/types/dashboardType";
 import { useEffect } from "react";
 import { useDashboard } from "@/hooks/useDashboard";
+import { UpdateDashboard } from "@/zodSchema/dashboardSchema";
 
 const EditDashboard = ({ dashboardId }: { dashboardId: number }) => {
   const {
@@ -29,13 +29,8 @@ const EditDashboard = ({ dashboardId }: { dashboardId: number }) => {
   }, [dashboardInfo, reset]);
 
   const onSubmit = () => {
-    const formData = watch() as ValueType;
-    updateDashboard(formData, {
-      onSuccess: () => {
-        // 변경 후 폼 상태 초기화
-        reset(formData, { keepValues: true });
-      },
-    });
+    const formData = watch() as UpdateDashboard;
+    updateDashboard({ id: dashboardId, data: formData });
   };
 
   const isButtonDisabled = !isValid || !isDirty || isUpdating;
