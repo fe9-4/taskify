@@ -25,7 +25,7 @@ const MyPage = () => {
   }
 
   return (
-    <div className="container mx-auto bg-gray05">
+    <div className="container bg-gray05">
       <div className="w-full space-y-3 p-3 md:w-[548px] xl:w-[672px]">
         <div className="flex cursor-pointer items-center" onClick={handleGoBack}>
           <Image src="/icons/previous_arrow.svg" alt="돌아가기" width={20} height={20} />
