@@ -224,7 +224,7 @@ const DashboardDetail = () => {
                 <div className="my-4 xl:my-0 xl:px-4">
                   <button
                     onClick={handleColumnBtn}
-                    className="mb-4 flex w-full items-center justify-center space-x-3 rounded-lg border border-gray03 bg-white py-4 xl:mt-16 xl:h-[70px] xl:min-w-[354px] xl:max-w-[354px] xl:py-0"
+                    className="mb-4 flex w-full items-center justify-center space-x-3 rounded-lg border border-gray03 bg-white py-4 xl:mt-14 xl:h-[70px] xl:min-w-[354px] xl:max-w-[354px] xl:py-0"
                   >
                     <span className="text-lg font-bold">새로운 컬럼 추가하기</span>
                     <PlusChip />
