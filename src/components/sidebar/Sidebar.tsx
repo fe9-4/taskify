@@ -23,7 +23,13 @@ const Sidebar = () => {
   const pathname = usePathname();
   const { user, isLoading } = useAuth();
 
-  const { dashboardData } = useDashboard({ dashboardId: currentDashboardId || 0, page, size });
+  const { dashboardData, isLoading: isDashboardLoading } = useDashboard({
+    dashboardId: currentDashboardId || 0,
+    page,
+    size,
+    enabled: !!user, // user가 있을 때만 API 호출
+  });
+
   const totalPage: number = dashboardData ? Math.ceil(dashboardData.totalCount / size) : 0;
 
   const onClickSidebar = () => {
@@ -38,7 +44,7 @@ const Sidebar = () => {
 
   if (isLoading || pathname === "/" || pathname === "/login" || pathname === "/signup") return null;
 
-  if (!isLoading && !user) return null;
+  if (!user) return null;
 
   return (
     <aside

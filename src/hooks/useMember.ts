@@ -1,27 +1,36 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { MemberForm, MemberList, MemberListSchema } from "@/zodSchema/memberSchema";
-import toast from "react-hot-toast";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import toastMessages from "@/lib/toastMessage";
 
-interface UseDashboardMemberProps extends MemberForm {
+interface UseDashboardMemberProps {
+  dashboardId: number;
+  page: number;
+  size: number;
+  enabled?: boolean;
+  staleTime?: number;
   showErrorToast?: boolean;
-  customErrorMessage?: string;
 }
 
 export const useMember = ({
   dashboardId,
   page = 1,
   size = 20,
+  enabled = true,
+  staleTime,
   showErrorToast = true,
-  customErrorMessage,
 }: UseDashboardMemberProps) => {
   const queryClient = useQueryClient();
   const [totalCount, setTotalCount] = useState(0);
 
   // 멤버 목록 조회 쿼리
-  const queryResult = useQuery<MemberList, Error>({
+  const {
+    data: memberData,
+    isLoading,
+    error,
+  } = useQuery<MemberList, Error>({
     queryKey: ["memberData", dashboardId, page, size],
     queryFn: async () => {
       if (dashboardId <= 0) {
@@ -36,34 +45,24 @@ export const useMember = ({
         setTotalCount(parsedData.totalCount);
         return parsedData;
       } catch (error) {
-        if (axios.isAxiosError(error)) {
-          const errorMessage = customErrorMessage || "멤버 목록을 불러오는데 실패했습니다.";
-          if (showErrorToast && error.response?.status === 500) {
-            toast.error(errorMessage);
-            console.error("대시보드 멤버 목록 조회 실패:", error.message);
-          }
+        if (showErrorToast) {
+          toast.error(toastMessages.error.getMemberList);
         }
-        return { members: [], totalCount: 0 };
+        throw error;
       }
     },
-    enabled: dashboardId > 0,
-    staleTime: 1000 * 60 * 5,
+    enabled: enabled && dashboardId > 0,
+    staleTime: staleTime || 1000 * 60 * 5,
   });
 
   // 멤버 삭제 뮤테이션
-  const deleteMutation = useMutation({
+  const { mutate: deleteMember, error: deleteError } = useMutation({
     mutationFn: async (memberId: number) => {
       const response = await axios.delete(`/api/members/${memberId}`);
       return response.data;
     },
-    onSuccess: (_, memberId) => {
-      const member = queryResult.data?.members.find((m) => m.id === memberId);
-      toast.success(toastMessages.success.deleteMember);
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["memberData", dashboardId, page, size] });
-    },
-    onError: (error) => {
-      console.error("Error deleting member:", error);
-      toast.error(toastMessages.error.deleteMember);
     },
   });
 
@@ -71,9 +70,11 @@ export const useMember = ({
   const totalPage = Math.ceil(totalCount / size);
 
   return {
-    ...queryResult,
-    memberData: queryResult.data || { members: [], totalCount: 0 },
-    deleteMember: deleteMutation.mutate,
+    memberData: memberData || { members: [], totalCount: 0 },
+    isLoading,
+    error,
+    deleteError,
+    deleteMember,
     pagination: {
       currentPage: page,
       totalPages: totalPage,

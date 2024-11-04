@@ -43,7 +43,7 @@ const DetailCard = () => {
   const onDelete = async () => {
     try {
       const response = await axios.delete(`/api/cards/${cardId}`);
-      if (response.status === 201) {
+      if (response.status === 204) {
         toast.success(toastMessages.success.deleteCard);
         toggleModal("detailCard", false);
         setDashboardCardUpdate(true);
@@ -137,6 +137,7 @@ const DetailCard = () => {
                       src={card.imageUrl}
                       alt={card.assignee.nickname}
                       fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
                       className="rounded-md object-cover"
                       priority={true}
                     />

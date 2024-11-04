@@ -24,11 +24,11 @@ const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
           <Pagination totalPage={totalPages} setPage={setPage} page={page} />
         </div>
       </div>
-      <div className="flex items-center justify-center gap-6 px-5 md:px-7">
-        {isLoading && <div className="pb-5 text-gray02">멤버 정보를 불러오고 있어요</div>}
-        {error && <div className="pb-5 text-gray02">멤버 정보를 불러오는데 실패했습니다</div>}
-      </div>
-      {!isLoading && !error && (
+      {isLoading ? (
+        <div className="flex items-center justify-center px-5 pb-5 text-gray02 md:px-7">
+          멤버 정보를 불러오고 있어요
+        </div>
+      ) : (
         <>
           <div className="px-5 text-base font-normal text-gray02 md:px-7 md:text-lg">이름</div>
           <ul>

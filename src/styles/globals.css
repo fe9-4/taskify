@@ -62,15 +62,17 @@ body {
   .react-datepicker .react-datepicker__day,
   .react-datepicker .react-datepicker__time-list-item,
   .react-datepicker .react-datepicker__day--keyboard-selected,
-  .react-datepicker .react-datepicker__day--selected,
   .react-datepicker .react-datepicker__time-list-item--selected {
     @apply hover:bg-violet02 !important;
   }
 
-  .react-datepicker .react-datepicker__day--keyboard-selected,
   .react-datepicker .react-datepicker__day--selected,
   .react-datepicker .react-datepicker__time-list-item--selected {
     @apply bg-purple01 text-white hover:bg-purple01 !important;
+  }
+
+  .react-datepicker .react-datepicker__day--keyboard-selected {
+    @apply bg-violet02 text-violet01 !important;
   }
 
   .react-datepicker .react-datepicker__current-month,
@@ -82,6 +84,28 @@ body {
     @apply text-gray01;
   }
   /* ----------------------- end datepicker calendar ----------------------- */
+
+  /* ----------------------- start scrollbar ----------------------- */
+  body::-webkit-scrollbar,
+  .react-datepicker .react-datepicker__time-list::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    scroll-behavior: smooth;
+  }
+
+  body::-webkit-scrollbar-track,
+  .react-datepicker .react-datepicker__time-list::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  body::-webkit-scrollbar-thumb,
+  .react-datepicker .react-datepicker__time-list::-webkit-scrollbar-thumb {
+    background: rgba(85, 52, 218, 0.6);
+    border-radius: 10px;
+    background-clip: padding-box;
+    border: 2px solid transparent;
+  }
+  /* ----------------------- end scrollbar ----------------------- */
 
   .text-overflow {
     text-overflow: ellipsis;
