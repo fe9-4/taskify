@@ -106,7 +106,7 @@ const ColumnList = ({ columnTitle, columnId, cards: initialCards = [], totalCoun
     };
   }, [currentColumn.hasMore, isLoading, loadMoreCards]);
 
-  // 수정, 삭제 시 업데이트함수 
+  // 수정, 삭제 시 업데이트함수
   useEffect(() => {
     if (dashboardCardUpdate) {
       loadMoreCards();
@@ -126,7 +126,7 @@ const ColumnList = ({ columnTitle, columnId, cards: initialCards = [], totalCoun
   };
 
   return (
-    <div className="h-full space-y-6 border-b bg-gray05 py-4 md:border-gray04 md:pb-6 xl:flex xl:flex-col xl:border-b-0 xl:border-r xl:pr-4">
+    <div className="h-full space-y-6 border-b bg-gray05 py-4 md:border-gray04 xl:flex xl:flex-col xl:border-b-0 xl:border-r xl:px-5 xl:py-1">
       <div className="flex flex-shrink-0 items-center justify-between rounded-t-lg">
         <div className="flex items-center space-x-3">
           <div className="flex items-center space-x-2">
@@ -159,7 +159,7 @@ const ColumnList = ({ columnTitle, columnId, cards: initialCards = [], totalCoun
                 ))}
                 {provided.placeholder}
                 {/* 무한 스크롤을 위한 관찰 대상 요소 */}
-                {currentColumn.hasMore && !isLoading && <div ref={observeRef} className="h-4 w-full hidden xl:block" />}
+                {currentColumn.hasMore && !isLoading && <div ref={observeRef} className="hidden h-4 w-full xl:block" />}
                 {isLoading && (
                   <div className="hidden py-2 text-center xl:block">
                     <p className="font-bold text-gray01">카드 불러오는 중...</p>

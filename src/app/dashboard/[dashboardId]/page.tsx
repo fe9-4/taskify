@@ -197,11 +197,11 @@ const DashboardDetail = () => {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="h-dvh w-full">
+      <div className="h-[calc(100dvh-60px)] w-full md:h-[calc(100dvh-70px)] xl:overflow-y-hidden">
         <Droppable droppableId="columns" direction="horizontal" type="COLUMN">
           {(provided) => (
             <div
-              className="flex h-full w-full flex-col p-4 xl:flex-row xl:space-x-4"
+              className="flex h-full w-full flex-col p-4 xl:flex-row xl:px-0"
               {...provided.droppableProps}
               ref={provided.innerRef}
             >
@@ -221,7 +221,7 @@ const DashboardDetail = () => {
               ))}
               {provided.placeholder}
               {columnList.length < 10 && (
-                <div className="my-4 xl:my-0">
+                <div className="my-4 xl:my-0 xl:px-4">
                   <button
                     onClick={handleColumnBtn}
                     className="mb-4 flex w-full items-center justify-center space-x-3 rounded-lg border border-gray03 bg-white py-4 xl:mt-16 xl:h-[70px] xl:min-w-[354px] xl:max-w-[354px] xl:py-0"
