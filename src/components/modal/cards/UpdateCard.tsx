@@ -249,7 +249,7 @@ const UpdateCard = () => {
       <h3 className="mb-5 text-2xl font-bold text-black03 md:mb-6 md:text-3xl">할 일 수정</h3>
 
       <form onSubmit={handleSubmit(onSubmit)} className="grid gap-8">
-        <div className="grid gap-8 md:flex md:gap-7">
+        <div className="grid gap-8 md:grid-cols-2 md:gap-7">
           <StatusDropdown setSelectedValueId={setSelectedValue} />
           <Controller
             name="assigneeUserId"
