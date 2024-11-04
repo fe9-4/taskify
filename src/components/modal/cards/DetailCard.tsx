@@ -77,10 +77,10 @@ const DetailCard = () => {
   };
 
   return (
-    <section className="w-[327px] gap-3 rounded-lg bg-white p-4 md:w-[678px] md:px-6 md:py-8" ref={detailCardToptRef}>
+    <section className="w-[327px] gap-3 rounded-lg bg-white p-4 md:w-[678px] md:px-6 md:pt-8" ref={detailCardToptRef}>
       {cardData &&
         [cardData].map((card) => (
-          <section key={card.id}>
+          <div key={card.id}>
             <div className="mb-4 flex flex-col justify-between md:flex-row-reverse md:items-center">
               <div className="relative ml-auto flex items-center gap-4 md:gap-6">
                 <button onClick={toggleDropdown} className="relative size-5 md:size-7">
@@ -145,7 +145,7 @@ const DetailCard = () => {
                 </div>
               </div>
             </div>
-          </section>
+          </div>
         ))}
 
       <CommentList cardId={cardId} columnId={columnId} handleScrollTop={handleScrollTop} />

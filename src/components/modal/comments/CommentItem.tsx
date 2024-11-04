@@ -59,7 +59,7 @@ const CommentItem = forwardRef<HTMLDivElement, CommentItemProps>(({ comment, set
   };
 
   return (
-    <div ref={ref} className="mb-5 flex items-start gap-2 border-b-[1px] border-b-gray03 pb-2 pr-3">
+    <div ref={ref} className="mt-5 flex items-start gap-2 border-b-[1px] border-b-gray03 pb-3 pr-3">
       {comment.author && comment.author.profileImageUrl ? (
         <div className="relative size-6 overflow-hidden rounded-full md:size-8">
           <Image src={comment.author.profileImageUrl} fill alt={comment.author.nickname} />

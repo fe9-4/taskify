@@ -14,7 +14,7 @@ const CommentList = ({ cardId, columnId, handleScrollTop }: CommentListProps) =>
   const [cursorId, setCursorId] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const size = 10;
+  const size = 3;
 
   const getComments = useCallback(async () => {
     if (isLoading || !hasMore) return;
@@ -73,24 +73,21 @@ const CommentList = ({ cardId, columnId, handleScrollTop }: CommentListProps) =>
             />
           ))
         ) : (
-          <p className="mb-3 flex items-center justify-center text-center text-xs font-medium text-gray02 md:mb-2 md:text-lg">
+          <p className="mb-3 flex items-center justify-center text-center text-xs font-medium text-gray02 md:mb-8 md:text-lg">
             등록된 댓글이 없습니다.
           </p>
         )}
-
-        <button
-          onClick={handleScrollTop}
-          className={cls(
-            "fixed right-0 transform rounded-full bg-[#f1effd] p-2 transition-all duration-500 md:right-4",
-            comments.length > 10
-              ? "bottom-0 scale-100 opacity-100 delay-200 md:bottom-4"
-              : "bottom-4 scale-90 opacity-0 delay-0 md:bottom-8"
-          )}
-        >
-          <HiChevronDoubleUp className="size-5 text-[#5534da]" />
-        </button>
       </div>
       {isLoading && <p className="text-xs text-gray02 md:text-base">Loading...</p>}
+      <button
+        onClick={handleScrollTop}
+        className={cls(
+          "sticky bottom-4 ml-auto mr-[-8px] mt-[-36px] transform rounded-full bg-violet02 p-2 outline-none transition-all delay-500 duration-500 focus:outline-none",
+          comments.length > 5 ? "block scale-100 opacity-100" : "hidden scale-90 opacity-0"
+        )}
+      >
+        <HiChevronDoubleUp className="size-5 text-violet01" />
+      </button>
     </>
   );
 };
