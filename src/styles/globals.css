@@ -86,20 +86,17 @@ body {
   /* ----------------------- end datepicker calendar ----------------------- */
 
   /* ----------------------- start scrollbar ----------------------- */
-  body::-webkit-scrollbar,
-  .react-datepicker .react-datepicker__time-list::-webkit-scrollbar {
+  ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
     scroll-behavior: smooth;
   }
 
-  body::-webkit-scrollbar-track,
-  .react-datepicker .react-datepicker__time-list::-webkit-scrollbar-track {
+  ::-webkit-scrollbar-track {
     background: transparent;
   }
 
-  body::-webkit-scrollbar-thumb,
-  .react-datepicker .react-datepicker__time-list::-webkit-scrollbar-thumb {
+  ::-webkit-scrollbar-thumb {
     background: rgba(85, 52, 218, 0.6);
     border-radius: 10px;
     background-clip: padding-box;
