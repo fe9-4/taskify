@@ -58,7 +58,7 @@ const SearchDropdown = ({ setValue, inviteMemberList, setManager, currentManager
         담당자
       </label>
       <div className="relative flex w-full flex-col space-y-[2px] bg-white" ref={dropdownRef}>
-        <div className="flex h-[50px] w-[217px] items-center justify-between overflow-hidden rounded-lg px-4 ring-1 ring-inset ring-gray03 transition-all focus-within:ring-violet01 focus:outline-none focus:ring-1 focus:ring-inset">
+        <div className="flex h-[50px] w-full xl:w-[217px] md:w-[240px] items-center justify-between overflow-hidden rounded-lg px-4 ring-1 ring-inset ring-gray03 transition-all focus-within:ring-violet01 focus:outline-none focus:ring-1 focus:ring-inset">
           <div className="flex w-full items-center space-x-2 text-base md:text-lg">
             {selectedName && (
               <span className="flex h-[26px] w-8 items-center justify-center rounded-full bg-[#A3C4A2] text-xs font-semibold text-white ring-white ring-offset-2">
