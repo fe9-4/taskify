@@ -7,7 +7,6 @@ import {
   Dashboard,
   UpdateDashboard,
   DashboardList,
-  DashboardListSchema,
   DashboardSchema,
   CreateDashboard,
 } from "@/zodSchema/dashboardSchema";
@@ -73,7 +72,7 @@ export const useDashboard = ({
         const response = await axios.get("/api/dashboards", {
           params: { page, size, cursorId },
         });
-        return DashboardListSchema.parse(response.data);
+        return response.data;
       } catch (error) {
         console.error("Error fetching dashboards:", error);
         if (showErrorToast) {
@@ -82,16 +81,7 @@ export const useDashboard = ({
         throw error;
       }
     },
-    enabled: !!user && enabled,
-    staleTime: 1000 * 30, // 30초 동안 데이터를 fresh 상태로 유지
-    gcTime: 1000 * 60 * 5, // 5분 동안 가비지 컬렉션 전까지 캐시 유지
-    refetchOnWindowFocus: false, // 윈도우 포커스 시 리페치 비활성화
-    refetchOnMount: false, // 컴포넌트 마운트 시 리페치 비활성화
-    initialData: {
-      dashboards: [],
-      totalCount: 0,
-      cursorId: null,
-    },
+    enabled: enabled && !!user,
   });
 
   // 대시보드 상세 조회

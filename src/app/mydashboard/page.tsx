@@ -2,7 +2,7 @@
 
 import InviteList from "@/app/mydashboard/components/InviteList";
 import Pagination from "../../components/pagination/Pagination";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AddDashboardBtn, DashboardCard } from "@/components/button/ButtonComponents";
 import { useToggleModal } from "@/hooks/useModal";
@@ -17,18 +17,13 @@ const MyDashboard = () => {
   const toggleModal = useToggleModal();
   const { user, isLoading: isAuthLoading } = useAuth();
 
-  // 페이지 변경 핸들러를 메모이제이션
-  const handlePageChange = useCallback((newPage: number) => {
-    setPage(newPage);
-  }, []);
-
   // useDashboard 훅 사용
   const { dashboardData, isLoading: isDashboardLoading } = useDashboard({
     page,
     size,
     showErrorToast: true,
     customErrorMessage: toastMessages.error.getDashboardList,
-    enabled: !!user && !isAuthLoading, // user가 있고 인증 로딩이 완료된 경우에만 API 호출
+    enabled: !!user && !isAuthLoading,
   });
 
   // 로그인 상태 체크
@@ -40,7 +35,7 @@ const MyDashboard = () => {
 
   // 로딩 중이거나 사용자 정보가 없으면 early return
   if (isDashboardLoading || isAuthLoading || !user) {
-    return null; // 또는 로딩 컴포넌트
+    return null;
   }
 
   // 페이지네이션을 위한 총 페이지 수 계산
