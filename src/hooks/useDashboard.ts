@@ -9,6 +9,7 @@ import {
   DashboardList,
   DashboardSchema,
   CreateDashboard,
+  DashboardListSchema,
 } from "@/zodSchema/dashboardSchema";
 import toastMessages from "@/lib/toastMessage";
 
@@ -72,7 +73,7 @@ export const useDashboard = ({
         const response = await axios.get("/api/dashboards", {
           params: { page, size, cursorId },
         });
-        return response.data;
+        return DashboardListSchema.parse(response.data);
       } catch (error) {
         console.error("Error fetching dashboards:", error);
         if (showErrorToast) {

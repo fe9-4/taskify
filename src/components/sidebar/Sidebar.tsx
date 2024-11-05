@@ -57,7 +57,7 @@ const Sidebar = () => {
       <Logo isExpanded={isExpanded} />
       <div className="relative flex h-[700px] w-full shrink-0 flex-col">
         <Button isExpanded={isExpanded} />
-        <DashboardList list={dashboardData?.dashboards} isExpanded={isExpanded} />
+        {dashboardData && <DashboardList list={dashboardData.dashboards} isExpanded={isExpanded} />}
         <button
           type="button"
           onClick={onClickSidebar}

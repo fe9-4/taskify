@@ -56,7 +56,7 @@ const MyDashboard = () => {
             />
           ))}
         </div>
-        {dashboardData?.dashboards.length > 0 ? (
+        {dashboardData && dashboardData.totalCount > 0 ? (
           <div className="flex items-center justify-end space-x-4">
             <span className="text-xs">
               {totalPage}페이지 중 {page}
