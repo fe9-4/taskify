@@ -17,7 +17,7 @@ interface DashboardOptions {
   dashboardId?: number;
   page?: number;
   size?: number;
-  cursorId?: number;
+  cursorId?: number | null;
   showErrorToast?: boolean;
   customErrorMessage?: string;
   enabled?: boolean;
@@ -54,13 +54,13 @@ const useCreateDashboard = () => {
 
 export const useDashboard = ({
   dashboardId,
-  page = 1,
-  size = 10,
-  cursorId,
-  showErrorToast = true,
+  page,
+  size,
+  cursorId = null,
+  showErrorToast = false,
   customErrorMessage,
   enabled = true,
-}: DashboardOptions = {}) => {
+}: DashboardOptions) => {
   const { user } = useAuth();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -83,6 +83,10 @@ export const useDashboard = ({
       }
     },
     enabled: !!user && enabled,
+    staleTime: 1000 * 30, // 30초 동안 데이터를 fresh 상태로 유지
+    gcTime: 1000 * 60 * 5, // 5분 동안 가비지 컬렉션 전까지 캐시 유지
+    refetchOnWindowFocus: false, // 윈도우 포커스 시 리페치 비활성화
+    refetchOnMount: false, // 컴포넌트 마운트 시 리페치 비활성화
     initialData: {
       dashboards: [],
       totalCount: 0,
