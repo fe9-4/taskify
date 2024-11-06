@@ -7,9 +7,9 @@ import {
   Dashboard,
   UpdateDashboard,
   DashboardList,
-  DashboardListSchema,
   DashboardSchema,
   CreateDashboard,
+  DashboardListSchema,
 } from "@/zodSchema/dashboardSchema";
 import toastMessages from "@/lib/toastMessage";
 
@@ -17,7 +17,7 @@ interface DashboardOptions {
   dashboardId?: number;
   page?: number;
   size?: number;
-  cursorId?: number;
+  cursorId?: number | null;
   showErrorToast?: boolean;
   customErrorMessage?: string;
   enabled?: boolean;
@@ -54,13 +54,13 @@ const useCreateDashboard = () => {
 
 export const useDashboard = ({
   dashboardId,
-  page = 1,
-  size = 10,
-  cursorId,
-  showErrorToast = true,
+  page,
+  size,
+  cursorId = null,
+  showErrorToast = false,
   customErrorMessage,
   enabled = true,
-}: DashboardOptions = {}) => {
+}: DashboardOptions) => {
   const { user } = useAuth();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -82,12 +82,7 @@ export const useDashboard = ({
         throw error;
       }
     },
-    enabled: !!user && enabled,
-    initialData: {
-      dashboards: [],
-      totalCount: 0,
-      cursorId: null,
-    },
+    enabled: enabled && !!user,
   });
 
   // 대시보드 상세 조회

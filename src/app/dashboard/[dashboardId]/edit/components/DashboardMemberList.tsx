@@ -6,7 +6,7 @@ import Pagination from "@/components/pagination/Pagination";
 const DashboardMemberList = ({ dashboardId }: { dashboardId: number }) => {
   const [page, setPage] = useState(1);
   const size = 4;
-  const { memberData, isLoading, error, deleteMember, pagination } = useMember({
+  const { memberData, isLoading, deleteMember, pagination } = useMember({
     dashboardId,
     page,
     size,

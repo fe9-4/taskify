@@ -10,6 +10,7 @@ import { NumChip } from "@/components/chip/PlusAndNumChip";
 import { HiOutlineCog } from "react-icons/hi";
 import { Droppable } from "@hello-pangea/dnd";
 import { AddTodoBtn } from "@/components/button/ButtonComponents";
+import { useParams } from "next/navigation";
 
 interface IProps {
   columnTitle: string;

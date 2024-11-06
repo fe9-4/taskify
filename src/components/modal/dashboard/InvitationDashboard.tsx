@@ -45,6 +45,12 @@ const InvitationDashboard = () => {
     }
   }, [error, toggleModal]);
 
+  useEffect(() => {
+    if (error) {
+      toggleModal("invitationDashboard", false);
+    }
+  }, [error, toggleModal]);
+
   // 초대 관리 커스텀 훅
   const { inviteMember, isInviting } = useInvitation({
     dashboardId: currentDashboardId || 0,

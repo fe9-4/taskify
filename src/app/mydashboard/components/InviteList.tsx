@@ -10,7 +10,7 @@ const InviteList = () => {
   const [invitationList, setInvitationList] = useState<IInvitation["invitations"]>([]);
   const [size] = useState(10);
   const [hasMore, setHasMore] = useState(true);
-  const [cursorId, setCursorId] = useState<IInvitation["cursorId"]>();
+  const [cursorId, setCursorId] = useState<IInvitation["cursorId"] | null>(null);
   const observeRef = useRef<HTMLDivElement | null>(null);
 
   const getInvitationList = useCallback(async () => {
