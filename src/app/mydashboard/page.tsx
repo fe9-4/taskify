@@ -15,7 +15,7 @@ const MyDashboard = () => {
   const [size] = useState(5);
   const router = useRouter();
   const toggleModal = useToggleModal();
-  const { user } = useAuth();
+  const { user, isLoading: isAuthLoading } = useAuth();
 
   // useDashboard 훅 사용
   const { dashboardData, isLoading: isDashboardLoading } = useDashboard({
@@ -23,14 +23,20 @@ const MyDashboard = () => {
     size,
     showErrorToast: true,
     customErrorMessage: toastMessages.error.getDashboardList,
+    enabled: !!user && !isAuthLoading,
   });
 
   // 로그인 상태 체크
   useEffect(() => {
-    if (!user && !isDashboardLoading) {
+    if (!user && !isAuthLoading) {
       router.push("/login");
     }
-  }, [user, isDashboardLoading, router]);
+  }, [user, isAuthLoading, router]);
+
+  // 로딩 중이거나 사용자 정보가 없으면 early return
+  if (isDashboardLoading || isAuthLoading || !user) {
+    return null;
+  }
 
   // 페이지네이션을 위한 총 페이지 수 계산
   const totalPage = Math.ceil((dashboardData?.totalCount || 0) / size);
@@ -40,7 +46,7 @@ const MyDashboard = () => {
       <div className="flex flex-col space-y-6 xl:w-[1022px]">
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3">
           <AddDashboardBtn onClick={() => toggleModal("createDashboard", true)} />
-          {dashboardData.dashboards.map((dashboard) => (
+          {dashboardData?.dashboards.map((dashboard) => (
             <DashboardCard
               key={dashboard.id}
               dashboardName={dashboard.title}
@@ -50,7 +56,7 @@ const MyDashboard = () => {
             />
           ))}
         </div>
-        {dashboardData.dashboards.length > 0 ? (
+        {dashboardData && dashboardData.totalCount > 0 ? (
           <div className="flex items-center justify-end space-x-4">
             <span className="text-xs">
               {totalPage}페이지 중 {page}

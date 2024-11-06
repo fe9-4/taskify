@@ -37,7 +37,6 @@ const UpdateCard = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const { isLoading, withLoading } = useLoading();
-
   const toggleModal = useToggleModal();
   const setDashboardCardUpdate = useSetAtom(dashboardCardUpdateAtom);
   const setColumnCards = useSetAtom(columnCardsAtom);

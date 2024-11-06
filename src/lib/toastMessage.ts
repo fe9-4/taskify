@@ -62,7 +62,7 @@ const toastMessages = {
     createCard: "카드 생성이 실패하였습니다",
     editCard: "카드 수정이 실패하였습니다",
     deleteCard: "카드 삭제가 실패하였습니다",
-    moveCard: "카드 이동이 실패하였습니다",
+    moveCard: "같은 컬럼 내 카드 이동은 지원하지 않습니다",
 
     getComment: "댓글 조회에 실패하였습니다",
     createComment: "댓글 생성이 실패하였습니다",

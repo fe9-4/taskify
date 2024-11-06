@@ -42,7 +42,8 @@ const Sidebar = () => {
     setSize(isLargeScreen ? 15 : 10);
   }, [isLargeScreen]);
 
-  if (isLoading || pathname === "/" || pathname === "/login" || pathname === "/signup") return null;
+  if (isLoading || isDashboardLoading || pathname === "/" || pathname === "/login" || pathname === "/signup")
+    return null;
 
   if (!user) return null;
 
@@ -56,7 +57,7 @@ const Sidebar = () => {
       <Logo isExpanded={isExpanded} />
       <div className="relative flex h-[700px] w-full shrink-0 flex-col">
         <Button isExpanded={isExpanded} />
-        <DashboardList list={dashboardData?.dashboards} isExpanded={isExpanded} />
+        {dashboardData && <DashboardList list={dashboardData.dashboards} isExpanded={isExpanded} />}
         <button
           type="button"
           onClick={onClickSidebar}

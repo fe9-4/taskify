@@ -14,8 +14,6 @@ interface IProps {
   setSelectedValueId: Dispatch<SetStateAction<number>>;
 }
 
-// 현재 열린 모달의 컬럼정보는 받아오고 있습니다.
-// 드롭다운에서 값을 선택하면 해당 컬럼의 title은 화면에 표시되는 용도로 쓰이고, id는 updateCard로 전달됩니다.
 const StatusDropdown = ({ setSelectedValueId }: IProps) => {
   const currentColumnList = useAtomValue(currentColumnListAtom);
   const column = useAtomValue(ColumnAtom);
@@ -62,7 +60,7 @@ const StatusDropdown = ({ setSelectedValueId }: IProps) => {
       <label htmlFor="assignee" className="text-lg font-medium text-black03 md:text-xl">
         상태
       </label>
-      <div className="relative flex w-full flex-col space-y-[2px] md:w-[217px]" ref={dropdownRef}>
+      <div className="relative flex w-full flex-col space-y-[2px]" ref={dropdownRef}>
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
