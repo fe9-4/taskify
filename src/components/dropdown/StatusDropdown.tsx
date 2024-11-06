@@ -19,7 +19,7 @@ const StatusDropdown = ({ setSelectedValueId }: IProps) => {
   const column = useAtomValue(ColumnAtom);
   const { dashboardId } = useParams();
   const currentDashboardId = useAtomValue(currentDashboardIdAtom);
-  
+
   const [isOpen, setIsOpen] = useState(false);
   const [value, setValue] = useState(column.title);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -60,7 +60,7 @@ const StatusDropdown = ({ setSelectedValueId }: IProps) => {
       <label htmlFor="assignee" className="text-lg font-medium text-black03">
         상태
       </label>
-      <div className="relative flex w-full flex-col space-y-[2px] md:w-[217px]" ref={dropdownRef}>
+      <div className="relative flex w-full flex-col space-y-[2px]" ref={dropdownRef}>
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
