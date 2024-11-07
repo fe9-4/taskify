@@ -17,6 +17,7 @@ import { useAtom } from "jotai";
 const SignupPage = () => {
   const router = useRouter();
   const [user] = useAtom(userAtom);
+
   // 사용자가 이미 로그인한 경우 내 대시보드 페이지로 리다이렉트
   useEffect(() => {
     if (user) {

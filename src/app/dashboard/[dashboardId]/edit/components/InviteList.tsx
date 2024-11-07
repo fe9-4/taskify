@@ -4,10 +4,10 @@ import { CiSquarePlus } from "react-icons/ci";
 import InviteItem from "./InviteItem";
 import Image from "next/image";
 import Pagination from "@/components/pagination/Pagination";
-import { useInvitation } from "@/hooks/useInvitation";
 import { Invitation } from "@/zodSchema/invitationSchema";
 import { useToggleModal } from "@/hooks/useModal";
 import toastMessages from "@/lib/toastMessage";
+import { useDashboard } from "@/hooks/useDashboard";
 
 const InviteList = ({ dashboardId }: { dashboardId: number }) => {
   const [page, setPage] = useState(1);
@@ -15,11 +15,13 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
   const toggleModal = useToggleModal();
 
   // useInvitation 훅 사용
-  const { invitationList, cancelInvitation, isCanceling } = useInvitation({
+  const { invitationList, cancelInvitation, isCanceling } = useDashboard({
     dashboardId,
+    enabled: !!dashboardId,
   });
 
-  const totalPage: number = Math.ceil(invitationList.totalCount / size) || 1;
+  // 총 페이지 수 계산
+  const totalPage: number = invitationList ? Math.ceil(invitationList.totalCount / size) : 1;
 
   const onClickCancelInvitation = async (invitationId: number) => {
     try {
@@ -51,7 +53,7 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
       </div>
 
       <div className="flex flex-col items-center justify-center px-5 md:px-7">
-        {invitationList.invitations.length === 0 && (
+        {invitationList?.invitations.length === 0 && (
           <div className="flex flex-col items-center justify-center gap-6 pb-5 pt-10">
             <Image
               src="/images/myDashboard/invitation.svg"
@@ -64,14 +66,15 @@ const InviteList = ({ dashboardId }: { dashboardId: number }) => {
           </div>
         )}
       </div>
-      {invitationList.invitations.length > 0 && (
+      {invitationList && invitationList.invitations.length > 0 && (
         <div className="px-5 py-[1px] text-base font-normal text-gray02 md:px-7 md:text-lg">이메일</div>
       )}
       <ul>
         <li>
-          {invitationList.invitations.map((item: Invitation) => (
-            <InviteItem key={item.id} item={item} onClick={onClickCancelInvitation} disabled={isCanceling} />
-          ))}
+          {invitationList &&
+            invitationList.invitations.map((item: Invitation) => (
+              <InviteItem key={item.id} item={item} onClick={onClickCancelInvitation} disabled={isCanceling} />
+            ))}
         </li>
       </ul>
     </>

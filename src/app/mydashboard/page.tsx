@@ -30,7 +30,6 @@ const MyDashboard = () => {
     size,
     showErrorToast: true,
     customErrorMessage: toastMessages.error.getDashboardList,
-    enabled: !!user,
   });
 
   // 로딩 중이거나 사용자 정보가 없으면 early return

@@ -6,7 +6,7 @@ import { CancelBtn, ConfirmBtn } from "../../button/ButtonComponents";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMember } from "@/hooks/useMember";
 import { FormData, FormSchema } from "@/zodSchema/invitationSchema";
-import { useInvitation } from "@/hooks/useInvitation";
+import { useDashboard } from "@/hooks/useDashboard";
 import { useToggleModal } from "@/hooks/useModal";
 import toast from "react-hot-toast";
 import axios from "axios";
@@ -31,15 +31,15 @@ const InvitationDashboard = () => {
     },
   });
 
-   // 대시보드 멤버 여부 확인
-   const { memberData, isLoading, error } = useMember({
+  // 대시보드 멤버 여부 확인
+  const { memberData, isLoading, error } = useMember({
     dashboardId: Number(currentDashboardId),
     page: 1,
     size: 100,
     enabled: !!currentDashboardId,
-   });
-  
-   useEffect(() => {
+  });
+
+  useEffect(() => {
     if (error) {
       toggleModal("invitationDashboard", false);
     }
@@ -52,7 +52,7 @@ const InvitationDashboard = () => {
   }, [error, toggleModal]);
 
   // 초대 관리 커스텀 훅
-  const { inviteMember, isInviting } = useInvitation({
+  const { inviteMember, isInviting } = useDashboard({
     dashboardId: currentDashboardId || 0,
   });
 

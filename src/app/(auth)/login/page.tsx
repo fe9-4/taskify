@@ -16,8 +16,18 @@ import { useAtom } from "jotai";
 
 const LoginPage = () => {
   const router = useRouter();
+<<<<<<< HEAD
   const [user] = useAtom(userAtom);
   const { login } = useAuth();
+=======
+  const { user, isLoading, login } = useAuth();
+
+  useEffect(() => {
+    if (user && !isLoading) {
+      router.push("/mydashboard");
+    }
+  }, [user, isLoading, router]);
+>>>>>>> 9d68937ea329b2c240b070f7708b7ce091c546b0
 
   const {
     register,
@@ -33,12 +43,6 @@ const LoginPage = () => {
     },
   });
 
-  useEffect(() => {
-    if (user) {
-      router.push("/mydashboard");
-    }
-  }, [user, router]);
-
   const onSubmit: SubmitHandler<Login> = async (data) => {
     try {
       await login(data);
@@ -48,10 +52,6 @@ const LoginPage = () => {
       toast.error(toastMessages.error.login);
     }
   };
-
-  if (user) {
-    return <div>로딩 중...</div>;
-  }
 
   return (
     <div className="mx-auto w-[351px] md:w-[520px]">

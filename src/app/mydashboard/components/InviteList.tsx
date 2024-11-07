@@ -1,81 +1,40 @@
-import axios from "axios";
-import toast from "react-hot-toast";
 import Image from "next/image";
 import InviteItem from "@/app/mydashboard/components/InviteItem";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { IInvitation } from "@/types/myDashboardType";
+import { useEffect, useRef, useState } from "react";
 import { cls } from "@/lib/utils";
+import { useInvitation } from "@/hooks/useInvitation";
 
 const InviteList = () => {
-  const [invitationList, setInvitationList] = useState<IInvitation["invitations"]>([]);
   const [size] = useState(10);
-  const [hasMore, setHasMore] = useState(true);
-  const [cursorId, setCursorId] = useState<IInvitation["cursorId"] | null>(null);
   const observeRef = useRef<HTMLDivElement | null>(null);
 
-  const getInvitationList = useCallback(async () => {
-    if (!hasMore) return;
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useInvitation(size);
 
-    try {
-      const response = await axios.get(`/api/invitations?size=${size}&cursorId=${cursorId}`);
-
-      if (response.status === 200) {
-        const newInviteList: IInvitation["invitations"] = response.data;
-
-        setInvitationList((prev) => {
-          const existingId = new Set(prev.map((item) => item.dashboard.id));
-          const filteredNewInviteList = newInviteList.filter((item) => {
-            if (existingId.has(item.dashboard.id)) {
-              return false;
-            }
-
-            existingId.add(item.dashboard.id);
-            return true;
-          });
-
-          if (filteredNewInviteList.length < size) {
-            setHasMore(false);
-          }
-
-          return [...prev, ...filteredNewInviteList];
-        });
-
-        if (newInviteList.length >= size) {
-          setCursorId(newInviteList[newInviteList.length - 1].id);
-        }
-      }
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        console.error("내 대시보드 초대받은 목록 조회 실패", error);
-        toast.error(error.response?.data);
-      }
-    }
-  }, [hasMore, size, cursorId]);
+  const invitationList = data?.pages.flat() ?? [];
 
   useEffect(() => {
+    if (!observeRef.current || !hasNextPage || isFetchingNextPage) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
-        const lastInviteItem = entries[0];
-
-        if (lastInviteItem.isIntersecting && hasMore) {
-          getInvitationList();
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
         }
       },
-      { threshold: 0.5 }
+      { threshold: 0.1, rootMargin: "100px" }
     );
 
-    const currentLoadingRef = observeRef.current;
-
-    if (currentLoadingRef) {
-      observer.observe(currentLoadingRef);
-    }
+    const currentRef = observeRef.current;
+    observer.observe(currentRef);
 
     return () => {
-      if (currentLoadingRef) {
-        observer.unobserve(currentLoadingRef);
+      if (currentRef) {
+        observer.unobserve(currentRef);
       }
     };
-  }, [hasMore, getInvitationList]);
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  if (isLoading) return null;
 
   return (
     <div
@@ -97,9 +56,9 @@ const InviteList = () => {
           <span className="text-xs text-gray02 md:text-xl">아직 초대받은 대시보드가 없어요</span>
         </div>
       ) : (
-        <InviteItem invitationList={invitationList} setInvitationList={setInvitationList} />
+        <InviteItem invitationList={invitationList} />
       )}
-      {hasMore && <div ref={observeRef} className="h-4 w-full" />}
+      {hasNextPage && <div ref={observeRef} className="h-4 w-full" />}
     </div>
   );
 };
