@@ -23,41 +23,37 @@ export const useAuth = () => {
     queryKey: ["user"],
     queryFn: async () => {
       try {
-        const cookieResponse = await axios.get("/api/auth/checkCookie");
-
-        if (cookieResponse.status === 200 && cookieResponse.data.success) {
-          const userResponse = await axios.get("/api/users/me");
-          return userResponse.data.user;
-        }
-        return null;
+        const userResponse = await axios.get("/api/users/me");
+        return userResponse.data.user;
       } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status === 401) {
-          console.error("Cookie에 accessToken이 없습니다.");
           return null;
         }
         throw error;
       }
     },
     retry: false,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 5, // 5분
     refetchOnWindowFocus: false,
+    refetchInterval: false,
   });
 
   useEffect(() => {
-    if (!isLoading && !isError) {
+    if (!isLoading && !isError && userData) {
       setUser(userData);
     }
   }, [userData, isLoading, isError, setUser]);
 
   useEffect(() => {
     if (isError) {
+      console.error("인증 에러로 인한 리다이렉트:", userError);
       setUser(null);
       const publicPaths = ["/", "/login", "/signup"];
       if (!publicPaths.includes(pathname)) {
         router.push("/");
       }
     }
-  }, [isError, setUser, router, pathname]);
+  }, [isError, setUser, router, pathname, userError]);
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: Login) => {
@@ -67,7 +63,10 @@ export const useAuth = () => {
     onSuccess: (data) => {
       setUser(data);
       queryClient.setQueryData(["user"], data);
-      router.push("/mydashboard");
+      // 상태 업데이트가 완료된 후 리다이렉션
+      setTimeout(() => {
+        router.push("/mydashboard");
+      }, 100);
     },
     onError: (error) => {
       if (axios.isAxiosError(error)) {

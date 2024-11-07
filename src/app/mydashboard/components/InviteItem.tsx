@@ -7,14 +7,15 @@ import { myDashboardUpdateAtom } from "@/store/myDashboardAtom";
 import { IInvitation } from "@/types/myDashboardType";
 import { HiOutlineSearch } from "react-icons/hi";
 import toastMessages from "@/lib/toastMessage";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface IProps {
   invitationList: IInvitation["invitations"];
-  setInvitationList: Dispatch<SetStateAction<IInvitation["invitations"]>>;
 }
 
-const InviteItem = ({ invitationList, setInvitationList }: IProps) => {
+const InviteItem = ({ invitationList }: IProps) => {
   const [search, setSearch] = useState("");
+  const queryClient = useQueryClient();
   const setMyDashboardUpdated = useSetAtom(myDashboardUpdateAtom);
 
   const handleChangeSearch = (e: ChangeEvent<HTMLInputElement>) => {
@@ -35,7 +36,7 @@ const InviteItem = ({ invitationList, setInvitationList }: IProps) => {
 
       if (response.status === 200) {
         toast.success(toastMessages.success.acceptInvitation);
-        setInvitationList((prev) => prev.filter((item) => item.id !== id));
+        queryClient.invalidateQueries({ queryKey: ["invitations"] });
         setMyDashboardUpdated(true);
       }
     } catch (error) {
@@ -55,7 +56,7 @@ const InviteItem = ({ invitationList, setInvitationList }: IProps) => {
 
       if (response.status === 200) {
         toast.success(toastMessages.success.refuseInvitation);
-        setInvitationList((prev) => prev.filter((item) => item.id !== id));
+        queryClient.invalidateQueries({ queryKey: ["invitations"] });
         setMyDashboardUpdated(true);
       }
     } catch (error) {

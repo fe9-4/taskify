@@ -43,14 +43,3 @@ export const DashboardListSchema = z.object({
 });
 
 export type DashboardList = z.infer<typeof DashboardListSchema>;
-
-// 사용자 대시보드 응답 스키마
-export const UserDashboardSchema = z.object({
-  user: z.object({
-    dashboards: z.array(DashboardSchema),
-    totalCount: z.number(),
-    cursorId: z.number().nullable(),
-  }),
-});
-
-export type UserDashboard = z.infer<typeof UserDashboardSchema>;

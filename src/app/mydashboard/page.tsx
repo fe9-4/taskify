@@ -23,7 +23,6 @@ const MyDashboard = () => {
     size,
     showErrorToast: true,
     customErrorMessage: toastMessages.error.getDashboardList,
-    enabled: !!user && !isAuthLoading,
   });
 
   // 로그인 상태 체크

@@ -15,14 +15,14 @@ import toastMessages from "@/lib/toastMessage";
 
 const SignupPage = () => {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
 
   // 사용자가 이미 로그인한 경우 내 대시보드 페이지로 리다이렉트
   useEffect(() => {
-    if (user) {
+    if (user && !isLoading) {
       router.push("/mydashboard");
     }
-  }, [user, router]);
+  }, [user, isLoading, router]);
 
   const {
     register,
