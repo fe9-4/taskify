@@ -1,6 +1,8 @@
 import { ICurrentColumn, ICard } from "@/types/dashboardType";
 import { atom } from "jotai";
 
+export const myDashboardIdAtom = atom<number | null>(null);
+
 export const dashboardCardUpdateAtom = atom(false);
 
 export const currentDashboardIdAtom = atom<string | null>(null);

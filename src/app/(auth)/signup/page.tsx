@@ -10,13 +10,13 @@ import axios from "axios";
 import InputItem from "@/components/input/InputItem";
 import { ActiveBtn } from "@/components/button/ButtonComponents";
 import { useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
 import toastMessages from "@/lib/toastMessage";
+import { userAtom } from "@/store/userAtoms";
+import { useAtom } from "jotai";
 
 const SignupPage = () => {
   const router = useRouter();
-  const { user } = useAuth();
-
+  const [user] = useAtom(userAtom);
   // 사용자가 이미 로그인한 경우 내 대시보드 페이지로 리다이렉트
   useEffect(() => {
     if (user) {

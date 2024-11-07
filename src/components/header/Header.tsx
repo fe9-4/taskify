@@ -5,11 +5,12 @@ import { useEffect, useState } from "react";
 import { Logo } from "./Logo";
 import { UserMenu } from "./UserMenu";
 import { DashboardMemberDisplay } from "./dashboard/DashboardMemberDisplay";
-import { useAuth } from "@/hooks/useAuth";
+import { userAtom } from "@/store/userAtoms";
+import { useAtom } from "jotai";
 
 export default function Header() {
   const pathname = usePathname();
-  const { user, isLoading } = useAuth();
+  const [user] = useAtom(userAtom);
   const [isHomePage, setIsHomePage] = useState(pathname === "/");
 
   useEffect(() => {
@@ -20,7 +21,7 @@ export default function Header() {
     return null;
   }
 
-  const showHeader = isHomePage || !isLoading;
+  const showHeader = isHomePage || !!user;
 
   if (!showHeader) {
     return null;

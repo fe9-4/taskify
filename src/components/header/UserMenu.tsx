@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useAuth } from "@/hooks/useAuth";
 import React from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { userAtom } from "@/store/userAtoms";
+import { useAtom } from "jotai";
 
 interface UserMenuProps {
   isHomePage: boolean;
@@ -17,7 +19,8 @@ interface MenuItem {
 export const UserMenu = ({ isHomePage }: UserMenuProps) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { user, logout, isInitialLoading } = useAuth();
+  const [user] = useAtom(userAtom);
+  const { logout } = useAuth();
 
   const handleLogout = async () => {
     try {
@@ -52,15 +55,6 @@ export const UserMenu = ({ isHomePage }: UserMenuProps) => {
   const getInitials = (name: string) => {
     return name.charAt(0).toUpperCase();
   };
-
-  if (isInitialLoading) {
-    return (
-      <div className="flex items-center space-x-2">
-        <div className="h-8 w-8 animate-pulse rounded-full bg-gray-200" />
-        <div className="hidden h-5 w-20 animate-pulse rounded bg-gray-200 md:block" />
-      </div>
-    );
-  }
 
   // 로그인하지 않은 사용자를 위한 메뉴 아이템
   const authMenuItems: MenuItem[] = [

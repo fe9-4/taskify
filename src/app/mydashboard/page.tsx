@@ -6,16 +6,23 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AddDashboardBtn, DashboardCard } from "@/components/button/ButtonComponents";
 import { useToggleModal } from "@/hooks/useModal";
-import { useAuth } from "@/hooks/useAuth";
 import { useDashboard } from "@/hooks/useDashboard";
 import toastMessages from "@/lib/toastMessage";
+import { userAtom } from "@/store/userAtoms";
+import { useAtom } from "jotai";
+import { myDashboardIdAtom } from "@/store/dashboardAtom";
 
 const MyDashboard = () => {
   const [page, setPage] = useState(1);
   const [size] = useState(5);
   const router = useRouter();
   const toggleModal = useToggleModal();
-  const { user, isLoading: isAuthLoading } = useAuth();
+  const [user] = useAtom(userAtom);
+  const [, setMyDashboardId] = useAtom(myDashboardIdAtom);
+
+  if (!user) {
+    router.push("/login");
+  }
 
   // useDashboard 훅 사용
   const { dashboardData, isLoading: isDashboardLoading } = useDashboard({
@@ -23,19 +30,16 @@ const MyDashboard = () => {
     size,
     showErrorToast: true,
     customErrorMessage: toastMessages.error.getDashboardList,
-    enabled: !!user && !isAuthLoading,
+    enabled: !!user,
   });
 
-  // 로그인 상태 체크
-  useEffect(() => {
-    if (!user && !isAuthLoading) {
-      router.push("/login");
-    }
-  }, [user, isAuthLoading, router]);
-
   // 로딩 중이거나 사용자 정보가 없으면 early return
-  if (isDashboardLoading || isAuthLoading || !user) {
+  if (isDashboardLoading || !user) {
     return null;
+  }
+
+  if (dashboardData?.dashboards && dashboardData?.dashboards.length > 0) {
+    setMyDashboardId(dashboardData?.dashboards[0].id);
   }
 
   // 페이지네이션을 위한 총 페이지 수 계산

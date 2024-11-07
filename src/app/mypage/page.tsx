@@ -1,28 +1,24 @@
 "use client";
 
 import React from "react";
-import { useAuth } from "@/hooks/useAuth";
 import UpdateProfile from "@/app/mypage/components/UpdateProfile";
 import ChangePassword from "@/app/mypage/components/ChangePassword";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { FaSpinner } from "react-icons/fa";
+import { userAtom } from "@/store/userAtoms";
+import { useAtom } from "jotai";
 
 const MyPage = () => {
-  const { isInitialLoading } = useAuth();
   const router = useRouter();
+  const [user] = useAtom(userAtom);
+
+  if (!user) {
+    router.push("/login");
+  }
 
   const handleGoBack = () => {
     router.back();
   };
-
-  if (isInitialLoading) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-gray05 bg-opacity-50">
-        <FaSpinner className="text-primary h-12 w-12 animate-spin" />
-      </div>
-    );
-  }
 
   return (
     <div className="container bg-gray05">

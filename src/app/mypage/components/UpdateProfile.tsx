@@ -7,15 +7,16 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { ActiveBtn } from "@/components/button/ButtonComponents";
 import InputItem from "@/components/input/InputItem";
-import { useAuth } from "@/hooks/useAuth";
 import { UpdateUserProfile, UpdateUserProfileSchema } from "@/zodSchema/userSchema";
 import InputFile from "@/components/input/InputFile";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { uploadType } from "@/types/uploadType";
 import toastMessages from "@/lib/toastMessage";
+import { userAtom } from "@/store/userAtoms";
+import { useAtom } from "jotai";
 
 const UpdateProfile = () => {
-  const { user, updateUser } = useAuth();
+  const [user, setUser] = useAtom(userAtom);
   const [isProfileChanged, setIsProfileChanged] = useState(false);
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
   const [previewImage, setPreviewImage] = useState<string | null>(null); // 미리보기 이미지 상태
@@ -89,7 +90,7 @@ const UpdateProfile = () => {
         ...data,
         profileImageUrl: imageUrl,
       });
-      updateUser(response.data.user);
+      setUser(response.data.user);
       toast.success(toastMessages.success.updateProfile);
       setIsProfileChanged(false);
       reset();

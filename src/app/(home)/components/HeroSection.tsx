@@ -1,11 +1,12 @@
 "use client";
 
-import { useAuth } from "@/hooks/useAuth";
+import { useAtom } from "jotai";
+import { userAtom } from "@/store/userAtoms";
 import Image from "next/image";
 import Link from "next/link";
 
 const HeroSection = () => {
-  const { user } = useAuth();
+  const [user] = useAtom(userAtom);
 
   return (
     <div className="flex flex-col items-center">

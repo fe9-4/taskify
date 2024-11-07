@@ -7,12 +7,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CardSchema } from "@/zodSchema/cardSchema";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useAuth } from "@/hooks/useAuth";
 import { useMember } from "@/hooks/useMember";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { useToggleModal } from "@/hooks/useModal";
 import useLoading from "@/hooks/useLoading";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { dashboardCardUpdateAtom } from "@/store/dashboardAtom";
 import { ColumnAtom } from "@/store/modalAtom";
 import { CreateCardProps } from "@/types/cardType";
@@ -24,9 +23,10 @@ import InputDate from "@/components/input/InputDate";
 import InputTag from "@/components/input/InputTag";
 import InputFile from "@/components/input/InputFile";
 import toastMessages from "@/lib/toastMessage";
+import { userAtom } from "@/store/userAtoms";
 
 const CreateCard = () => {
-  const { user } = useAuth();
+  const [user] = useAtom(userAtom);
   const { dashboardId } = useParams();
   const { columnId } = useAtomValue(ColumnAtom);
   const {

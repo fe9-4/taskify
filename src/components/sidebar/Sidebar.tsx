@@ -8,26 +8,34 @@ import { useEffect, useState } from "react";
 import { useWidth } from "@/hooks/useWidth";
 import Pagination from "../pagination/Pagination";
 import { useDashboard } from "@/hooks/useDashboard";
-import { useAuth } from "@/hooks/useAuth";
 import { cls } from "@/lib/utils";
 import { HiChevronDoubleRight, HiChevronDoubleLeft } from "react-icons/hi";
+import { userAtom } from "@/store/userAtoms";
+import { useAtom } from "jotai";
+import { myDashboardIdAtom } from "@/store/dashboardAtom";
 
 const Sidebar = () => {
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(10);
   const [isExpanded, setIsExpanded] = useState(false);
-
   const params = useParams();
   const currentDashboardId = params?.dashboardId ? Number(params.dashboardId) : null;
   const { isLargeScreen } = useWidth();
   const pathname = usePathname();
-  const { user, isLoading } = useAuth();
+  const [user] = useAtom(userAtom);
+  const [myDashboardId, setMyDashboardId] = useAtom(myDashboardIdAtom);
+
+  useEffect(() => {
+    if (currentDashboardId) {
+      setMyDashboardId(currentDashboardId);
+    }
+  }, [currentDashboardId]);
 
   const { dashboardData, isLoading: isDashboardLoading } = useDashboard({
-    dashboardId: currentDashboardId || 0,
+    dashboardId: myDashboardId || 0,
     page,
     size,
-    enabled: !!user, // user가 있을 때만 API 호출
+    enabled: !!user && myDashboardId !== null,
   });
 
   const totalPage: number = dashboardData ? Math.ceil(dashboardData.totalCount / size) : 0;
@@ -38,14 +46,7 @@ const Sidebar = () => {
     }
   };
 
-  useEffect(() => {
-    setSize(isLargeScreen ? 15 : 10);
-  }, [isLargeScreen]);
-
-  if (isLoading || isDashboardLoading || pathname === "/" || pathname === "/login" || pathname === "/signup")
-    return null;
-
-  if (!user) return null;
+  if (!user || isDashboardLoading || pathname === "/" || pathname === "/login" || pathname === "/signup") return null;
 
   return (
     <aside

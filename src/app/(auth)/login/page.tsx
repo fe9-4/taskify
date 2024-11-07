@@ -11,10 +11,13 @@ import InputItem from "@/components/input/InputItem";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect } from "react";
 import toastMessages from "@/lib/toastMessage";
+import { userAtom } from "@/store/userAtoms";
+import { useAtom } from "jotai";
 
 const LoginPage = () => {
   const router = useRouter();
-  const { user, login } = useAuth();
+  const [user] = useAtom(userAtom);
+  const { login } = useAuth();
 
   const {
     register,
@@ -38,13 +41,9 @@ const LoginPage = () => {
 
   const onSubmit: SubmitHandler<Login> = async (data) => {
     try {
-      const result = await login(data);
-      if (result.success) {
-        reset();
-        toast.success(toastMessages.success.login);
-      } else {
-        toast.error(result.message || toastMessages.error.login);
-      }
+      await login(data);
+      reset();
+      toast.success(toastMessages.success.login);
     } catch (error) {
       toast.error(toastMessages.error.login);
     }

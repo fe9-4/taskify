@@ -2,7 +2,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/hooks/useAuth";
 import {
   Dashboard,
   UpdateDashboard,
@@ -12,6 +11,8 @@ import {
   DashboardListSchema,
 } from "@/zodSchema/dashboardSchema";
 import toastMessages from "@/lib/toastMessage";
+import { userAtom } from "@/store/userAtoms";
+import { useAtom } from "jotai";
 
 interface DashboardOptions {
   dashboardId?: number;
@@ -61,7 +62,7 @@ export const useDashboard = ({
   customErrorMessage,
   enabled = true,
 }: DashboardOptions) => {
-  const { user } = useAuth();
+  const [user] = useAtom(userAtom);
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -73,7 +74,7 @@ export const useDashboard = ({
         const response = await axios.get("/api/dashboards", {
           params: { page, size, cursorId },
         });
-        return DashboardListSchema.parse(response.data);
+        return response.data;
       } catch (error) {
         console.error("Error fetching dashboards:", error);
         if (showErrorToast) {
@@ -82,7 +83,8 @@ export const useDashboard = ({
         throw error;
       }
     },
-    enabled: enabled && !!user,
+    enabled: enabled && !!user && page !== undefined && size !== undefined,
+    staleTime: 1000 * 60 * 5,
   });
 
   // 대시보드 상세 조회

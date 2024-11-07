@@ -2,9 +2,10 @@ import { InvitationList, InvitationListSchema, InvitationResponse } from "@/zodS
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useAuth } from "@/hooks/useAuth";
 import { useMember } from "@/hooks/useMember";
 import toastMessages from "@/lib/toastMessage";
+import { userAtom } from "@/store/userAtoms";
+import { useAtom } from "jotai";
 
 interface InviteEmailData {
   email: string;
@@ -13,7 +14,7 @@ interface InviteEmailData {
 export const useInvitation = ({ dashboardId }: { dashboardId: number }) => {
   const queryClient = useQueryClient();
   const dashboardIdString = String(dashboardId);
-  const { user } = useAuth();
+  const [user] = useAtom(userAtom);
 
   // 대시보드 멤버 목록 조회
   const { memberData } = useMember({
