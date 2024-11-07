@@ -11,34 +11,50 @@ import toastMessages from "@/lib/toastMessage";
 import { userAtom } from "@/store/userAtoms";
 import { useAtom } from "jotai";
 import { myDashboardIdAtom } from "@/store/dashboardAtom";
+import axios from "axios";
+import { UserSchema } from "@/zodSchema/commonSchema";
+import { useQuery } from "@tanstack/react-query";
 
 const MyDashboard = () => {
   const [page, setPage] = useState(1);
   const [size] = useState(5);
   const router = useRouter();
   const toggleModal = useToggleModal();
-  const [user] = useAtom(userAtom);
+  const [user, setUser] = useAtom(userAtom);
   const [, setMyDashboardId] = useAtom(myDashboardIdAtom);
 
-  if (!user) {
-    router.push("/login");
-  }
+  // user 정보 가져오기
+  const { isLoading: isUserLoading } = useQuery({
+    queryKey: ["user"],
+    queryFn: async () => {
+      const response = await axios.get("/api/users/me");
+      const parsedUser = UserSchema.parse(response.data.user);
+      setUser(parsedUser);
+      return parsedUser;
+    },
+    enabled: !user, // user가 없을 때만 실행
+    staleTime: 1000 * 60 * 5, // 5분
+  });
 
-  // useDashboard 훅 사용
+  // useDashboard 훅 사용 - user가 있을 때만 호출
   const { dashboardData, isLoading: isDashboardLoading } = useDashboard({
     page,
     size,
     showErrorToast: true,
     customErrorMessage: toastMessages.error.getDashboardList,
+    enabled: !!user, // user가 있을 때만 API 호출
   });
 
-  // 로딩 중이거나 사용자 정보가 없으면 early return
-  if (isDashboardLoading || !user) {
-    return null;
-  }
+  // dashboardData가 변경될 때마다 myDashboardId 업데이트
+  useEffect(() => {
+    if (dashboardData?.dashboards && dashboardData.dashboards.length > 0) {
+      setMyDashboardId(dashboardData.dashboards[0].id);
+    }
+  }, [dashboardData, setMyDashboardId]);
 
-  if (dashboardData?.dashboards && dashboardData?.dashboards.length > 0) {
-    setMyDashboardId(dashboardData?.dashboards[0].id);
+  // 로딩 중이거나 사용자 정보가 없으면 early return
+  if (isDashboardLoading || isUserLoading || !user) {
+    return null;
   }
 
   // 페이지네이션을 위한 총 페이지 수 계산

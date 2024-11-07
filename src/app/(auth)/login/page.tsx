@@ -16,18 +16,14 @@ import { useAtom } from "jotai";
 
 const LoginPage = () => {
   const router = useRouter();
-<<<<<<< HEAD
   const [user] = useAtom(userAtom);
   const { login } = useAuth();
-=======
-  const { user, isLoading, login } = useAuth();
 
   useEffect(() => {
-    if (user && !isLoading) {
+    if (user) {
       router.push("/mydashboard");
     }
-  }, [user, isLoading, router]);
->>>>>>> 9d68937ea329b2c240b070f7708b7ce091c546b0
+  }, [user, router]);
 
   const {
     register,
@@ -45,9 +41,11 @@ const LoginPage = () => {
 
   const onSubmit: SubmitHandler<Login> = async (data) => {
     try {
-      await login(data);
-      reset();
-      toast.success(toastMessages.success.login);
+      const response = await login(data);
+      if (response.success) {
+        reset();
+        toast.success(toastMessages.success.login);
+      }
     } catch (error) {
       toast.error(toastMessages.error.login);
     }

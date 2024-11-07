@@ -15,6 +15,7 @@ import toastMessages from "@/lib/toastMessage";
 import { useMember } from "@/hooks/useMember";
 import { userAtom } from "@/store/userAtoms";
 import { useAtom } from "jotai";
+import { MemberListSchema } from "@/zodSchema/memberSchema";
 
 interface DashboardOptions {
   dashboardId?: number;
@@ -71,16 +72,6 @@ export const useDashboard = ({
   const [user] = useAtom(userAtom);
   const router = useRouter();
   const queryClient = useQueryClient();
-  const dashboardIdString = dashboardId ? String(dashboardId) : undefined;
-
-  // 대시보드 멤버 목록 조회
-  const { memberData } = useMember({
-    dashboardId: Number(dashboardId),
-    page,
-    size,
-    showErrorToast: true,
-    enabled: !!dashboardId && enabled,
-  });
 
   // 대시보드 목록 조회
   const { data: dashboardData, isLoading: isDashboardListLoading } = useQuery<DashboardList>({
@@ -99,13 +90,8 @@ export const useDashboard = ({
         throw error;
       }
     },
-    enabled: !!user && !!dashboardId && enabled,
-    placeholderData: {
-      dashboards: [],
-      totalCount: 0,
-      cursorId: null,
-    },
-    retry: false,
+    enabled: !!user && enabled,
+    staleTime: 1000 * 60 * 5,
   });
 
   // 대시보드 상세 조회
@@ -130,7 +116,7 @@ export const useDashboard = ({
 
   // 초대 목록 조회
   const { data: invitationList } = useQuery<InvitationList>({
-    queryKey: ["invitations", dashboardIdString],
+    queryKey: ["invitations", dashboardId],
     queryFn: async () => {
       if (!dashboardId) throw new Error("대시보드 ID가 필요합니다.");
 
@@ -150,23 +136,30 @@ export const useDashboard = ({
   });
 
   // 초대 가능 여부 확인 함수
-  const validateInvitation = (email: string) => {
-    if (!user || !memberData) return;
+  const validateInvitation = async (email: string) => {
+    try {
+      const memberResponse = await axios.get(`/api/dashboards/${dashboardId}/members`);
+      const memberData = MemberListSchema.parse(memberResponse.data);
 
-    if (email === user.email) {
-      throw new Error("본인은 초대할 수 없습니다.");
-    }
+      if (!user || !memberData) return;
 
-    if (memberData.members.some((member) => member.email === email)) {
-      throw new Error("이미 대시보드의 멤버입니다.");
-    }
+      if (email === user.email) {
+        throw new Error("본인은 초대할 수 없습니다.");
+      }
 
-    const existingInvitation = invitationList?.invitations?.find(
-      (invitation) => invitation.invitee.email === email && invitation.inviteAccepted == null
-    );
+      if (memberData.members.some((member: { email: string }) => member.email === email)) {
+        throw new Error("이미 대시보드의 멤버입니다.");
+      }
 
-    if (existingInvitation) {
-      throw new Error("이미 초대 요청을 한 계정입니다.");
+      const existingInvitation = invitationList?.invitations?.find(
+        (invitation) => invitation.invitee.email === email && invitation.inviteAccepted == null
+      );
+
+      if (existingInvitation) {
+        throw new Error("이미 초대 요청을 한 계정입니다.");
+      }
+    } catch (error) {
+      throw error;
     }
   };
 
@@ -181,7 +174,7 @@ export const useDashboard = ({
     },
     onSuccess: () => {
       toast.success(toastMessages.success.invitation);
-      queryClient.invalidateQueries({ queryKey: ["invitations", dashboardIdString] });
+      queryClient.invalidateQueries({ queryKey: ["invitations", dashboardId] });
     },
     onError: (error) => {
       toast.error(error.message || toastMessages.error.invitation);
@@ -198,7 +191,7 @@ export const useDashboard = ({
     },
     onSuccess: () => {
       toast.success(toastMessages.success.cancelInvitation);
-      queryClient.invalidateQueries({ queryKey: ["invitations", dashboardIdString] });
+      queryClient.invalidateQueries({ queryKey: ["invitations", dashboardId] });
     },
     onError: () => {
       toast.error(toastMessages.error.cancelInvitation);

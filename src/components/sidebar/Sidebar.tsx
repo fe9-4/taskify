@@ -29,7 +29,7 @@ const Sidebar = () => {
     if (currentDashboardId) {
       setMyDashboardId(currentDashboardId);
     }
-  }, [currentDashboardId]);
+  }, [currentDashboardId, setMyDashboardId]);
 
   const { dashboardData, isLoading: isDashboardLoading } = useDashboard({
     dashboardId: myDashboardId || 0,

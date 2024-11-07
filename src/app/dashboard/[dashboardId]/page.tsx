@@ -40,8 +40,11 @@ const DashboardDetail = () => {
   const calculateInitialCardCount = useCallback(() => {
     const BASE_CARD_COUNT = 3;
     const ADDITIONAL_CARD_COUNT = 1;
-    const isXLargeScreen = window.innerWidth >= 1280;
-    return isXLargeScreen ? BASE_CARD_COUNT + ADDITIONAL_CARD_COUNT : BASE_CARD_COUNT;
+    if (typeof window !== "undefined") {
+      const isXLargeScreen = window.innerWidth >= 1280;
+      return isXLargeScreen ? BASE_CARD_COUNT + ADDITIONAL_CARD_COUNT : BASE_CARD_COUNT;
+    }
+    return BASE_CARD_COUNT;
   }, []);
 
   // 컬럼 리스트 초기화 및 설정

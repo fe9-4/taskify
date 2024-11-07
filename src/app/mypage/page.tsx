@@ -12,7 +12,7 @@ const MyPage = () => {
   const router = useRouter();
   const [user] = useAtom(userAtom);
 
-  if (!user) {
+  if (typeof window !== "undefined" && !user) {
     router.push("/login");
   }
 
