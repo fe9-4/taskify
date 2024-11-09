@@ -1,7 +1,7 @@
 import { useAtom } from "jotai";
 import { useCallback, useEffect } from "react";
 import axios from "axios";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { Login } from "@/zodSchema/authSchema";
 import { UserSchemaType } from "@/zodSchema/commonSchema";
@@ -9,7 +9,6 @@ import { userAtom } from "@/store/userAtoms";
 
 export const useAuth = () => {
   const router = useRouter();
-  const pathname = usePathname();
   const queryClient = useQueryClient();
   const [user, setUser] = useAtom(userAtom);
 
@@ -44,20 +43,10 @@ export const useAuth = () => {
   });
 
   useEffect(() => {
-    if (!isLoading && !isError) {
+    if (!isLoading && !userError) {
       setUser(userData);
     }
-  }, [userData, isLoading, isError, setUser]);
-
-  useEffect(() => {
-    if (isError) {
-      setUser(null);
-      const publicPaths = ["/", "/login", "/signup"];
-      if (!publicPaths.includes(pathname)) {
-        router.push("/");
-      }
-    }
-  }, [isError, setUser, router, pathname]);
+  }, [userData, isLoading, userError, setUser]);
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: Login) => {
